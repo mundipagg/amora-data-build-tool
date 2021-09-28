@@ -139,9 +139,9 @@ cython_debug/
 
 # dbt
 
-target/
-dbt_modules/
-logs/
+dbt/target/
+dbt/dbt_modules/
+dbt/logs/
 
 # Google Cloud
 config/*/**
