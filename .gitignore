@@ -143,6 +143,9 @@ dbt/target/
 dbt/dbt_modules/
 dbt/logs/
 
+# amora
+amora/target/**/*.sql
+
 # Google Cloud
 config/*/**
 !config/*/.gitkeep
