@@ -6,15 +6,17 @@ authors = ["diogommartins <diogommartins.dev@gmail.com>"]
 license = "copyright"
 
 [tool.poetry.dependencies]
+amora = { path = "amora", develop = true }
 python = "3.9.6"
 pandas = "^1.3.0"
 jupyter = "^1.0.0"
 numpy = "^1.21.1"
 matplotlib = "^3.4.2"
-Jinja2 = "^3.0.1"
 sqlmodel = "^0.0.4"
 sqlalchemy-bigquery = "1.2.0"
 networkx = {extras = ["all"], version = "^2.6.3"}
+dbt = "^0.20.2"
+typer = {extras = ["all"], version = "^0.4.0"}
 
 [tool.poetry.dev-dependencies]
 
