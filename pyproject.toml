@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "self"
+name = "amora"
 version = "0.1.0"
-description = "Self analysis"
+description = "Amora Data Build Tool"
 authors = ["diogommartins <diogommartins.dev@gmail.com>"]
-license = "copyright"
+license = "MIT"
 
 [tool.poetry.dependencies]
-amora = { path = "amora", develop = true }
+amora = { path = "./amora", develop = true }
 python = "3.9.6"
 pandas = "^1.3.0"
 jupyter = "^1.0.0"
