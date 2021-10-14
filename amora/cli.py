@@ -22,7 +22,9 @@ target_option = typer.Option(
 )
 
 models_option = typer.Option(
-    [], "--models", help="A list space separated models to be compiled"
+    [],
+    "--model",
+    help="A model to be compiled. This option can be passed multiple times.",
 )
 
 
