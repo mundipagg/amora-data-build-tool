@@ -1,20 +1,20 @@
+import os
 import sqlparse
 
 from importlib.util import spec_from_file_location, module_from_spec
 from pathlib import Path
-from typing import Union, Any
+from typing import Union, Any, Optional
 
 from sqlalchemy_bigquery import BigQueryDialect
-from sqlmodel.sql.expression import Select, SelectOfScalar
+
 
 from amora.config import settings
+from amora.models import AmoraModel, Compilable, list_target_files
 
 dialect = BigQueryDialect()
 
-Compilable = Union[Select, SelectOfScalar]
 
-
-def compile(statement: Compilable) -> str:
+def compile_statement(statement: Compilable) -> str:
     raw_sql = str(
         statement.compile(dialect=dialect, compile_kwargs={"literal_binds": True})
     )
@@ -25,7 +25,7 @@ def compile(statement: Compilable) -> str:
 def model_path_for_target_path(path: Path) -> Path:
     return Path(
         str(path)
-        .replace(settings.target_path, settings.dbt_models_path)
+        .replace(settings.TARGET_PATH, settings.DBT_MODELS_PATH)
         .replace(".sql", ".py"),
     )
 
@@ -33,7 +33,7 @@ def model_path_for_target_path(path: Path) -> Path:
 def target_path_for_model_path(path: Path) -> Path:
     return Path(
         str(path)
-        .replace(settings.dbt_models_path, settings.target_path)
+        .replace(settings.DBT_MODELS_PATH, settings.TARGET_PATH)
         .replace(".py", ".sql")
     )
 
