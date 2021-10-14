@@ -50,3 +50,8 @@ def py_module_for_path(path: Path) -> Any:
 def py_module_for_target_path(path: Path) -> Any:
     model_path = model_path_for_target_path(path)
     return py_module_for_path(model_path)
+
+
+def clean_compiled_files():
+    for sql_file in list_target_files():
+        os.remove(sql_file)
