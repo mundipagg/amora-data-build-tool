@@ -7,8 +7,8 @@ AMORA_MODULE_PATH = ROOT_PATH.joinpath("amora")
 
 
 class Settings(BaseSettings):
-    TARGET_PROJECT: str = "stg-tau-rex"
-    TARGET_SCHEMA: str = "stg-tau-rex.diogo"
+    TARGET_PROJECT: str
+    TARGET_SCHEMA: str
     TARGET_PATH: str = AMORA_MODULE_PATH.joinpath("target").as_posix()
     DBT_MODELS_PATH: str = ROOT_PATH.joinpath("dbt/models").as_posix()
 
