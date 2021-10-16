@@ -1,18 +1,22 @@
-import inspect
+from inspect import getfile
 import os
 from dataclasses import dataclass
+from importlib.util import spec_from_file_location, module_from_spec
 from pathlib import Path
-from typing import List, Optional, Iterable, Union
+from typing import List, Optional, Iterable, Union, Type
 
 from dbt.adapters.bigquery.impl import PartitionConfig
 from sqlalchemy import Table, MetaData
 from sqlmodel import SQLModel
+from sqlmodel.main import default_registry
+from sqlmodel.sql.expression import Select, SelectOfScalar
 from sqlalchemy.inspection import inspect
+from sqlalchemy.orm.decl_api import DeclarativeMeta
 
 
-from amora.compilation import Compilable
 from amora.config import settings
 
+Compilable = Union[Select, SelectOfScalar]
 PartitionConfig = PartitionConfig
 
 
@@ -34,11 +38,11 @@ def list_files(path: Union[str, Path], suffix: str) -> Iterable[Path]:
 
 
 def list_model_files() -> Iterable[Path]:
-    return list_files(settings.dbt_models_path, suffix=".py")
+    return list_files(settings.DBT_MODELS_PATH, suffix=".py")
 
 
 def list_target_files() -> Iterable[Path]:
-    return list_files(settings.target_path, suffix=".sql")
+    return list_files(settings.TARGET_PATH, suffix=".sql")
 
 
 # todo: Como defino "Objeto que tenha 2 atributos: `source` e `output`" ?
@@ -46,10 +50,16 @@ def is_py_model(obj) -> bool:
     return hasattr(obj, "source") and hasattr(obj, "output")
 
 
+# registry = registry()
+
+metadata = MetaData(schema=settings.TARGET_SCHEMA)
+
+
 class AmoraModel(SQLModel):
     __depends_on__: List["AmoraModel"] = []
     __model_config__ = ModelConfig(materialized="view")
-    metadata = MetaData(schema=settings.target_schema)
+    __table_args__ = {"extend_existing": True}
+    metadata = metadata
 
     @classmethod
     def dependencies(cls) -> Iterable["AmoraModel"]:
@@ -77,12 +87,12 @@ class AmoraModel(SQLModel):
         return None
 
     @classmethod
-    def target_path(cls) -> Path:
+    def target_path(cls, model_file_path: Union[str, Path]) -> Path:
         # {settings.dbt_models_path}/a_model/a_model.py -> a_model/a_model.py
-        strip_path = settings.dbt_models_path
-        relative_model_path = str(cls.model_file_path()).split(strip_path)[1][1:]
+        strip_path = settings.DBT_MODELS_PATH
+        relative_model_path = str(model_file_path).split(strip_path)[1][1:]
         # a_model/a_model.py -> ~/project/amora/target/a_model/a_model.sql
-        target_file_path = Path(settings.target_path).joinpath(
+        target_file_path = Path(settings.TARGET_PATH).joinpath(
             relative_model_path.replace(".py", ".sql")
         )
 
@@ -90,4 +100,21 @@ class AmoraModel(SQLModel):
 
     @classmethod
     def model_file_path(cls) -> Path:
-        return Path(inspect.getfile(cls))
+        return Path(getfile(cls))
+
+    @classmethod
+    def is_source_model(cls, path: Path) -> bool:
+        raise path == cls.target_path()
+
+    @classmethod
+    def init_from_path(cls, model_path: Path) -> Type["AmoraModel"]:
+        spec = spec_from_file_location(model_path.stem, model_path)
+        module = module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        for attr_name in dir(module):
+            attr = getattr(module, attr_name)
+            if issubclass(attr, cls):
+                return attr
+
+        return module
