@@ -17,7 +17,5 @@ class Health(AmoraModel, table=True):
     value: float
     device: str
 
-    metadata = MetaData(schema="amora-data-build-tool.diogo", quote_schema=True)
-
 
 output = Health
