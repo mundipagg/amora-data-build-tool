@@ -74,6 +74,9 @@ def materialize(
     model_to_task = {}
 
     for target_file_path in list_target_files():
+        if models and target_file_path.stem not in models:
+            continue
+
         task = materialization.Task.for_target(target_file_path)
         model_to_task[task.model.__name__] = task
 
