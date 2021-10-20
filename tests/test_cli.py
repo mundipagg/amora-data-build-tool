@@ -1,6 +1,6 @@
 import inspect
 import itertools
-from unittest.mock import patch, call
+from unittest.mock import patch, call, MagicMock
 
 import pytest
 from amora.compilation import clean_compiled_files
@@ -90,3 +90,15 @@ def test_materialize_with_model_options(materialize):
 
     assert result.exit_code == 0
     assert materialize.call_args_list == [call(sql="SELECT 1", name="steps")]
+
+
+@patch("amora.cli.materialization.materialize")
+@patch("amora.cli.materialization.DependencyDAG.draw")
+def test_materialize_with_draw_dag_option(draw: MagicMock, _materialize):
+    result = runner.invoke(
+        app,
+        ["materialize", "--draw-dag"],
+    )
+
+    assert result.exit_code == 0
+    draw.assert_called_once()
