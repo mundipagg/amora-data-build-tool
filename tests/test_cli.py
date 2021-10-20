@@ -1,5 +1,6 @@
 import inspect
 import itertools
+from typing import List
 from unittest.mock import patch, call, MagicMock
 
 import pytest
@@ -30,7 +31,9 @@ def teardown_function(module):
         (["modelo_que_nao_existe"], 0, []),
     ],
 )
-def test_compile_with_models_options(models, expected_exit_code, expected_target_files):
+def test_compile_with_models_options(
+    models: List[str], expected_exit_code: int, expected_target_files: List[str]
+):
     # todo: implementar função clean_target
     # todo: clean_target()
     models_args = [("--model", model) for model in models]
@@ -57,7 +60,7 @@ def test_compile_without_arguments_and_options():
 
 
 @patch("amora.cli.materialization.materialize")
-def test_materialize_without_arguments_and_options(materialize):
+def test_materialize_without_arguments_and_options(materialize: MagicMock):
 
     for model in [HeartRate, Steps]:
         target_path = model.target_path(model_file_path=inspect.getfile(model))
@@ -76,7 +79,7 @@ def test_materialize_without_arguments_and_options(materialize):
 
 
 @patch("amora.cli.materialization.materialize")
-def test_materialize_with_model_options(materialize):
+def test_materialize_with_model_options(materialize: MagicMock):
 
     for model in [HeartRate, Steps]:
         target_path = model.target_path(model_file_path=inspect.getfile(model))
@@ -94,7 +97,7 @@ def test_materialize_with_model_options(materialize):
 
 @patch("amora.cli.materialization.materialize")
 @patch("amora.cli.materialization.DependencyDAG.draw")
-def test_materialize_with_draw_dag_option(draw: MagicMock, _materialize):
+def test_materialize_with_draw_dag_option(draw: MagicMock, _materialize: MagicMock):
     result = runner.invoke(
         app,
         ["materialize", "--draw-dag"],
