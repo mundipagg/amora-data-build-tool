@@ -1,9 +1,13 @@
+import inspect
 import itertools
+from unittest.mock import patch, call
 
 import pytest
 from amora.compilation import clean_compiled_files
-from models import list_target_files
+from amora.models import list_target_files
 from typer.testing import CliRunner
+from tests.models.heart_rate import HeartRate
+from tests.models.steps import Steps
 
 from amora.cli import app
 
@@ -29,7 +33,7 @@ def teardown_function(module):
 def test_compile_with_models_options(models, expected_exit_code, expected_target_files):
     # todo: implementar função clean_target
     # todo: clean_target()
-    models_args = [("--models", model) for model in models]
+    models_args = [("--model", model) for model in models]
     result = runner.invoke(
         app,
         ["compile", *itertools.chain.from_iterable(models_args)],
@@ -52,4 +56,37 @@ def test_compile_without_arguments_and_options():
     assert sorted(generated_target_files) == sorted(["heart_rate.sql", "steps.sql"])
 
 
-# todo: Adicionar teste com target
+@patch("amora.cli.materialization.materialize")
+def test_materialize_without_arguments_and_options(materialize):
+
+    for model in [HeartRate, Steps]:
+        target_path = model.target_path(model_file_path=inspect.getfile(model))
+        with open(target_path, "w") as fp:
+            fp.write("SELECT 1")
+
+    result = runner.invoke(
+        app,
+        ["materialize"],
+    )
+    assert result.exit_code == 0
+    assert materialize.call_args_list == [
+        call(sql="SELECT 1", name="steps"),
+        call(sql="SELECT 1", name="heart_rate"),
+    ]
+
+
+@patch("amora.cli.materialization.materialize")
+def test_materialize_with_model_options(materialize):
+
+    for model in [HeartRate, Steps]:
+        target_path = model.target_path(model_file_path=inspect.getfile(model))
+        with open(target_path, "w") as fp:
+            fp.write("SELECT 1")
+
+    result = runner.invoke(
+        app,
+        ["materialize", "--model", "steps"],
+    )
+
+    assert result.exit_code == 0
+    assert materialize.call_args_list == [call(sql="SELECT 1", name="steps")]
