@@ -118,3 +118,4 @@ def test_materialize_as_ephemeral(Client: MagicMock):
         created_at: datetime
 
     assert materialize(sql="SELECT 1", model=EphemeralModel) is None
+    assert not Client.called
