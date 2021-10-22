@@ -41,19 +41,20 @@ def compile(
             continue
 
         try:
-            module = py_module_for_path(model_file_path).output
+            module = py_module_for_path(model_file_path)
+            model: AmoraModel = module.output
         except AttributeError:
             continue
 
-        if not issubclass(module, AmoraModel):
+        if not issubclass(model, AmoraModel):
             continue
 
-        source_sql_statement = module.source()
+        source_sql_statement = model.source()
         if source_sql_statement is None:
             typer.echo(f"⏭ Skipping compilation of model `{model_file_path}`")
             continue
 
-        target_file_path = module.target_path(model_file_path)
+        target_file_path = model.target_path(model_file_path)
         typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
 
         # todo: remover a necessidade de passar `model_file_path`
