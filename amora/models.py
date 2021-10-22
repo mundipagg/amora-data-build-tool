@@ -1,6 +1,7 @@
 from inspect import getfile
 import os
 from dataclasses import dataclass
+from enum import Enum, auto
 from importlib.util import spec_from_file_location, module_from_spec
 from pathlib import Path
 from typing import List, Optional, Iterable, Union, Type
@@ -20,11 +21,22 @@ Compilable = Union[Select, SelectOfScalar]
 PartitionConfig = PartitionConfig
 
 
+class AutoName(Enum):
+    def _generate_next_value_(name, start, count, last_values):
+        return name
+
+
+class MaterializationTypes(AutoName):
+    ephemeral = auto()
+    view = auto()
+    table = auto()
+
+
 @dataclass
 class ModelConfig:
-    materialized: str = "ephemeral"
+    materialized: MaterializationTypes = MaterializationTypes.view
     partition_by: Optional[PartitionConfig] = None
-    cluster_by: Optional[str] = None
+    cluster_by: Optional[Union[str, List[str]]] = None
     tags: Optional[List[str]] = None
 
 
@@ -90,6 +102,7 @@ class AmoraModel(SQLModel):
     def target_path(cls, model_file_path: Union[str, Path]) -> Path:
         # {settings.dbt_models_path}/a_model/a_model.py -> a_model/a_model.py
         strip_path = settings.DBT_MODELS_PATH
+        model_path = cls.model_file_path()
         relative_model_path = str(model_file_path).split(strip_path)[1][1:]
         # a_model/a_model.py -> ~/project/amora/target/a_model/a_model.sql
         target_file_path = Path(settings.TARGET_PATH).joinpath(
