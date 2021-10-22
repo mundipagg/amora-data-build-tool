@@ -102,7 +102,6 @@ class AmoraModel(SQLModel):
     def target_path(cls, model_file_path: Union[str, Path]) -> Path:
         # {settings.dbt_models_path}/a_model/a_model.py -> a_model/a_model.py
         strip_path = settings.DBT_MODELS_PATH
-        model_path = cls.model_file_path()
         relative_model_path = str(model_file_path).split(strip_path)[1][1:]
         # a_model/a_model.py -> ~/project/amora/target/a_model/a_model.sql
         target_file_path = Path(settings.TARGET_PATH).joinpath(
