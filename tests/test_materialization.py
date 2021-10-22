@@ -102,8 +102,7 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
     )
 
 
-# @patch("amora.materialization.Client")
-@pytest.mark.skip("Ephemeral materialization not implemented")
+@patch("amora.materialization.Client")
 def test_materialize_as_ephemeral(Client: MagicMock):
     table_name = uuid4().hex
     table_id = f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{table_name}"
@@ -118,4 +117,4 @@ def test_materialize_as_ephemeral(Client: MagicMock):
         y: int
         created_at: datetime
 
-    result = materialize(sql="SELECT 1", model=EphemeralModel)
+    assert materialize(sql="SELECT 1", model=EphemeralModel) is None
