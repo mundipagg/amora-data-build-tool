@@ -93,9 +93,7 @@ def materialize(
             continue
         else:
             # todo: deveria ser `task.module.output.__table__.name` ?
-            result = materialization.materialize(
-                sql=task.sql_stmt, name=task.target_file_path.stem
-            )
+            result = materialization.materialize(sql=task.sql_stmt, model=task.model)
 
             typer.echo(f"✅  Created `{model}` as `{result.full_table_id}`")
             typer.echo(f"    Rows: {result.num_rows}")

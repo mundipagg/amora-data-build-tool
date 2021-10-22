@@ -1,4 +1,4 @@
-from google.cloud.bigquery import Table, Client
+from google.cloud.bigquery import Table, Client, QueryJobConfig
 from amora.config import settings
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Any, Iterable
 from amora.compilation import py_module_for_target_path
-from amora.models import list_target_files, AmoraModel
+from amora.models import list_target_files, AmoraModel, MaterializationTypes
 
 
 @dataclass
@@ -63,11 +63,27 @@ class DependencyDAG(nx.DiGraph):
         plt.show()
 
 
-client = Client()
+def materialize(sql: str, model: AmoraModel) -> Table:
+    materialization = model.__model_config__.materialized
+    table_id = (
+        f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{model.__tablename__}"
+    )
 
+    client = Client()
 
-def materialize(sql: str, name: str) -> Table:
-    view = Table(f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{name}")
-    view.view_query = sql
+    if materialization == MaterializationTypes.view:
+        view = Table(table_id)
+        view.view_query = sql
 
-    return client.create_table(view, exists_ok=True)
+        return client.create_table(view, exists_ok=True)
+    elif materialization == MaterializationTypes.table:
+        query_job = client.query(sql, job_config=QueryJobConfig(destination=table_id))
+
+        return query_job.result()
+    elif materialization == MaterializationTypes.ephemeral:
+        raise NotImplementedError
+    else:
+        raise ValueError(
+            f"Invalid model materialization configuration. "
+            f"Valid types are: {', '.join((m.name for m in MaterializationTypes))}"
+        )
