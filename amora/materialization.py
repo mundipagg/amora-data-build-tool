@@ -19,15 +19,10 @@ class Task:
 
     @classmethod
     def for_target(cls, target_file_path: Path) -> "Task":
-        with open(target_file_path) as fp:
-            sql_stmt = fp.read()
-
-        module = py_module_for_target_path(target_file_path)
-
         return cls(
-            sql_stmt=sql_stmt,
+            sql_stmt=target_file_path.read_text(),
+            model=py_module_for_target_path(target_file_path),
             target_file_path=target_file_path,
-            model=module.output,
         )
 
     def __repr__(self):

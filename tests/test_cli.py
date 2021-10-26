@@ -56,7 +56,9 @@ def test_compile_without_arguments_and_options():
     assert result.exit_code == 0
 
     generated_target_files = [path.name for path in list_target_files()]
-    assert sorted(generated_target_files) == sorted(["heart_rate.sql", "steps.sql"])
+    assert sorted(generated_target_files) == sorted(
+        ["heart_agg.sql", "heart_rate.sql", "steps.sql"]
+    )
 
 
 @patch("amora.cli.materialization.materialize")
@@ -70,11 +72,12 @@ def test_materialize_without_arguments_and_options(materialize: MagicMock):
         app,
         ["materialize"],
     )
+
     assert result.exit_code == 0
-    assert materialize.call_args_list == [
-        call(sql="SELECT 1", name="steps"),
-        call(sql="SELECT 1", name="heart_rate"),
-    ]
+
+    [materialize_call_steps, materialize_call_heart_rate] = materialize.call_args_list
+    assert materialize_call_steps[1]["model"].__table__ == Steps.__table__
+    assert materialize_call_heart_rate[1]["model"].__table__ == HeartRate.__table__
 
 
 @patch("amora.cli.materialization.materialize")
@@ -90,7 +93,8 @@ def test_materialize_with_model_options(materialize: MagicMock):
     )
 
     assert result.exit_code == 0
-    assert materialize.call_args_list == [call(sql="SELECT 1", name="steps")]
+    materialize_call_model = materialize.mock_calls[0][2]["model"]
+    assert materialize_call_model.__table__ == Steps.__table__
 
 
 @patch("amora.cli.materialization.materialize")
