@@ -12,10 +12,8 @@ def compile_py_model(path: Path) -> str:
     target_file_path = Path(settings.target_path).joinpath(
         relative_model_path.replace(".py", ".sql")
     )
-
-    with open(target_file_path, "w") as fp:
-        content = compile(module.source())
-        fp.write(content)
+    content = compile(module.source())
+    target_file_path.write_text(content)
 
     return content
 

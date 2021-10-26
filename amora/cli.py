@@ -56,10 +56,8 @@ def compile(
         target_file_path = model.target_path(model_file_path)
         typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
 
-        # todo: remover a necessidade de passar `model_file_path`
-        with open(target_file_path, "w") as fp:
-            content = compile_statement(source_sql_statement)
-            fp.write(content)
+        content = compile_statement(source_sql_statement)
+        target_file_path.write_text(content)
 
 
 @app.command()

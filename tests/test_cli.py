@@ -64,8 +64,7 @@ def test_materialize_without_arguments_and_options(materialize: MagicMock):
 
     for model in [HeartRate, Steps]:
         target_path = model.target_path(model_file_path=inspect.getfile(model))
-        with open(target_path, "w") as fp:
-            fp.write("SELECT 1")
+        target_path.write_text("SELECT 1")
 
     result = runner.invoke(
         app,
@@ -83,8 +82,7 @@ def test_materialize_with_model_options(materialize: MagicMock):
 
     for model in [HeartRate, Steps]:
         target_path = model.target_path(model_file_path=inspect.getfile(model))
-        with open(target_path, "w") as fp:
-            fp.write("SELECT 1")
+        target_path.write_text("SELECT 1")
 
     result = runner.invoke(
         app,
