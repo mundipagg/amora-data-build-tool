@@ -16,6 +16,3 @@ class Health(AmoraModel, table=True):
     endDate: datetime
     value: float
     device: str
-
-
-output = Health

@@ -43,6 +43,3 @@ class HeartRate(AmoraModel, table=True):
                 Health.value,
             ]
         ).where(Health.type == "HeartRate")
-
-
-output = HeartRate

@@ -41,12 +41,11 @@ def compile(
             continue
 
         try:
-            module = py_module_for_path(model_file_path)
-            model: AmoraModel = module.output
+            model: AmoraModel = py_module_for_path(model_file_path)
         except AttributeError:
             continue
 
-        if not issubclass(model, AmoraModel):
+        if not model or not issubclass(model, AmoraModel):
             continue
 
         source_sql_statement = model.source()

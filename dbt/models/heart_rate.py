@@ -1,14 +1,13 @@
 from datetime import datetime
 
-from sqlalchemy import MetaData
-from sqlmodel import select, SQLModel, Field
-
 from amora.compilation import Compilable
-from amora.models import ModelConfig, PartitionConfig
+from amora.models import AmoraModel, ModelConfig, PartitionConfig
 from dbt.models.health import Health
+from sqlalchemy import MetaData
+from sqlmodel import Field, select
 
 
-class HeartRate(SQLModel, table=True):
+class HeartRate(AmoraModel, table=True):
     __tablename__ = "heart_rate"
     __depends_on__ = [Health]
     __config__ = ModelConfig(
@@ -31,20 +30,17 @@ class HeartRate(SQLModel, table=True):
     unit: str
     value: float
 
-
-def source() -> Compilable:
-    return select(
-        [
-            Health.creationDate,
-            Health.device,
-            Health.endDate,
-            Health.id,
-            Health.sourceName,
-            Health.startDate,
-            Health.unit,
-            Health.value,
-        ]
-    ).where(Health.type == "HeartRate")
-
-
-output = HeartRate
+    @classmethod
+    def source(cls) -> Compilable:
+        return select(
+            [
+                Health.creationDate,
+                Health.device,
+                Health.endDate,
+                Health.id,
+                Health.sourceName,
+                Health.startDate,
+                Health.unit,
+                Health.value,
+            ]
+        ).where(Health.type == "HeartRate")

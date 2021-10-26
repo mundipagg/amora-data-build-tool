@@ -1,14 +1,13 @@
 from datetime import datetime
 
-from sqlalchemy import MetaData
-from sqlmodel import select, SQLModel, Field
-
 from amora.compilation import Compilable
-from amora.models import ModelConfig, PartitionConfig
+from amora.models import AmoraModel, ModelConfig, PartitionConfig
 from dbt.models.health import Health
+from sqlalchemy import MetaData
+from sqlmodel import Field, select
 
 
-class Steps(SQLModel, table=True):
+class Steps(AmoraModel, table=True):
     __depends_on__ = [Health]
     __model_config__ = ModelConfig(
         materialized="table",
@@ -30,20 +29,17 @@ class Steps(SQLModel, table=True):
     unit: str
     value: float
 
-
-def source() -> Compilable:
-    return select(
-        [
-            Health.creationDate,
-            Health.device,
-            Health.endDate,
-            Health.id,
-            Health.sourceName,
-            Health.startDate,
-            Health.unit,
-            Health.value,
-        ]
-    ).where(Health.type == "StepCount")
-
-
-output = Steps
+    @classmethod
+    def source(cls) -> Compilable:
+        return select(
+            [
+                Health.creationDate,
+                Health.device,
+                Health.endDate,
+                Health.id,
+                Health.sourceName,
+                Health.startDate,
+                Health.unit,
+                Health.value,
+            ]
+        ).where(Health.type == "StepCount")
