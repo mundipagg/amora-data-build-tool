@@ -2,12 +2,10 @@ from datetime import datetime
 from unittest.mock import patch, MagicMock
 from uuid import uuid4
 
-import pytest
 from amora.compilation import clean_compiled_files
 from amora.materialization import Task, DependencyDAG, materialize
 from amora.models import AmoraModel, ModelConfig, PartitionConfig, MaterializationTypes
 from config import settings
-from google.cloud.bigquery import QueryJobConfig
 
 from tests.models.heart_agg import HeartRateAgg
 from tests.models.heart_rate import HeartRate
@@ -20,9 +18,7 @@ def setup_function(module):
 
 def test_it_creates_a_task_from_a_target_file_path():
     target_path = HeartRate.target_path(model_file_path=HeartRate.model_file_path())
-    with open(target_path, "w") as fp:
-        fp.write("SELECT 1")
-
+    target_path.write_text("SELECT 1")
     task = Task.for_target(target_path)
 
     assert isinstance(task, Task)
@@ -36,8 +32,8 @@ def test_dependency_dags_is_iterable_and_topologicaly_sorted():
 
     for model in [HeartRateAgg, Steps, HeartRate]:
         target_path = model.target_path(model_file_path=model.model_file_path())
-        with open(target_path, "w") as fp:
-            fp.write("SELECT 1")
+        target_path.write_text("SELECT 1")
+
         tasks.append(Task.for_target(target_path))
 
     dag = DependencyDAG.from_tasks(tasks)
