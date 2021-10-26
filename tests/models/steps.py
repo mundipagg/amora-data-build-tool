@@ -41,6 +41,3 @@ class Steps(AmoraModel, table=True):
                 Health.value,
             ]
         ).where(Health.type == "StepCount")
-
-
-output = Steps
