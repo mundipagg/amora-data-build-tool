@@ -29,7 +29,7 @@ def compile_statement(statement: Compilable) -> str:
 def model_path_for_target_path(path: Path) -> Path:
     return Path(
         str(path)
-        .replace(settings.TARGET_PATH, settings.DBT_MODELS_PATH)
+        .replace(settings.TARGET_PATH, settings.MODELS_PATH)
         .replace(".sql", ".py"),
     )
 
@@ -37,7 +37,7 @@ def model_path_for_target_path(path: Path) -> Path:
 def target_path_for_model_path(path: Path) -> Path:
     return Path(
         str(path)
-        .replace(settings.DBT_MODELS_PATH, settings.TARGET_PATH)
+        .replace(settings.MODELS_PATH, settings.TARGET_PATH)
         .replace(".py", ".sql")
     )
 

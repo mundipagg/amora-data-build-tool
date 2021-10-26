@@ -6,10 +6,10 @@ from amora.models import list_model_files, is_py_model
 
 def compile_py_model(path: Path) -> str:
     # {settings.dbt_models_path}/a_model/a_model.py -> a_model/a_model.py
-    strip_path = settings.dbt_models_path
+    strip_path = settings.MODELS_PATH
     relative_model_path = str(path).split(strip_path)[1][1:]
     # a_model/a_model.py -> ~/project/amora/target/a_model/a_model.sql
-    target_file_path = Path(settings.target_path).joinpath(
+    target_file_path = Path(settings.TARGET_PATH).joinpath(
         relative_model_path.replace(".py", ".sql")
     )
     content = compile(module.source())
