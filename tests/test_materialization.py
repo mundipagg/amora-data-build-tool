@@ -5,7 +5,7 @@ from uuid import uuid4
 from amora.compilation import clean_compiled_files
 from amora.materialization import Task, DependencyDAG, materialize
 from amora.models import AmoraModel, ModelConfig, PartitionConfig, MaterializationTypes
-from config import settings
+from amora.config import settings
 
 from tests.models.heart_agg import HeartRateAgg
 from tests.models.heart_rate import HeartRate
