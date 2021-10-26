@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from sqlmodel import SQLModel, MetaData, Field
+from amora.models import AmoraModel
+from sqlmodel import Field, MetaData
 
 
-class Health(SQLModel, table=True):
+class Health(AmoraModel, table=True):
     id: int = Field(primary_key=True)
     type: str
     sourceName: str
@@ -16,10 +17,3 @@ class Health(SQLModel, table=True):
     device: str
 
     metadata = MetaData(schema="amora-data-build-tool.diogo", quote_schema=True)
-
-
-def source() -> None:
-    return None
-
-
-output = Health

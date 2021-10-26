@@ -1,17 +1,21 @@
+import inspect
 import os
-import sqlparse
-
-from importlib.util import spec_from_file_location, module_from_spec
+from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
-from typing import Union, Any, Optional
+from typing import Optional, Protocol, runtime_checkable
 
-from sqlalchemy_bigquery import BigQueryDialect
-
-
+import sqlparse
 from amora.config import settings
 from amora.models import AmoraModel, Compilable, list_target_files
+from sqlalchemy_bigquery import BigQueryDialect
 
 dialect = BigQueryDialect()
+
+
+@runtime_checkable
+class CompilableProtocol(Protocol):
+    def source(self) -> Compilable:
+        ...
 
 
 def compile_statement(statement: Compilable) -> str:
@@ -38,16 +42,25 @@ def target_path_for_model_path(path: Path) -> Path:
     )
 
 
-def py_module_for_path(path: Path) -> Any:
+def py_module_for_path(path: Path) -> Optional[CompilableProtocol]:
     spec = spec_from_file_location(path.stem, path)
     module = module_from_spec(spec)
     # todo: medo dessa execução
     spec.loader.exec_module(module)
+    compilables = inspect.getmembers(
+        module,
+        lambda x: isinstance(x, CompilableProtocol)
+        and inspect.isclass(x)
+        and issubclass(x, AmoraModel),
+    )
+    classes = [class_ for _name, class_ in compilables]
+    if classes:
+        return classes[-1]
 
-    return module
+    return None
 
 
-def py_module_for_target_path(path: Path) -> Any:
+def py_module_for_target_path(path: Path) -> Optional[CompilableProtocol]:
     model_path = model_path_for_target_path(path)
     return py_module_for_path(model_path)
 
