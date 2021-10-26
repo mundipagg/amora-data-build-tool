@@ -2,8 +2,8 @@ name: pull-request
 on: pull_request
 
 jobs:
-  compile:
-    name: 📦 DBT compile
+  qa:
+    name: 👀 Quality Assurance
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
