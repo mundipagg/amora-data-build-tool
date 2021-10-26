@@ -1,40 +1,41 @@
-from inspect import getfile
-import os
 from dataclasses import dataclass
-from importlib.util import spec_from_file_location, module_from_spec
+from enum import Enum, auto
+from importlib.util import module_from_spec, spec_from_file_location
+from inspect import getfile
 from pathlib import Path
-from typing import List, Optional, Iterable, Union, Type
-
-from dbt.adapters.bigquery.impl import PartitionConfig
-from sqlalchemy import Table, MetaData
-from sqlmodel import SQLModel
-from sqlmodel.main import default_registry
-from sqlmodel.sql.expression import Select, SelectOfScalar
-from sqlalchemy.inspection import inspect
-from sqlalchemy.orm.decl_api import DeclarativeMeta
-
+from typing import Iterable, List, Optional, Type, Union
 
 from amora.config import settings
+from dbt.adapters.bigquery.impl import PartitionConfig
+from sqlalchemy import MetaData
+from sqlmodel import SQLModel
+from sqlmodel.sql.expression import Select, SelectOfScalar
 
 Compilable = Union[Select, SelectOfScalar]
 PartitionConfig = PartitionConfig
 
 
+class AutoName(Enum):
+    def _generate_next_value_(name, start, count, last_values):
+        return name
+
+
+class MaterializationTypes(AutoName):
+    ephemeral = auto()
+    view = auto()
+    table = auto()
+
+
 @dataclass
 class ModelConfig:
-    materialized: str = "ephemeral"
+    materialized: MaterializationTypes = MaterializationTypes.view
     partition_by: Optional[PartitionConfig] = None
-    cluster_by: Optional[str] = None
+    cluster_by: Optional[Union[str, List[str]]] = None
     tags: Optional[List[str]] = None
 
 
 def list_files(path: Union[str, Path], suffix: str) -> Iterable[Path]:
-    for root, _dir, files in os.walk(path):
-        for file in files:
-            if not file.endswith(suffix):
-                continue
-
-            yield Path(root, file)
+    yield from Path(path).rglob(f"*{suffix}")
 
 
 def list_model_files() -> Iterable[Path]:

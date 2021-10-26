@@ -1,7 +1,6 @@
 from amora.compilation import Compilable
 from amora.models import AmoraModel
 from dbt.models.heart_rate import HeartRate
-from sqlalchemy import PrimaryKeyConstraint
 from sqlmodel import func, select, Field
 
 
