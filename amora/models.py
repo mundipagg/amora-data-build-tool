@@ -39,7 +39,7 @@ def list_files(path: Union[str, Path], suffix: str) -> Iterable[Path]:
 
 
 def list_model_files() -> Iterable[Path]:
-    return list_files(settings.DBT_MODELS_PATH, suffix=".py")
+    return list_files(settings.MODELS_PATH, suffix=".py")
 
 
 def list_target_files() -> Iterable[Path]:
@@ -90,7 +90,7 @@ class AmoraModel(SQLModel):
     @classmethod
     def target_path(cls, model_file_path: Union[str, Path]) -> Path:
         # {settings.dbt_models_path}/a_model/a_model.py -> a_model/a_model.py
-        strip_path = settings.DBT_MODELS_PATH
+        strip_path = settings.MODELS_PATH
         relative_model_path = str(model_file_path).split(strip_path)[1][1:]
         # a_model/a_model.py -> ~/project/amora/target/a_model/a_model.sql
         target_file_path = Path(settings.TARGET_PATH).joinpath(
