@@ -49,4 +49,4 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: 🧪 Mypy - Static type check
-        run: mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --install-types --non-interactive amora
+        run: mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --install-types --non-interactive --pretty --no-color-output amora
