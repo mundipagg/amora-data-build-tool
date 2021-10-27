@@ -3,7 +3,12 @@ from typing import Optional, List
 from amora.compilation import amora_model_for_path
 
 from amora.config import settings
-from amora.models import list_model_files, is_py_model, AmoraModel, list_target_files
+from amora.models import (
+    list_model_files,
+    is_py_model,
+    AmoraModel,
+    list_target_files,
+)
 from amora.compilation import compile_statement
 from amora import materialization
 
