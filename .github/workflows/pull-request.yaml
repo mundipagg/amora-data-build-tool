@@ -38,7 +38,7 @@ jobs:
         env:
           POETRY_VIRTUALENVS_CREATE: false
 
-      - name: 🎨 Black - python format check
+      - name: 🎨 Black - Python format check
         run: black -v --line-length 80 --check amora tests
 
       - name: 🧪 pytest

@@ -80,7 +80,9 @@ def test_materialize_without_arguments_and_options(materialize: MagicMock):
         materialize_call_heart_rate,
     ] = materialize.call_args_list
     assert materialize_call_steps[1]["model"].__table__ == Steps.__table__
-    assert materialize_call_heart_rate[1]["model"].__table__ == HeartRate.__table__
+    assert (
+        materialize_call_heart_rate[1]["model"].__table__ == HeartRate.__table__
+    )
 
 
 @patch("amora.cli.materialization.materialize")
@@ -102,7 +104,9 @@ def test_materialize_with_model_options(materialize: MagicMock):
 
 @patch("amora.cli.materialization.materialize")
 @patch("amora.cli.materialization.DependencyDAG.draw")
-def test_materialize_with_draw_dag_option(draw: MagicMock, _materialize: MagicMock):
+def test_materialize_with_draw_dag_option(
+    draw: MagicMock, _materialize: MagicMock
+):
     result = runner.invoke(
         app,
         ["materialize", "--draw-dag"],

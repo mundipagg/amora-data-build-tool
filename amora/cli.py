@@ -59,7 +59,9 @@ def compile(
             continue
 
         target_file_path = AmoraModel_class.target_path(model_file_path)
-        typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
+        typer.echo(
+            f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`"
+        )
 
         content = compile_statement(source_sql_statement)
         target_file_path.write_text(content)
@@ -96,7 +98,9 @@ def materialize(
             continue
         else:
             # todo: deveria ser `task.module.output.__table__.name` ?
-            result = materialization.materialize(sql=task.sql_stmt, model=task.model)
+            result = materialization.materialize(
+                sql=task.sql_stmt, model=task.model
+            )
 
             typer.echo(f"✅  Created `{model}` as `{result.full_table_id}`")
             typer.echo(f"    Rows: {result.num_rows}")
