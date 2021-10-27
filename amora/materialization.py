@@ -69,15 +69,21 @@ def materialize(sql: str, model: AmoraModel) -> Optional[Table]:
 
         return Client().create_table(view, exists_ok=True)
     elif materialization == MaterializationTypes.table:
-        query_job = Client().query(
-            sql, job_config=QueryJobConfig(destination=table_id)
+        client = Client()
+        query_job = client.query(
+            sql,
+            job_config=QueryJobConfig(
+                destination=table_id, write_disposition="WRITE_TRUNCATE"
+            ),
         )
 
-        return query_job.result()
+        query_job.result()
+        return client.get_table(table_id)
     elif materialization == MaterializationTypes.ephemeral:
         return None
     else:
         raise ValueError(
             f"Invalid model materialization configuration. "
-            f"Valid types are: {', '.join((m.name for m in MaterializationTypes))}"
+            f"Valid types are: `{', '.join((m.name for m in MaterializationTypes))}`. "
+            f"Got: `{materialization}`"
         )
