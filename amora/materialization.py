@@ -6,7 +6,7 @@ from google.cloud.bigquery import Table, Client, QueryJobConfig
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from amora.compilation import py_module_for_target_path
+from amora.compilation import amora_model_for_target_path
 from amora.config import settings
 from amora.models import list_target_files, AmoraModel, MaterializationTypes
 
@@ -21,7 +21,7 @@ class Task:
     def for_target(cls, target_file_path: Path) -> "Task":
         return cls(
             sql_stmt=target_file_path.read_text(),
-            model=py_module_for_target_path(target_file_path),
+            model=amora_model_for_target_path(target_file_path),
             target_file_path=target_file_path,
         )
 

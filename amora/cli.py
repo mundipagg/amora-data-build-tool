@@ -1,6 +1,6 @@
 import typer
 from typing import Optional, List
-from amora.compilation import py_module_for_path
+from amora.compilation import amora_model_for_path
 
 from amora.config import settings
 from amora.models import list_model_files, is_py_model, AmoraModel, list_target_files
@@ -41,19 +41,19 @@ def compile(
             continue
 
         try:
-            model: AmoraModel = py_module_for_path(model_file_path)
+            AmoraModel_class = amora_model_for_path(model_file_path)
         except AttributeError:
             continue
 
-        if not model or not issubclass(model, AmoraModel):
+        if not AmoraModel_class or not issubclass(AmoraModel_class, AmoraModel):
             continue
 
-        source_sql_statement = model.source()
+        source_sql_statement = AmoraModel_class.source()
         if source_sql_statement is None:
             typer.echo(f"⏭ Skipping compilation of model `{model_file_path}`")
             continue
 
-        target_file_path = model.target_path(model_file_path)
+        target_file_path = AmoraModel_class.target_path(model_file_path)
         typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
 
         content = compile_statement(source_sql_statement)
