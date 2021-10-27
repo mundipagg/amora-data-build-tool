@@ -156,3 +156,5 @@ config/*/**
 !config/*/.gitkeep
 
 */.sqlfluff_output/annotations.json
+
+.mypy_coverage
