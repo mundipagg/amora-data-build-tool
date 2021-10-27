@@ -50,7 +50,7 @@ def compile(
         except ValueError:
             continue
 
-        if not issubclass(AmoraModel_class, AmoraModel):
+        if not issubclass(AmoraModel_class, AmoraModel):  # type: ignore
             continue
 
         source_sql_statement = AmoraModel_class.source()
@@ -97,14 +97,15 @@ def materialize(
             typer.echo(f"⚠️  Skipping `{model}`")
             continue
         else:
-            # todo: deveria ser `task.module.output.__table__.name` ?
-            result = materialization.materialize(
+            table = materialization.materialize(
                 sql=task.sql_stmt, model=task.model
             )
+            if table is None:
+                continue
 
-            typer.echo(f"✅  Created `{model}` as `{result.full_table_id}`")
-            typer.echo(f"    Rows: {result.num_rows}")
-            typer.echo(f"    Bytes: {result.num_bytes}")
+            typer.echo(f"✅  Created `{model}` as `{table.full_table_id}`")
+            typer.echo(f"    Rows: {table.num_rows}")
+            typer.echo(f"    Bytes: {table.num_bytes}")
 
 
 def main():

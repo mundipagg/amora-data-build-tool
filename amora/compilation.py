@@ -46,15 +46,28 @@ def target_path_for_model_path(path: Path) -> Path:
 
 def amora_model_for_path(path: Path) -> AmoraModel:
     spec = spec_from_file_location(path.stem, path)
+    if spec is None:
+        raise ValueError(f"Invalid path `{path}`. Not a valid Python file.")
+
     module = module_from_spec(spec)
-    # todo: medo dessa execução
-    spec.loader.exec_module(module)
+    # if module is None:
+    #     raise ValueError(f"Invalid path `{path}`")
+
+    if spec.loader is None:
+        raise ValueError(f"Invalid path `{path}`. Unable to load module.")
+
+    try:
+        spec.loader.exec_module(module)  # type: ignore
+    except ImportError:
+        raise ValueError(f"Invalid path `{path}`. Unable to load module.")
+
     compilables = inspect.getmembers(
         module,
         lambda x: isinstance(x, CompilableProtocol)
         and inspect.isclass(x)
-        and issubclass(x, AmoraModel),
+        and issubclass(x, AmoraModel),  # type: ignore
     )
+
     classes = [class_ for _name, class_ in compilables]
     if classes:
         return classes[-1]
