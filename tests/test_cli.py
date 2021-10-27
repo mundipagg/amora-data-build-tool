@@ -75,14 +75,10 @@ def test_materialize_without_arguments_and_options(materialize: MagicMock):
 
     assert result.exit_code == 0
 
-    [
-        materialize_call_steps,
-        materialize_call_heart_rate,
-    ] = materialize.call_args_list
-    assert materialize_call_steps[1]["model"].__table__ == Steps.__table__
-    assert (
-        materialize_call_heart_rate[1]["model"].__table__ == HeartRate.__table__
+    tables = sorted(
+        [str(call[1]["model"].__table__) for call in materialize.call_args_list]
     )
+    assert tables == sorted([str(Steps.__table__), str(HeartRate.__table__)])
 
 
 @patch("amora.cli.materialization.materialize")
