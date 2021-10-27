@@ -42,7 +42,7 @@ def target_path_for_model_path(path: Path) -> Path:
     )
 
 
-def py_module_for_path(path: Path) -> Optional[CompilableProtocol]:
+def amora_model_for_path(path: Path) -> AmoraModel:
     spec = spec_from_file_location(path.stem, path)
     module = module_from_spec(spec)
     # todo: medo dessa execução
@@ -57,12 +57,12 @@ def py_module_for_path(path: Path) -> Optional[CompilableProtocol]:
     if classes:
         return classes[-1]
 
-    return None
+    raise ValueError(f"Invalid path `{path}`")
 
 
-def py_module_for_target_path(path: Path) -> Optional[CompilableProtocol]:
+def amora_model_for_target_path(path: Path) -> AmoraModel:
     model_path = model_path_for_target_path(path)
-    return py_module_for_path(model_path)
+    return amora_model_for_path(model_path)
 
 
 def clean_compiled_files():

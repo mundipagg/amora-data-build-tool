@@ -58,7 +58,7 @@ metadata = MetaData(schema=settings.TARGET_SCHEMA)
 
 class AmoraModel(SQLModel):
     __depends_on__: List["AmoraModel"] = []
-    __model_config__ = ModelConfig(materialized="view")
+    __model_config__ = ModelConfig(materialized=MaterializationTypes.view)
     __table_args__ = {"extend_existing": True}
     metadata = metadata
 
@@ -102,20 +102,3 @@ class AmoraModel(SQLModel):
     @classmethod
     def model_file_path(cls) -> Path:
         return Path(getfile(cls))
-
-    @classmethod
-    def is_source_model(cls, path: Path) -> bool:
-        raise path == cls.target_path()
-
-    @classmethod
-    def init_from_path(cls, model_path: Path) -> Type["AmoraModel"]:
-        spec = spec_from_file_location(model_path.stem, model_path)
-        module = module_from_spec(spec)
-        spec.loader.exec_module(module)
-
-        for attr_name in dir(module):
-            attr = getattr(module, attr_name)
-            if issubclass(attr, cls):
-                return attr
-
-        return module
