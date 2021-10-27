@@ -61,9 +61,7 @@ class DependencyDAG(nx.DiGraph):
 
 def materialize(sql: str, model: AmoraModel) -> Optional[Table]:
     materialization = model.__model_config__.materialized
-    table_id = (
-        f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{model.__tablename__}"
-    )
+    table_id = f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{model.__tablename__}"
 
     if materialization == MaterializationTypes.view:
         view = Table(table_id)
@@ -71,7 +69,9 @@ def materialize(sql: str, model: AmoraModel) -> Optional[Table]:
 
         return Client().create_table(view, exists_ok=True)
     elif materialization == MaterializationTypes.table:
-        query_job = Client().query(sql, job_config=QueryJobConfig(destination=table_id))
+        query_job = Client().query(
+            sql, job_config=QueryJobConfig(destination=table_id)
+        )
 
         return query_job.result()
     elif materialization == MaterializationTypes.ephemeral:
