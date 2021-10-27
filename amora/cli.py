@@ -47,10 +47,10 @@ def compile(
 
         try:
             AmoraModel_class = amora_model_for_path(model_file_path)
-        except AttributeError:
+        except ValueError:
             continue
 
-        if not AmoraModel_class or not issubclass(AmoraModel_class, AmoraModel):
+        if not issubclass(AmoraModel_class, AmoraModel):
             continue
 
         source_sql_statement = AmoraModel_class.source()
