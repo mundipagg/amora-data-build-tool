@@ -20,7 +20,9 @@ class CompilableProtocol(Protocol):
 
 def compile_statement(statement: Compilable) -> str:
     raw_sql = str(
-        statement.compile(dialect=dialect, compile_kwargs={"literal_binds": True})
+        statement.compile(
+            dialect=dialect, compile_kwargs={"literal_binds": True}
+        )
     )
     formatted_sql = sqlparse.format(raw_sql, reindent=True, indent_columns=True)
     return formatted_sql
@@ -29,7 +31,7 @@ def compile_statement(statement: Compilable) -> str:
 def model_path_for_target_path(path: Path) -> Path:
     return Path(
         str(path)
-        .replace(settings.TARGET_PATH, settings.DBT_MODELS_PATH)
+        .replace(settings.TARGET_PATH, settings.MODELS_PATH)
         .replace(".sql", ".py"),
     )
 
@@ -37,32 +39,45 @@ def model_path_for_target_path(path: Path) -> Path:
 def target_path_for_model_path(path: Path) -> Path:
     return Path(
         str(path)
-        .replace(settings.DBT_MODELS_PATH, settings.TARGET_PATH)
+        .replace(settings.MODELS_PATH, settings.TARGET_PATH)
         .replace(".py", ".sql")
     )
 
 
-def py_module_for_path(path: Path) -> Optional[CompilableProtocol]:
+def amora_model_for_path(path: Path) -> AmoraModel:
     spec = spec_from_file_location(path.stem, path)
+    if spec is None:
+        raise ValueError(f"Invalid path `{path}`. Not a valid Python file.")
+
     module = module_from_spec(spec)
-    # todo: medo dessa execução
-    spec.loader.exec_module(module)
+    # if module is None:
+    #     raise ValueError(f"Invalid path `{path}`")
+
+    if spec.loader is None:
+        raise ValueError(f"Invalid path `{path}`. Unable to load module.")
+
+    try:
+        spec.loader.exec_module(module)  # type: ignore
+    except ImportError:
+        raise ValueError(f"Invalid path `{path}`. Unable to load module.")
+
     compilables = inspect.getmembers(
         module,
         lambda x: isinstance(x, CompilableProtocol)
         and inspect.isclass(x)
-        and issubclass(x, AmoraModel),
+        and issubclass(x, AmoraModel),  # type: ignore
     )
+
     classes = [class_ for _name, class_ in compilables]
     if classes:
         return classes[-1]
 
-    return None
+    raise ValueError(f"Invalid path `{path}`")
 
 
-def py_module_for_target_path(path: Path) -> Optional[CompilableProtocol]:
+def amora_model_for_target_path(path: Path) -> AmoraModel:
     model_path = model_path_for_target_path(path)
-    return py_module_for_path(model_path)
+    return amora_model_for_path(model_path)
 
 
 def clean_compiled_files():

@@ -6,7 +6,7 @@ from google.cloud.bigquery import Table, Client, QueryJobConfig
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from amora.compilation import py_module_for_target_path
+from amora.compilation import amora_model_for_target_path
 from amora.config import settings
 from amora.models import list_target_files, AmoraModel, MaterializationTypes
 
@@ -21,7 +21,7 @@ class Task:
     def for_target(cls, target_file_path: Path) -> "Task":
         return cls(
             sql_stmt=target_file_path.read_text(),
-            model=py_module_for_target_path(target_file_path),
+            model=amora_model_for_target_path(target_file_path),
             target_file_path=target_file_path,
         )
 
@@ -61,9 +61,7 @@ class DependencyDAG(nx.DiGraph):
 
 def materialize(sql: str, model: AmoraModel) -> Optional[Table]:
     materialization = model.__model_config__.materialized
-    table_id = (
-        f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{model.__tablename__}"
-    )
+    table_id = f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{model.__tablename__}"
 
     if materialization == MaterializationTypes.view:
         view = Table(table_id)
@@ -71,13 +69,21 @@ def materialize(sql: str, model: AmoraModel) -> Optional[Table]:
 
         return Client().create_table(view, exists_ok=True)
     elif materialization == MaterializationTypes.table:
-        query_job = Client().query(sql, job_config=QueryJobConfig(destination=table_id))
+        client = Client()
+        query_job = client.query(
+            sql,
+            job_config=QueryJobConfig(
+                destination=table_id, write_disposition="WRITE_TRUNCATE"
+            ),
+        )
 
-        return query_job.result()
+        query_job.result()
+        return client.get_table(table_id)
     elif materialization == MaterializationTypes.ephemeral:
         return None
     else:
         raise ValueError(
             f"Invalid model materialization configuration. "
-            f"Valid types are: {', '.join((m.name for m in MaterializationTypes))}"
+            f"Valid types are: `{', '.join((m.name for m in MaterializationTypes))}`. "
+            f"Got: `{materialization}`"
         )

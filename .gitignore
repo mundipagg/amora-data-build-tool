@@ -73,7 +73,6 @@ docs/_build/
 
 # PyBuilder
 .pybuilder/
-target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -125,6 +124,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+.mypy_coverage/
 .dmypy.json
 dmypy.json
 
@@ -156,3 +156,5 @@ config/*/**
 !config/*/.gitkeep
 
 */.sqlfluff_output/annotations.json
+
+

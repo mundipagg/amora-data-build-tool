@@ -1,0 +1,64 @@
+name: pull-request
+on: pull_request
+
+jobs:
+  qa:
+    name: 👀 Quality Assurance
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.9']
+    steps:
+      - name: 🚧 Install OS dependencies
+        run: sudo apt-get install libxml2-dev libxslt-dev
+
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: 🐍 Install python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: 🐍 Cache python dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/cache
+            ~/.cache
+            !~/cache/exclude
+          key: ${{ runner.os }}-${{ matrix.python }}-${{ hashFiles('poetry.lock') }}
+
+      - name: 🐍 Install Pip and Poetry
+        run: pip install -U pip==21.2.4 poetry==1.1.9
+
+      - name: 🐍 poetry install - Installing python dependencies
+        run: poetry install --no-root --no-interaction
+        env:
+          POETRY_VIRTUALENVS_CREATE: false
+
+      - name: 🎨 Black - Python format check
+        run: black -v --line-length 80 --check amora tests
+
+      - name: 🧪 pytest
+        run: py.test --cov=amora --cov-report=term-missing --cov-report=xml
+
+      - name: 🧪 SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        if: ${{ matrix.python == '3.10' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: 🧪 Mypy - Static type check
+        run: mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --install-types --non-interactive --pretty --no-color-output amora
+
+      - name: 📤 Uploading coverage reports as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.python }}-coverage
+          path: |
+            coverage.xml
+            .mypy_coverage
+          retention-days: 7
