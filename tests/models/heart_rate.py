@@ -4,15 +4,20 @@ from sqlalchemy import MetaData, func
 from sqlmodel import select, SQLModel, Field
 
 from amora.compilation import Compilable
-from amora.models import ModelConfig, PartitionConfig, AmoraModel
+from amora.models import (
+    ModelConfig,
+    PartitionConfig,
+    AmoraModel,
+    MaterializationTypes,
+)
 from dbt.models.health import Health
 
 
 class HeartRate(AmoraModel, table=True):
     __tablename__ = "heart_rate"
     __depends_on__ = [Health]
-    __config__ = ModelConfig(
-        materialized="table",
+    __model_config__ = ModelConfig(
+        materialized=MaterializationTypes.table,
         partition_by=PartitionConfig(
             field="creationDate", data_type="TIMESTAMP", granularity="day"
         ),

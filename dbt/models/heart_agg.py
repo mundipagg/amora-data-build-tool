@@ -1,13 +1,13 @@
 from amora.compilation import Compilable
-from amora.models import AmoraModel
+from amora.models import AmoraModel, ModelConfig, MaterializationTypes
 from dbt.models.heart_rate import HeartRate
-from sqlalchemy import PrimaryKeyConstraint
 from sqlmodel import func, select, Field
 
 
 class HeartRateAgg(AmoraModel, table=True):
     __depends_on__ = [HeartRate]
     __tablename__ = "heart_rate_agg"
+    __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
 
     _avg: float
     _sum: float
