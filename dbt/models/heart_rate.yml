@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: heart_rate
+    columns:
+        - name: sourceName
+          description: nome da origem da medida
+        - name: sourceVersion
+          description: versao da origem de medida
+        - name: unit
+          description: unidade de medida
+        - name: creationDate
+          description: Momento onde a medida foi salva
+        - name: startDate
+          description: Inicio da medidade
+        - name: endDate
+          description: Fim da medida
+        - name: value
+          description: valor registrado
+        - name: device
+          description: dispositivo de origem da medida
+    

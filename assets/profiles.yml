@@ -1,0 +1,32 @@
+config:
+  use_colors: True
+  # Por padrão, o dbt envia dados para tracking de uso. Nós não queremos isso.
+  send_anonymous_usage_stats: False
+stg-tau-rex:
+  target: "stg-tau-rex"
+  outputs:
+    stg-tau-rex:
+      dataset: "diogo"
+      # Localização dos datasets no BigQuery. Pode ser multi-region (ex.: US, EU) or regional (ex.: us-east1)
+      location: US
+      # Para desenvolvimento local, o recomendado é usar oauth. Para rodar em servidores/CI, o ideal é usar autenticação
+      # por Service Account. Mais em: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile#authentication-methods
+      method: "{{ env_var('TREX_DBT_METHOD', 'oauth') }}"
+      # Chave na forma de uma string JSON da Service Account
+      keyfile_json: "{{ env_var('TREX_DBT_SA_KEYFILE_JSON', {}) }}"
+      # Define a prioridade usada para as consultas no BigQuery. Pode ser 'batch' ou 'interactive'.
+      priority: interactive
+      # GCP Project Id
+      project: "stg-tau-rex"
+      # Quantas vezes o dbt deve retentar rodar queries que resultaram em erros
+      retries: 1
+      # A quantidade de threads que o dbt deve rodar. Mais em: https://docs.getdbt.com/dbt-cli/configure-your-profile#understanding-threads
+      threads: "{{ env_var('TREX_DBT_THREADS', 20) }}"
+      # Se um modelo do dbt demorar mais do que o timeout para completar, então o BigQuery pode cancelar a query e
+      # emitir o seguinte erro: 'Operation did not complete within the designated timeout.'
+      timeout_seconds: 300
+      # Tipo do datasource.
+      type: bigquery
+      # Se a query tiver que percorrer mais do que 1Tb de dados, o BigQuery rejeita a query.
+      # Uma constraint para evitar gastos inesperados.
+      maximum_bytes_billed: "{{ env_var('TREX_DBT_MAXIMUM_BYTES_BILLED', 100000000000) }}"
