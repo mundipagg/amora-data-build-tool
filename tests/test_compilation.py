@@ -34,6 +34,7 @@ def test_amora_model_for_path_with_invalid_bytecode_python_file_path():
 
 
 def test_amora_model_for_path_with_valid_python_file_path():
-    model_path = Path("models/steps.py")
-    model = amora_model_for_path(path=model_path)
+    model = amora_model_for_path(
+        path=Path(__file__).parent.joinpath("models/steps.py")
+    )
     assert issubclass(model, AmoraModel)

@@ -98,12 +98,14 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
     result = materialize(sql="SELECT 1", model=TableModel)
 
     client = Client.return_value
-    query_job = client.query.return_value
 
-    assert query_job.result.return_value == result
+    assert client.get_table.return_value == result
+    client.get_table.assert_called_once_with(table_id)
     client.query.assert_called_once_with(
         "SELECT 1",
-        job_config=QueryJobConfig(destination=table_id),
+        job_config=QueryJobConfig(
+            destination=table_id, write_disposition="WRITE_TRUNCATE"
+        ),
     )
 
 
