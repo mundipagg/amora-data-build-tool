@@ -1,0 +1,36 @@
+name: release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    name: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: 🐍 Install python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: 🐍 Install pip
+        run: pip install -U pip==21.2.4
+
+      - name: 🐍 Install twine
+        run: pip install twine==3.4.2
+
+      - name: 📦 Generate Packages
+        run: python setup.py sdist
+
+      - name: 🚀 Twine check
+        run: twine check dist/*
+
+      - name: 🚀 Publish (${{github.ref}})
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{secrets.PYPI_TOKEN}}
+        run: twine upload dist/*
