@@ -43,6 +43,7 @@ Models express both a data schema and a transformation statement:
 
 
 ```python
+# project/models/heart_rate.py
 from datetime import datetime
 
 from amora.compilation import Compilable
@@ -51,9 +52,10 @@ from amora.models import (
     ModelConfig,
     PartitionConfig,
     MaterializationTypes,
+    select,
+    Field   
 )
-from dbt.models.health import Health
-from sqlmodel import Field, select
+from project.models.health import Health
 
 
 class HeartRate(AmoraModel, table=True):
@@ -101,18 +103,23 @@ class HeartRate(AmoraModel, table=True):
 named `heart_rate`, with data [clustered](https://cloud.google.com/bigquery/docs/clustered-tables) by the `sourceName` column. 
 The source of its data is a filter in `Health` model. Let's go through each part of the `HeartRate` model:
 
-- `__tablename__: str`: 
-- `__depends_on__: List[AmoraModel]`: 
-- `__model_config__: amora.models.ModelConfig`:
-- `source(cls) -> Compilable`: 
-- 
+- `__tablename__: str`: Used to override the automatically generated name
+- `__depends_on__: List[AmoraModel]`: A list of Amora Models that the current model depends on
+- `__model_config__: amora.models.ModelConfig` 
+    - `materialized: amora.models.MaterializationTypes`: The materialization configuration: `view`, `table`, `ephemeral`. 
+      Default: `view` 
+    - `partition_by: amora.models.PartitionConfig`: BigQuery supports the use of a [partition by](https://cloud.google.com/bigquery/docs/partitioned-tables) clause to easily partition 
+      a table by a column or expression. This option can help decrease latency and cost when querying large tables.
+    - `cluster_by: Union[str, List[str]]`: BigQuery tables can be [clustered](https://cloud.google.com/bigquery/docs/clustered-tables) to colocate related data. Expects a column of a list of columns.
+    - `tags: List[str]`: A list of tags that can be used as the resource selection
+- `source(cls) -> Compilable`: The SELECT statement that defines the model resulting dataset
 
 ### Sources
 
 Tables/views that already exist on the Data Warehouse and shouldn't be managed by Amora. 
 
 ```python
-# models/health.py
+# project/models/health.py
 from amora.models import AmoraModel, Field
 from datetime import datetime
 
@@ -130,4 +137,6 @@ class Health(AmoraModel):
     device: str
 
 ```
-Source models are models without a `source` implementation, no dependencies and no materialization configuration.
+
+Source models are models managed outside the scope of Amora, without a `source` implementation, 
+no dependencies and no materialization configuration.
