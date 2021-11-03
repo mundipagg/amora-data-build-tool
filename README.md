@@ -15,8 +15,20 @@ to-do
 
 ### How can I set up the right permissions in BigQuery?
 
-1. Do this
-2. Do that
+In order to use Amora with BigQuery, you'll need to setup a [keyfile](https://cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts.keys).
+
+1. Go to the [BigQuery credential wizard](https://console.cloud.google.com/apis/credentials/wizard). Ensure that the right project is selected in the header bar.
+2. Generate credentials with the following options:
+    - **Which API are you using?** BigQuery API
+    - **What data will you be accessing?** Application data (you'll be creating a service account)
+    - **Are you planning to use this API with App Engine or Compute Engine?** No
+    - **Service account name:** amora-user
+    - **Role**: BigQuery Job User & BigQuery User
+    - **Key type**: JSON
+3. Download the JSON file and save it in an easy-to-remember spot, with a clear filename (e.g. `~/.bq-service-accounts/amora-user-credentials.json`)
+4. Set the environment variable `GOOGLE_APPLICATION_CREDENTIALS` to the path of the JSON file that contains your service 
+   account key. You can add `export GOOGLE_APPLICATION_CREDENTIALS=~/.bq-service-accounts/amora-user-credentials.json` 
+   to your shell initialization script (`.zshrc` for zsh, `.bash_profile` for bash, ...)
 
 Required roles:
    
