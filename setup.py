@@ -28,7 +28,7 @@ setup(
     install_requires=[
         "jupyter~=1.0.0",
         "matplotlib~=3.4.2",
-        "networkx[all]~=2.6.3",
+        "networkx[default,extra]~=2.6.3",
         "numpy~=1.21.1",
         "pandas~=1.3.0",
         "sqlalchemy-bigquery~=1.2.0",
