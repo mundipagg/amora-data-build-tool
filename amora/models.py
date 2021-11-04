@@ -8,7 +8,7 @@ from typing import Iterable, List, Optional, Type, Union
 from amora.config import settings
 from dbt.adapters.bigquery.impl import PartitionConfig
 from sqlalchemy import MetaData
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, Field, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
 Compilable = Union[Select, SelectOfScalar]
