@@ -10,6 +10,8 @@ setup(
     license="MIT",
     packages=["."],
     entry_points={
-        "console_scripts": ["amora=amora.cli:main"],
+        "console_scripts": ["amora=cli:main"],
+        "pytest11": ["amora = tests.pytest_plugin"]
     },
+    classifiers=[]
 )
