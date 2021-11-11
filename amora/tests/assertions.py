@@ -1,9 +1,42 @@
 from typing import Iterable
 
+import pytest
+from mypy.api import Callable
+from sqlalchemy import func
+from sqlalchemy.orm import InstrumentedAttribute
+from sqlmodel.sql.expression import SelectOfScalar
 
-def not_null(column):
+from amora.models import select, Compilable
+from amora.compilation import compile_statement
+from amora.providers.bigquery import get_client
+
+Column = InstrumentedAttribute
+
+
+def that(
+    column: Column,
+    test: Callable[[Column, ...], SelectOfScalar],
+    **test_kwargs,
+):
     """
-    >>> not_null(HeartRate.id)
+    >>> assert that(HeartRate.value, is_not_null)
+
+    Executes the test, returning True if the test is successful and raising a pytest fail otherwise
+    """
+    sql_stmt = compile_statement(statement=test(column, **test_kwargs))
+
+    query_job = get_client().query(sql_stmt)
+    result = query_job.result()
+
+    if result.total_rows == 0:
+        return True
+    else:
+        pytest.fail(f"{result.total_rows} rows failed the test assertion.")
+
+
+def is_not_null(column: Column) -> Compilable:
+    """
+    >>> is_not_null(HeartRate.id)
 
     The `id` column in the `HeartRate` model should not contain `null` values
 
@@ -15,12 +48,12 @@ def not_null(column):
         WHERE {{ column_name }} IS NULL
     ```
     """
-    pass
+    return select(column.parent.entity).where(column == None)
 
 
-def unique(column):
+def is_unique(column: Column) -> Compilable:
     """
-    >>> unique(HeartRate.id)
+    >>> is_unique(HeartRate.id)
 
     The `id` column in the `HeartRate` model should be unique
 
@@ -35,22 +68,22 @@ def unique(column):
         ) validation_errors
     ```
     """
-    pass
+    return select(column.parent.entity).group_by(column).having(func.count(column) > 1)
 
 
-def accepted_values(column, values: Iterable):
+def has_accepted_values(column: Column, values: Iterable) -> Compilable:
     """
-    >>> accepted_values(HeartRate.source, values=["iPhone", "Mi Band"])
+    >>> has_accepted_values(HeartRate.source, values=["iPhone", "Mi Band"])
 
     The `source` column in the `HeartRate` model should be one of
     'iPhone' or 'MiBand'
     """
-    pass
+    return select(column.parent.entity).where(~column.in_(values))
 
 
-def relationships(column, to):
+def relates_to(column: Column, to: Column) -> Compilable:
     """
-    >>> relationships(HeartRate.id, to=Health.id)
+    >>> relates_to(HeartRate.id, to=Health.id)
 
     Each `id` in the `HeartRate` model exists as an `id` in the `Health`
     table (also known as referential integrity)
@@ -58,10 +91,16 @@ def relationships(column, to):
     pass
 
 
-def is_non_negative(column):
+def is_non_negative(column: Column) -> Compilable:
     """
     >>> is_non_negative(HeartRate.value)
 
     Each not null `value` in `HeartRate` model is >= 0
+
+    ```sql
+        SELECT *
+        FROM {{ model }}
+        WHERE {{ column_name }} < 0
+    ```
     """
-    pass
+    return select(column.parent.entity).where(column < 0)
