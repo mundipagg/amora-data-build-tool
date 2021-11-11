@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from importlib.util import module_from_spec, spec_from_file_location
 from inspect import getfile
 from pathlib import Path
 from typing import Iterable, List, Optional, Type, Union
@@ -13,6 +12,8 @@ from sqlmodel.sql.expression import Select, SelectOfScalar
 
 Compilable = Union[Select, SelectOfScalar]
 PartitionConfig = PartitionConfig
+
+select = select
 
 
 class AutoName(Enum):
