@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlmodel import MetaData, Field
+from sqlmodel import Field
 
 from amora.models import AmoraModel
 

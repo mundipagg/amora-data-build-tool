@@ -10,9 +10,9 @@ class StepsAgg(AmoraModel, table=True):
     __tablename__ = "steps_agg"
     __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
 
-    _avg: float
-    _sum: float
-    _count: float
+    avg: float
+    sum: float
+    count: float
     year: int = Field(primary_key=True)
     month: int = Field(primary_key=True)
 
@@ -22,9 +22,9 @@ class StepsAgg(AmoraModel, table=True):
     def source(cls) -> Compilable:
         sub = select(
             [
-                func.avg(Steps.value).label("_avg"),
-                func.sum(Steps.value).label("_sum"),
-                func.count(Steps.value).label("_count"),
+                func.avg(Steps.value).label("avg"),
+                func.sum(Steps.value).label("sum"),
+                func.count(Steps.value).label("count"),
                 func.extract("year", Steps.creationDate).label("year"),
                 func.extract("month", Steps.creationDate).label("month"),
             ]
