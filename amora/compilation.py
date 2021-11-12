@@ -20,7 +20,9 @@ class CompilableProtocol(Protocol):
 
 def compile_statement(statement: Compilable) -> str:
     raw_sql = str(
-        statement.compile(dialect=dialect, compile_kwargs={"literal_binds": True})
+        statement.compile(
+            dialect=dialect, compile_kwargs={"literal_binds": True}
+        )
     )
     formatted_sql = sqlparse.format(raw_sql, reindent=True, indent_columns=True)
     return formatted_sql
