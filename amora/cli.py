@@ -60,7 +60,9 @@ def compile(
             continue
 
         target_file_path = AmoraModel_class.target_path(model_file_path)
-        typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
+        typer.echo(
+            f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`"
+        )
 
         content = compile_statement(source_sql_statement)
         target_file_path.write_text(content)
@@ -96,7 +98,9 @@ def materialize(
             typer.echo(f"⚠️  Skipping `{model}`")
             continue
         else:
-            table = materialization.materialize(sql=task.sql_stmt, model=task.model)
+            table = materialization.materialize(
+                sql=task.sql_stmt, model=task.model
+            )
             if table is None:
                 continue
 
@@ -106,13 +110,12 @@ def materialize(
 
 
 @app.command()
-def test(tests_dir: Optional[str] = typer.Option(
-    None,
-    "--tests-dir",
-    help="Target connection configuration as defined as an amora.target.Target",
-), models: Optional[Models] = models_option) -> None:
+def test(
+    models: Optional[Models] = models_option,
+) -> None:
     """
-    Runs tests on data in deployed models. Run this after `amora materialize`.
+    Runs tests on data in deployed models. Run this after `amora materialize`
+    to ensure that the date state is up-to-date.
     """
     return_code = pytest.main(["-n", "auto"])
     raise typer.Exit(return_code)

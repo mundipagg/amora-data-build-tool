@@ -1,4 +1,4 @@
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Any
 
 import pytest
 from mypy.api import Callable
@@ -100,7 +100,10 @@ def has_accepted_values(column: Column, values: Iterable) -> Compilable:
 
 
 def relationship(
-    from_: Column, to: Column, from_condition=and_(True), to_condition=and_(True)
+    from_: Column,
+    to: Column,
+    from_condition=and_(True),
+    to_condition=and_(True),
 ) -> Compilable:
     """
     >>> relationship(HeartRate.id, to=Health.id)
@@ -154,7 +157,10 @@ def relationship(
         .cte("left_table")
     )
     right_table = (
-        select(to.label("id")).where(to != None).where(to_condition).cte("right_table")
+        select(to.label("id"))
+        .where(to != None)
+        .where(to_condition)
+        .cte("right_table")
     )
 
     exceptions = (

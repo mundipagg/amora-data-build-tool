@@ -61,9 +61,7 @@ class DependencyDAG(nx.DiGraph):
 
 def materialize(sql: str, model: AmoraModel) -> Optional[Table]:
     materialization = model.__model_config__.materialized
-    table_id = (
-        f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{model.__tablename__}"
-    )
+    table_id = f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{model.__tablename__}"
 
     if materialization == MaterializationTypes.view:
         view = Table(table_id)
