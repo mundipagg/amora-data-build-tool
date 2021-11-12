@@ -108,6 +108,38 @@ def relationship(
     last X minutes/hours to account for temporary gaps due to data
     ingestion limitations, etc.
 
+    ```sql
+        WITH left_table AS (
+          SELECT
+            {{from_column_name}} AS id
+          FROM {{from_table}}
+          WHERE
+            {{from_column_name}} IS NOT NULL
+            AND {{from_condition}}
+        ),
+        right_table AS (
+          SELECT
+            {{to_column_name}} AS id
+          FROM {{to_table}}
+          WHERE
+            {{to_column_name}} IS NOT NULL
+            AND {{to_condition}}
+        ),
+        exceptions as (
+          SELECT
+            left_table.id AS {{from_column_name}}}
+          FROM
+            left_table
+          LEFT JOIN
+            right_table
+            ON left_table.id = right_table.id
+          WHERE
+            right_table.id IS NULL
+        )
+
+        SELECT * FROM exceptions
+    ```
+
     """
     left_table = (
         select(from_.label("id"))
