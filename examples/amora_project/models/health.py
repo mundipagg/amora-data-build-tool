@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from amora.models import AmoraModel
-from sqlmodel import Field, MetaData
+from sqlmodel import Field
 
 
 class Health(AmoraModel, table=True):
@@ -15,5 +15,3 @@ class Health(AmoraModel, table=True):
     endDate: datetime
     value: float
     device: str
-
-    metadata = MetaData(schema="stg-tau-rex.diogo", quote_schema=True)
