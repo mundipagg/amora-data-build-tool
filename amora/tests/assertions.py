@@ -1,8 +1,8 @@
-from typing import Iterable
+from typing import Iterable, Optional
 
 import pytest
 from mypy.api import Callable
-from sqlalchemy import func, and_, Table
+from sqlalchemy import func, and_, Table, text, literal_column, union_all
 from sqlalchemy.orm import InstrumentedAttribute
 from sqlmodel.sql.expression import SelectOfScalar
 
@@ -89,6 +89,12 @@ def has_accepted_values(column: Column, values: Iterable) -> Compilable:
 
     The `source` column in the `HeartRate` model should be one of
     'iPhone' or 'MiBand'
+
+    ```sql
+        SELECT {{ column_name }}
+        FROM {{ model }}
+        WHERE {{ column_name }} NOT IN {{ values }}
+    ```
     """
     return select(column).where(~column.in_(values))
 
@@ -193,3 +199,32 @@ def expression_is_true(expression, condition=and_(True)) -> bool:
     ```
     """
     return _test(statement=select(["*"]).where(condition).where(~expression))
+
+
+def equality(
+    model_a: AmoraModel,
+    model_b: AmoraModel,
+    compare_columns: Optional[Iterable[Column]] = None,
+) -> bool:
+    """
+    This schema test asserts the equality of two models. Optionally specify a subset of columns to compare.
+
+    """
+
+    raise NotImplementedError
+
+    def comparable_columns(model: AmoraModel) -> Iterable[Column]:
+        if not compare_columns:
+            return model
+        return [getattr(model, column_name) for column_name in compare_columns]
+
+    a = select(comparable_columns(model_a)).cte("a")
+    b = select(comparable_columns(model_b)).cte("b")
+
+    # fixme: google.api_core.exceptions.BadRequest: 400 EXCEPT must be followed by ALL, DISTINCT, or "(" at [34:4]
+    a_minus_b = select(a).except_(select(b))
+    b_minus_a = select(b).except_(select(a))
+
+    diff_union = union_all(a_minus_b, b_minus_a)
+
+    return _test(statement=diff_union)
