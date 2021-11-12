@@ -8,7 +8,6 @@ from amora.models import (
     MaterializationTypes,
 )
 from examples.amora_project.models.health import Health
-from sqlalchemy import MetaData
 from sqlmodel import Field, select
 
 
@@ -22,8 +21,6 @@ class Steps(AmoraModel, table=True):
         cluster_by="sourceName",
         tags=["daily"],
     )
-
-    metadata = MetaData(schema="amora-data-build-tool.diogo")
 
     creationDate: datetime
     device: str

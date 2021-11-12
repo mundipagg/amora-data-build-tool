@@ -1,7 +1,6 @@
 from amora.compilation import Compilable
 from amora.models import AmoraModel, MaterializationTypes, ModelConfig
 from examples.amora_project.models.steps import Steps
-from sqlalchemy import MetaData
 from sqlmodel import func, select, Field
 
 
@@ -15,8 +14,6 @@ class StepsAgg(AmoraModel, table=True):
     count: float
     year: int = Field(primary_key=True)
     month: int = Field(primary_key=True)
-
-    metadata = MetaData(schema="amora-data-build-tool.diogo")
 
     @classmethod
     def source(cls) -> Compilable:
