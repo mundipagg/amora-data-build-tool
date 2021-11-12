@@ -7,7 +7,7 @@ from amora.models import (
     PartitionConfig,
     MaterializationTypes,
 )
-from dbt.models.health import Health
+from examples.amora_project.models.health import Health
 from sqlalchemy import MetaData
 from sqlmodel import Field, select
 
