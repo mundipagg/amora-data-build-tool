@@ -1,3 +1,4 @@
+import pytest
 import typer
 from typing import Optional, List
 from amora.compilation import amora_model_for_path
@@ -105,11 +106,16 @@ def materialize(
 
 
 @app.command()
-def test(models: Optional[Models] = models_option) -> None:
+def test(tests_dir: Optional[str] = typer.Option(
+    None,
+    "--tests-dir",
+    help="Target connection configuration as defined as an amora.target.Target",
+), models: Optional[Models] = models_option) -> None:
     """
     Runs tests on data in deployed models. Run this after `amora materialize`.
     """
-    pass
+    return_code = pytest.main(["-n", "auto"])
+    raise typer.Exit(return_code)
 
 
 def main():
