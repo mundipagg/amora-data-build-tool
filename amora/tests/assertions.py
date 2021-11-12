@@ -103,10 +103,10 @@ def relationship(
     table (also known as referential integrity)
 
     This test validates the referential integrity between two relations
-    (same as the core relationships schema test) with an added predicate
-    to filter out some rows from the test. This is useful to exclude
-    records such as test entities, rows created in the last X minutes/hours
-    to account for temporary gaps due to data ingestion limitations, etc.
+    with a predicate to filter out some rows from the test. This is
+    useful to exclude records such as test entities, rows created in the
+    last X minutes/hours to account for temporary gaps due to data
+    ingestion limitations, etc.
 
     """
     left_table = (
@@ -120,7 +120,7 @@ def relationship(
     )
 
     exceptions = (
-        select([left_table.c["id"], right_table.c["id"]])
+        select([left_table.c["id"].label(from_.key)])
         .select_from(
             left_table.join(
                 right_table,
