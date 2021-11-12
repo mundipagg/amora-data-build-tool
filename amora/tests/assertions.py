@@ -55,7 +55,7 @@ def is_not_null(column: Column) -> Compilable:
     Results in the following query:
 
     ```sql
-        SELECT *
+        SELECT {{ column_name }}
         FROM {{ model }}
         WHERE {{ column_name }} IS NULL
     ```
@@ -70,7 +70,7 @@ def is_unique(column: Column) -> Compilable:
     The `id` column in the `HeartRate` model should be unique
 
     ```sql
-        SELECT *
+        SELECT {{ column_name }}
         FROM (
             SELECT {{ column_name }}
             FROM {{ model }}
@@ -174,12 +174,12 @@ def is_non_negative(column: Column) -> Compilable:
     Each not null `value` in `HeartRate` model is >= 0
 
     ```sql
-        SELECT *
+        SELECT {{ column_name }}
         FROM {{ model }}
         WHERE {{ column_name }} < 0
     ```
     """
-    return select(column.parent.entity).where(column < 0)
+    return select(column).where(column < 0)
 
 
 def expression_is_true(expression, condition=and_(True)) -> bool:
