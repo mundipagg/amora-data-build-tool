@@ -1,6 +1,6 @@
 from amora.compilation import Compilable
 from amora.models import AmoraModel, MaterializationTypes, ModelConfig
-from dbt.models.steps import Steps
+from examples.amora_project.models.steps import Steps
 from sqlalchemy import MetaData
 from sqlmodel import func, select, Field
 
