@@ -1,6 +1,12 @@
+import json
+
 import pytest
 import typer
 from typing import Optional, List
+
+from rich.console import Console
+from rich.table import Table
+
 from amora.compilation import amora_model_for_path
 
 from amora.config import settings
@@ -12,6 +18,7 @@ from amora.models import (
 )
 from amora.compilation import compile_statement
 from amora import materialization
+from amora.providers.bigquery import dry_run
 
 app = typer.Typer(
     help="Amora Data Build Tool enables engineers to transform data in their warehouses "
@@ -119,6 +126,64 @@ def test(
     """
     return_code = pytest.main(["-n", "auto"])
     raise typer.Exit(return_code)
+
+
+@app.command(name="list")
+def ls(
+    format: str = typer.Option(
+        "table", help="Output format. Options: json,table"
+    )
+) -> None:
+    """
+    List the resources in your project
+
+    """
+    models = [
+        amora_model_for_path(model_file_path)
+        for model_file_path in list_model_files()
+    ]
+
+    if format == "table":
+        table = Table(show_header=True, header_style="bold", show_lines=True)
+        table.add_column("Model name", style="green bold")
+        table.add_column("Total bytes")
+        table.add_column("Referenced tables")
+        table.add_column("Depends on")
+
+        for model in models:
+            result = dry_run(model)
+            table.add_row(
+                model.__name__,
+                str(result.total_bytes_processed) if result else "-",
+                " , ".join(result.referenced_tables) if result else "-",
+                " , ".join((model.__name__ for model in model.dependencies())),
+            )
+
+        console = Console(color_system="standard")
+        console.print(table)
+    elif format == "json":
+        output = {"models": []}
+        for model in models:
+            result = dry_run(model)
+            if result:
+                total_bytes_processed = result.total_bytes_processed
+                referenced_tables = result.referenced_tables
+            else:
+                total_bytes_processed = None
+                referenced_tables = None
+
+            output["models"].append(
+                {
+                    "model_name": model.__name__,
+                    "total_bytes_processed": total_bytes_processed,
+                    "referenced_tables": referenced_tables,
+                    "depends_on": [
+                        dep.__name__ for dep in model.dependencies()
+                    ],
+                }
+            )
+
+        print(json.dumps(output))
 
 
 def main():
