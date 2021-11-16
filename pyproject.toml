@@ -12,7 +12,7 @@ jupyter = "^1.0.0"
 numpy = "^1.21.1"
 matplotlib = "^3.4.2"
 sqlmodel = "^0.0.4"
-sqlalchemy-bigquery = "1.2.0"
+sqlalchemy-bigquery = "1.2.1"
 networkx = {extras = ["all"], version = "^2.6.3"}
 dbt = "^0.20.2"
 typer = {extras = ["all"], version = "^0.4.0"}
