@@ -151,4 +151,8 @@ class Health(AmoraModel):
 ```
 
 Source models are models managed outside the scope of Amora, without a `source` implementation, 
-no dependencies and no materialization configuration.
+no dependencies and no materialization configuration.   
+
+# Examples
+
+* Amora demo project: [amora-project](examples/amora_project/README.md)
