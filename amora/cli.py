@@ -1,4 +1,5 @@
 import json
+from dataclasses import dataclass
 
 import pytest
 import typer
@@ -18,7 +19,7 @@ from amora.models import (
 )
 from amora.compilation import compile_statement
 from amora import materialization
-from amora.providers.bigquery import dry_run
+from amora.providers.bigquery import dry_run, DryRunResult
 
 app = typer.Typer(
     help="Amora Data Build Tool enables engineers to transform data in their warehouses "
@@ -129,19 +130,56 @@ def test(
 
 
 @app.command(name="list")
-def ls(
+def list_models(
     format: str = typer.Option(
-        "table", help="Output format. Options: json,table"
-    )
+        "table",
+        help="Output format. Options: json,table",
+    ),
+    with_processed_bytes: bool = typer.Option(
+        False,
+        help="Uses BigQuery query dry run feature "
+        "to gather model total bytes processed information",
+    ),
 ) -> None:
     """
     List the resources in your project
 
     """
-    models = [
-        amora_model_for_path(model_file_path)
-        for model_file_path in list_model_files()
-    ]
+
+    @dataclass
+    class ResultItem:
+        model: AmoraModel
+        dry_run_result: Optional[DryRunResult] = None
+
+        @property
+        def model_name(self):
+            return model.__name__
+
+        @property
+        def depends_on(self) -> List[str]:
+            return [model.__name__ for model in model.dependencies()]
+
+        @property
+        def total_bytes_processed(self) -> Optional[int]:
+            if self.dry_run_result:
+                return self.dry_run_result.total_bytes_processed
+            return None
+
+        @property
+        def referenced_tables(self) -> Optional[List[str]]:
+            if self.dry_run_result:
+                return self.dry_run_result.referenced_tables
+            return None
+
+    results = []
+    for model_file_path in list_model_files():
+        model = amora_model_for_path(model_file_path)
+        if with_processed_bytes:
+            result_item = ResultItem(model=model, dry_run_result=dry_run(model))
+        else:
+            result_item = ResultItem(model=model, dry_run_result=None)
+
+        results.append(result_item)
 
     if format == "table":
         table = Table(show_header=True, header_style="bold", show_lines=True)
@@ -150,40 +188,30 @@ def ls(
         table.add_column("Referenced tables")
         table.add_column("Depends on")
 
-        for model in models:
-            result = dry_run(model)
+        for result in results:
             table.add_row(
-                model.__name__,
-                str(result.total_bytes_processed) if result else "-",
-                " , ".join(result.referenced_tables) if result else "-",
-                " , ".join((model.__name__ for model in model.dependencies())),
+                result.model_name,
+                str(result.total_bytes_processed) if result.total_bytes_processed else "-",
+                " , ".join(result.referenced_tables) if result.referenced_tables else "-",
+                " , ".join(result.depends_on),
             )
 
         console = Console(color_system="standard")
         console.print(table)
+
     elif format == "json":
         output = {"models": []}
-        for model in models:
-            result = dry_run(model)
-            if result:
-                total_bytes_processed = result.total_bytes_processed
-                referenced_tables = result.referenced_tables
-            else:
-                total_bytes_processed = None
-                referenced_tables = None
-
+        for result in results:
             output["models"].append(
                 {
-                    "model_name": model.__name__,
-                    "total_bytes_processed": total_bytes_processed,
-                    "referenced_tables": referenced_tables,
-                    "depends_on": [
-                        dep.__name__ for dep in model.dependencies()
-                    ],
+                    "model_name": result.model_name,
+                    "total_bytes_processed": result.total_bytes_processed,
+                    "referenced_tables": result.referenced_tables,
+                    "depends_on": result.depends_on,
                 }
             )
 
-        print(json.dumps(output))
+        typer.echo(json.dumps(output))
 
 
 def main():
