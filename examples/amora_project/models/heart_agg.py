@@ -1,6 +1,6 @@
 from amora.compilation import Compilable
 from amora.models import AmoraModel, ModelConfig, MaterializationTypes
-from dbt.models.heart_rate import HeartRate
+from examples.amora_project.models.heart_rate import HeartRate
 from sqlmodel import func, select, Field
 
 
@@ -9,9 +9,9 @@ class HeartRateAgg(AmoraModel, table=True):
     __tablename__ = "heart_rate_agg"
     __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
 
-    _avg: float
-    _sum: float
-    _count: float
+    avg: float
+    sum: float
+    count: float
     year: int = Field(primary_key=True)
     month: int = Field(primary_key=True)
 
@@ -19,9 +19,9 @@ class HeartRateAgg(AmoraModel, table=True):
     def source(cls) -> Compilable:
         return select(
             [
-                func.avg(HeartRate.value).label("_avg"),
-                func.sum(HeartRate.value).label("_sum"),
-                func.count(HeartRate.value).label("_count"),
+                func.avg(HeartRate.value).label("avg"),
+                func.sum(HeartRate.value).label("sum"),
+                func.count(HeartRate.value).label("count"),
                 func.extract("year", HeartRate.creationDate).label("year"),
                 func.extract("month", HeartRate.creationDate).label("month"),
             ]

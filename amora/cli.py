@@ -1,3 +1,4 @@
+import pytest
 import typer
 from typing import Optional, List
 from amora.compilation import amora_model_for_path
@@ -106,6 +107,18 @@ def materialize(
             typer.echo(f"✅  Created `{model}` as `{table.full_table_id}`")
             typer.echo(f"    Rows: {table.num_rows}")
             typer.echo(f"    Bytes: {table.num_bytes}")
+
+
+@app.command()
+def test(
+    models: Optional[Models] = models_option,
+) -> None:
+    """
+    Runs tests on data in deployed models. Run this after `amora materialize`
+    to ensure that the date state is up-to-date.
+    """
+    return_code = pytest.main(["-n", "auto"])
+    raise typer.Exit(return_code)
 
 
 def main():

@@ -10,6 +10,27 @@ setup(
     license="MIT",
     packages=["."],
     entry_points={
-        "console_scripts": ["amora=amora.cli:main"],
+        "console_scripts": ["amora=cli:main"],
+        "pytest11": ["amora = amora.tests.pytest_plugin"],
     },
+    install_requires=[
+        "jupyter~=1.0.0",
+        "matplotlib~=3.4.2",
+        "networkx~=2.6.3",
+        "numpy~=1.21.1",
+        "pandas~=1.3.0",
+        "pytest~=6.2.5",
+        "sqlalchemy-bigquery~=1.2.0",
+        "sqlmodel~=0.0.4",
+        "typer[all]~=0.4.0",
+    ],
+    classifiers=[
+        "Development Status :: 2 - Pre-Alpha",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: SQL",
+    ],
 )
