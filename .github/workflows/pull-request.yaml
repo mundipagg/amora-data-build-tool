@@ -42,7 +42,7 @@ jobs:
         run: black -v --line-length 80 --check amora tests
 
       - name: 🧪 pytest
-        run: py.test --cov=amora --cov-report=term-missing --cov-report=xml
+        run: py.test --cov=amora --cov-report=term-missing --cov-report=xml ./tests
 
       - name: 🧪 SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master

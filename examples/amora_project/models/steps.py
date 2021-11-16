@@ -7,8 +7,7 @@ from amora.models import (
     PartitionConfig,
     MaterializationTypes,
 )
-from dbt.models.health import Health
-from sqlalchemy import MetaData
+from examples.amora_project.models.health import Health
 from sqlmodel import Field, select
 
 
@@ -22,8 +21,6 @@ class Steps(AmoraModel, table=True):
         cluster_by="sourceName",
         tags=["daily"],
     )
-
-    metadata = MetaData(schema="stg-tau-rex.diogo")
 
     creationDate: datetime
     device: str

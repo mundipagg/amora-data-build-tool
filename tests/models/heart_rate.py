@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import MetaData, func
-from sqlmodel import select, SQLModel, Field
+from sqlmodel import select, Field
 
 from amora.compilation import Compilable
 from amora.models import (
@@ -10,7 +9,7 @@ from amora.models import (
     AmoraModel,
     MaterializationTypes,
 )
-from dbt.models.health import Health
+from tests.models.health import Health
 
 
 class HeartRate(AmoraModel, table=True):
