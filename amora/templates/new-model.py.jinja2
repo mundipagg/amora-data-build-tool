@@ -3,11 +3,11 @@ from datetime import date, datetime, time
 from sqlalchemy import MetaData
 
 
-class {{ table.title() -}}(AmoraModel):
+class {{ model_name -}}(AmoraModel):
     """
         {{ project }}.{{ dataset }}.{{ table }}
 
-        Generated with `amora new-model`
+        Generated with `amora model-create`
     """
     metadata = MetaData(schema='{{ project }}.{{ dataset }}')
     __tablename__ = '{{ table }}'

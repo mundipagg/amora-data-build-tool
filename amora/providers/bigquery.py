@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Optional, List
+from datetime import datetime, date, time
+from typing import Optional, List, Literal
 
 from google.cloud.bigquery import Client, QueryJobConfig, SchemaField
 
@@ -7,6 +8,28 @@ from amora.compilation import compile_statement
 from amora.models import AmoraModel
 
 Schema = List[SchemaField]
+
+# todo: cobrir todos os tipos
+BIGQUERY_TYPES_TO_PYTHON_TYPES = {
+    "ARRAY": list,
+    "BIGNUMERIC": int,
+    "BOOL": bool,
+    "BOOLEAN": bool,
+    "BYTES": bytes,
+    "DATE": date,
+    "DATETIME": datetime,
+    "FLOAT64": float,
+    "FLOAT": float,
+    "GEOGRAPHY": str,
+    "INT64": int,
+    "INTEGER": int,
+    "INTERVAL": "",
+    "JSON": dict,
+    "NUMERIC": "",
+    "STRING": str,
+    "TIME": time,
+    "TIMESTAMP": datetime,
+}
 
 
 @dataclass
@@ -30,6 +53,12 @@ def get_client() -> Client:
     if _client is None:
         _client = Client()
     return _client
+
+
+def get_schema(table_id: str) -> Schema:
+    client = get_client()
+    table = client.get_table(table_id)
+    return table.schema
 
 
 def dry_run(model: AmoraModel) -> Optional[DryRunResult]:
