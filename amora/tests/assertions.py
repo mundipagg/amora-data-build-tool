@@ -11,7 +11,7 @@ from amora.compilation import compile_statement
 from amora.providers.bigquery import get_client
 
 Column = InstrumentedAttribute
-Test = Callable[[Column, ...], SelectOfScalar]
+Test = Callable[..., SelectOfScalar]
 
 
 def _test(statement: Compilable) -> bool:
@@ -104,7 +104,7 @@ def relationship(
     to: Column,
     from_condition=and_(True),
     to_condition=and_(True),
-) -> Compilable:
+) -> bool:
     """
     >>> relationship(HeartRate.id, to=Health.id)
 
@@ -112,10 +112,10 @@ def relationship(
     table (also known as referential integrity)
 
     This test validates the referential integrity between two relations
-    with a predicate to filter out some rows from the test. This is
-    useful to exclude records such as test entities, rows created in the
-    last X minutes/hours to account for temporary gaps due to data
-    ingestion limitations, etc.
+    with a predicate (`from_condition` and `to_condition`) to filter out
+    some rows from the test. This is useful to exclude records such as
+    test entities, rows created in the last X minutes/hours to account
+    for temporary gaps due to data ingestion limitations, etc.
 
     ```sql
         WITH left_table AS (
@@ -198,10 +198,11 @@ def expression_is_true(expression, condition=and_(True)) -> bool:
     """
     >>> expression_is_true(StepsAgg._sum > StepsAgg._avg, condition=StepsAgg.year == 2021)
 
-    Asserts that a expression is True for all records.
+    Asserts that a expression is TRUE for all records.
     This is useful when checking integrity across columns, for example,
     that a total is equal to the sum of its parts, or that at least one column is true.
 
+    Optionally assert `expression` only for rows where `condition` is met.
     ```
     """
     return _test(statement=select(["*"]).where(condition).where(~expression))
