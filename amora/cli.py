@@ -14,7 +14,6 @@ from amora.compilation import amora_model_for_path
 from amora.config import settings
 from amora.models import (
     list_model_files,
-    is_py_model,
     AmoraModel,
     list_target_files,
 )
@@ -24,6 +23,7 @@ from amora.providers.bigquery import (
     dry_run,
     get_schema,
     BIGQUERY_TYPES_TO_PYTHON_TYPES,
+    DryRunResult,
 )
 
 app = typer.Typer(
