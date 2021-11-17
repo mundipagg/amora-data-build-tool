@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from pydantic import BaseSettings
@@ -11,6 +12,8 @@ class Settings(BaseSettings):
     TARGET_SCHEMA: str
     TARGET_PATH: str = AMORA_MODULE_PATH.joinpath("target").as_posix()
     MODELS_PATH: str = ROOT_PATH.joinpath("dbt/models").as_posix()
+
+    CLI_CONSOLE_MAX_WIDTH: int = 160
 
     class Config:
         env_prefix = "AMORA_"

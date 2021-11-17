@@ -135,10 +135,10 @@ def list_models(
         "table",
         help="Output format. Options: json,table",
     ),
-    with_processed_bytes: bool = typer.Option(
+    with_total_bytes: bool = typer.Option(
         False,
         help="Uses BigQuery query dry run feature "
-        "to gather model total bytes processed information",
+        "to gather model total bytes information",
     ),
 ) -> None:
     """
@@ -151,30 +151,56 @@ def list_models(
         model: AmoraModel
         dry_run_result: Optional[DryRunResult] = None
 
+        def as_dict(self):
+            return {
+                "depends_on": self.depends_on,
+                "has_source": self.has_source,
+                "materialization_type": self.materialization_type,
+                "model_name": self.model_name,
+                "referenced_tables": self.referenced_tables,
+                "total_bytes": self.total_bytes,
+            }
+
         @property
         def model_name(self):
-            return model.__name__
+            return self.model.__name__
+
+        @property
+        def has_source(self):
+            return self.model.source() is not None
 
         @property
         def depends_on(self) -> List[str]:
-            return [model.__name__ for model in model.dependencies()]
+            return sorted(
+                [
+                    dependency.__name__
+                    for dependency in self.model.dependencies()
+                ]
+            )
 
         @property
-        def total_bytes_processed(self) -> Optional[int]:
+        def total_bytes(self) -> Optional[int]:
             if self.dry_run_result:
-                return self.dry_run_result.total_bytes_processed
+                return self.dry_run_result.total_bytes
             return None
 
         @property
-        def referenced_tables(self) -> Optional[List[str]]:
+        def referenced_tables(self) -> List[str]:
             if self.dry_run_result:
                 return self.dry_run_result.referenced_tables
-            return None
+            return []
+
+        @property
+        def materialization_type(self) -> Optional[str]:
+            if self.has_source:
+                return self.model.__model_config__.materialized.value
+            else:
+                return None
 
     results = []
     for model_file_path in list_model_files():
         model = amora_model_for_path(model_file_path)
-        if with_processed_bytes:
+        if with_total_bytes:
             result_item = ResultItem(model=model, dry_run_result=dry_run(model))
         else:
             result_item = ResultItem(model=model, dry_run_result=None)
@@ -182,35 +208,36 @@ def list_models(
         results.append(result_item)
 
     if format == "table":
-        table = Table(show_header=True, header_style="bold", show_lines=True)
-        table.add_column("Model name", style="green bold")
-        table.add_column("Total bytes")
-        table.add_column("Referenced tables")
-        table.add_column("Depends on")
+        table = Table(
+            show_header=True,
+            header_style="bold",
+            show_lines=True,
+            width=settings.CLI_CONSOLE_MAX_WIDTH,
+            row_styles=["none", "dim"],
+        )
+
+        table.add_column("Model name", style="green bold", no_wrap=True)
+        table.add_column("Total bytes", no_wrap=True)
+        table.add_column("Referenced tables", no_wrap=True)
+        table.add_column("Depends on", no_wrap=True)
+        table.add_column("Has source?", no_wrap=True, justify="center")
+        table.add_column("Materialization", no_wrap=True)
 
         for result in results:
             table.add_row(
                 result.model_name,
-                str(result.total_bytes_processed) if result.total_bytes_processed else "-",
-                " , ".join(result.referenced_tables) if result.referenced_tables else "-",
-                " , ".join(result.depends_on),
+                f"{result.total_bytes or '-'}",
+                " , ".join(result.referenced_tables) or "-",
+                " , ".join(result.depends_on) or "-",
+                "🟢" if result.has_source else "🔴",
+                result.materialization_type or "-",
             )
 
-        console = Console(color_system="standard")
+        console = Console(width=settings.CLI_CONSOLE_MAX_WIDTH)
         console.print(table)
 
     elif format == "json":
-        output = {"models": []}
-        for result in results:
-            output["models"].append(
-                {
-                    "model_name": result.model_name,
-                    "total_bytes_processed": result.total_bytes_processed,
-                    "referenced_tables": result.referenced_tables,
-                    "depends_on": result.depends_on,
-                }
-            )
-
+        output = {"models": [result.as_dict() for result in results]}
         typer.echo(json.dumps(output))
 
 

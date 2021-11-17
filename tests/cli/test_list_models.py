@@ -3,6 +3,7 @@ import json
 from unittest.mock import MagicMock, patch
 
 import rich
+from google.cloud.bigquery.exceptions import BigQueryError
 from typer.testing import CliRunner
 
 from amora.cli import app
@@ -19,7 +20,7 @@ def test_list_without_options(Console: MagicMock, dry_run: MagicMock):
         ["list"],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.stderr
 
     console_print = Console.return_value.print
 
@@ -47,10 +48,10 @@ def test_list_with_json_format(dry_run: MagicMock):
 
 
 @patch("amora.cli.dry_run", return_value=None)
-def test_list_with_processed_bytes_option(dry_run: MagicMock):
+def test_list_with_total_bytes_option(dry_run: MagicMock):
     result = runner.invoke(
         app,
-        ["list", "--with-processed-bytes"],
+        ["list", "--with-total-bytes"],
     )
 
     assert result.exit_code == 0, result.stderr
@@ -59,10 +60,10 @@ def test_list_with_processed_bytes_option(dry_run: MagicMock):
 
 
 @patch("amora.cli.dry_run", return_value=None)
-def test_list_json_format_and_with_processed_bytes_option(dry_run: MagicMock):
+def test_list_json_format_and_with_total_bytes_option(dry_run: MagicMock):
     result = runner.invoke(
         app,
-        ["list", "--format", "json", "--with-processed-bytes"],
+        ["list", "--format", "json", "--with-total-bytes"],
     )
 
     assert result.exit_code == 0, result.stderr
@@ -71,3 +72,18 @@ def test_list_json_format_and_with_processed_bytes_option(dry_run: MagicMock):
     assert models_as_json
     assert len(models_as_json["models"]) == len(list(list_model_files()))
     assert dry_run.call_count == len(list(list_model_files()))
+
+
+exc = BigQueryError()
+
+
+@patch("amora.cli.dry_run", side_effect=exc)
+def test_list_with_total_bytes_option_and_dry_run_error(dry_run: MagicMock):
+    result = runner.invoke(
+        app,
+        ["list", "--format", "json", "--with-total-bytes"],
+    )
+
+    assert result.exit_code == 1, result.stderr
+    assert result.exception == exc
+    dry_run.assert_called_once()
