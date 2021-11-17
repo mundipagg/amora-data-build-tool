@@ -1,6 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, date, time
-from typing import Optional, List, Literal
+from typing import Optional, List
 
 from google.cloud.bigquery import Client, QueryJobConfig, SchemaField
 
