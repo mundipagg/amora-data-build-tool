@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, List
 
 from google.cloud.bigquery import Client, QueryJobConfig, SchemaField
@@ -11,11 +11,11 @@ Schema = List[SchemaField]
 
 @dataclass
 class DryRunResult:
-    total_bytes_processed: int
-    query: str
+    total_bytes: int
     model: AmoraModel
-    referenced_tables: List[str]
     schema: Schema
+    query: str = None
+    referenced_tables: List[str] = field(default_factory=list)
 
     @property
     def estimated_cost(self):
@@ -30,6 +30,10 @@ def get_client() -> Client:
     if _client is None:
         _client = Client()
     return _client
+
+
+def get_fully_qualified_id(model: AmoraModel) -> str:
+    return f"{model.metadata.schema}.{model.__tablename__}"
 
 
 def dry_run(model: AmoraModel) -> Optional[DryRunResult]:
@@ -58,20 +62,42 @@ def dry_run(model: AmoraModel) -> Optional[DryRunResult]:
 
     Read more: https://cloud.google.com/bigquery/docs/dry-run-queries
     """
+    client = get_client()
     source = model.source()
     if source is None:
-        return
+        table = client.get_table(get_fully_qualified_id(model))
+
+        if table.table_type == "VIEW":
+            query_job = client.query(
+                query=table.view_query,
+                job_config=QueryJobConfig(dry_run=True, use_query_cache=False),
+            )
+
+            return DryRunResult(
+                model=model,
+                query=table.view_query,
+                referenced_tables=[
+                    ".".join(table.to_api_repr().values())
+                    for table in query_job.referenced_tables
+                ],
+                schema=query_job.schema,
+                total_bytes=query_job.total_bytes_processed,
+            )
+        else:
+            return DryRunResult(
+                total_bytes=table.num_bytes, schema=table.schema, model=model
+            )
 
     query = compile_statement(source)
 
-    query_job = get_client().query(
+    query_job = client.query(
         query=query,
         job_config=QueryJobConfig(dry_run=True, use_query_cache=False),
     )
     tables = [table.to_api_repr() for table in query_job.referenced_tables]
 
     return DryRunResult(
-        total_bytes_processed=query_job.total_bytes_processed,
+        total_bytes=query_job.total_bytes_processed,
         referenced_tables=[".".join(table.values()) for table in tables],
         query=query,
         model=model,

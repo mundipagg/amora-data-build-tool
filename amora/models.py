@@ -54,7 +54,9 @@ def is_py_model(obj) -> bool:
 
 # registry = registry()
 
-metadata = MetaData(schema=settings.TARGET_SCHEMA)
+metadata = MetaData(
+    schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}"
+)
 
 
 class AmoraModel(SQLModel):
