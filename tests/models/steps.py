@@ -3,14 +3,19 @@ from datetime import datetime
 from sqlmodel import select, Field
 
 from amora.compilation import Compilable
-from amora.models import ModelConfig, PartitionConfig, AmoraModel
+from amora.models import (
+    ModelConfig,
+    PartitionConfig,
+    AmoraModel,
+    MaterializationTypes,
+)
 from tests.models.health import Health
 
 
 class Steps(AmoraModel, table=True):
     __depends_on__ = [Health]
     __model_config__ = ModelConfig(
-        materialized="table",
+        materialized=MaterializationTypes.table,
         partition_by=PartitionConfig(
             field="creationDate", data_type="TIMESTAMP", granularity="day"
         ),
