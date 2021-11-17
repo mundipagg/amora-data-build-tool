@@ -14,7 +14,7 @@ class DryRunResult:
     total_bytes: int
     model: AmoraModel
     schema: Schema
-    query: str = None
+    query: Optional[str] = None
     referenced_tables: List[str] = field(default_factory=list)
 
     @property
