@@ -134,8 +134,12 @@ def test(
     raise typer.Exit(return_code)
 
 
-@app.command(name="list")
-def list_models(
+models = typer.Typer()
+app.add_typer(models, name="models")
+
+
+@models.command(name="list")
+def models_list(
     format: str = typer.Option(
         "table",
         help="Output format. Options: json,table",
@@ -147,7 +151,8 @@ def list_models(
     ),
 ) -> None:
     """
-    List the resources in your project
+    List the models in your project as a human readable table
+    or as a JSON serialized document
 
     """
 
@@ -246,8 +251,8 @@ def list_models(
         typer.echo(json.dumps(output))
 
 
-@app.command(name="model-create")
-def model_create(
+@models.command(name="import")
+def models_import(
     table_reference: str = typer.Option(
         ...,
         "--table-reference",
