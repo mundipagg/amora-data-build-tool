@@ -24,7 +24,7 @@ Jinja2 = "^2.11.3"
 [tool.poetry.dev-dependencies]
 pytest-cov = "^3.0.0"
 black = "^21.9b0"
-dbt = "^0.20.2"
+dbt = "^0.21.0"
 mypy = "^0.910"
 lxml = "^4.6.3"
 
