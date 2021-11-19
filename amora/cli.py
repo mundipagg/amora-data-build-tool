@@ -259,7 +259,7 @@ def models_import(
         help="BigQuery unique table identifier. "
         "E.g.: project-id.dataset-id.table-id",
     ),
-    model_name: str = typer.Argument(
+    model_file_path: str = typer.Argument(
         None,
         help="Canonical name of python module for the generated AmoraModel. "
         "A good pattern would be to use an unique "
@@ -285,6 +285,18 @@ def models_import(
     project, dataset, table = table_reference.split(".")
     model_name = "".join((part.title() for part in table.split("_")))
 
+    destination_file_path = Path(settings.MODELS_PATH).joinpath(
+        (model_file_path or model_name.replace(".", "/")) + ".py"
+    )
+
+    if destination_file_path.exists() and not overwrite:
+        typer.echo(
+            f"`{destination_file_path}` already exists. "
+            f"Pass `--overwrite` to overwrite file.",
+            err=True,
+        )
+        raise typer.Exit(1)
+
     model_source_code = template.render(
         BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
         dataset=dataset,
@@ -295,24 +307,13 @@ def models_import(
         table=table,
     )
 
-    destination_file_path = Path(settings.MODELS_PATH).joinpath(
-        model_name.replace(".", "/") + ".py"
-    )
-    if destination_file_path.exists() and not overwrite:
-        typer.echo(
-            f"`{destination_file_path}` already exists. "
-            f"Pass `--overwrite` to overwrite file.",
-            err=True,
-        )
-        raise typer.Exit(1)
-
     destination_file_path.parent.mkdir(parents=True, exist_ok=True)
     destination_file_path.write_text(model_source_code)
 
     typer.secho(
         f"🎉 Amora Model `{model_name}` (`{table_reference}`) imported!",
         fg=typer.colors.GREEN,
-        bold=True
+        bold=True,
     )
     typer.secho(f"Current File Path: `{destination_file_path.as_posix()}`")
 
