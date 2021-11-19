@@ -17,7 +17,7 @@ runner = CliRunner()
 def test_list_without_options(Console: MagicMock, dry_run: MagicMock):
     result = runner.invoke(
         app,
-        ["list"],
+        ["models", "list"],
     )
 
     assert result.exit_code == 0, result.stderr
@@ -35,7 +35,7 @@ def test_list_without_options(Console: MagicMock, dry_run: MagicMock):
 def test_list_with_json_format(dry_run: MagicMock):
     result = runner.invoke(
         app,
-        ["list", "--format", "json"],
+        ["models", "list", "--format", "json"],
     )
 
     assert result.exit_code == 0, result.stderr
@@ -51,7 +51,7 @@ def test_list_with_json_format(dry_run: MagicMock):
 def test_list_with_total_bytes_option(dry_run: MagicMock):
     result = runner.invoke(
         app,
-        ["list", "--with-total-bytes"],
+        ["models", "list", "--with-total-bytes"],
     )
 
     assert result.exit_code == 0, result.stderr
@@ -63,7 +63,7 @@ def test_list_with_total_bytes_option(dry_run: MagicMock):
 def test_list_json_format_and_with_total_bytes_option(dry_run: MagicMock):
     result = runner.invoke(
         app,
-        ["list", "--format", "json", "--with-total-bytes"],
+        ["models", "list", "--format", "json", "--with-total-bytes"],
     )
 
     assert result.exit_code == 0, result.stderr
@@ -81,7 +81,7 @@ exc = BigQueryError()
 def test_list_with_total_bytes_option_and_dry_run_error(dry_run: MagicMock):
     result = runner.invoke(
         app,
-        ["list", "--format", "json", "--with-total-bytes"],
+        ["models", "list", "--format", "json", "--with-total-bytes"],
     )
 
     assert result.exit_code == 1, result.stderr
