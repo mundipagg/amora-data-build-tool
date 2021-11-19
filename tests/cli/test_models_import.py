@@ -8,6 +8,7 @@ from google.cloud.bigquery import SchemaField
 from typer.testing import CliRunner
 from amora.cli import app
 from amora.compilation import amora_model_for_path
+from amora.models import AmoraModel
 
 runner = CliRunner()
 
@@ -19,18 +20,24 @@ exc = NotFound("Table not found")
 def test_models_import_with_invalid_table_reference(get_schema: MagicMock):
     table_reference = "project.dataset.table"
 
-    result = runner.invoke(
-        app,
-        ["models", "import", "--table-reference", table_reference, "./"],
-    )
+    with NamedTemporaryFile(suffix=".py") as fp:
+        output = Path(fp.name).parent.joinpath(Path(fp.name).stem)
+        result = runner.invoke(
+            app,
+            [
+                "models",
+                "import",
+                "--overwrite",
+                "--table-reference",
+                table_reference,
+                output.as_posix(),
+            ],
+        )
 
-    assert result.exit_code == 1, result.stderr
-    assert result.exception == exc
-    get_schema.assert_called_once_with(table_reference)
-
-
-def test_models_import_with_valid_table_reference():
-    pass
+        assert result.exit_code == 1, result.stderr
+        assert result.exception == exc
+        assert not fp.read()
+        get_schema.assert_called_once_with(table_reference)
 
 
 mock_schema = [
@@ -60,20 +67,20 @@ def test_models_import_with_valid_table_reference_and_existing_destination_file_
     with NamedTemporaryFile(suffix=".py") as fp:
         output = Path(fp.name).parent.joinpath(Path(fp.name).stem)
 
-        table_reference = "project.dataset.table"
-
         result = runner.invoke(
             app,
             [
                 "models",
                 "import",
                 "--table-reference",
-                table_reference,
+                "project.dataset.table",
                 output.as_posix(),
             ],
         )
 
         assert result.exit_code == 1, result.stderr
+        assert not get_schema.called
+        assert not fp.read()
         assert "Pass `--overwrite` to overwrite file." in result.stdout
 
 
@@ -100,6 +107,5 @@ def test_models_import_with_valid_table_reference_and_existing_destination_file_
         )
 
         assert result.exit_code == 0, result.stderr
-        model_content = fp.read()
-
-        assert amora_model_for_path(path=output_path)
+        assert output_path.read_text()
+        assert issubclass(amora_model_for_path(path=output_path), AmoraModel)
