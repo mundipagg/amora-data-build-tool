@@ -271,6 +271,10 @@ def models_import(
 ):
     """
     Generates a new amora model file from an existing table/view
+
+    ```shell
+    $ amora models import --table-reference my_gcp_project.my_dataset.my_table my_gcp_project/my_dataset/my_table
+    ```
     """
 
     env = Environment(
@@ -279,12 +283,13 @@ def models_import(
     template = env.get_template("new-model.py.jinja2")
 
     project, dataset, table = table_reference.split(".")
+    model_name = "".join((part.title() for part in table.split("_")))
 
     model_source_code = template.render(
         BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
         dataset=dataset,
         dataset_id=f"{project}.{dataset}",
-        model_name="".join((part.title() for part in table.split("_"))),
+        model_name=model_name,
         project=project,
         schema=get_schema(table_reference),
         table=table,
@@ -304,8 +309,12 @@ def models_import(
     destination_file_path.parent.mkdir(parents=True, exist_ok=True)
     destination_file_path.write_text(model_source_code)
 
-    # validar que select * FROM modelo funciona
-    # validar que pode ser carregado com `amora_model_for_path(destination_file_path)`
+    typer.secho(
+        f"🎉 Amora Model `{model_name}` (`{table_reference}`) imported!",
+        fg=typer.colors.GREEN,
+        bold=True
+    )
+    typer.secho(f"Current File Path: `{destination_file_path.as_posix()}`")
 
 
 def main():
