@@ -2,7 +2,7 @@
 name = "agate"
 version = "1.6.1"
 description = "A data analysis library that is optimized for humans instead of machines."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -43,7 +43,7 @@ tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pytest"]
 name = "asn1crypto"
 version = "1.4.0"
 description = "Fast ASN.1 parser and serializer with definitions for private keys, public keys, certificates, CRL, OCSP, CMS, PKCS#3, PKCS#7, PKCS#8, PKCS#12, PKCS#5, X.509 and TSP"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -73,7 +73,7 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 name = "azure-common"
 version = "1.1.27"
 description = "Microsoft Azure Client Library for Python (Common)"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -81,7 +81,7 @@ python-versions = "*"
 name = "azure-core"
 version = "1.20.1"
 description = "Microsoft Azure Core Library for Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -93,7 +93,7 @@ six = ">=1.11.0"
 name = "azure-storage-blob"
 version = "12.9.0"
 description = "Microsoft Azure Blob Storage Client Library for Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -106,7 +106,7 @@ msrest = ">=0.6.21"
 name = "babel"
 version = "2.9.1"
 description = "Internationalization utilities"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
@@ -160,14 +160,14 @@ webencodings = "*"
 
 [[package]]
 name = "boto3"
-version = "1.20.7"
+version = "1.20.8"
 description = "The AWS SDK for Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">= 3.6"
 
 [package.dependencies]
-botocore = ">=1.23.7,<1.24.0"
+botocore = ">=1.23.8,<1.24.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.5.0,<0.6.0"
 
@@ -176,9 +176,9 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.23.7"
+version = "1.23.8"
 description = "Low-level, data-driven core of boto 3."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">= 3.6"
 
@@ -221,7 +221,7 @@ pycparser = "*"
 name = "chardet"
 version = "4.0.0"
 description = "Universal encoding detector for Python 2 and 3"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
@@ -284,7 +284,7 @@ toml = ["tomli"]
 name = "cryptography"
 version = "3.4.8"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -311,7 +311,7 @@ python-versions = ">=3.6"
 name = "dbt"
 version = "0.20.2"
 description = "With dbt, data analysts and engineers can build analytics the way engineers build applications."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.2"
 
@@ -326,7 +326,7 @@ dbt-snowflake = "0.20.2"
 name = "dbt-bigquery"
 version = "0.20.2"
 description = "The bigquery adapter plugin for dbt (data build tool)"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.2"
 
@@ -343,7 +343,7 @@ six = ">=1.14.0"
 name = "dbt-core"
 version = "0.20.2"
 description = "dbt (data build tool) is a command line tool that helps analysts and engineers transform data in their warehouse more effectively"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.3"
 
@@ -372,7 +372,7 @@ werkzeug = ">=0.15,<3.0"
 name = "dbt-extractor"
 version = "0.4.0"
 description = ""
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -380,7 +380,7 @@ python-versions = "*"
 name = "dbt-postgres"
 version = "0.20.2"
 description = "The postgres adpter plugin for dbt (data build tool)"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.2"
 
@@ -392,7 +392,7 @@ psycopg2-binary = ">=2.8,<3.0"
 name = "dbt-redshift"
 version = "0.20.2"
 description = "The redshift adapter plugin for dbt (data build tool)"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.2"
 
@@ -405,7 +405,7 @@ dbt-postgres = "0.20.2"
 name = "dbt-snowflake"
 version = "0.20.2"
 description = "The snowflake adapter plugin for dbt (data build tool)"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.2"
 
@@ -642,7 +642,7 @@ protobuf = ["grpcio-tools (>=1.42.0)"]
 name = "hologram"
 version = "0.0.14"
 description = "JSON schema generation from dataclasses"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -766,7 +766,7 @@ test = ["pytest (>=3.6.0)", "pytest-cov", "mock"]
 name = "isodate"
 version = "0.6.0"
 description = "An ISO 8601 date/time/duration parser and formatter"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -792,7 +792,7 @@ testing = ["Django (<3.1)", "colorama", "docopt", "pytest (<7.0.0)"]
 name = "jeepney"
 version = "0.7.1"
 description = "Low-level, pure Python DBus protocol wrapper."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -818,7 +818,7 @@ i18n = ["Babel (>=0.8)"]
 name = "jmespath"
 version = "0.10.0"
 description = "JSON Matching Expressions"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -826,7 +826,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 name = "json-rpc"
 version = "1.13.0"
 description = "JSON-RPC transport implementation"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -937,7 +937,7 @@ python-versions = ">=3.6"
 name = "keyring"
 version = "21.8.0"
 description = "Store and access your passwords safely."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -962,7 +962,7 @@ python-versions = ">=3.7"
 name = "leather"
 version = "0.3.4"
 description = "Python charting for 80% of humans."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -973,7 +973,7 @@ six = ">=1.6.1"
 name = "logbook"
 version = "1.5.3"
 description = "A logging replacement for Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1014,7 +1014,7 @@ python-versions = ">=3.6"
 name = "mashumaro"
 version = "2.5"
 description = "Fast serialization framework on top of dataclasses"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -1057,7 +1057,7 @@ traitlets = "*"
 name = "minimal-snowplow-tracker"
 version = "0.0.2"
 description = "A minimal snowplow event tracker for Python. Add analytics to your Python and Django apps, webapps and games"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1077,7 +1077,7 @@ python-versions = "*"
 name = "msgpack"
 version = "1.0.2"
 description = "MessagePack (de)serializer."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1085,7 +1085,7 @@ python-versions = "*"
 name = "msrest"
 version = "0.6.21"
 description = "AutoRest swagger generator Python client runtime."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1255,7 +1255,7 @@ python-versions = ">=3.7,<3.11"
 name = "oauthlib"
 version = "3.1.1"
 description = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -1268,7 +1268,7 @@ signedtoken = ["cryptography (>=3.0.0,<4)", "pyjwt (>=2.0.0,<3)"]
 name = "oscrypto"
 version = "1.2.1"
 description = "TLS (SSL) sockets, key generation, encryption, decryption, signing, verification and KDFs using the OS crypto libraries. Does not require a compiler, and relies on the OS for patching. Works on Windows, OS X and Linux/BSD."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1318,7 +1318,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 name = "parsedatetime"
 version = "2.6"
 description = "Parse human-readable date/time text."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1452,7 +1452,7 @@ test = ["ipaddress", "mock", "unittest2", "enum34", "pywin32", "wmi"]
 name = "psycopg2-binary"
 version = "2.9.2"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -1503,7 +1503,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 name = "pycryptodomex"
 version = "3.11.0"
 description = "Cryptographic library for Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
@@ -1534,7 +1534,7 @@ python-versions = ">=3.5"
 name = "pyjwt"
 version = "2.3.0"
 description = "JSON Web Token implementation in Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -1548,7 +1548,7 @@ tests = ["pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)"]
 name = "pyopenssl"
 version = "20.0.1"
 description = "Python wrapper module around the OpenSSL library"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
 
@@ -1672,7 +1672,7 @@ six = ">=1.5"
 name = "python-slugify"
 version = "5.0.2"
 description = "A Python Slugify application that handles Unicode"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -1686,7 +1686,7 @@ unidecode = ["Unidecode (>=1.1.1)"]
 name = "pytimeparse"
 version = "1.1.8"
 description = "Time expression parser"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1710,7 +1710,7 @@ python-versions = "*"
 name = "pywin32-ctypes"
 version = "0.2.0"
 description = ""
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1726,7 +1726,7 @@ python-versions = ">=3.6"
 name = "pyyaml"
 version = "6.0"
 description = "YAML parser and emitter for Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -1802,7 +1802,7 @@ use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
 name = "requests-oauthlib"
 version = "1.3.0"
 description = "OAuthlib authentication support for Requests."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
@@ -1844,7 +1844,7 @@ pyasn1 = ">=0.1.3"
 name = "s3transfer"
 version = "0.5.0"
 description = "An Amazon S3 Transfer Manager"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">= 3.6"
 
@@ -1858,7 +1858,7 @@ crt = ["botocore[crt] (>=1.20.29,<2.0a.0)"]
 name = "secretstorage"
 version = "3.3.1"
 description = "Python bindings to FreeDesktop.org Secret Service API"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -1914,7 +1914,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 name = "snowflake-connector-python"
 version = "2.4.6"
 description = "Snowflake Connector for Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -2022,7 +2022,7 @@ sqlalchemy2-stubs = "*"
 name = "sqlparse"
 version = "0.3.1"
 description = "Non-validating SQL parser"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
@@ -2057,7 +2057,7 @@ test = ["pytest", "pathlib2"]
 name = "text-unidecode"
 version = "1.3"
 description = "The most basic Text::Unidecode port"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -2156,7 +2156,7 @@ python-versions = "*"
 name = "werkzeug"
 version = "2.0.2"
 description = "The comprehensive WSGI web application library."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -2189,7 +2189,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9.6,<3.10"
-content-hash = "9f8ae734a5ee8215eb44c5ff365d78c92057e2432e5b8b33af49d7e0e81d8654"
+content-hash = "67120e6f7af9ac68c2d9a7d17d8c7ef66278512e8f306eb2e02eaacfc1b3d1a1"
 
 [metadata.files]
 agate = [
@@ -2254,12 +2254,12 @@ bleach = [
     {file = "bleach-4.1.0.tar.gz", hash = "sha256:0900d8b37eba61a802ee40ac0061f8c2b5dee29c1927dd1d233e075ebf5a71da"},
 ]
 boto3 = [
-    {file = "boto3-1.20.7-py3-none-any.whl", hash = "sha256:d3750ebf56b25ec54f0bbb10c1fa73c973770fba28e9bc04ba13f59d4a025812"},
-    {file = "boto3-1.20.7.tar.gz", hash = "sha256:cd386635d01c3474c6a2c028af4b7d36d9a45d29bfc1f7766189daefe3bbf533"},
+    {file = "boto3-1.20.8-py3-none-any.whl", hash = "sha256:c0ac23cc36dc484edd1edd28903b5712cb07507af1ae19b2e8d6db176416d9e2"},
+    {file = "boto3-1.20.8.tar.gz", hash = "sha256:81ebdcabc534a52e2b7a2bfcbe1a1d7f1e34f028f7fe1cb16ccd80e34cea867a"},
 ]
 botocore = [
-    {file = "botocore-1.23.7-py3-none-any.whl", hash = "sha256:39f9880eee40e170f8098a7cabe6de8689faa2f0313a03972f7a7c0ccc8b0e84"},
-    {file = "botocore-1.23.7.tar.gz", hash = "sha256:50c3bd89849f257915f2d161e056ce55ff318712077565113c435547bfea4073"},
+    {file = "botocore-1.23.8-py3-none-any.whl", hash = "sha256:a0c7cfea155a0202ab197a016736dd4e6a26f9e416bdd9cdd2c9a3fb88ffa5a8"},
+    {file = "botocore-1.23.8.tar.gz", hash = "sha256:ae4ed9666199020a9e53c3d3efc0a7d417315cd2313b70cb013282afe70ac358"},
 ]
 cachetools = [
     {file = "cachetools-4.2.4-py3-none-any.whl", hash = "sha256:92971d3cb7d2a97efff7c7bb1657f21a8f5fb309a37530537c71b1774189f2d1"},

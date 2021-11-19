@@ -1,0 +1,18 @@
+from amora.models import AmoraModel
+from datetime import date, datetime, time
+from sqlalchemy import MetaData
+
+
+class {{ model_name -}}(AmoraModel):
+    """
+        {{ project }}.{{ dataset }}.{{ table }}
+
+        Generated with `amora model-create`
+    """
+    metadata = MetaData(schema='{{ project }}.{{ dataset }}')
+    __tablename__ = '{{ table }}'
+
+{% for schema_field in schema %}
+    {{ schema_field.name -}}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ -}}
+{% endfor %}
+
