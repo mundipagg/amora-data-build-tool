@@ -1,10 +1,11 @@
 import json
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
 import typer
 from typing import Optional, List
-
+from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
 from rich.table import Table
 
@@ -13,13 +14,17 @@ from amora.compilation import amora_model_for_path
 from amora.config import settings
 from amora.models import (
     list_model_files,
-    is_py_model,
     AmoraModel,
     list_target_files,
 )
 from amora.compilation import compile_statement
 from amora import materialization
-from amora.providers.bigquery import dry_run, DryRunResult
+from amora.providers.bigquery import (
+    dry_run,
+    get_schema,
+    BIGQUERY_TYPES_TO_PYTHON_TYPES,
+    DryRunResult,
+)
 
 app = typer.Typer(
     help="Amora Data Build Tool enables engineers to transform data in their warehouses "
@@ -129,8 +134,12 @@ def test(
     raise typer.Exit(return_code)
 
 
-@app.command(name="list")
-def list_models(
+models = typer.Typer()
+app.add_typer(models, name="models")
+
+
+@models.command(name="list")
+def models_list(
     format: str = typer.Option(
         "table",
         help="Output format. Options: json,table",
@@ -142,7 +151,8 @@ def list_models(
     ),
 ) -> None:
     """
-    List the resources in your project
+    List the models in your project as a human readable table
+    or as a JSON serialized document
 
     """
 
@@ -239,6 +249,73 @@ def list_models(
     elif format == "json":
         output = {"models": [result.as_dict() for result in results]}
         typer.echo(json.dumps(output))
+
+
+@models.command(name="import")
+def models_import(
+    table_reference: str = typer.Option(
+        ...,
+        "--table-reference",
+        help="BigQuery unique table identifier. "
+        "E.g.: project-id.dataset-id.table-id",
+    ),
+    model_file_path: str = typer.Argument(
+        None,
+        help="Canonical name of python module for the generated AmoraModel. "
+        "A good pattern would be to use an unique "
+        "and deterministic identifier, like: `project_id.dataset_id.table_id`",
+    ),
+    overwrite: bool = typer.Option(
+        False, help="Overwrite the output file if one already exists"
+    ),
+):
+    """
+    Generates a new amora model file from an existing table/view
+
+    ```shell
+    $ amora models import --table-reference my_gcp_project.my_dataset.my_table my_gcp_project/my_dataset/my_table
+    ```
+    """
+
+    env = Environment(
+        loader=PackageLoader("amora"), autoescape=select_autoescape()
+    )
+    template = env.get_template("new-model.py.jinja2")
+
+    project, dataset, table = table_reference.split(".")
+    model_name = "".join((part.title() for part in table.split("_")))
+
+    destination_file_path = Path(settings.MODELS_PATH).joinpath(
+        (model_file_path or model_name.replace(".", "/")) + ".py"
+    )
+
+    if destination_file_path.exists() and not overwrite:
+        typer.echo(
+            f"`{destination_file_path}` already exists. "
+            f"Pass `--overwrite` to overwrite file.",
+            err=True,
+        )
+        raise typer.Exit(1)
+
+    model_source_code = template.render(
+        BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
+        dataset=dataset,
+        dataset_id=f"{project}.{dataset}",
+        model_name=model_name,
+        project=project,
+        schema=get_schema(table_reference),
+        table=table,
+    )
+
+    destination_file_path.parent.mkdir(parents=True, exist_ok=True)
+    destination_file_path.write_text(model_source_code)
+
+    typer.secho(
+        f"🎉 Amora Model `{model_name}` (`{table_reference}`) imported!",
+        fg=typer.colors.GREEN,
+        bold=True,
+    )
+    typer.secho(f"Current File Path: `{destination_file_path.as_posix()}`")
 
 
 def main():
