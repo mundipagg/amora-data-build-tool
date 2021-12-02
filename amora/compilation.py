@@ -8,8 +8,23 @@ import sqlparse
 from amora.config import settings
 from amora.models import AmoraModel, Compilable, list_target_files
 from sqlalchemy_bigquery import BigQueryDialect
+from sqlalchemy_bigquery.base import BigQueryCompiler
+
+
+class AmoraBigQueryCompiler(BigQueryCompiler):
+    def visit_getitem_binary(self, binary, operator_, **kw):
+        left = self.process(binary.left, **kw)
+        right = self.process(binary.right, **kw)
+
+        try:
+            # Only integer values should be wrapped in OFFSET
+            return f"{left}[OFFSET({int(right)})]"
+        except ValueError:
+            return f"{left}[{right}]"
+
 
 dialect = BigQueryDialect()
+dialect.statement_compiler = AmoraBigQueryCompiler
 
 
 @runtime_checkable
