@@ -72,6 +72,19 @@ class AmoraModel(SQLModel):
     __table_args__ = {"extend_existing": True}
     metadata = metadata
 
+    @declared_attr  # type: ignore
+    def __tablename__(cls) -> str:
+        """
+        By default, `__tablename__` is the `snake_case` class name.
+
+        ```python
+        class MyModel(AmoraModel): ...
+
+        assert MyModel.__tablename__ == 'my_model
+        ```
+        """
+        return re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__name__).lower()
+
     @classmethod
     def dependencies(cls) -> Iterable["AmoraModel"]:
         source = cls.source()
