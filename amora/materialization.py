@@ -46,7 +46,8 @@ class DependencyDAG(nx.DiGraph):
         return dag
 
     def draw(self) -> None:
-        nx.draw_spectral(
+        plt.figure(1, figsize=settings.CLI_MATERIALIZATION_DAG_FIGURE_SIZE)
+        nx.draw(
             self,
             with_labels=True,
             font_weight="bold",
