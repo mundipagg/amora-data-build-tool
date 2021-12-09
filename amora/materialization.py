@@ -62,10 +62,12 @@ class DependencyDAG(nx.DiGraph):
 
 def materialize(sql: str, model: AmoraModel) -> Optional[Table]:
     materialization = model.__model_config__.materialized
-    table_id = f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{model.__tablename__}"
 
     if materialization == MaterializationTypes.view:
-        view = Table(table_id)
+        view = Table(model.unique_name)
+        view.description = model.__model_config__.description
+        view.labels = model.__model_config__.labels
+        view.clustering_fields = model.__model_config__.cluster_by
         view.view_query = sql
 
         return Client().create_table(view, exists_ok=True)
@@ -74,12 +76,21 @@ def materialize(sql: str, model: AmoraModel) -> Optional[Table]:
         query_job = client.query(
             sql,
             job_config=QueryJobConfig(
-                destination=table_id, write_disposition="WRITE_TRUNCATE"
+                destination=model.unique_name,
+                write_disposition="WRITE_TRUNCATE",
             ),
         )
 
-        query_job.result()
-        return client.get_table(table_id)
+        result = query_job.result()
+
+        table = client.get_table(model.unique_name)
+        table.description = model.__model_config__.description
+        table.labels = model.__model_config__.labels
+        table.clustering_fields = model.__model_config__.cluster_by
+
+        return client.update_table(
+            table, ["description", "labels", "clustering_fields"]
+        )
     elif materialization == MaterializationTypes.ephemeral:
         return None
     else:
