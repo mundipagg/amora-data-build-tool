@@ -5,15 +5,21 @@ from pathlib import Path
 from typing import Iterable, List, Optional, Type, Union
 
 from amora.config import settings
-from dbt.adapters.bigquery.impl import PartitionConfig
 from sqlalchemy import MetaData
 from sqlmodel import SQLModel, Field, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
 Compilable = Union[Select, SelectOfScalar]
-PartitionConfig = PartitionConfig
-
 select = select
+Field = Field
+
+
+@dataclass
+class PartitionConfig:
+    field: str
+    data_type: str = "date"
+    granularity: str = "day"
+    range: Optional[Dict[str, Any]] = None
 
 
 class AutoName(Enum):
