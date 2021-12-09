@@ -1,4 +1,10 @@
-from amora.tests.assertions import expression_is_true, is_non_negative, that
+from amora.tests.assertions import (
+    expression_is_true,
+    is_non_negative,
+    that,
+    are_unique_together,
+    has_at_least_one_not_null_value,
+)
 from examples.amora_project.models.heart_agg import HeartRateAgg
 
 
@@ -20,5 +26,13 @@ def test_count_is_non_negative():
     assert that(HeartRateAgg.count, is_non_negative)
 
 
+def test_count_has_at_least_one_not_null_value():
+    assert that(HeartRateAgg.count, has_at_least_one_not_null_value)
+
+
 def test_theres_no_data_before_year_2019():
     assert expression_is_true(HeartRateAgg.year > 2018)
+
+
+def test_year_and_month_columns_are_unique_together():
+    assert that([HeartRateAgg.year, HeartRateAgg.month], are_unique_together)
