@@ -1,13 +1,20 @@
 from dataclasses import dataclass, field
 from datetime import datetime, date, time
-from typing import Optional, List
+from typing import Optional, List, Union
 
-from google.cloud.bigquery import Client, QueryJobConfig, SchemaField
+from google.cloud.bigquery import (
+    Client,
+    QueryJobConfig,
+    SchemaField,
+    Table,
+    TableReference,
+)
 
 from amora.compilation import compile_statement
 from amora.models import AmoraModel
 
 Schema = List[SchemaField]
+BQTable = Union[Table, TableReference, str]
 
 # todo: cobrir todos os tipos
 BIGQUERY_TYPES_TO_PYTHON_TYPES = {
