@@ -1,13 +1,16 @@
+import re
 from dataclasses import dataclass
 from enum import Enum, auto
 from inspect import getfile
 from pathlib import Path
-from typing import Iterable, List, Optional, Type, Union
+from typing import Iterable, List, Optional, Type, Union, Dict, Any
 
 from amora.config import settings
 from sqlalchemy import MetaData
 from sqlmodel import SQLModel, Field, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
+from sqlalchemy.orm import declared_attr
+
 
 Compilable = Union[Select, SelectOfScalar]
 select = select
@@ -57,8 +60,6 @@ def list_target_files() -> Iterable[Path]:
 def is_py_model(obj) -> bool:
     return hasattr(obj, "source") and hasattr(obj, "output")
 
-
-# registry = registry()
 
 metadata = MetaData(
     schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}"
@@ -111,3 +112,8 @@ class AmoraModel(SQLModel):
     @classmethod
     def model_file_path(cls) -> Path:
         return Path(getfile(cls))
+
+    @property
+    @classmethod
+    def unique_name(cls) -> str:
+        return str(cls.__table__)
