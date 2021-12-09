@@ -20,8 +20,8 @@ class HeartRate(AmoraModel, table=True):
         partition_by=PartitionConfig(
             field="creationDate", data_type="TIMESTAMP", granularity="day"
         ),
-        cluster_by="sourceName",
-        tags=["daily"],
+        cluster_by=["sourceName"],
+        labels={"freshness": "daily"},
     )
 
     creationDate: datetime
