@@ -39,9 +39,9 @@ class DependencyDAG(nx.DiGraph):
         dag = cls()
 
         for task in tasks:
-            dag.add_node(task.model.__name__)
+            dag.add_node(task.model.unique_name)
             for dependency in getattr(task.model, "__depends_on__", []):
-                dag.add_edge(dependency.__name__, task.model.__name__)
+                dag.add_edge(dependency.unique_name, task.model.unique_name)
 
         return dag
 
