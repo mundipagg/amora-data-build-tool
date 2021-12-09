@@ -1,7 +1,6 @@
-from typing import Iterable, Optional, Any
+from typing import Iterable, Optional, Callable
 
 import pytest
-from mypy.api import Callable
 from sqlalchemy import func, and_, Table, text, literal_column, union_all
 from sqlalchemy.orm import InstrumentedAttribute
 from sqlmodel.sql.expression import SelectOfScalar
@@ -11,6 +10,7 @@ from amora.compilation import compile_statement
 from amora.providers.bigquery import get_client
 
 Column = InstrumentedAttribute
+Columns = Iterable[Column]
 Test = Callable[..., SelectOfScalar]
 
 
@@ -235,3 +235,32 @@ def equality(
     diff_union = union_all(a_minus_b, b_minus_a)
 
     return _test(statement=diff_union)
+
+
+def has_at_least_one_not_null_value(column: Column) -> Compilable:
+    """
+    Asserts if column has at least one value.
+
+    ```sql
+
+    select
+        {# In TSQL, subquery aggregate columns need aliases #}
+        {# thus: a filler col name, 'filler_column' #}
+      count({{ column_name }}) as filler_column
+
+    from {{ model }}
+
+    having count({{ column_name }}) = 0
+    ```
+    """
+    return select(func.count(column)).having(func.count(column) == 0)
+
+
+def are_unique_together(columns: Iterable[Column]) -> Compilable:
+    """
+    This test confirms that the combination of columns is unique.
+    For example, the combination of month and product is unique,
+    however neither column is unique in isolation.
+
+    """
+    return select(columns).group_by(*columns).having(func.count() > 1)
