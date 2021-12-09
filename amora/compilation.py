@@ -73,8 +73,10 @@ def amora_model_for_path(path: Path) -> AmoraModel:
 
     try:
         spec.loader.exec_module(module)  # type: ignore
-    except ImportError:
-        raise ValueError(f"Invalid path `{path}`. Unable to load module.")
+    except ImportError as e:
+        raise ValueError(
+            f"Invalid path `{path}`. Unable to load module."
+        ) from e
 
     compilables = inspect.getmembers(
         module,
