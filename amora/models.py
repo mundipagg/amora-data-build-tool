@@ -126,7 +126,7 @@ class AmoraModel(SQLModel):
     def model_file_path(cls) -> Path:
         return Path(getfile(cls))
 
-    @property
     @classmethod
+    @property
     def unique_name(cls) -> str:
         return str(cls.__table__)
