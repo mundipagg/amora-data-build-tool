@@ -2,11 +2,15 @@ import inspect
 import os
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
-from typing import Optional, Protocol, runtime_checkable
+from typing import Optional, Protocol, runtime_checkable, Iterable
 
 import sqlparse
 from amora.config import settings
-from amora.models import AmoraModel, Compilable, list_target_files
+from amora.models import (
+    AmoraModel,
+    Compilable,
+    list_target_files,
+)
 from sqlalchemy_bigquery import BigQueryDialect
 from sqlalchemy_bigquery.base import BigQueryCompiler
 
@@ -85,9 +89,14 @@ def amora_model_for_path(path: Path) -> AmoraModel:
         and issubclass(x, AmoraModel),  # type: ignore
     )
 
-    classes = [class_ for _name, class_ in compilables]
-    if classes:
-        return classes[-1]
+    for _name, class_ in compilables:
+        try:
+            # fixme: Quando carregamos o código em inspect, não existe um arquivo associado,
+            #  ou seja, ao iterar sobre as classes de um arquivo, a classe que retornar um TypeError,
+            #  é uma classe definida no arquivo
+            class_.model_file_path()
+        except TypeError:
+            return class_
 
     raise ValueError(f"Invalid path `{path}`")
 
