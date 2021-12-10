@@ -243,14 +243,12 @@ def has_at_least_one_not_null_value(column: Column) -> Compilable:
 
     ```sql
 
-    select
-        {# In TSQL, subquery aggregate columns need aliases #}
-        {# thus: a filler col name, 'filler_column' #}
-      count({{ column_name }}) as filler_column
-
-    from {{ model }}
-
-    having count({{ column_name }}) = 0
+    SELECT
+        count({{ column_name }}) as filler_column
+    FROM
+        {{ model }}
+    HAVING
+        count({{ column_name }}) = 0
     ```
     """
     return select(func.count(column)).having(func.count(column) == 0)
