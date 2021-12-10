@@ -8,6 +8,7 @@ from typing import Optional, List
 from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
 from rich.table import Table
+from rich.text import Text
 
 from amora.compilation import amora_model_for_path
 
@@ -209,13 +210,19 @@ def models_list(
 
     results = []
     for model_file_path in list_model_files():
-        model = amora_model_for_path(model_file_path)
-        if with_total_bytes:
-            result_item = ResultItem(model=model, dry_run_result=dry_run(model))
+        try:
+            model = amora_model_for_path(model_file_path)
+        except ValueError as e:
+            continue
         else:
-            result_item = ResultItem(model=model, dry_run_result=None)
+            if with_total_bytes:
+                result_item = ResultItem(
+                    model=model, dry_run_result=dry_run(model)
+                )
+            else:
+                result_item = ResultItem(model=model, dry_run_result=None)
 
-        results.append(result_item)
+            results.append(result_item)
 
     if format == "table":
         table = Table(
@@ -228,8 +235,8 @@ def models_list(
 
         table.add_column("Model name", style="green bold", no_wrap=True)
         table.add_column("Total bytes", no_wrap=True)
-        table.add_column("Referenced tables", no_wrap=True)
-        table.add_column("Depends on", no_wrap=True)
+        table.add_column("Referenced tables")
+        table.add_column("Depends on")
         table.add_column("Has source?", no_wrap=True, justify="center")
         table.add_column("Materialization", no_wrap=True)
 
@@ -237,8 +244,10 @@ def models_list(
             table.add_row(
                 result.model_name,
                 f"{result.total_bytes or '-'}",
-                " , ".join(result.referenced_tables) or "-",
-                " , ".join(result.depends_on) or "-",
+                Text(
+                    "\n".join(result.referenced_tables) or "-", overflow="fold"
+                ),
+                Text("\n".join(result.depends_on) or "-", overflow="fold"),
                 "🟢" if result.has_source else "🔴",
                 result.materialization_type or "-",
             )
