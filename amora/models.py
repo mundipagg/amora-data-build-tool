@@ -45,18 +45,6 @@ class ModelConfig:
     labels: Dict[str, str] = field(default_factory=dict)
 
 
-def list_files(path: Union[str, Path], suffix: str) -> Iterable[Path]:
-    yield from Path(path).rglob(f"*{suffix}")
-
-
-def list_model_files() -> Iterable[Path]:
-    return list_files(settings.MODELS_PATH, suffix=".py")
-
-
-def list_target_files() -> Iterable[Path]:
-    return list_files(settings.TARGET_PATH, suffix=".sql")
-
-
 # todo: Como defino "Objeto que tenha 2 atributos: `source` e `output`" ?
 def is_py_model(obj) -> bool:
     return hasattr(obj, "source") and hasattr(obj, "output")
@@ -114,10 +102,10 @@ class AmoraModel(SQLModel):
     @classmethod
     def target_path(cls, model_file_path: Union[str, Path]) -> Path:
         # {settings.dbt_models_path}/a_model/a_model.py -> a_model/a_model.py
-        strip_path = settings.MODELS_PATH
+        strip_path = settings.MODELS_PATH.as_posix()
         relative_model_path = str(model_file_path).split(strip_path)[1][1:]
         # a_model/a_model.py -> ~/project/amora/target/a_model/a_model.sql
-        target_file_path = Path(settings.TARGET_PATH).joinpath(
+        target_file_path = settings.TARGET_PATH.joinpath(
             relative_model_path.replace(".py", ".sql")
         )
 
