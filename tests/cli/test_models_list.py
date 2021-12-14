@@ -1,4 +1,3 @@
-import inspect
 import json
 from unittest.mock import MagicMock, patch
 
@@ -7,11 +6,11 @@ from google.cloud.bigquery.exceptions import BigQueryError
 from typer.testing import CliRunner
 
 from amora.cli import app
-from amora.models import list_model_files
+from amora.models import list_models
 
 runner = CliRunner()
-# fixme: list_models_file retorna __init__.py e outros arquivos python que não são amora models
-AMORA_MODELS_COUNT = len(list(list_model_files())) - 1
+
+AMORA_MODELS_COUNT = len(list(list_models()))
 
 
 @patch("amora.cli.dry_run", return_value=None)

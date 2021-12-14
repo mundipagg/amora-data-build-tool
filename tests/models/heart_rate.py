@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlmodel import select, Field
 
-from amora.compilation import Compilable
+from amora.types import Compilable
 from amora.models import (
     ModelConfig,
     PartitionConfig,

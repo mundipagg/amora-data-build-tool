@@ -1,20 +1,26 @@
+import inspect
 import re
 from dataclasses import dataclass, field
 from enum import Enum, auto
+from importlib.util import spec_from_file_location, module_from_spec
 from inspect import getfile
 from pathlib import Path
-from typing import Iterable, List, Optional, Type, Union, Dict, Any
+from typing import Iterable, List, Optional, Union, Dict, Any, Tuple, Type
 
+from amora.protocols import CompilableProtocol
 from amora.config import settings
-from sqlalchemy import MetaData
-from sqlmodel import SQLModel, Field, select
-from sqlmodel.sql.expression import Select, SelectOfScalar
+from sqlalchemy import MetaData, Table, select
+from sqlmodel import SQLModel, Field
+
 from sqlalchemy.orm import declared_attr
 
+from amora.types import Compilable
+from amora.utils import model_path_for_target_path, list_files
 
-Compilable = Union[Select, SelectOfScalar]
 select = select
 Field = Field
+Model = Type["AmoraModel"]
+Models = Iterable[Model]
 
 
 @dataclass
@@ -56,9 +62,10 @@ metadata = MetaData(
 
 
 class AmoraModel(SQLModel):
-    __depends_on__: List["AmoraModel"] = []
+    __depends_on__: Models = []
     __model_config__ = ModelConfig(materialized=MaterializationTypes.view)
-    __table_args__ = {"extend_existing": True}
+    __table__: Table
+    __table_args__: Dict[str, Any] = {"extend_existing": True}
     metadata = metadata
 
     @declared_attr  # type: ignore
@@ -75,7 +82,7 @@ class AmoraModel(SQLModel):
         return re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__name__).lower()
 
     @classmethod
-    def dependencies(cls) -> Iterable["AmoraModel"]:
+    def dependencies(cls) -> Models:
         source = cls.source()
         if source is None:
             return []
@@ -119,3 +126,58 @@ class AmoraModel(SQLModel):
     @property
     def unique_name(cls) -> str:
         return str(cls.__table__)
+
+
+def amora_model_for_path(path: Path) -> Model:
+    spec = spec_from_file_location(path.stem, path)
+    if spec is None:
+        raise ValueError(f"Invalid path `{path}`. Not a valid Python file.")
+
+    module = module_from_spec(spec)
+    # if module is None:
+    #     raise ValueError(f"Invalid path `{path}`")
+
+    if spec.loader is None:
+        raise ValueError(f"Invalid path `{path}`. Unable to load module.")
+
+    try:
+        spec.loader.exec_module(module)  # type: ignore
+    except ImportError as e:
+        raise ValueError(
+            f"Invalid path `{path}`. Unable to load module."
+        ) from e
+    is_amora_model = (
+        lambda x: isinstance(x, CompilableProtocol)
+        and inspect.isclass(x)
+        and issubclass(x, AmoraModel)  # type: ignore
+    )
+    compilables = inspect.getmembers(
+        module,
+        is_amora_model,  # type: ignore
+    )
+
+    for _name, class_ in compilables:
+        try:
+            # fixme: Quando carregamos o código em inspect, não existe um arquivo associado,
+            #  ou seja, ao iterar sobre as classes de um arquivo, a classe que retornar um TypeError,
+            #  é uma classe definida no arquivo
+            class_.model_file_path()
+        except TypeError:
+            return class_
+
+    raise ValueError(f"Invalid path `{path}`")
+
+
+def amora_model_for_target_path(path: Path) -> Model:
+    model_path = model_path_for_target_path(path)
+    return amora_model_for_path(model_path)
+
+
+def list_models(
+    path: Path = settings.MODELS_PATH,
+) -> Iterable[Tuple[Model, Path]]:
+    for model_file_path in list_files(path, suffix=".py"):
+        try:
+            yield amora_model_for_path(model_file_path), model_file_path
+        except ValueError:
+            continue

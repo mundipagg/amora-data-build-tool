@@ -7,8 +7,7 @@ from google.api_core.exceptions import NotFound
 from google.cloud.bigquery import SchemaField
 from typer.testing import CliRunner
 from amora.cli import app
-from amora.compilation import amora_model_for_path
-from amora.models import AmoraModel
+from amora.models import AmoraModel, amora_model_for_path
 
 runner = CliRunner()
 
@@ -108,4 +107,4 @@ def test_models_import_with_valid_table_reference_and_existing_destination_file_
 
         assert result.exit_code == 0, result.stderr
         assert output_path.read_text()
-        assert issubclass(amora_model_for_path(path=output_path), AmoraModel)
+        assert issubclass(amora_model_for_path(path=output_path), AmoraModel)  # type: ignore

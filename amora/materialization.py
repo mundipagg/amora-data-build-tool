@@ -1,20 +1,23 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Any, Iterable, Optional
+from typing import Iterable, Optional
 
 from google.cloud.bigquery import Table, Client, QueryJobConfig
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from amora.compilation import amora_model_for_target_path
 from amora.config import settings
-from amora.models import list_target_files, AmoraModel, MaterializationTypes
+from amora.models import (
+    MaterializationTypes,
+    amora_model_for_target_path,
+    Model,
+)
 
 
 @dataclass
 class Task:
     sql_stmt: str
-    model: AmoraModel
+    model: Model
     target_file_path: Path
 
     @classmethod
@@ -60,7 +63,7 @@ class DependencyDAG(nx.DiGraph):
         plt.show()
 
 
-def materialize(sql: str, model: AmoraModel) -> Optional[Table]:
+def materialize(sql: str, model: Model) -> Optional[Table]:
     materialization = model.__model_config__.materialized
 
     if materialization == MaterializationTypes.view:

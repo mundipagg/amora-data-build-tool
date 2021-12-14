@@ -1,7 +1,7 @@
 import inspect
 from unittest.mock import patch, MagicMock
 
-from amora.compilation import clean_compiled_files
+from amora.utils import clean_compiled_files
 from typer.testing import CliRunner
 from tests.models.heart_rate import HeartRate
 from tests.models.steps import Steps
