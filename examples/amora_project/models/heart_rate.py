@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from amora.compilation import Compilable
+from amora.types import Compilable
 from amora.models import (
     AmoraModel,
     ModelConfig,

@@ -2,7 +2,7 @@ from datetime import datetime
 from unittest.mock import patch, MagicMock
 from uuid import uuid4
 
-from amora.compilation import clean_compiled_files
+from amora.utils import clean_compiled_files
 from amora.materialization import Task, DependencyDAG, materialize
 from amora.models import (
     AmoraModel,
