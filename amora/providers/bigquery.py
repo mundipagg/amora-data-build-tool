@@ -11,7 +11,8 @@ from google.cloud.bigquery import (
 )
 
 from amora.compilation import compile_statement
-from amora.models import AmoraModel
+from amora.models import Model
+
 
 Schema = List[SchemaField]
 BQTable = Union[Table, TableReference, str]
@@ -40,7 +41,7 @@ BIGQUERY_TYPES_TO_PYTHON_TYPES = {
 @dataclass
 class DryRunResult:
     total_bytes: int
-    model: AmoraModel
+    model: Model
     schema: Schema
     query: Optional[str] = None
     referenced_tables: List[str] = field(default_factory=list)
@@ -60,7 +61,7 @@ def get_client() -> Client:
     return _client
 
 
-def get_fully_qualified_id(model: AmoraModel) -> str:
+def get_fully_qualified_id(model: Model) -> str:
     return f"{model.metadata.schema}.{model.__tablename__}"
 
 
@@ -70,7 +71,7 @@ def get_schema(table_id: str) -> Schema:
     return table.schema
 
 
-def dry_run(model: AmoraModel) -> Optional[DryRunResult]:
+def dry_run(model: Model) -> Optional[DryRunResult]:
     """
     >>> dry_run(HeartRate)
     DryRunResult(
