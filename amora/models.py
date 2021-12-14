@@ -134,8 +134,6 @@ def amora_model_for_path(path: Path) -> Model:
         raise ValueError(f"Invalid path `{path}`. Not a valid Python file.")
 
     module = module_from_spec(spec)
-    # if module is None:
-    #     raise ValueError(f"Invalid path `{path}`")
 
     if spec.loader is None:
         raise ValueError(f"Invalid path `{path}`. Unable to load module.")
