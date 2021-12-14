@@ -1,11 +1,16 @@
 from typing import Iterable, Optional, Callable
 
 import pytest
-from sqlalchemy import func, and_, Table, text, literal_column, union_all
+from sqlalchemy import (
+    and_,
+    union_all,
+    Integer,
+    func,
+)
 from sqlalchemy.orm import InstrumentedAttribute
 from sqlmodel.sql.expression import SelectOfScalar
-
-from amora.models import select, Compilable, AmoraModel
+from amora.models import select, AmoraModel
+from amora.types import Compilable
 from amora.compilation import compile_statement
 from amora.providers.bigquery import get_client
 
@@ -251,7 +256,9 @@ def has_at_least_one_not_null_value(column: Column) -> Compilable:
         count({{ column_name }}) = 0
     ```
     """
-    return select(func.count(column)).having(func.count(column) == 0)
+    return select(func.count(column, type_=Integer)).having(
+        func.count(column) == 0
+    )
 
 
 def are_unique_together(columns: Iterable[Column]) -> Compilable:
@@ -261,4 +268,6 @@ def are_unique_together(columns: Iterable[Column]) -> Compilable:
     however neither column is unique in isolation.
 
     """
-    return select(columns).group_by(*columns).having(func.count() > 1)
+    return (
+        select(columns).group_by(*columns).having(func.count(type_=Integer) > 1)
+    )

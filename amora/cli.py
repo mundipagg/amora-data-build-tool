@@ -10,14 +10,13 @@ from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
-from amora.compilation import amora_model_for_path
-
 from amora.config import settings
 from amora.models import (
-    list_model_files,
     AmoraModel,
-    list_target_files,
+    list_models,
+    Model,
 )
+from amora.utils import list_target_files
 from amora.compilation import compile_statement
 from amora import materialization
 from amora.providers.bigquery import (
@@ -56,24 +55,16 @@ def compile(
     """
     Generates executable SQL from model files. Compiled SQL files are written to the `./target` directory.
     """
-    for model_file_path in list_model_files():
+    for model, model_file_path in list_models():
         if models and model_file_path.stem not in models:
             continue
 
-        try:
-            AmoraModel_class = amora_model_for_path(model_file_path)
-        except ValueError:
-            continue
-
-        if not issubclass(AmoraModel_class, AmoraModel):  # type: ignore
-            continue
-
-        source_sql_statement = AmoraModel_class.source()
+        source_sql_statement = model.source()
         if source_sql_statement is None:
             typer.echo(f"⏭ Skipping compilation of model `{model_file_path}`")
             continue
 
-        target_file_path = AmoraModel_class.target_path(model_file_path)
+        target_file_path = model.target_path(model_file_path)
         typer.echo(
             f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`"
         )
@@ -131,7 +122,7 @@ def test(
     Runs tests on data in deployed models. Run this after `amora materialize`
     to ensure that the date state is up-to-date.
     """
-    return_code = pytest.main(["-n", "auto"])
+    return_code = pytest.main(["-n", "auto", "--verbose"])
     raise typer.Exit(return_code)
 
 
@@ -159,7 +150,7 @@ def models_list(
 
     @dataclass
     class ResultItem:
-        model: AmoraModel
+        model: Model
         dry_run_result: Optional[DryRunResult] = None
 
         def as_dict(self):
@@ -209,20 +200,14 @@ def models_list(
                 return None
 
     results = []
-    for model_file_path in list_model_files():
-        try:
-            model = amora_model_for_path(model_file_path)
-        except ValueError as e:
-            continue
-        else:
-            if with_total_bytes:
-                result_item = ResultItem(
-                    model=model, dry_run_result=dry_run(model)
-                )
-            else:
-                result_item = ResultItem(model=model, dry_run_result=None)
 
-            results.append(result_item)
+    for model, model_file_path in list_models():
+        if with_total_bytes:
+            result_item = ResultItem(model=model, dry_run_result=dry_run(model))
+        else:
+            result_item = ResultItem(model=model, dry_run_result=None)
+
+        results.append(result_item)
 
     if format == "table":
         table = Table(
