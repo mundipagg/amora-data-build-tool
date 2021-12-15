@@ -2,8 +2,7 @@ import itertools
 from typing import List
 
 import pytest
-from amora.compilation import clean_compiled_files
-from amora.models import list_target_files
+from amora.utils import clean_compiled_files, list_target_files
 from typer.testing import CliRunner
 
 from amora.cli import app

@@ -8,15 +8,15 @@ from typing import Optional, List
 from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
 from rich.table import Table
-
-from amora.compilation import amora_model_for_path
+from rich.text import Text
 
 from amora.config import settings
 from amora.models import (
-    list_model_files,
     AmoraModel,
-    list_target_files,
+    list_models,
+    Model,
 )
+from amora.utils import list_target_files
 from amora.compilation import compile_statement
 from amora import materialization
 from amora.providers.bigquery import (
@@ -55,24 +55,16 @@ def compile(
     """
     Generates executable SQL from model files. Compiled SQL files are written to the `./target` directory.
     """
-    for model_file_path in list_model_files():
+    for model, model_file_path in list_models():
         if models and model_file_path.stem not in models:
             continue
 
-        try:
-            AmoraModel_class = amora_model_for_path(model_file_path)
-        except ValueError:
-            continue
-
-        if not issubclass(AmoraModel_class, AmoraModel):  # type: ignore
-            continue
-
-        source_sql_statement = AmoraModel_class.source()
+        source_sql_statement = model.source()
         if source_sql_statement is None:
             typer.echo(f"⏭ Skipping compilation of model `{model_file_path}`")
             continue
 
-        target_file_path = AmoraModel_class.target_path(model_file_path)
+        target_file_path = model.target_path(model_file_path)
         typer.echo(
             f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`"
         )
@@ -97,7 +89,7 @@ def materialize(
             continue
 
         task = materialization.Task.for_target(target_file_path)
-        model_to_task[task.model.__name__] = task
+        model_to_task[task.model.unique_name] = task
 
     dag = materialization.DependencyDAG.from_tasks(tasks=model_to_task.values())
 
@@ -130,7 +122,7 @@ def test(
     Runs tests on data in deployed models. Run this after `amora materialize`
     to ensure that the date state is up-to-date.
     """
-    return_code = pytest.main(["-n", "auto"])
+    return_code = pytest.main(["-n", "auto", "--verbose"])
     raise typer.Exit(return_code)
 
 
@@ -158,7 +150,7 @@ def models_list(
 
     @dataclass
     class ResultItem:
-        model: AmoraModel
+        model: Model
         dry_run_result: Optional[DryRunResult] = None
 
         def as_dict(self):
@@ -208,8 +200,8 @@ def models_list(
                 return None
 
     results = []
-    for model_file_path in list_model_files():
-        model = amora_model_for_path(model_file_path)
+
+    for model, model_file_path in list_models():
         if with_total_bytes:
             result_item = ResultItem(model=model, dry_run_result=dry_run(model))
         else:
@@ -228,8 +220,8 @@ def models_list(
 
         table.add_column("Model name", style="green bold", no_wrap=True)
         table.add_column("Total bytes", no_wrap=True)
-        table.add_column("Referenced tables", no_wrap=True)
-        table.add_column("Depends on", no_wrap=True)
+        table.add_column("Referenced tables")
+        table.add_column("Depends on")
         table.add_column("Has source?", no_wrap=True, justify="center")
         table.add_column("Materialization", no_wrap=True)
 
@@ -237,8 +229,10 @@ def models_list(
             table.add_row(
                 result.model_name,
                 f"{result.total_bytes or '-'}",
-                " , ".join(result.referenced_tables) or "-",
-                " , ".join(result.depends_on) or "-",
+                Text(
+                    "\n".join(result.referenced_tables) or "-", overflow="fold"
+                ),
+                Text("\n".join(result.depends_on) or "-", overflow="fold"),
                 "🟢" if result.has_source else "🔴",
                 result.materialization_type or "-",
             )

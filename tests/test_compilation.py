@@ -5,8 +5,8 @@ import pytest
 from sqlalchemy import func, String, Integer
 from sqlalchemy_bigquery.base import BQArray
 
-from amora.compilation import amora_model_for_path, compile_statement
-from amora.models import AmoraModel, select
+from amora.compilation import compile_statement
+from amora.models import AmoraModel, select, amora_model_for_path
 
 
 def test_amora_model_for_path_with_invalid_file_path_type():

@@ -1,13 +1,23 @@
 from dataclasses import dataclass, field
 from datetime import datetime, date, time
-from typing import Optional, List
+from typing import Optional, List, Union
 
-from google.cloud.bigquery import Client, QueryJobConfig, SchemaField
+import sqlalchemy
+from google.cloud.bigquery import (
+    Client,
+    QueryJobConfig,
+    SchemaField,
+    Table,
+    TableReference,
+)
+from sqlalchemy_bigquery.base import unnest
 
 from amora.compilation import compile_statement
-from amora.models import AmoraModel
+from amora.models import Model
+
 
 Schema = List[SchemaField]
+BQTable = Union[Table, TableReference, str]
 
 # todo: cobrir todos os tipos
 BIGQUERY_TYPES_TO_PYTHON_TYPES = {
@@ -33,7 +43,7 @@ BIGQUERY_TYPES_TO_PYTHON_TYPES = {
 @dataclass
 class DryRunResult:
     total_bytes: int
-    model: AmoraModel
+    model: Model
     schema: Schema
     query: Optional[str] = None
     referenced_tables: List[str] = field(default_factory=list)
@@ -53,7 +63,7 @@ def get_client() -> Client:
     return _client
 
 
-def get_fully_qualified_id(model: AmoraModel) -> str:
+def get_fully_qualified_id(model: Model) -> str:
     return f"{model.metadata.schema}.{model.__tablename__}"
 
 
@@ -63,7 +73,7 @@ def get_schema(table_id: str) -> Schema:
     return table.schema
 
 
-def dry_run(model: AmoraModel) -> Optional[DryRunResult]:
+def dry_run(model: Model) -> Optional[DryRunResult]:
     """
     >>> dry_run(HeartRate)
     DryRunResult(
@@ -130,3 +140,9 @@ def dry_run(model: AmoraModel) -> Optional[DryRunResult]:
         model=model,
         schema=query_job.schema,
     )
+
+
+class fixed_unnest(sqlalchemy.sql.roles.InElementRole, unnest):
+    def __init__(self, *args, **kwargs):
+        self.name = "unnest"
+        super().__init__(*args, **kwargs)

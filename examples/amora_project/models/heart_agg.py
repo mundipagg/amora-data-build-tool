@@ -1,4 +1,4 @@
-from amora.compilation import Compilable
+from amora.types import Compilable
 from amora.models import AmoraModel, ModelConfig, MaterializationTypes
 from examples.amora_project.models.heart_rate import HeartRate
 from sqlmodel import func, select, Field
