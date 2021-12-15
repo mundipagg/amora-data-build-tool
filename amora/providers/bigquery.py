@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, date, time
 from typing import Optional, List, Union
 
+import sqlalchemy
 from google.cloud.bigquery import (
     Client,
     QueryJobConfig,
@@ -9,6 +10,7 @@ from google.cloud.bigquery import (
     Table,
     TableReference,
 )
+from sqlalchemy_bigquery.base import unnest
 
 from amora.compilation import compile_statement
 from amora.models import Model
@@ -138,3 +140,9 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
         model=model,
         schema=query_job.schema,
     )
+
+
+class fixed_unnest(sqlalchemy.sql.roles.InElementRole, unnest):
+    def __init__(self, *args, **kwargs):
+        self.name = "unnest"
+        super().__init__(*args, **kwargs)

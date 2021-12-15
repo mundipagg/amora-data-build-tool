@@ -1,14 +1,8 @@
 import sqlparse
-from amora.types import Compilable
-import sqlalchemy
 from sqlalchemy_bigquery import BigQueryDialect
-from sqlalchemy_bigquery.base import BigQueryCompiler, unnest
+from sqlalchemy_bigquery.base import BigQueryCompiler
 
-
-class fixed_unnest(sqlalchemy.sql.roles.InElementRole, unnest):
-    def __init__(self, *args, **kwargs):
-        self.name = "unnest"
-        super().__init__(*args, **kwargs)
+from amora.types import Compilable
 
 
 class AmoraBigQueryCompiler(BigQueryCompiler):
