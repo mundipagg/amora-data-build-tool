@@ -1,20 +1,23 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Any, Iterable, Optional
+from typing import Iterable, Optional
 
 from google.cloud.bigquery import Table, Client, QueryJobConfig
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from amora.compilation import amora_model_for_target_path
 from amora.config import settings
-from amora.models import list_target_files, AmoraModel, MaterializationTypes
+from amora.models import (
+    MaterializationTypes,
+    amora_model_for_target_path,
+    Model,
+)
 
 
 @dataclass
 class Task:
     sql_stmt: str
-    model: AmoraModel
+    model: Model
     target_file_path: Path
 
     @classmethod
@@ -39,14 +42,15 @@ class DependencyDAG(nx.DiGraph):
         dag = cls()
 
         for task in tasks:
-            dag.add_node(task.model.__name__)
+            dag.add_node(task.model.unique_name)
             for dependency in getattr(task.model, "__depends_on__", []):
-                dag.add_edge(dependency.__name__, task.model.__name__)
+                dag.add_edge(dependency.unique_name, task.model.unique_name)
 
         return dag
 
     def draw(self) -> None:
-        nx.draw_spectral(
+        plt.figure(1, figsize=settings.CLI_MATERIALIZATION_DAG_FIGURE_SIZE)
+        nx.draw(
             self,
             with_labels=True,
             font_weight="bold",
@@ -59,12 +63,14 @@ class DependencyDAG(nx.DiGraph):
         plt.show()
 
 
-def materialize(sql: str, model: AmoraModel) -> Optional[Table]:
+def materialize(sql: str, model: Model) -> Optional[Table]:
     materialization = model.__model_config__.materialized
-    table_id = f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{model.__tablename__}"
 
     if materialization == MaterializationTypes.view:
-        view = Table(table_id)
+        view = Table(model.unique_name)
+        view.description = model.__model_config__.description
+        view.labels = model.__model_config__.labels
+        view.clustering_fields = model.__model_config__.cluster_by
         view.view_query = sql
 
         return Client().create_table(view, exists_ok=True)
@@ -73,12 +79,21 @@ def materialize(sql: str, model: AmoraModel) -> Optional[Table]:
         query_job = client.query(
             sql,
             job_config=QueryJobConfig(
-                destination=table_id, write_disposition="WRITE_TRUNCATE"
+                destination=model.unique_name,
+                write_disposition="WRITE_TRUNCATE",
             ),
         )
 
-        query_job.result()
-        return client.get_table(table_id)
+        result = query_job.result()
+
+        table = client.get_table(model.unique_name)
+        table.description = model.__model_config__.description
+        table.labels = model.__model_config__.labels
+        table.clustering_fields = model.__model_config__.cluster_by
+
+        return client.update_table(
+            table, ["description", "labels", "clustering_fields"]
+        )
     elif materialization == MaterializationTypes.ephemeral:
         return None
     else:

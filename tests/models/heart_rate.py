@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlmodel import select, Field
 
-from amora.compilation import Compilable
+from amora.types import Compilable
 from amora.models import (
     ModelConfig,
     PartitionConfig,
@@ -20,8 +20,8 @@ class HeartRate(AmoraModel, table=True):
         partition_by=PartitionConfig(
             field="creationDate", data_type="TIMESTAMP", granularity="day"
         ),
-        cluster_by="sourceName",
-        tags=["daily"],
+        cluster_by=["sourceName"],
+        labels={"freshness": "daily"},
     )
 
     creationDate: datetime

@@ -53,19 +53,18 @@ An Amora project is a directory with `.py` files, each containing a model defini
 
 Models express both a data schema and a transformation statement:
 
-
 ```python
 # project/models/heart_rate.py
 from datetime import datetime
 
-from amora.compilation import Compilable
+from amora.types import Compilable
 from amora.models import (
     AmoraModel,
     ModelConfig,
-    PartitionConfig,
+    PartitionConfig, 
     MaterializationTypes,
     select,
-    Field   
+    Field
 )
 from project.models.health import Health
 
@@ -79,8 +78,8 @@ class HeartRate(AmoraModel, table=True):
         partition_by=PartitionConfig(
             field="creationDate", data_type="TIMESTAMP", granularity="day"
         ),
-        cluster_by="sourceName",
-        tags=["daily"],
+        cluster_by=["sourceName"],
+        labels={"freshness": "daily"},
     )
 
     # data schema
