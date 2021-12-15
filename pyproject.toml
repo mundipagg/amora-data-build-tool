@@ -1,33 +1,52 @@
 [tool.poetry]
 name = "amora"
-version = "0.1.0"
+version = "0.1.5"
 description = "Amora Data Build Tool"
-authors = ["diogommartins <diogommartins.dev@gmail.com>"]
+authors = ["diogommartins <diogo.martins@stone.com.br>"]
 license = "MIT"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: SQL",
+]
 
 [tool.poetry.dependencies]
 python = ">=3.9.6,<3.10"
 pandas = "^1.3.0"
-jupyter = "^1.0.0"
 numpy = "^1.21.1"
 matplotlib = "^3.4.2"
 sqlmodel = "^0.0.4"
 sqlalchemy-bigquery = "1.2.1"
-networkx = {extras = ["all"], version = "^2.6.3"}
-typer = {extras = ["all"], version = "^0.4.0"}
+networkx = { extras = ["all"], version = "^2.6.3" }
+typer = { extras = ["all"], version = "^0.4.0" }
 pytest = "^6.2.5"
-pytest-env = "^0.6.2"
-pytest-xdist = {extras = ['psutil'], version = "~2.4.0"}
+pytest-xdist = { extras = ['psutil'], version = ">=2.4,<2.6" }
 rich = "^10.13.0"
 Jinja2 = "^2.11.3"
+sqlparse = "0.3.1"
+SQLAlchemy = {version = "^1.4.27", extras = ["mypy"]}
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "^3.0.0"
 black = "^21.9b0"
 dbt = "^0.20.2"
+jupyter = "^1.0.0"
 mypy = "^0.910"
 lxml = "^4.6.3"
+pytest-env = "^0.6.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+amora = "amora.cli:main"
+
+[tool.mypy]
+plugins = [
+    "sqlalchemy.ext.mypy.plugin"
+]
