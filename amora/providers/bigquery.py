@@ -154,21 +154,32 @@ def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
     """
     Returns a table like selectable (CTE) for the given hardcoded values.
 
-    >>> cte_from_rows(
-        [
-            {"numeric_column": "123"},
-            {"numeric_column": "234"},
-            {"numeric_column": "345"},
-        ]
-    )
+    >>> rows = [{"numeric_column": "123"}, {"numeric_column": "234"}, {"numeric_column": "345"}]
+    >>> cte_from_rows(rows)
+
+    Will result in the following SQL
 
     ```sql
-        WITH annon_cte AS (
+        WITH `annon_1` AS (
             SELECT "123" AS numeric_column
-            UNION SELECT "234 AS numeric_column
-            UNION SELECT "345" AS numeric_column
+            UNION ALL SELECT "234 AS numeric_column
+            UNION ALL SELECT "345" AS numeric_column
         )
     ```
+
+    Which would render a table like:
+
+    ```md
+    | numeric_column |
+    |----------------|
+    | 123            |
+    | 234            |
+    | 345            |
+    ```
+
+    Useful both for model writing and testing purposes. Think of `cte_from_rows` as way of generating
+    a "temporary table like object", with data avaiable at runtime.
+
     """
     selects = [
         select([literal(value).label(name) for name, value in row.items()])
