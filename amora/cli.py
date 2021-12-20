@@ -70,6 +70,7 @@ def compile(
         )
 
         content = compile_statement(source_sql_statement)
+        target_file_path.parent.mkdir(parents=True, exist_ok=True)
         target_file_path.write_text(content)
 
 
