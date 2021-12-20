@@ -183,6 +183,21 @@ def relationship(
     return _test(statement=exceptions)
 
 
+def is_numeric(column: Column) -> Compilable:
+    """
+
+    :param column:
+    :return:
+    """
+    int_col_or_null = (
+        select(func.cast(column, Integer).label("col"))
+        .where(column != None)
+        .cte("int_col_or_null")
+    )
+
+    return select(int_col_or_null.c.col).where(int_col_or_null.c.col == None)
+
+
 def is_non_negative(column: Column) -> Compilable:
     """
     >>> is_non_negative(HeartRate.value)
