@@ -5,7 +5,7 @@ from amora.providers.bigquery import cte_from_rows
 from amora.tests.assertions import is_numeric, that
 
 
-def test_it_numeric_with_numeric_column():
+def test_is_numeric_with_numeric_column():
     cte = cte_from_rows(
         [
             {"numeric_column": "123"},
