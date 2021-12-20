@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime, date, time
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Iterable, Any, Dict
 
 import sqlalchemy
 from google.cloud.bigquery import (
@@ -10,10 +10,12 @@ from google.cloud.bigquery import (
     Table,
     TableReference,
 )
+from sqlalchemy import literal
+from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery.base import unnest
 
 from amora.compilation import compile_statement
-from amora.models import Model
+from amora.models import Model, select
 
 
 Schema = List[SchemaField]
@@ -146,3 +148,34 @@ class fixed_unnest(sqlalchemy.sql.roles.InElementRole, unnest):
     def __init__(self, *args, **kwargs):
         self.name = "unnest"
         super().__init__(*args, **kwargs)
+
+
+def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
+    """
+    Returns a table like selectable (CTE) for the given hardcoded values.
+
+    >>> cte_from_rows(
+        [
+            {"numeric_column": "123"},
+            {"numeric_column": "234"},
+            {"numeric_column": "345"},
+        ]
+    )
+
+    ```sql
+        WITH annon_cte AS (
+            SELECT "123" AS numeric_column
+            UNION SELECT "234 AS numeric_column
+            UNION SELECT "345" AS numeric_column
+        )
+    ```
+    """
+    selects = [
+        select([literal(value).label(name) for name, value in row.items()])
+        for row in rows
+    ]
+
+    if len(selects) == 1:
+        return selects[0].cte()
+    else:
+        return selects[0].union_all(*(selects[1:])).cte()
