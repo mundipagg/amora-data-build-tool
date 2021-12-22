@@ -1,5 +1,7 @@
 # CLI
 
+Amora comes packed with a Command Line Interface, developed using [tiangolo/typer](http://typer.tiangolo.com). 
+To check all the options, type `amora --help` after the installation.
 
 ```
 Usage: amora [OPTIONS] COMMAND [ARGS]...
