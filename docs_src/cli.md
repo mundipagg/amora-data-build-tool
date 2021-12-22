@@ -40,6 +40,75 @@ Commands:
 
 ::: amora.cli.models_list
 
+![amora models list](static/cli/amora-models-list.png)
+
+---
+
+![amora models list --with-total-bytes](static/cli/amora-models-list-with-total-bytes.png)
+
+---
+If a machine readable format is required, the `--format json` option can be used as followed:
+
+```shell
+$ amora models list --format json
+```
+
+```json
+{
+  "models": [
+    {
+      "depends_on": [
+        "Health"
+      ],
+      "has_source": true,
+      "materialization_type": "table",
+      "model_name": "Steps",
+      "referenced_tables": [],
+      "total_bytes": null
+    },
+    {
+      "depends_on": [
+        "HeartRate"
+      ],
+      "has_source": true,
+      "materialization_type": "table",
+      "model_name": "HeartRateAgg",
+      "referenced_tables": [],
+      "total_bytes": null
+    },
+    {
+      "depends_on": [],
+      "has_source": false,
+      "materialization_type": null,
+      "model_name": "Health",
+      "referenced_tables": [],
+      "total_bytes": null
+    },
+    {
+      "depends_on": [
+        "Health"
+      ],
+      "has_source": true,
+      "materialization_type": "table",
+      "model_name": "HeartRate",
+      "referenced_tables": [],
+      "total_bytes": null
+    },
+    {
+      "depends_on": [
+        "Steps"
+      ],
+      "has_source": true,
+      "materialization_type": "table",
+      "model_name": "StepsAgg",
+      "referenced_tables": [],
+      "total_bytes": null
+    }
+  ]
+}
+
+```
+
 ## amora models import
 
 ::: amora.cli.models_import

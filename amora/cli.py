@@ -149,13 +149,13 @@ def models_list(
     or as a JSON serialized document
 
     ```shell
-    $ amora models list
+    amora models list
     ```
     You can also use the option `--with-total-bytes` to use
     BigQuery query dry run feature to gather model total bytes information
 
     ```shell
-    $ amora models list --with-total-bytes
+    amora models list --with-total-bytes
     ```
 
     """
@@ -279,7 +279,7 @@ def models_import(
     Generates a new amora model file from an existing table/view
 
     ```shell
-    $ amora models import --table-reference my_gcp_project.my_dataset.my_table my_gcp_project/my_dataset/my_table
+    amora models import --table-reference my_gcp_project.my_dataset.my_table my_gcp_project/my_dataset/my_table
     ```
     """
 
