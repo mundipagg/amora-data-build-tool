@@ -11,8 +11,7 @@ from sqlalchemy.orm import InstrumentedAttribute
 from sqlmodel.sql.expression import SelectOfScalar
 from amora.models import select, AmoraModel
 from amora.types import Compilable
-from amora.compilation import compile_statement
-from amora.providers.bigquery import get_client
+from amora.providers.bigquery import run
 
 Column = InstrumentedAttribute
 Columns = Iterable[Column]
@@ -20,20 +19,17 @@ Test = Callable[..., SelectOfScalar]
 
 
 def _test(statement: Compilable) -> bool:
-    sql_stmt = compile_statement(statement=statement)
+    run_result = run(statement)
 
-    query_job = get_client().query(sql_stmt)
-    result = query_job.result()
-
-    if result.total_rows == 0:
+    if run_result.rows.total_rows == 0:
         return True
     else:
         pytest.fail(
-            f"{result.total_rows} rows failed the test assertion."
+            f"{run_result.rows.total_rows} rows failed the test assertion."
             f"\n==========="
             f"\nTest query:"
             f"\n==========="
-            f"\n{sql_stmt}",
+            f"\n{run_result.query}",
             pytrace=False,
         )
 
