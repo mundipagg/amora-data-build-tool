@@ -1,0 +1,79 @@
+site_name: Amora Data Build Tool
+docs_dir: 'docs_src/'
+site_dir: 'docs/'
+site_description: transform data on the data warehouse (BigQuery) by writing Amora Models that describe the data schema using Python's PEP484 - Type Hints
+repo_url: https://github.com/mundipagg/amora-data-build-tool
+repo_name: amora-data-build-tool
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - tables
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - markdown.extensions.codehilite:
+      guess_lang: false
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+nav:
+  - Amora: 'index.md'
+  - Features: 'features.md'
+  - Tutorial - User Guide:
+      - 'models.md'
+  - Examples: 'examples.md'
+  - API Reference: ''
+plugins:
+  - autorefs
+  - include-markdown
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          setup_commands:
+            - import sys
+            - from unittest.mock import MagicMock
+            - sys.path.append("amora")
+            - sys.modules['amora.config.settings'] = MagicMock()
+          rendering:
+            show_source: true
+            show_root_heading: false
+            show_root_toc_entry: false
+            show_signature_annotations: true
+          filters:
+            - "!^_"  # exclude all members starting with _
+            - "^__init__$"  # but always include __init__ modules and methods
+      custom_templates: templates
+      watch:
+        - amora
+  - search:
+      lang: pt
+  - git-revision-date
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+          remove_comments: true
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - scheme: default
+      media: "(prefers-color-scheme: light)"
+      primary: teal
+      toggle:
+        icon: material/toggle-switch-off
+        name: Switch to dark mode
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+      primary: teal
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
