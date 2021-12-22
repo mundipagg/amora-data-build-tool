@@ -26,8 +26,11 @@ nav:
   - Features: 'features.md'
   - Tutorial - User Guide:
       - 'models.md'
+      - 'cli.md'
   - Examples: 'examples.md'
   - API Reference: ''
+  - Testing:
+      - 'tests/assertions.md'
 plugins:
   - autorefs
   - include-markdown
