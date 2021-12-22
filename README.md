@@ -40,7 +40,7 @@ Required roles:
 Amora is packed with a **compiler** and a **runner**. The **compiler** (CLI `amora compile`) compiles Amora's python 
 models into SQL statements which can be executed against the configured data warehouse using `amora materialize`.
 
-![Amora](./docs/static/capture.gif)
+![Amora](docs_src/static/demo.gif)
 
 The animation above displays an user inside an Amora Project using Amora's CLI `amora compile` to compile model 
 files into SQL statements and creating the corresponding views/tables into the Data Warehouse (BigQuery) using `amora materialize`.
