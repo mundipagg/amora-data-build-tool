@@ -57,14 +57,3 @@ amora = "amora.cli:main"
 plugins = [
     "sqlalchemy.ext.mypy.plugin"
 ]
-
-[[tool.pydoc-markdown.loaders]]
-type = "python"
-search_path = [ "amora" ]
-
-[tool.pydoc-markdown.renderer]
-type = "mkdocs"
-
-[[tool.pydoc-markdown.renderer.pages]]
-title = "API Documentation"
-name = "index"
