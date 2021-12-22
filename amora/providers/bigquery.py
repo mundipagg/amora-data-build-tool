@@ -10,13 +10,14 @@ from google.cloud.bigquery import (
     Table,
     TableReference,
 )
+from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
 from sqlalchemy import literal
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery.base import unnest
 
 from amora.compilation import compile_statement
 from amora.models import Model, select
-
+from amora.types import Compilable
 
 Schema = List[SchemaField]
 BQTable = Union[Table, TableReference, str]
@@ -55,6 +56,19 @@ class DryRunResult:
         raise NotImplementedError
 
 
+@dataclass
+class RunResult:
+    total_bytes: int
+    query: str
+    rows: Union[RowIterator, _EmptyRowIterator]
+    job_id: str
+    schema: Optional[Schema] = None
+
+    @property
+    def estimated_cost(self):
+        raise NotImplementedError
+
+
 _client = None
 
 
@@ -73,6 +87,24 @@ def get_schema(table_id: str) -> Schema:
     client = get_client()
     table = client.get_table(table_id)
     return table.schema
+
+
+def run(statement: Compilable) -> RunResult:
+    """
+    Executes a given query and returns its results
+    and metadata as an `amora.providers.bigquery.RunResult`
+    """
+    query = compile_statement(statement)
+    query_job = get_client().query(query)
+    rows = query_job.result()
+
+    return RunResult(
+        query=query,
+        job_id=query_job.job_id,
+        total_bytes=query_job.total_bytes_processed,
+        schema=query_job.schema,
+        rows=rows,
+    )
 
 
 def dry_run(model: Model) -> Optional[DryRunResult]:
