@@ -47,7 +47,7 @@ class ModelConfig:
     """
     Model configuration metadata
 
-    Args:
+    Attributes:
         description (str)
         materialized (amora.models.MaterializationTypes): The materialization configuration: `view`, `table`, `ephemeral`. Default: `view`
         partition_by (Optional[PartitionConfig]): BigQuery supports the use of a [partition by](https://cloud.google.com/bigquery/docs/partitioned-tables) clause to easily partition a table by a column or expression. This option can help decrease latency and cost when querying large tables.

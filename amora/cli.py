@@ -81,7 +81,8 @@ def materialize(
     draw_dag: bool = typer.Option(False, "--draw-dag"),
 ) -> None:
     """
-    Executes the compiled SQL againts the current target database.
+    Executes the compiled SQL against the current target database.
+
     """
     model_to_task = {}
 
@@ -146,6 +147,16 @@ def models_list(
     """
     List the models in your project as a human readable table
     or as a JSON serialized document
+
+    ```shell
+    $ amora models list
+    ```
+    You can also use the option `--with-total-bytes` to use
+    BigQuery query dry run feature to gather model total bytes information
+
+    ```shell
+    $ amora models list --with-total-bytes
+    ```
 
     """
 
