@@ -185,9 +185,29 @@ def relationship(
 
 def is_numeric(column: Column) -> Compilable:
     """
+    >>> is_numeric(func.cast(Health.value, String).label('value_as_str'))
+    True
 
-    :param column:
-    :return:
+    Asserts that each not null value is a number
+
+    ```sql
+        WITH `int_col_or_null` AS (
+            SELECT
+                CAST({{ column }}, INT64) AS `col`
+            FROM
+                {{ model }}
+            WHERE
+                {{ column }} IS NOT NULL
+        )
+
+        SELECT
+            col
+        FROM
+            int_col_or_null
+        WHERE
+            col IS NULL
+    ```
+
     """
     int_col_or_null = (
         select(func.cast(column, Integer).label("col"))
