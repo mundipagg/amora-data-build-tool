@@ -62,3 +62,13 @@ jobs:
             coverage.xml
             .mypy_coverage
           retention-days: 7
+
+      # todo: Mover linhas abaixo para main.yml
+      - name: 📝 Build documentation
+        run: mkdocs build
+
+      - name: 📝 Deploy documentation
+        uses: JamesIves/github-pages-deploy-action@4.1.7
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs # The folder the action should deploy.
