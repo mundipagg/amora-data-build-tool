@@ -1,5 +1,8 @@
-name: pull-request
-on: pull_request
+name: main
+on:
+  push:
+    branches:
+      - main
 
 env:
   gcp_service_account: ${{ secrets.GCP_SA_KEY }}
@@ -75,3 +78,12 @@ jobs:
             coverage.xml
             .mypy_coverage
           retention-days: 7
+
+      - name: 📝 Build documentation
+        run: mkdocs build
+
+      - name: 📝 Deploy documentation
+        uses: JamesIves/github-pages-deploy-action@4.1.7
+        with:
+          branch: gh-pages
+          folder: docs
