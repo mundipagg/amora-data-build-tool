@@ -39,7 +39,7 @@ jobs:
         run: pip install -U pip==21.2.4 poetry==1.1.9
 
       - name: 🐍 poetry install - Installing python dependencies
-        run: poetry install --no-root --no-interaction
+        run: poetry install --no-interaction
         env:
           POETRY_VIRTUALENVS_CREATE: false
 
