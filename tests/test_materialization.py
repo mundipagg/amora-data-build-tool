@@ -49,11 +49,12 @@ def test_dependency_dags_is_iterable_and_topologicaly_sorted():
     topologicaly_sorted_tasks = list(dag)
 
     assert (
-        topologicaly_sorted_tasks[0] == "amora-test-project.testschema.health"
+        topologicaly_sorted_tasks[0]
+        == f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.health"
     )
     assert (
         topologicaly_sorted_tasks[-1]
-        == "amora-test-project.testschema.heart_rate_agg"
+        == f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.heart_rate_agg"
     )
 
 
