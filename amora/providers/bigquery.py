@@ -3,6 +3,7 @@ from datetime import datetime, date, time
 from typing import Optional, List, Union, Iterable, Any, Dict
 
 import sqlalchemy
+from google.api_core.client_info import ClientInfo
 from google.cloud.bigquery import (
     Client,
     QueryJobConfig,
@@ -18,6 +19,7 @@ from sqlalchemy_bigquery.base import unnest
 from amora.compilation import compile_statement
 from amora.models import Model, select
 from amora.types import Compilable
+from amora.version import VERSION
 
 Schema = List[SchemaField]
 BQTable = Union[Table, TableReference, str]
@@ -75,7 +77,12 @@ _client = None
 def get_client() -> Client:
     global _client
     if _client is None:
-        _client = Client()
+        _client = Client(
+            client_info=ClientInfo(
+                client_library_version=VERSION,
+                user_agent=f"amora-data-build-tool/{VERSION}",
+            )
+        )
     return _client
 
 
