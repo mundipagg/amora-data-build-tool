@@ -3,6 +3,8 @@ on: pull_request
 
 env:
   gcp_service_account: ${{ secrets.GCP_SA_KEY }}
+  AMORA_TARGET_SCHEMA: amora
+  AMORA_TARGET_PROJECT: amora-data-build-tool
 
 jobs:
   qa:
