@@ -2,7 +2,7 @@ name: pull-request
 on: pull_request
 
 env:
-  gcp_service_account: ${{ secrets.STG_SA_KEY }}
+  gcp_service_account: ${{ secrets.GCP_SA_KEY }}
 
 jobs:
   qa:
@@ -41,7 +41,7 @@ jobs:
         env:
           POETRY_VIRTUALENVS_CREATE: false
 
-      - id: 🚧 GCP Auth
+      - name: 🚧 GCP Auth
         uses: "google-github-actions/auth@v0"
         with:
           credentials_json: ${{ env.gcp_service_account }}
