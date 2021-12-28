@@ -89,6 +89,7 @@ jobs:
 
       - name: 📝 Deploy documentation
         uses: JamesIves/github-pages-deploy-action@4.1.7
+        if: ${{ matrix.python == '3.9' }}
         with:
           branch: gh-pages
           folder: docs
