@@ -158,3 +158,4 @@ config/*/**
 */.sqlfluff_output/annotations.json
 
 
+docs/
