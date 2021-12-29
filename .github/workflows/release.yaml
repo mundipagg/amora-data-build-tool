@@ -1,0 +1,27 @@
+name: release
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  release:
+    name: 🚀 Deploy to PyPI
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚧 Install OS dependencies
+        run: sudo apt-get install libxml2-dev libxslt-dev
+
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: 🐍 Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: 🐍 Install Pip and Poetry
+        run: pip install -U pip==21.2.4 poetry==1.1.9
+
+      - name: 🚀 Deploy to PyPI
+        run: poetry publish --build --username __token__ --password ${{ secrets.PYPI_TOKEN }}
