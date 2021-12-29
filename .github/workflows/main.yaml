@@ -1,5 +1,8 @@
-name: pull-request
-on: pull_request
+name: main
+on:
+  push:
+    branches:
+      - main
 
 env:
   gcp_service_account: ${{ secrets.GCP_SA_KEY }}
@@ -14,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ['3.9']
+        python: [ '3.9' ]
         experimental: [ false ]
         include:
           - python: '3.10'
@@ -80,3 +83,13 @@ jobs:
             coverage.xml
             .mypy_coverage
           retention-days: 7
+
+      - name: 📝 Build documentation
+        run: mkdocs build
+
+      - name: 📝 Deploy documentation
+        uses: JamesIves/github-pages-deploy-action@4.1.7
+        if: ${{ matrix.python == '3.9' }}
+        with:
+          branch: gh-pages
+          folder: docs

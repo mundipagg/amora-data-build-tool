@@ -70,6 +70,7 @@ def compile(
         )
 
         content = compile_statement(source_sql_statement)
+        target_file_path.parent.mkdir(parents=True, exist_ok=True)
         target_file_path.write_text(content)
 
 
@@ -80,7 +81,8 @@ def materialize(
     draw_dag: bool = typer.Option(False, "--draw-dag"),
 ) -> None:
     """
-    Executes the compiled SQL againts the current target database.
+    Executes the compiled SQL against the current target database.
+
     """
     model_to_task = {}
 
@@ -145,6 +147,16 @@ def models_list(
     """
     List the models in your project as a human readable table
     or as a JSON serialized document
+
+    ```shell
+    amora models list
+    ```
+    You can also use the option `--with-total-bytes` to use
+    BigQuery query dry run feature to gather model total bytes information
+
+    ```shell
+    amora models list --with-total-bytes
+    ```
 
     """
 
@@ -267,7 +279,7 @@ def models_import(
     Generates a new amora model file from an existing table/view
 
     ```shell
-    $ amora models import --table-reference my_gcp_project.my_dataset.my_table my_gcp_project/my_dataset/my_table
+    amora models import --table-reference my_gcp_project.my_dataset.my_table my_gcp_project/my_dataset/my_table
     ```
     """
 
