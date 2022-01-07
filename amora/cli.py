@@ -1,10 +1,14 @@
 import json
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
 import typer
-from typing import Optional, List
+from typing import Optional, List, Iterable
+
+from google.cloud import bigquery
+from google.cloud.bigquery import LoadJobConfig
 from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
 from rich.table import Table
@@ -15,8 +19,9 @@ from amora.models import (
     AmoraModel,
     list_models,
     Model,
+    metadata,
 )
-from amora.utils import list_target_files
+from amora.utils import list_target_files, list_files
 from amora.compilation import compile_statement
 from amora import materialization
 from amora.providers.bigquery import (
@@ -24,6 +29,7 @@ from amora.providers.bigquery import (
     get_schema,
     BIGQUERY_TYPES_TO_PYTHON_TYPES,
     DryRunResult,
+    get_client,
 )
 
 app = typer.Typer(
@@ -322,6 +328,53 @@ def models_import(
         bold=True,
     )
     typer.secho(f"Current File Path: `{destination_file_path.as_posix()}`")
+
+
+seed = typer.Typer()
+app.add_typer(seed, name="seed")
+
+
+@seed.command(name="load")
+def seed_load(
+    file_path: List[Path] = typer.Option(
+        [],
+        "--file-path",
+        help="The path of a seed file",
+    )
+) -> None:
+    seed_files: Iterable[Path] = file_path or list_files(
+        settings.SEEDS_PATH, suffix=".csv"
+    )
+
+    client = get_client()
+    for file in seed_files:
+        with open(file, mode="rb") as fp:
+            destination_table = f"{metadata.schema}.{file.stem}"
+            client.delete_table(destination_table)
+            job = client.load_table_from_file(
+                file_obj=fp,
+                destination=destination_table,
+                job_config=bigquery.LoadJobConfig(
+                    autodetect=True, source_format=bigquery.SourceFormat.CSV
+                ),
+                rewind=True,
+            )
+            typer.secho(
+                f"🏗 Running seed load job (GCP Job id:'{job.job_id}') for table '{destination_table}'"
+            )
+            while job.state != "DONE":
+                if job.error_result:
+                    message = "\n".join(
+                        error["message"].strip() for error in job.errors
+                    )
+                    typer.secho(f"Seed load job failed: {message}", err=True)
+                typer.secho(".", nl=False)
+                time.sleep(settings.GCP_POLLING_INTERVAL_IN_SECONDS)
+
+            typer.secho(
+                f"🎉 Seed load job finished! Table '{destination_table}' created.",
+                fg=typer.colors.GREEN,
+            )
 
 
 def main():
