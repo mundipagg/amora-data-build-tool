@@ -1,17 +1,34 @@
 import logging
 import os
+from enum import Enum
 from uuid import uuid4
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Tuple
 
-from pydantic import BaseSettings
+from pydantic import BaseSettings, AnyUrl
 
 ROOT_PATH = Path(__file__).parent.parent
 AMORA_MODULE_PATH = ROOT_PATH.joinpath("amora")
 
 _Width = float
 _Height = float
+
+
+class FeatureStoreProviders(str, Enum):
+    local = "local"
+    gcp = "gcp"
+
+
+class FeatureStoreOnlineStoreTypes(str, Enum):
+    redis = "redis"
+    sqllite = "sqllite"
+    datastore = "datastore"
+
+
+class FeatureStoreOfflineStoreTypes(str, Enum):
+    bigquery = "bigquery"
+    file = "file"
 
 
 class Settings(BaseSettings):
