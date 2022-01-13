@@ -212,21 +212,12 @@ def is_numeric(column: Column) -> Compilable:
     Example SQL:
 
     ```sql
-    WITH `int_col_or_null` AS (
         SELECT
-            CAST({{ column }}, INT64) AS `col`
+            col
         FROM
-            {{ model }}
+            validation
         WHERE
-            {{ column }} IS NOT NULL
-    )
-
-    SELECT
-        col
-    FROM
-        int_col_or_null
-    WHERE
-        col IS NULL
+            REGEXP_CONTAINS(col, "[^0-9]")
     ```
 
     Example:
@@ -234,15 +225,8 @@ def is_numeric(column: Column) -> Compilable:
     ```python
     is_numeric(func.cast(Health.value, String).label('value_as_str'))
     ```
-
     """
-    int_col_or_null = (
-        select(func.cast(column, Integer).label("col"))
-        .where(column != None)
-        .cte("int_col_or_null")
-    )
-
-    return select(int_col_or_null.c.col).where(int_col_or_null.c.col == None)
+    return select(column).where(func.REGEXP_CONTAINS(column, "[^0-9]"))
 
 
 def is_non_negative(column: Column) -> Compilable:
