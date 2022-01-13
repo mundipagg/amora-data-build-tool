@@ -211,11 +211,11 @@ def is_numeric(column: Column) -> Compilable:
 
     ```sql
         SELECT
-            col
+            {{ column }}
         FROM
-            validation
+            {{ model }}
         WHERE
-            REGEXP_CONTAINS(col, "[^0-9]")
+            REGEXP_CONTAINS({{ column }}, "[^0-9]")
     ```
 
     Example:
