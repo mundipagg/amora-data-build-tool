@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, Callable
+from typing import Iterable, Optional, Callable, Union
 
 import pytest
 from sqlalchemy import (
@@ -7,14 +7,12 @@ from sqlalchemy import (
     Integer,
     func,
 )
-from sqlalchemy.orm import InstrumentedAttribute
 from sqlmodel.sql.expression import SelectOfScalar
-from amora.models import select, AmoraModel
+from amora.models import select, AmoraModel, Column, Columns
 from amora.types import Compilable
 from amora.providers.bigquery import run
 
-Column = InstrumentedAttribute
-Columns = Iterable[Column]
+
 Test = Callable[..., SelectOfScalar]
 
 

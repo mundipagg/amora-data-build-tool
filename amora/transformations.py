@@ -1,4 +1,5 @@
-from sqlalchemy import func, String, Column
+from sqlalchemy import func, String
+from amora.models import Column
 from sqlalchemy.sql.functions import Function
 
 

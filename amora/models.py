@@ -6,18 +6,18 @@ from importlib.util import spec_from_file_location, module_from_spec
 from inspect import getfile
 from pathlib import Path
 from typing import Iterable, List, Optional, Union, Dict, Any, Tuple, Type
-
 from amora.protocols import CompilableProtocol
 from amora.config import settings
 from sqlalchemy import MetaData, Table, select
+from sqlalchemy.sql import ColumnElement
 from sqlmodel import SQLModel, Field
-
 from sqlalchemy.orm import declared_attr
-
 from amora.types import Compilable
 from amora.utils import model_path_for_target_path, list_files
 
 select = select
+Column = ColumnElement
+Columns = Iterable[Column]
 Field = Field
 Model = Type["AmoraModel"]
 Models = Iterable[Model]
