@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     CLI_MATERIALIZATION_DAG_FIGURE_SIZE: Tuple[_Width, _Height] = (32, 32)
 
     GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD: float = 5.0
+    GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD: float = 0.020
+
+    MONEY_DECIMAL_PLACES: int = 4
 
     class Config:
         env_prefix = "AMORA_"

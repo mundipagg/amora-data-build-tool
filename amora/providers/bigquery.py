@@ -56,7 +56,7 @@ class DryRunResult:
 
     @property
     def estimated_cost(self):
-        raise NotImplementedError
+        return estimated_query_cost_in_usd(self.total_bytes)
 
 
 @dataclass
@@ -69,7 +69,7 @@ class RunResult:
 
     @property
     def estimated_cost(self):
-        raise NotImplementedError
+        return estimated_query_cost_in_usd(self.total_bytes)
 
 
 _client = None
@@ -252,4 +252,27 @@ def estimated_query_cost_in_usd(total_bytes: int) -> float:
     return (
         total_terabytes
         * settings.GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD
+    )
+
+
+def estimated_storage_cost_in_usd(total_bytes: int) -> float:
+    """
+    Storage pricing is the cost to store data that you load into BigQuery.
+    `Active storage` includes any table or table partition that has been modified in the last 90 days.
+
+    - This function doesn't take into consideration that the first 10 GB of storage per month is free.
+    - By default, the estimation is based on BigQuery's `Active Storage` cost per GB, which may change over time and
+    may vary according to regions and your personal contract with GCP.
+
+    You may set `AMORA_GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD` to the appropriate value for your use case.
+
+    More on: https://cloud.google.com/bigquery/pricing#storage
+
+    :param total_bytes: Total bytes stored into the table
+    :return: The estimated cost in USD, based on `Active storage` price
+    """
+    total_gigabytes = total_bytes / 1024 ** 3
+    return (
+        total_gigabytes
+        * settings.GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD
     )
