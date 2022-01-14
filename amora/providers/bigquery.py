@@ -17,6 +17,7 @@ from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery.base import unnest
 
 from amora.compilation import compile_statement
+from amora.config import settings
 from amora.models import Model, select
 from amora.types import Compilable
 from amora.version import VERSION
@@ -229,3 +230,26 @@ def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
         return selects[0].cte()
     else:
         return selects[0].union_all(*(selects[1:])).cte()
+
+
+def estimated_query_cost_in_usd(total_bytes: int) -> float:
+    """
+    By default, queries are billed using the on-demand pricing model,
+    where you pay for the data scanned by your queries.
+
+    - This function doesn't take into consideration that the first 1 TB per month is free.
+    - By default, the estimation is based on BigQuery's `On-demand analysis` pricing, which may change over time and
+    may vary according to regions and your personal contract with GCP.
+
+    You may set `AMORA_GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD` to the appropriate value for your use case.
+
+    More on: https://cloud.google.com/bigquery/pricing#analysis_pricing_models
+
+    :param total_bytes: Total data processed by the query
+    :return: The estimated cost in USD, based on `On-demand` price
+    """
+    total_terabytes = total_bytes / 1024 ** 4
+    return (
+        total_terabytes
+        * settings.GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD
+    )

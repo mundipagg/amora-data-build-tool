@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     CLI_CONSOLE_MAX_WIDTH: int = 160
     CLI_MATERIALIZATION_DAG_FIGURE_SIZE: Tuple[_Width, _Height] = (32, 32)
 
+    GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD: float = 5.0
+
     class Config:
         env_prefix = "AMORA_"
 
