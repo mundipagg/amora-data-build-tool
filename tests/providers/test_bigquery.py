@@ -3,7 +3,11 @@ from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.selectable import CTE
 
 from amora.compilation import compile_statement
-from amora.providers.bigquery import cte_from_rows, estimated_query_cost_in_usd
+from amora.providers.bigquery import (
+    cte_from_rows,
+    estimated_query_cost_in_usd,
+    estimated_storage_cost_in_usd,
+)
 
 
 def test_cte_from_rows_with_single_row():
@@ -31,6 +35,7 @@ def test_cte_from_rows_with_distinguished_schema_rows():
 
 
 ONE_TERABYTE = 1 * 1024 ** 4
+ONE_GIGABYTE = 1 * 1024 ** 3
 
 
 @pytest.mark.parametrize(
@@ -44,3 +49,16 @@ ONE_TERABYTE = 1 * 1024 ** 4
 )
 def test_estimated_query_cost_in_usd(total_bytes: int, expected_cost: float):
     assert estimated_query_cost_in_usd(total_bytes) == expected_cost
+
+
+@pytest.mark.parametrize(
+    "total_bytes, expected_cost",
+    [
+        (0, 0),
+        (ONE_GIGABYTE, 0.020),
+        (ONE_GIGABYTE * 10, 0.200),
+        (ONE_GIGABYTE / 2, 0.010),
+    ],
+)
+def test_estimated_storage_cost_in_usd(total_bytes: int, expected_cost: float):
+    assert estimated_storage_cost_in_usd(total_bytes) == expected_cost
