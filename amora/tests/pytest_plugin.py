@@ -2,6 +2,7 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import SubRequest
+from amora.tests.assertions import _REGISTRY
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -23,7 +24,12 @@ A amora adoça mais na boca de quem namora.
 
 
 def teardown_test_environment():
-    print("todo: Print table with total bytes billed, query time, etc")
+    for test, results in _REGISTRY.items():
+        total_bytes = sum(r.total_bytes for r in results)
+        total_cost = sum(r.estimated_cost for r in results)
+        print(
+            f"🤑 {test} :: Total bytes: {total_bytes} :: Estimated cost: ${total_cost}"
+        )
 
 
 @pytest.fixture(autouse=True, scope="session")

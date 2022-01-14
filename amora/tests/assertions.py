@@ -1,4 +1,5 @@
-from typing import Iterable, Optional, Callable
+import os
+from typing import Iterable, Optional, Callable, Dict, List
 
 import pytest
 from sqlalchemy import (
@@ -11,15 +12,19 @@ from sqlalchemy.orm import InstrumentedAttribute
 from sqlmodel.sql.expression import SelectOfScalar
 from amora.models import select, AmoraModel
 from amora.types import Compilable
-from amora.providers.bigquery import run
+from amora.providers.bigquery import run, RunResult
+from collections import defaultdict
 
 Column = InstrumentedAttribute
 Columns = Iterable[Column]
 Test = Callable[..., SelectOfScalar]
 
+_REGISTRY: Dict[str, List[RunResult]] = defaultdict(list)
+
 
 def _test(statement: Compilable) -> bool:
     run_result = run(statement)
+    _REGISTRY[os.getenv("PYTEST_CURRENT_TEST")].append(run_result)
 
     if run_result.rows.total_rows == 0:
         return True
