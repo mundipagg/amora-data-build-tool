@@ -1,9 +1,8 @@
 import json
-from dataclasses import dataclass
-from pathlib import Path
-
 import pytest
 import typer
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional, List
 from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
@@ -24,6 +23,8 @@ from amora.providers.bigquery import (
     get_schema,
     BIGQUERY_TYPES_TO_PYTHON_TYPES,
     DryRunResult,
+    estimated_query_cost_in_usd,
+    estimated_storage_cost_in_usd,
 )
 
 app = typer.Typer(
@@ -173,6 +174,8 @@ def models_list(
                 "model_name": self.model_name,
                 "referenced_tables": self.referenced_tables,
                 "total_bytes": self.total_bytes,
+                "estimated_query_cost_in_usd": self.estimated_query_cost_in_usd,
+                "estimated_storage_cost_in_usd": self.estimated_storage_cost_in_usd,
             }
 
         @property
@@ -191,6 +194,24 @@ def models_list(
                     for dependency in self.model.dependencies()
                 ]
             )
+
+        @property
+        def estimated_query_cost_in_usd(self) -> str:
+            if self.dry_run_result:
+                cost = estimated_query_cost_in_usd(
+                    self.dry_run_result.total_bytes
+                )
+                return f"{cost:.{settings.MONEY_DECIMAL_PLACES}f}"
+            return None
+
+        @property
+        def estimated_storage_cost_in_usd(self) -> str:
+            if self.dry_run_result:
+                cost = estimated_storage_cost_in_usd(
+                    self.dry_run_result.total_bytes
+                )
+                return f"{cost:.{settings.MONEY_DECIMAL_PLACES}f}"
+            return None
 
         @property
         def total_bytes(self) -> Optional[int]:
@@ -212,6 +233,7 @@ def models_list(
                 return None
 
     results = []
+    placeholder = "-"
 
     for model, model_file_path in list_models():
         if with_total_bytes:
@@ -232,6 +254,8 @@ def models_list(
 
         table.add_column("Model name", style="green bold", no_wrap=True)
         table.add_column("Total bytes", no_wrap=True)
+        table.add_column("Estimated query cost", no_wrap=True)
+        table.add_column("Estimated storage cost", no_wrap=True)
         table.add_column("Referenced tables")
         table.add_column("Depends on")
         table.add_column("Has source?", no_wrap=True, justify="center")
@@ -240,13 +264,18 @@ def models_list(
         for result in results:
             table.add_row(
                 result.model_name,
-                f"{result.total_bytes or '-'}",
+                f"{result.total_bytes or placeholder}",
+                result.estimated_query_cost_in_usd or placeholder,
+                result.estimated_storage_cost_in_usd or placeholder,
                 Text(
-                    "\n".join(result.referenced_tables) or "-", overflow="fold"
+                    "\n".join(result.referenced_tables) or placeholder,
+                    overflow="fold",
                 ),
-                Text("\n".join(result.depends_on) or "-", overflow="fold"),
+                Text(
+                    "\n".join(result.depends_on) or placeholder, overflow="fold"
+                ),
                 "🟢" if result.has_source else "🔴",
-                result.materialization_type or "-",
+                result.materialization_type or placeholder,
             )
 
         console = Console(width=settings.CLI_CONSOLE_MAX_WIDTH)
