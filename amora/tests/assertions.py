@@ -14,7 +14,7 @@ from sqlmodel.sql.expression import SelectOfScalar
 
 from amora.config import settings
 from amora.models import select, AmoraModel, Session
-from amora.storage import local_storage
+from amora.storage import local_engine
 from amora.tests.audit import AuditLog
 from amora.types import Compilable
 from amora.providers.bigquery import run, RunResult, estimated_query_cost_in_usd
@@ -26,7 +26,7 @@ Test = Callable[..., SelectOfScalar]
 
 
 def _log_result(run_result: RunResult) -> AuditLog:
-    with Session(local_storage) as session:
+    with Session(local_engine) as session:
         log = AuditLog(
             bytes_billed=run_result.total_bytes,
             estimated_cost_in_usd=estimated_query_cost_in_usd(

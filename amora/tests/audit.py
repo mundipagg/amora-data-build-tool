@@ -1,18 +1,29 @@
+import os
 from datetime import datetime
 from typing import Optional
 
-from amora.models import AmoraModel, Field, MetaData
-from amora.storage import local_storage
+from sqlalchemy import func
+
+from amora.models import (
+    AmoraModel,
+    Field,
+    MetaData,
+    select,
+    ModelConfig,
+    MaterializationTypes,
+)
+from amora.storage import local_engine, local_metadata
 from amora.config import settings
+from amora.types import Compilable
 from amora.version import VERSION
 
 
 class AuditLog(AmoraModel, table=True):
-    """
-    Stores test log data
-    """
-
-    metadata = MetaData(schema=None)
+    __model_config__ = ModelConfig(
+        materialized=MaterializationTypes.view,
+        description="Stores test log data",
+    )
+    metadata = local_metadata
 
     test_run_id: str = Field(
         primary_key=True,
@@ -51,6 +62,48 @@ class AuditLog(AmoraModel, table=True):
     amora_version: str = Field(
         description="Current version of the amora package", default=VERSION
     )
+    xdist_worker_id: Optional[str] = Field(
+        description="The name of the `pytest-xdist` worker. E.g.: gw2",
+        default=os.getenv("PYTEST_XDIST_WORKER"),
+    )
 
 
-AuditLog.__table__.create(bind=local_storage, checkfirst=True)
+class AuditReport(AmoraModel, table=True):
+    __depends_on__ = [AuditLog]
+    __model_config__ = ModelConfig(
+        materialized=MaterializationTypes.view,
+        description="Stores test run reports",
+    )
+    metadata = local_metadata
+
+    test_run_id: str = Field(primary_key=True)
+    amora_version: str = Field(
+        description="Current version of the amora package", default=VERSION
+    )
+    user_email: Optional[str] = Field(
+        description="GCP user email that performed the query", nullable=True
+    )
+
+    total_query_time: int
+    total_cost: float
+    total_bytes_billed: int
+
+    @classmethod
+    def source(cls) -> Optional[Compilable]:
+        raise NotImplementedError  # WIP
+
+        return select(
+            AuditLog.test_run_id,
+            AuditLog.amora_version,
+            AuditLog.user_email,
+            func.sum(AuditLog.execution_time_in_ms).label(
+                cls.total_query_time.key
+            ),
+            func.sum(AuditLog.estimated_cost_in_usd).label(cls.total_cost.key),
+            func.sum(AuditLog.bytes_billed).label(cls.total_bytes_billed.key),
+        ).group_by(
+            AuditLog.test_run_id, AuditLog.amora_version, AuditLog.user_email
+        )
+
+
+AuditLog.__table__.create(bind=local_engine, checkfirst=True)
