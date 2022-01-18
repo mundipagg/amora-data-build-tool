@@ -16,12 +16,17 @@ from amora.providers.bigquery import run
 Test = Callable[..., SelectOfScalar]
 
 
-def _test(statement: Compilable) -> bool:
+def _test(statement: Compilable, raise_on_fail: bool = True) -> bool:
+    """
+    :param statement: A str with a valid SQL compiled statement
+    :param raise_on_fail: By default, the test will raise a pytest Fail exception, with a debug message. Default `True`.
+    :return: `True` if the test passed, `False` otherwise
+    """
     run_result = run(statement)
 
     if run_result.rows.total_rows == 0:
         return True
-    else:
+    elif raise_on_fail:
         pytest.fail(
             f"{run_result.rows.total_rows} rows failed the test assertion."
             f"\n==========="
@@ -30,11 +35,14 @@ def _test(statement: Compilable) -> bool:
             f"\n{run_result.query}",
             pytrace=False,
         )
+    else:
+        return False
 
 
 def that(
     column: Column,
     test: Test,
+    raise_on_fail: bool = True,
     **test_kwargs,
 ) -> bool:
     """
@@ -45,8 +53,15 @@ def that(
     ```python
     assert that(HeartRate.value, is_not_null)
     ```
+    :param column: An AmoraModel column to test
+    :param test: The test assertion function
+    :param raise_on_fail: By default, the test will raise a pytest Fail exception, with a debug message.  Default `True`.
+    :param test_kwargs: Keyword arguments passed to the `test` function
+
     """
-    return _test(statement=test(column, **test_kwargs))
+    return _test(
+        statement=test(column, **test_kwargs), raise_on_fail=raise_on_fail
+    )
 
 
 def is_not_null(column: Column) -> Compilable:
