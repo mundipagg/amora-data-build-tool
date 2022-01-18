@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Iterable, Optional, Callable, Dict, List
 
@@ -10,21 +11,42 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import InstrumentedAttribute
 from sqlmodel.sql.expression import SelectOfScalar
-from amora.models import select, AmoraModel
+
+from amora.config import settings
+from amora.models import select, AmoraModel, Session
+from amora.storage import local_storage
+from amora.tests.audit import AuditLog
 from amora.types import Compilable
-from amora.providers.bigquery import run, RunResult
+from amora.providers.bigquery import run, RunResult, estimated_query_cost_in_usd
 from collections import defaultdict
 
 Column = InstrumentedAttribute
 Columns = Iterable[Column]
 Test = Callable[..., SelectOfScalar]
 
-_REGISTRY: Dict[str, List[RunResult]] = defaultdict(list)
+
+def _log_result(run_result: RunResult) -> AuditLog:
+    with Session(local_storage) as session:
+        log = AuditLog(
+            bytes_billed=run_result.total_bytes,
+            estimated_cost_in_usd=estimated_query_cost_in_usd(
+                run_result.total_bytes
+            ),
+            execution_time_in_ms=run_result.execution_time_in_ms,
+            query=run_result.query,
+            referenced_tables=json.dumps(run_result.referenced_tables),
+            test_node_id=os.getenv("PYTEST_CURRENT_TEST"),
+            test_run_id=settings.TEST_RUN_ID,
+            user_email=run_result.user_email,
+        )
+        session.add(log)
+        session.commit()
+        return log
 
 
 def _test(statement: Compilable) -> bool:
     run_result = run(statement)
-    _REGISTRY[os.getenv("PYTEST_CURRENT_TEST")].append(run_result)
+    _log_result(run_result)
 
     if run_result.rows.total_rows == 0:
         return True
