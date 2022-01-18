@@ -18,6 +18,7 @@ from sqlalchemy_bigquery.base import unnest
 
 from amora.compilation import compile_statement
 from amora.config import settings
+from amora.contracts import BaseResult
 from amora.models import Model, select
 from amora.types import Compilable
 from amora.version import VERSION
@@ -47,12 +48,9 @@ BIGQUERY_TYPES_TO_PYTHON_TYPES = {
 
 
 @dataclass
-class DryRunResult:
-    total_bytes: int
+class DryRunResult(BaseResult):
     model: Model
     schema: Schema
-    query: Optional[str] = None
-    referenced_tables: List[str] = field(default_factory=list)
 
     @property
     def estimated_cost(self):
@@ -60,11 +58,8 @@ class DryRunResult:
 
 
 @dataclass
-class RunResult:
-    total_bytes: int
-    query: str
+class RunResult(BaseResult):
     rows: Union[RowIterator, _EmptyRowIterator]
-    job_id: str
     schema: Optional[Schema] = None
 
     @property
@@ -105,13 +100,20 @@ def run(statement: Compilable) -> RunResult:
     query = compile_statement(statement)
     query_job = get_client().query(query)
     rows = query_job.result()
+    execution_time_delta = query_job.ended - query_job.started
 
     return RunResult(
-        query=query,
+        execution_time_in_ms=execution_time_delta.microseconds / 1000,
         job_id=query_job.job_id,
-        total_bytes=query_job.total_bytes_processed,
-        schema=query_job.schema,
+        query=query,
+        referenced_tables=[
+            ".".join(table.to_api_repr().values())
+            for table in query_job.referenced_tables
+        ],
         rows=rows,
+        schema=query_job.schema,
+        total_bytes=query_job.total_bytes_billed,
+        user_email=query_job.user_email,
     )
 
 
