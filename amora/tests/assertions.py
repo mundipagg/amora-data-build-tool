@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, Callable
+from typing import Iterable, Optional, Callable, Union
 
 import pytest
 from sqlalchemy import (
@@ -7,23 +7,26 @@ from sqlalchemy import (
     Integer,
     func,
 )
-from sqlalchemy.orm import InstrumentedAttribute
 from sqlmodel.sql.expression import SelectOfScalar
-from amora.models import select, AmoraModel
+from amora.models import select, AmoraModel, Column, Columns
 from amora.types import Compilable
 from amora.providers.bigquery import run
 
-Column = InstrumentedAttribute
-Columns = Iterable[Column]
+
 Test = Callable[..., SelectOfScalar]
 
 
-def _test(statement: Compilable) -> bool:
+def _test(statement: Compilable, raise_on_fail: bool = True) -> bool:
+    """
+    :param statement: A str with a valid SQL compiled statement
+    :param raise_on_fail: By default, the test will raise a pytest Fail exception, with a debug message. Default `True`.
+    :return: `True` if the test passed, `False` otherwise
+    """
     run_result = run(statement)
 
     if run_result.rows.total_rows == 0:
         return True
-    else:
+    elif raise_on_fail:
         pytest.fail(
             f"{run_result.rows.total_rows} rows failed the test assertion."
             f"\n==========="
@@ -32,11 +35,14 @@ def _test(statement: Compilable) -> bool:
             f"\n{run_result.query}",
             pytrace=False,
         )
+    else:
+        return False
 
 
 def that(
     column: Column,
     test: Test,
+    raise_on_fail: bool = True,
     **test_kwargs,
 ) -> bool:
     """
@@ -47,8 +53,15 @@ def that(
     ```python
     assert that(HeartRate.value, is_not_null)
     ```
+    :param column: An AmoraModel column to test
+    :param test: The test assertion function
+    :param raise_on_fail: By default, the test will raise a pytest Fail exception, with a debug message.  Default `True`.
+    :param test_kwargs: Keyword arguments passed to the `test` function
+
     """
-    return _test(statement=test(column, **test_kwargs))
+    return _test(
+        statement=test(column, **test_kwargs), raise_on_fail=raise_on_fail
+    )
 
 
 def is_not_null(column: Column) -> Compilable:
@@ -212,21 +225,12 @@ def is_numeric(column: Column) -> Compilable:
     Example SQL:
 
     ```sql
-    WITH `int_col_or_null` AS (
         SELECT
-            CAST({{ column }}, INT64) AS `col`
+            {{ column }}
         FROM
             {{ model }}
         WHERE
-            {{ column }} IS NOT NULL
-    )
-
-    SELECT
-        col
-    FROM
-        int_col_or_null
-    WHERE
-        col IS NULL
+            REGEXP_CONTAINS({{ column }}, "[^0-9]")
     ```
 
     Example:
@@ -234,15 +238,8 @@ def is_numeric(column: Column) -> Compilable:
     ```python
     is_numeric(func.cast(Health.value, String).label('value_as_str'))
     ```
-
     """
-    int_col_or_null = (
-        select(func.cast(column, Integer).label("col"))
-        .where(column != None)
-        .cte("int_col_or_null")
-    )
-
-    return select(int_col_or_null.c.col).where(int_col_or_null.c.col == None)
+    return select(column).where(func.REGEXP_CONTAINS(column, "[^0-9]"))
 
 
 def is_non_negative(column: Column) -> Compilable:

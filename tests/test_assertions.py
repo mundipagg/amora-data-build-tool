@@ -37,8 +37,4 @@ def test_is_numeric_with_non_numeric_values_on_column():
         ]
     )
 
-    with pytest.raises(
-        BadRequest,
-        match=fr".*Bad int64 value: {bad_int}",
-    ):
-        assert that(cte.c.numeric_column, is_numeric)
+    assert not that(cte.c.numeric_column, is_numeric, raise_on_fail=False)
