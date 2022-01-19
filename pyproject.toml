@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "amora"
-version = "0.1.6"
+version = "0.1.7rc2"
 description = "Amora Data Build Tool"
 authors = ["diogommartins <diogo.martins@stone.com.br>"]
 license = "MIT"
@@ -15,12 +15,12 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9.6,<3.10"
+python = ">=3.9.6,<3.11"
 pandas = "^1.3.0"
 numpy = "^1.21.1"
 matplotlib = "^3.4.2"
-sqlmodel = "^0.0.4"
-sqlalchemy-bigquery = "^1.2"
+sqlmodel = "^0.0.6"
+sqlalchemy-bigquery = "^1.3"
 networkx = { extras = ["all"], version = "^2.6.3" }
 typer = { extras = ["all"], version = "^0.4.0" }
 pytest = "^6.2.5"
@@ -28,7 +28,7 @@ pytest-xdist = { extras = ['psutil'], version = "^2.5.0" }
 rich = "^10.13.0"
 Jinja2 = "^2.11.3"
 sqlparse = "^0.3.1"
-SQLAlchemy = {version = "^1.4.27", extras = ["mypy"]}
+SQLAlchemy = {version = ">=1.2.0,<=1.4.26", extras = ["mypy"]}
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "^3.0.0"
