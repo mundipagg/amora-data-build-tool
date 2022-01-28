@@ -276,7 +276,7 @@ def is_a_non_empty_string(column: Column) -> Compilable:
     FROM
          {{ model }}
     WHERE
-         TRIM({{ column_name }}) == ""
+         TRIM({{ column_name }}) = ""
     ```
 
     Example:
