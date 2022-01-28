@@ -6,6 +6,7 @@ from sqlalchemy import (
     union_all,
     Integer,
     func,
+    literal,
 )
 from sqlmodel.sql.expression import SelectOfScalar
 from amora.models import select, AmoraModel, Column, Columns
@@ -261,6 +262,30 @@ def is_non_negative(column: Column) -> Compilable:
     ```
     """
     return select(column).where(column < 0)
+
+
+def is_a_non_empty_string(column: Column) -> Compilable:
+    """
+    Asserts that the column isn't an empty string
+
+    Example SQL:
+
+    ```sql
+    SELECT
+         {{ column_name }}
+    FROM
+         {{ model }}
+    WHERE
+         TRIM({{ column_name }}) = ""
+    ```
+
+    Example:
+
+    ```python
+    is_a_non_empty_string(Health.source)
+    ```
+    """
+    return select(column).where(func.trim(column) == literal(""))
 
 
 def expression_is_true(expression, condition=None) -> bool:
