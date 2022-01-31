@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Iterable
 
 from sqlalchemy import func
 
@@ -11,6 +11,7 @@ from amora.models import (
     select,
     ModelConfig,
     MaterializationTypes,
+    Session,
 )
 from amora.storage import local_engine, local_metadata
 from amora.config import settings
@@ -66,6 +67,12 @@ class AuditLog(AmoraModel, table=True):
         description="The name of the `pytest-xdist` worker. E.g.: gw2",
         default=os.getenv("PYTEST_XDIST_WORKER"),
     )
+
+    @classmethod
+    def get_all(cls, test_run_id: str) -> Iterable["AuditLog"]:
+        with Session(local_engine) as session:
+            statement = select(cls).where(cls.test_run_id == test_run_id)
+            return (log for (log, *_) in session.exec(statement).all())
 
 
 class AuditReport(AmoraModel, table=True):
