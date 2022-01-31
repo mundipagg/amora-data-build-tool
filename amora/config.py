@@ -19,15 +19,16 @@ class Settings(BaseSettings):
     TARGET_PATH: Path
     MODELS_PATH: Path
 
-    SQLITE_FILE_PATH: Path = Path(
-        NamedTemporaryFile(suffix="amora-sqlite.db", delete=False).name
-    )
-
     CLI_CONSOLE_MAX_WIDTH: int = 160
     CLI_MATERIALIZATION_DAG_FIGURE_SIZE: Tuple[_Width, _Height] = (32, 32)
 
     GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD: float = 5.0
     GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD: float = 0.020
+
+    LOCAL_ENGINE_ECHO: bool = False
+    LOCAL_ENGINE_SQLITE_FILE_PATH: Path = Path(
+        NamedTemporaryFile(suffix="amora-sqlite.db", delete=False).name
+    )
 
     MONEY_DECIMAL_PLACES: int = 4
 
