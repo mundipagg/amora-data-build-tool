@@ -1,18 +1,14 @@
-from typing import List
+from typing import Union
+from _pytest.config import ExitCode
+from _pytest.main import Session
+from rich.console import Console
+from rich.table import Table
 
-import pytest
-from _pytest.fixtures import SubRequest
-from amora.tests.assertions import _REGISTRY
-
-
-@pytest.hookimpl(tryfirst=True)
-def pytest_collection_modifyitems(
-    session, config, items: List[pytest.Item]
-) -> None:
-    return
+from amora.config import settings
+from amora.tests.audit import AuditLog
 
 
-def setup_test_environement():
+def pytest_sessionstart():
     print(
         """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -23,20 +19,27 @@ A amora adoça mais na boca de quem namora.
     )
 
 
-def teardown_test_environment():
-    for test, results in _REGISTRY.items():
-        total_bytes = sum(r.total_bytes for r in results)
-        total_cost = sum(r.estimated_cost for r in results)
-        print(
-            f"🤑 {test} :: Total bytes: {total_bytes} :: Estimated cost: ${total_cost}"
+def pytest_sessionfinish(
+    session: Session, exitstatus: Union[int, ExitCode]
+) -> None:
+    log_rows = AuditLog.get_all(test_run_id=settings.TEST_RUN_ID)
+
+    table = Table(
+        show_header=True,
+        header_style="bold",
+        show_lines=True,
+        width=settings.CLI_CONSOLE_MAX_WIDTH,
+        row_styles=["none", "dim"],
+    )
+    table.add_column("🧪 Test node id")
+    table.add_column("🔎 Bytes billed")
+    table.add_column("💰 Estimated cost (USD)")
+    for audit_log in log_rows:
+        table.add_row(
+            audit_log.test_node_id,
+            str(audit_log.bytes_billed),
+            str(audit_log.estimated_cost_in_usd),
         )
 
-
-@pytest.fixture(autouse=True, scope="session")
-def amora_test_environment(request: SubRequest) -> None:
-    """
-    Ensure that everything that Amora needs is loaded and has its testing environment setup.
-
-    """
-    setup_test_environement()
-    request.addfinalizer(teardown_test_environment)
+    console = Console(width=settings.CLI_CONSOLE_MAX_WIDTH)
+    console.print(table)
