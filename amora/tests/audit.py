@@ -21,7 +21,7 @@ from amora.version import VERSION
 
 class AuditLog(AmoraModel, table=True):
     __model_config__ = ModelConfig(
-        materialized=MaterializationTypes.view,
+        materialized=MaterializationTypes.table,
         description="Stores test log data",
     )
     metadata = local_metadata
