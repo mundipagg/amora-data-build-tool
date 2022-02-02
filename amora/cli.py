@@ -196,7 +196,7 @@ def models_list(
             )
 
         @property
-        def estimated_query_cost_in_usd(self) -> str:
+        def estimated_query_cost_in_usd(self) -> Optional[str]:
             if self.dry_run_result:
                 cost = estimated_query_cost_in_usd(
                     self.dry_run_result.total_bytes
@@ -205,7 +205,7 @@ def models_list(
             return None
 
         @property
-        def estimated_storage_cost_in_usd(self) -> str:
+        def estimated_storage_cost_in_usd(self) -> Optional[str]:
             if self.dry_run_result:
                 cost = estimated_storage_cost_in_usd(
                     self.dry_run_result.total_bytes
