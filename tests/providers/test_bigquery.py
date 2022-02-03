@@ -8,6 +8,7 @@ from amora.providers.bigquery import (
     estimated_query_cost_in_usd,
     estimated_storage_cost_in_usd,
 )
+from amora.config import settings
 
 
 def test_cte_from_rows_with_single_row():
@@ -42,9 +43,18 @@ ONE_GIGABYTE = 1 * 1024 ** 3
     "total_bytes, expected_cost",
     [
         (0, 0),
-        (ONE_TERABYTE, 5.0),
-        (ONE_TERABYTE * 10, 50.0),
-        (ONE_TERABYTE / 2, 2.5),
+        (
+            ONE_TERABYTE,
+            settings.GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD,
+        ),
+        (
+            ONE_TERABYTE * 10,
+            settings.GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD * 10,
+        ),
+        (
+            ONE_TERABYTE / 2,
+            settings.GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD / 2,
+        ),
     ],
 )
 def test_estimated_query_cost_in_usd(total_bytes: int, expected_cost: float):
@@ -55,9 +65,18 @@ def test_estimated_query_cost_in_usd(total_bytes: int, expected_cost: float):
     "total_bytes, expected_cost",
     [
         (0, 0),
-        (ONE_GIGABYTE, 0.020),
-        (ONE_GIGABYTE * 10, 0.200),
-        (ONE_GIGABYTE / 2, 0.010),
+        (
+            ONE_GIGABYTE,
+            settings.GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD,
+        ),
+        (
+            ONE_GIGABYTE * 10,
+            settings.GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD * 10,
+        ),
+        (
+            ONE_GIGABYTE / 2,
+            settings.GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD / 2,
+        ),
     ],
 )
 def test_estimated_storage_cost_in_usd(total_bytes: int, expected_cost: float):
