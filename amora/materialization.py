@@ -70,7 +70,6 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
         view = Table(model.unique_name)
         view.description = model.__model_config__.description
         view.labels = model.__model_config__.labels
-        view.clustering_fields = model.__model_config__.cluster_by
         view.view_query = sql
 
         return Client().create_table(view, exists_ok=True)
