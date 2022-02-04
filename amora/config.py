@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     CLI_CONSOLE_MAX_WIDTH: int = 160
     CLI_MATERIALIZATION_DAG_FIGURE_SIZE: Tuple[_Width, _Height] = (32, 32)
 
+    FEATURE_STORE_REGISTRY: Path = NamedTemporaryFile(
+        suffix="amora-feature-store-registry", delete=False
+    )
+
     # https://cloud.google.com/bigquery/pricing#analysis_pricing_models
     GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD: float = 5.0
     # https://cloud.google.com/bigquery/pricing#storage

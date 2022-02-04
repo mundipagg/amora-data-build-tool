@@ -17,7 +17,7 @@ PYTHON_TYPES_TO_FS_TYPES = {
     datetime: ValueType.UNIX_TIMESTAMP,
 }
 
-fs = FeatureStore(settings.FS_REGISTRY)
+fs = FeatureStore(settings.FEATURE_STORE_REGISTRY)
 
 
 def feature_view(model: Model):
