@@ -81,7 +81,6 @@ def test_materialize_as_view(Client: MagicMock):
 
     view: Table = client.create_table.call_args_list[0][0][0]
     assert view.description == ViewModel.__model_config__.description
-    assert view.clustering_fields == ViewModel.__model_config__.cluster_by
     assert view.labels == ViewModel.__model_config__.labels
 
 
