@@ -72,7 +72,7 @@ class AuditLog(AmoraModel, table=True):
     def get_all(cls, test_run_id: str) -> Iterable["AuditLog"]:
         with Session(local_engine) as session:
             statement = select(cls).where(cls.test_run_id == test_run_id)
-            return (log for (log, *_) in session.exec(statement).all())
+            return (log for (log, *_) in session.exec(statement).all())  # type: ignore
 
 
 class AuditReport(AmoraModel, table=True):
