@@ -42,4 +42,4 @@ def pytest_sessionfinish(
         )
 
     console = Console(width=settings.CLI_CONSOLE_MAX_WIDTH)
-    console.print(table)
+    console.print(table, new_line_start=True)
