@@ -17,6 +17,8 @@ from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery.base import unnest
 
 from amora.compilation import compile_statement
+from amora.config import settings
+from amora.contracts import BaseResult
 from amora.models import Model, select
 from amora.types import Compilable
 from amora.version import VERSION
@@ -46,29 +48,24 @@ BIGQUERY_TYPES_TO_PYTHON_TYPES = {
 
 
 @dataclass
-class DryRunResult:
-    total_bytes: int
+class DryRunResult(BaseResult):
     model: Model
     schema: Schema
-    query: Optional[str] = None
-    referenced_tables: List[str] = field(default_factory=list)
 
     @property
     def estimated_cost(self):
-        raise NotImplementedError
+        return estimated_query_cost_in_usd(self.total_bytes)
 
 
 @dataclass
-class RunResult:
-    total_bytes: int
-    query: str
+class RunResult(BaseResult):
     rows: Union[RowIterator, _EmptyRowIterator]
-    job_id: str
+    execution_time_in_ms: int
     schema: Optional[Schema] = None
 
     @property
     def estimated_cost(self):
-        raise NotImplementedError
+        return estimated_query_cost_in_usd(self.total_bytes)
 
 
 _client = None
@@ -104,13 +101,20 @@ def run(statement: Compilable) -> RunResult:
     query = compile_statement(statement)
     query_job = get_client().query(query)
     rows = query_job.result()
+    execution_time_delta = query_job.ended - query_job.started
 
     return RunResult(
-        query=query,
+        execution_time_in_ms=execution_time_delta.microseconds / 1000,
         job_id=query_job.job_id,
-        total_bytes=query_job.total_bytes_processed,
-        schema=query_job.schema,
+        query=query,
+        referenced_tables=[
+            ".".join(table.to_api_repr().values())
+            for table in query_job.referenced_tables
+        ],
         rows=rows,
+        schema=query_job.schema,
+        total_bytes=query_job.total_bytes_billed,
+        user_email=query_job.user_email,
     )
 
 
@@ -150,8 +154,8 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
                 query=table.view_query,
                 job_config=QueryJobConfig(dry_run=True, use_query_cache=False),
             )
-
             return DryRunResult(
+                job_id=query_job.job_id,
                 model=model,
                 query=table.view_query,
                 referenced_tables=[
@@ -160,10 +164,17 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
                 ],
                 schema=query_job.schema,
                 total_bytes=query_job.total_bytes_processed,
+                user_email=query_job.user_email,
             )
         else:
             return DryRunResult(
-                total_bytes=table.num_bytes, schema=table.schema, model=model
+                job_id=None,
+                model=model,
+                query=None,
+                referenced_tables=[".".join(table.to_api_repr().values())],
+                schema=table.schema,
+                total_bytes=table.num_bytes,
+                user_email=None,
             )
 
     query = compile_statement(source)
@@ -172,14 +183,17 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
         query=query,
         job_config=QueryJobConfig(dry_run=True, use_query_cache=False),
     )
-    tables = [table.to_api_repr() for table in query_job.referenced_tables]
-
     return DryRunResult(
+        job_id=query_job.job_id,
         total_bytes=query_job.total_bytes_processed,
-        referenced_tables=[".".join(table.values()) for table in tables],
+        referenced_tables=[
+            ".".join(table.to_api_repr().values())
+            for table in query_job.referenced_tables
+        ],
         query=query,
         model=model,
         schema=query_job.schema,
+        user_email=query_job.user_email,
     )
 
 
@@ -229,3 +243,49 @@ def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
         return selects[0].cte()
     else:
         return selects[0].union_all(*(selects[1:])).cte()
+
+
+def estimated_query_cost_in_usd(total_bytes: int) -> float:
+    """
+    By default, queries are billed using the on-demand pricing model,
+    where you pay for the data scanned by your queries.
+
+    - This function doesn't take into consideration that the first 1 TB per month is free.
+    - By default, the estimation is based on BigQuery's `On-demand analysis` pricing, which may change over time and
+    may vary according to regions and your personal contract with GCP.
+
+    You may set `AMORA_GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD` to the appropriate value for your use case.
+
+    More on: https://cloud.google.com/bigquery/pricing#analysis_pricing_models
+
+    :param total_bytes: Total data processed by the query
+    :return: The estimated cost in USD, based on `On-demand` price
+    """
+    total_terabytes = total_bytes / 1024 ** 4
+    return (
+        total_terabytes
+        * settings.GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD
+    )
+
+
+def estimated_storage_cost_in_usd(total_bytes: int) -> float:
+    """
+    Storage pricing is the cost to store data that you load into BigQuery.
+    `Active storage` includes any table or table partition that has been modified in the last 90 days.
+
+    - This function doesn't take into consideration that the first 10 GB of storage per month is free.
+    - By default, the estimation is based on BigQuery's `Active Storage` cost per GB, which may change over time and
+    may vary according to regions and your personal contract with GCP.
+
+    You may set `AMORA_GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD` to the appropriate value for your use case.
+
+    More on: https://cloud.google.com/bigquery/pricing#storage
+
+    :param total_bytes: Total bytes stored into the table
+    :return: The estimated cost in USD, based on `Active storage` price
+    """
+    total_gigabytes = total_bytes / 1024 ** 3
+    return (
+        total_gigabytes
+        * settings.GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD
+    )

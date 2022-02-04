@@ -1,6 +1,7 @@
-from typing import Iterable, Optional, Callable, Union
-
+import json
+import os
 import pytest
+from typing import Iterable, Optional, Callable, Union
 from sqlalchemy import (
     and_,
     union_all,
@@ -9,12 +10,35 @@ from sqlalchemy import (
     literal,
 )
 from sqlmodel.sql.expression import SelectOfScalar
-from amora.models import select, AmoraModel, Column, Columns
+from amora.config import settings
+from amora.models import select, AmoraModel, Session, Column, Columns
+from amora.storage import local_engine
+from amora.tests.audit import AuditLog
 from amora.types import Compilable
-from amora.providers.bigquery import run
+from amora.providers.bigquery import run, RunResult, estimated_query_cost_in_usd
+from collections import defaultdict
 
 
 Test = Callable[..., SelectOfScalar]
+
+
+def _log_result(run_result: RunResult) -> AuditLog:
+    with Session(local_engine) as session:
+        log = AuditLog(
+            bytes_billed=run_result.total_bytes,
+            estimated_cost_in_usd=estimated_query_cost_in_usd(
+                run_result.total_bytes
+            ),
+            execution_time_in_ms=run_result.execution_time_in_ms,
+            query=run_result.query,
+            referenced_tables=json.dumps(run_result.referenced_tables),
+            test_node_id=os.getenv("PYTEST_CURRENT_TEST"),
+            test_run_id=settings.TEST_RUN_ID,
+            user_email=run_result.user_email,
+        )
+        session.add(log)
+        session.commit()
+        return log
 
 
 def _test(statement: Compilable, raise_on_fail: bool = True) -> bool:
@@ -24,6 +48,7 @@ def _test(statement: Compilable, raise_on_fail: bool = True) -> bool:
     :return: `True` if the test passed, `False` otherwise
     """
     run_result = run(statement)
+    _log_result(run_result)
 
     if run_result.rows.total_rows == 0:
         return True
