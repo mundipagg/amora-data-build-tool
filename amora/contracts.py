@@ -17,8 +17,7 @@ class BaseResult:
     """
 
     total_bytes: int
-    query: str
-    job_id: str
+    query: Optional[str]
+    job_id: Optional[str]
     referenced_tables: List[str]
-    user_email: str
-    execution_time_in_ms: int
+    user_email: Optional[str]

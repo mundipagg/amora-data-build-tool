@@ -60,6 +60,7 @@ class DryRunResult(BaseResult):
 @dataclass
 class RunResult(BaseResult):
     rows: Union[RowIterator, _EmptyRowIterator]
+    execution_time_in_ms: int
     schema: Optional[Schema] = None
 
     @property
@@ -153,8 +154,8 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
                 query=table.view_query,
                 job_config=QueryJobConfig(dry_run=True, use_query_cache=False),
             )
-
             return DryRunResult(
+                job_id=query_job.job_id,
                 model=model,
                 query=table.view_query,
                 referenced_tables=[
@@ -163,10 +164,17 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
                 ],
                 schema=query_job.schema,
                 total_bytes=query_job.total_bytes_processed,
+                user_email=query_job.user_email,
             )
         else:
             return DryRunResult(
-                total_bytes=table.num_bytes, schema=table.schema, model=model
+                job_id=None,
+                model=model,
+                query=None,
+                referenced_tables=[".".join(table.to_api_repr().values())],
+                schema=table.schema,
+                total_bytes=table.num_bytes,
+                user_email=None,
             )
 
     query = compile_statement(source)
@@ -175,14 +183,17 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
         query=query,
         job_config=QueryJobConfig(dry_run=True, use_query_cache=False),
     )
-    tables = [table.to_api_repr() for table in query_job.referenced_tables]
-
     return DryRunResult(
+        job_id=query_job.job_id,
         total_bytes=query_job.total_bytes_processed,
-        referenced_tables=[".".join(table.values()) for table in tables],
+        referenced_tables=[
+            ".".join(table.to_api_repr().values())
+            for table in query_job.referenced_tables
+        ],
         query=query,
         model=model,
         schema=query_job.schema,
+        user_email=query_job.user_email,
     )
 
 
