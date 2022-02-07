@@ -43,7 +43,7 @@ mkdocs-redirects = "^1.0.3"
 mkdocs-git-revision-date-plugin = "^0.3.1"
 mkdocs-include-markdown-plugin = "^3.2.3"
 mkdocs-autorefs = "^0.3.0"
-mkdocstrings = "^0.16.2"
+mkdocstrings = "^0.18.0"
 dbt-bigquery = "^1.0.0"
 
 [build-system]
