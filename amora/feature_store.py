@@ -2,7 +2,14 @@ from amora.config import settings
 from amora.models import Model
 from amora.providers.bigquery import get_fully_qualified_id
 from datetime import datetime
-from feast import FeatureView, FeatureStore, BigQuerySource, Feature, ValueType
+from feast import (
+    FeatureView,
+    FeatureStore,
+    BigQuerySource,
+    Feature,
+    ValueType,
+    RepoConfig,
+)
 from google.protobuf.duration_pb2 import Duration
 from typing import Dict
 
@@ -17,7 +24,21 @@ PYTHON_TYPES_TO_FS_TYPES = {
     datetime: ValueType.UNIX_TIMESTAMP,
 }
 
-fs = FeatureStore(settings.FEATURE_STORE_REGISTRY)
+repo_config = RepoConfig(
+    registry=settings.FEATURE_STORE_REGISTRY,
+    project="amora",
+    provider=settings.FEATURE_STORE_PROVIDER,
+    online_store={
+        "type": settings.FEATURE_STORE_ONLINE_STORE_TYPE,
+        **settings.FEATURE_STORE_ONLINE_STORE_CONFIG,
+    },
+    offline_store={
+        "type": settings.FEATURE_STORE_OFFLINE_STORE_TYPE,
+        **settings.FEATURE_STORE_OFFLINE_STORE_CONFIG,
+    },
+)
+
+fs = FeatureStore(config=repo_config)
 
 
 def feature_view(model: Model):

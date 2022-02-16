@@ -4,7 +4,7 @@ from enum import Enum
 from uuid import uuid4
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Tuple
+from typing import Tuple, Dict, Optional
 
 from pydantic import BaseSettings, AnyUrl
 
@@ -43,6 +43,15 @@ class Settings(BaseSettings):
     FEATURE_STORE_REGISTRY: Path = NamedTemporaryFile(
         suffix="amora-feature-store-registry", delete=False
     )
+    FEATURE_STORE_PROVIDER: FeatureStoreProviders = FeatureStoreProviders.local
+    FEATURE_STORE_OFFLINE_STORE_TYPE: FeatureStoreOfflineStoreTypes = (
+        FeatureStoreOfflineStoreTypes.file
+    )
+    FEATURE_STORE_OFFLINE_STORE_CONFIG: Optional[Dict[str, str]] = None
+    FEATURE_STORE_ONLINE_STORE_TYPE: FeatureStoreOnlineStoreTypes = (
+        FeatureStoreOnlineStoreTypes.sqllite
+    )
+    FEATURE_STORE_ONLINE_STORE_CONFIG: Optional[Dict[str, str]] = None
 
     # https://cloud.google.com/bigquery/pricing#analysis_pricing_models
     GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD: float = 5.0

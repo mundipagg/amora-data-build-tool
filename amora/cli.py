@@ -338,6 +338,18 @@ def models_import(
     typer.secho(f"Current File Path: `{destination_file_path.as_posix()}`")
 
 
+feature_store = typer.Typer()
+app.add_typer(feature_store, name="feature-store")
+
+
+@feature_store.command(name="list")
+def feature_store_list():
+    from feast.repo_operations import plan
+    from amora.feature_store import repo_config, fs
+
+    plan(repo_config)
+
+
 def main():
     return app()
 
