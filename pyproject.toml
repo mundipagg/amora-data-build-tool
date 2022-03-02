@@ -26,7 +26,7 @@ typer = { extras = ["all"], version = "^0.4.0" }
 pytest = "^6.2.5"
 pytest-xdist = { extras = ['psutil'], version = "^2.5.0" }
 rich = "^10.13.0"
-Jinja2 = "^2.11.3"
+Jinja2 = "^3.0.3"
 sqlparse = "^0.3.1"
 SQLAlchemy = {version = "^1.4.27", extras = ["mypy"]}
 
@@ -44,7 +44,6 @@ mkdocs-git-revision-date-plugin = "^0.3.1"
 mkdocs-include-markdown-plugin = "^3.2.3"
 mkdocs-autorefs = "^0.3.0"
 mkdocstrings = "^0.16.2"
-dbt-bigquery = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
