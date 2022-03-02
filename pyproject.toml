@@ -34,7 +34,7 @@ SQLAlchemy = {version = "^1.4.27", extras = ["mypy"]}
 pytest-cov = "^3.0.0"
 black = "^21.9b0"
 jupyter = "^1.0.0"
-mypy = "^0.910"
+mypy = "^0.931"
 lxml = "^4.6.3"
 pytest-env = "^0.6.2"
 mkdocs-material = "^8.1.3"
