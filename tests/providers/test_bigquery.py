@@ -43,8 +43,8 @@ def test_cte_from_rows_with_distinguished_schema_rows():
         compile_statement(cte)
 
 
-ONE_TERABYTE = 1 * 1024 ** 4
-ONE_GIGABYTE = 1 * 1024 ** 3
+ONE_TERABYTE = 1 * 1024**4
+ONE_GIGABYTE = 1 * 1024**3
 
 
 @pytest.mark.parametrize(
