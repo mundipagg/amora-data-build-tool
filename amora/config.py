@@ -1,3 +1,4 @@
+import logging
 import os
 from uuid import uuid4
 from pathlib import Path
@@ -31,12 +32,11 @@ class Settings(BaseSettings):
     LOCAL_ENGINE_SQLITE_FILE_PATH: Path = Path(
         NamedTemporaryFile(suffix="amora-sqlite.db", delete=False).name
     )
+    LOGGER_LOG_LEVEL: int = logging.DEBUG
 
     MONEY_DECIMAL_PLACES: int = 4
 
-    TEST_RUN_ID: str = (
-        os.getenv("PYTEST_XDIST_TESTRUNUID") or f"amora-{uuid4().hex}"
-    )
+    TEST_RUN_ID: str = os.getenv("PYTEST_XDIST_TESTRUNUID") or f"amora-{uuid4().hex}"
 
     class Config:
         env_prefix = "AMORA_"
