@@ -12,9 +12,7 @@ def list_files(path: Union[str, Path], suffix: str) -> Iterable[Path]:
 def model_path_for_target_path(path: Path) -> Path:
     return Path(
         str(path)
-        .replace(
-            settings.TARGET_PATH.as_posix(), settings.MODELS_PATH.as_posix()
-        )
+        .replace(settings.TARGET_PATH.as_posix(), settings.MODELS_PATH.as_posix())
         .replace(".sql", ".py"),
     )
 
@@ -22,9 +20,7 @@ def model_path_for_target_path(path: Path) -> Path:
 def target_path_for_model_path(path: Path) -> Path:
     return Path(
         str(path)
-        .replace(
-            settings.MODELS_PATH.as_posix(), settings.TARGET_PATH.as_posix()
-        )
+        .replace(settings.MODELS_PATH.as_posix(), settings.TARGET_PATH.as_posix())
         .replace(".py", ".sql")
     )
 

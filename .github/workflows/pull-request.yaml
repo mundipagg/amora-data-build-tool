@@ -59,7 +59,7 @@ jobs:
         uses: "google-github-actions/setup-gcloud@v0"
 
       - name: 🎨 Black - Python format check
-        run: black -v --line-length 80 --check amora tests
+        run: black -v --check amora tests
 
       - name: 🧪 pytest
         run: py.test --cov=amora --cov-report=term-missing --cov-report=xml ./tests

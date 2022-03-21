@@ -6,6 +6,8 @@ from importlib.util import spec_from_file_location, module_from_spec
 from inspect import getfile
 from pathlib import Path
 from typing import Iterable, List, Optional, Union, Dict, Any, Tuple, Type
+
+from amora.logger import logger
 from amora.protocols import CompilableProtocol
 from amora.config import settings
 from sqlalchemy import MetaData, Table, select
@@ -70,9 +72,7 @@ def is_py_model(obj) -> bool:
     return hasattr(obj, "source") and hasattr(obj, "output")
 
 
-metadata = MetaData(
-    schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}"
-)
+metadata = MetaData(schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}")
 
 
 class AmoraModel(SQLModel):
@@ -163,9 +163,7 @@ def amora_model_for_path(path: Path) -> Model:
     try:
         spec.loader.exec_module(module)  # type: ignore
     except ImportError as e:
-        raise ValueError(
-            f"Invalid path `{path}`. Unable to load module."
-        ) from e
+        raise ValueError(f"Invalid path `{path}`. Unable to load module.") from e
     is_amora_model = (
         lambda x: isinstance(x, CompilableProtocol)
         and inspect.isclass(x)
@@ -200,4 +198,8 @@ def list_models(
         try:
             yield amora_model_for_path(model_file_path), model_file_path
         except ValueError:
+            logger.warning(
+                "Unable to load amora model for path",
+                extra={"model_file_path": model_file_path},
+            )
             continue

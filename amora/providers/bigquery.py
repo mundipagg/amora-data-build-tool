@@ -171,7 +171,7 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
                 job_id=None,
                 model=model,
                 query=None,
-                referenced_tables=[".".join(table.to_api_repr().values())],
+                referenced_tables=[str(table.reference)],
                 schema=table.schema,
                 total_bytes=table.num_bytes,
                 user_email=None,
@@ -262,10 +262,7 @@ def estimated_query_cost_in_usd(total_bytes: int) -> float:
     :return: The estimated cost in USD, based on `On-demand` price
     """
     total_terabytes = total_bytes / 1024 ** 4
-    return (
-        total_terabytes
-        * settings.GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD
-    )
+    return total_terabytes * settings.GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD
 
 
 def estimated_storage_cost_in_usd(total_bytes: int) -> float:
@@ -286,6 +283,5 @@ def estimated_storage_cost_in_usd(total_bytes: int) -> float:
     """
     total_gigabytes = total_bytes / 1024 ** 3
     return (
-        total_gigabytes
-        * settings.GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD
+        total_gigabytes * settings.GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD
     )

@@ -65,9 +65,7 @@ def test_has_at_least_one_not_null_value_without_non_null_value():
         ]
     )
 
-    assert not that(
-        cte.c.col, has_at_least_one_not_null_value, raise_on_fail=False
-    )
+    assert not that(cte.c.col, has_at_least_one_not_null_value, raise_on_fail=False)
 
 
 def test_is_a_non_empty_string():

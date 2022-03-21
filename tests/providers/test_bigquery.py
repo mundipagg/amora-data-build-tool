@@ -1,14 +1,22 @@
 import pytest
+from google.api_core.exceptions import NotFound
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.selectable import CTE
 
 from amora.compilation import compile_statement
+from amora.models import AmoraModel, Field
 from amora.providers.bigquery import (
     cte_from_rows,
     estimated_query_cost_in_usd,
     estimated_storage_cost_in_usd,
+    dry_run,
+    DryRunResult,
+    get_fully_qualified_id,
 )
 from amora.config import settings
+from tests.models.health import Health
+from tests.models.heart_rate import HeartRate
+from tests.models.heart_rate_over_100 import HeartRateOver100
 
 
 def test_cte_from_rows_with_single_row():
@@ -81,3 +89,34 @@ def test_estimated_query_cost_in_usd(total_bytes: int, expected_cost: float):
 )
 def test_estimated_storage_cost_in_usd(total_bytes: int, expected_cost: float):
     assert estimated_storage_cost_in_usd(total_bytes) == expected_cost
+
+
+def test_dry_run_on_sourceless_table_model():
+    result = dry_run(Health)
+    assert isinstance(result, DryRunResult)
+    assert result.referenced_tables == [get_fully_qualified_id(Health)]
+
+
+def test_dry_run_on_sourceless_view_model():
+    result = dry_run(HeartRateOver100)
+    assert isinstance(result, DryRunResult)
+    assert result.referenced_tables == [get_fully_qualified_id(HeartRate)]
+
+
+def test_dry_run_on_invalid_model():
+    class Model(AmoraModel, table=True):
+        x: int
+        y: int
+        id: int = Field(primary_key=True)
+
+    with pytest.raises(NotFound):
+        dry_run(Model)
+
+
+def test_dry_run_on_model_with_source():
+    result = dry_run(HeartRate)
+
+    assert isinstance(result, DryRunResult)
+    assert result.referenced_tables == [
+        get_fully_qualified_id(dep) for dep in HeartRate.__depends_on__
+    ]
