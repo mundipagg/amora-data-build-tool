@@ -26,9 +26,7 @@ def _log_result(run_result: RunResult) -> AuditLog:
     with Session(local_engine) as session:
         log = AuditLog(
             bytes_billed=run_result.total_bytes,
-            estimated_cost_in_usd=estimated_query_cost_in_usd(
-                run_result.total_bytes
-            ),
+            estimated_cost_in_usd=estimated_query_cost_in_usd(run_result.total_bytes),
             execution_time_in_ms=run_result.execution_time_in_ms,
             query=run_result.query,
             referenced_tables=json.dumps(run_result.referenced_tables),
@@ -85,9 +83,7 @@ def that(
     :param test_kwargs: Keyword arguments passed to the `test` function
 
     """
-    return _test(
-        statement=test(column, **test_kwargs), raise_on_fail=raise_on_fail
-    )
+    return _test(statement=test(column, **test_kwargs), raise_on_fail=raise_on_fail)
 
 
 def is_not_null(column: Column) -> Compilable:
@@ -332,9 +328,7 @@ def expression_is_true(expression, condition=None) -> bool:
 
     """
     return _test(
-        statement=select(["*"])
-        .where(condition or and_(True))
-        .where(~expression)
+        statement=select(["*"]).where(condition or and_(True)).where(~expression)
     )
 
 
@@ -388,9 +382,7 @@ def has_at_least_one_not_null_value(column: Column) -> Compilable:
     has_at_least_one_not_null_value(Health.value)
     ```
     """
-    return select(func.count(column, type_=Integer)).having(
-        func.count(column) == 0
-    )
+    return select(func.count(column, type_=Integer)).having(func.count(column) == 0)
 
 
 def are_unique_together(columns: Iterable[Column]) -> Compilable:
@@ -406,6 +398,4 @@ def are_unique_together(columns: Iterable[Column]) -> Compilable:
     ```
 
     """
-    return (
-        select(columns).group_by(*columns).having(func.count(type_=Integer) > 1)
-    )
+    return select(columns).group_by(*columns).having(func.count(type_=Integer) > 1)

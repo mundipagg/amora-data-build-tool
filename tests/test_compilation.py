@@ -37,9 +37,7 @@ def test_amora_model_for_path_with_invalid_bytecode_python_file_path():
 
 
 def test_amora_model_for_path_with_valid_python_file_path():
-    model = amora_model_for_path(
-        path=Path(__file__).parent.joinpath("models/steps.py")
-    )
+    model = amora_model_for_path(path=Path(__file__).parent.joinpath("models/steps.py"))
     assert issubclass(model, AmoraModel)
 
 
@@ -55,9 +53,7 @@ def test_AmoraBigQueryCompiler_array__getitem__with_integer_item():
 
 
 def test_AmoraBigQueryCompiler_array__getitem__with_function_item():
-    version = func.split("123.45", ".", type_=BQArray(String))[
-        func.safe_ordinal(2)
-    ]
+    version = func.split("123.45", ".", type_=BQArray(String))[func.safe_ordinal(2)]
     statement = select(func.cast(version, Integer))
     query_str = compile_statement(statement)
 
