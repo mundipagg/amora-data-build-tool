@@ -261,7 +261,7 @@ def estimated_query_cost_in_usd(total_bytes: int) -> float:
     :param total_bytes: Total data processed by the query
     :return: The estimated cost in USD, based on `On-demand` price
     """
-    total_terabytes = total_bytes / 1024 ** 4
+    total_terabytes = total_bytes / 1024**4
     return total_terabytes * settings.GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD
 
 
@@ -281,7 +281,7 @@ def estimated_storage_cost_in_usd(total_bytes: int) -> float:
     :param total_bytes: Total bytes stored into the table
     :return: The estimated cost in USD, based on `Active storage` price
     """
-    total_gigabytes = total_bytes / 1024 ** 3
+    total_gigabytes = total_bytes / 1024**3
     return (
         total_gigabytes * settings.GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD
     )
