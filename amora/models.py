@@ -198,7 +198,7 @@ def list_models(
         try:
             yield amora_model_for_path(model_file_path), model_file_path
         except ValueError:
-            logger.debug(
+            logger.warning(
                 "Unable to load amora model for path",
                 extra={"model_file_path": model_file_path},
             )
