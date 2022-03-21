@@ -19,9 +19,7 @@ A amora adoça mais na boca de quem namora.
     )
 
 
-def pytest_sessionfinish(
-    session: Session, exitstatus: Union[int, ExitCode]
-) -> None:
+def pytest_sessionfinish(session: Session, exitstatus: Union[int, ExitCode]) -> None:
     log_rows = AuditLog.get_all(test_run_id=settings.TEST_RUN_ID)
 
     table = Table(

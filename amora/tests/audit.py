@@ -46,9 +46,7 @@ class AuditLog(AmoraModel, table=True):
     user_email: Optional[str] = Field(
         description="GCP user email that performed the query", nullable=True
     )
-    execution_time_in_ms: int = Field(
-        description="Query execution time in miliseconds"
-    )
+    execution_time_in_ms: int = Field(description="Query execution time in miliseconds")
     inserted_at: datetime = Field(
         default_factory=datetime.utcnow,
         description="UTC Datetime of the insert",
@@ -103,14 +101,10 @@ class AuditReport(AmoraModel, table=True):
             AuditLog.test_run_id,
             AuditLog.amora_version,
             AuditLog.user_email,
-            func.sum(AuditLog.execution_time_in_ms).label(
-                cls.total_query_time.key
-            ),
+            func.sum(AuditLog.execution_time_in_ms).label(cls.total_query_time.key),
             func.sum(AuditLog.estimated_cost_in_usd).label(cls.total_cost.key),
             func.sum(AuditLog.bytes_billed).label(cls.total_bytes_billed.key),
-        ).group_by(
-            AuditLog.test_run_id, AuditLog.amora_version, AuditLog.user_email
-        )
+        ).group_by(AuditLog.test_run_id, AuditLog.amora_version, AuditLog.user_email)
 
 
 AuditLog.__table__.create(bind=local_engine, checkfirst=True)

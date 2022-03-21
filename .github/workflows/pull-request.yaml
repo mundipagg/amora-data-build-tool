@@ -26,15 +26,15 @@ jobs:
         run: sudo apt-get install libxml2-dev libxslt-dev
 
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: 🐍 Install python ${{ matrix.python }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python }}
 
       - name: 🐍 Cache python dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/cache
@@ -59,7 +59,7 @@ jobs:
         uses: "google-github-actions/setup-gcloud@v0"
 
       - name: 🎨 Black - Python format check
-        run: black -v --line-length 80 --check amora tests
+        run: black -v --check amora tests
 
       - name: 🧪 pytest
         run: py.test --cov=amora --cov-report=term-missing --cov-report=xml ./tests

@@ -24,9 +24,7 @@ def setup_function(module):
 
 
 def test_it_creates_a_task_from_a_target_file_path():
-    target_path = HeartRate.target_path(
-        model_file_path=HeartRate.model_file_path()
-    )
+    target_path = HeartRate.target_path(model_file_path=HeartRate.model_file_path())
     target_path.write_text("SELECT 1")
     task = Task.for_target(target_path)
 
@@ -133,9 +131,7 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
 @patch("amora.materialization.Client", spec=Client)
 def test_materialize_as_ephemeral(Client: MagicMock):
     table_name = uuid4().hex
-    table_id = (
-        f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{table_name}"
-    )
+    table_id = f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{table_name}"
 
     class EphemeralModel(AmoraModel, table=True):
         __tablename__ = table_name

@@ -66,9 +66,7 @@ def compile(
             continue
 
         target_file_path = model.target_path(model_file_path)
-        typer.echo(
-            f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`"
-        )
+        typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
 
         content = compile_statement(source_sql_statement)
         target_file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -106,9 +104,7 @@ def materialize(
             typer.echo(f"⚠️  Skipping `{model}`")
             continue
         else:
-            table = materialization.materialize(
-                sql=task.sql_stmt, model=task.model
-            )
+            table = materialization.materialize(sql=task.sql_stmt, model=task.model)
             if table is None:
                 continue
 
@@ -189,27 +185,20 @@ def models_list(
         @property
         def depends_on(self) -> List[str]:
             return sorted(
-                [
-                    dependency.__name__
-                    for dependency in self.model.dependencies()
-                ]
+                [dependency.__name__ for dependency in self.model.dependencies()]
             )
 
         @property
         def estimated_query_cost_in_usd(self) -> Optional[str]:
             if self.dry_run_result:
-                cost = estimated_query_cost_in_usd(
-                    self.dry_run_result.total_bytes
-                )
+                cost = estimated_query_cost_in_usd(self.dry_run_result.total_bytes)
                 return f"{cost:.{settings.MONEY_DECIMAL_PLACES}f}"
             return None
 
         @property
         def estimated_storage_cost_in_usd(self) -> Optional[str]:
             if self.dry_run_result:
-                cost = estimated_storage_cost_in_usd(
-                    self.dry_run_result.total_bytes
-                )
+                cost = estimated_storage_cost_in_usd(self.dry_run_result.total_bytes)
                 return f"{cost:.{settings.MONEY_DECIMAL_PLACES}f}"
             return None
 
@@ -271,9 +260,7 @@ def models_list(
                     "\n".join(result.referenced_tables) or placeholder,
                     overflow="fold",
                 ),
-                Text(
-                    "\n".join(result.depends_on) or placeholder, overflow="fold"
-                ),
+                Text("\n".join(result.depends_on) or placeholder, overflow="fold"),
                 "🟢" if result.has_source else "🔴",
                 result.materialization_type or placeholder,
             )
@@ -312,9 +299,7 @@ def models_import(
     ```
     """
 
-    env = Environment(
-        loader=PackageLoader("amora"), autoescape=select_autoescape()
-    )
+    env = Environment(loader=PackageLoader("amora"), autoescape=select_autoescape())
     template = env.get_template("new-model.py.jinja2")
 
     project, dataset, table = table_reference.split(".")
