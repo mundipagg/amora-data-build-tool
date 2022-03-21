@@ -34,7 +34,7 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: 🐍 Cache python dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/cache
