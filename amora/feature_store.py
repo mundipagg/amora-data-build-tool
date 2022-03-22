@@ -1,4 +1,4 @@
-from amora.config import settings
+from amora.config import feature_store as settings
 from amora.models import Model
 from amora.providers.bigquery import get_fully_qualified_id
 from datetime import datetime
@@ -25,17 +25,18 @@ PYTHON_TYPES_TO_FS_TYPES = {
 }
 
 repo_config = RepoConfig(
-    registry=settings.FEATURE_STORE_REGISTRY,
+    registry=settings.REGISTRY,
     project="amora",
-    provider=settings.FEATURE_STORE_PROVIDER,
+    provider=settings.PROVIDER,
     online_store={
-        "type": settings.FEATURE_STORE_ONLINE_STORE_TYPE,
-        **settings.FEATURE_STORE_ONLINE_STORE_CONFIG,
+        "type": settings.ONLINE_STORE_TYPE,
+        **settings.ONLINE_STORE_CONFIG,
     },
     offline_store={
-        "type": settings.FEATURE_STORE_OFFLINE_STORE_TYPE,
-        **settings.FEATURE_STORE_OFFLINE_STORE_CONFIG,
+        "type": settings.OFFLINE_STORE_TYPE,
+        **settings.OFFLINE_STORE_CONFIG,
     },
+    repo_path=settings.REPO_PATH,
 )
 
 fs = FeatureStore(config=repo_config)
@@ -55,7 +56,7 @@ def feature_view(model: Model):
             for col in columns
         ],
         batch_source=BigQuerySource(table_ref=get_fully_qualified_id(model)),
-        ttl=Duration(seconds=settings.FS_DEFAULT_FEATURE_TTL_IN_SECONDS),
+        ttl=Duration(seconds=settings.DEFAULT_FEATURE_TTL_IN_SECONDS),
     )
 
     return model

@@ -15,22 +15,6 @@ _Width = float
 _Height = float
 
 
-class FeatureStoreProviders(str, Enum):
-    local = "local"
-    gcp = "gcp"
-
-
-class FeatureStoreOnlineStoreTypes(str, Enum):
-    redis = "redis"
-    sqllite = "sqllite"
-    datastore = "datastore"
-
-
-class FeatureStoreOfflineStoreTypes(str, Enum):
-    bigquery = "bigquery"
-    file = "file"
-
-
 class Settings(BaseSettings):
     TARGET_PROJECT: str
     TARGET_SCHEMA: str
@@ -39,19 +23,6 @@ class Settings(BaseSettings):
 
     CLI_CONSOLE_MAX_WIDTH: int = 160
     CLI_MATERIALIZATION_DAG_FIGURE_SIZE: Tuple[_Width, _Height] = (32, 32)
-
-    FEATURE_STORE_REGISTRY: Path = NamedTemporaryFile(
-        suffix="amora-feature-store-registry", delete=False
-    )
-    FEATURE_STORE_PROVIDER: FeatureStoreProviders = FeatureStoreProviders.local
-    FEATURE_STORE_OFFLINE_STORE_TYPE: FeatureStoreOfflineStoreTypes = (
-        FeatureStoreOfflineStoreTypes.file
-    )
-    FEATURE_STORE_OFFLINE_STORE_CONFIG: Optional[Dict[str, str]] = None
-    FEATURE_STORE_ONLINE_STORE_TYPE: FeatureStoreOnlineStoreTypes = (
-        FeatureStoreOnlineStoreTypes.sqllite
-    )
-    FEATURE_STORE_ONLINE_STORE_CONFIG: Optional[Dict[str, str]] = None
 
     # https://cloud.google.com/bigquery/pricing#analysis_pricing_models
     GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD: float = 5.0
@@ -72,4 +43,40 @@ class Settings(BaseSettings):
         env_prefix = "AMORA_"
 
 
+class FeatureStoreProviders(str, Enum):
+    local = "local"
+    gcp = "gcp"
+
+
+class FeatureStoreOnlineStoreTypes(str, Enum):
+    redis = "redis"
+    sqlite = "sqlite"
+    datastore = "datastore"
+
+
+class FeatureStoreOfflineStoreTypes(str, Enum):
+    bigquery = "bigquery"
+    file = "file"
+
+
+class FeatureStoreSettings(BaseSettings):
+    REGISTRY: str = NamedTemporaryFile(
+        suffix="amora-feature-store-registry", delete=False
+    ).name
+    REPO_PATH: str = NamedTemporaryFile(suffix="repo-path", delete=False).name
+    PROVIDER: str = FeatureStoreProviders.local.value
+    OFFLINE_STORE_TYPE: str = FeatureStoreOfflineStoreTypes.file.value
+    OFFLINE_STORE_CONFIG: Dict[str, str] = {}
+
+    ONLINE_STORE_TYPE: str = FeatureStoreOnlineStoreTypes.sqlite.value
+    ONLINE_STORE_CONFIG: Dict[str, str] = {
+        "path": Path(ROOT_PATH).joinpath("amora-online-feature-store.db").name
+    }
+    DEFAULT_FEATURE_TTL_IN_SECONDS: int = 3600
+
+    class Config:
+        env_prefix = "AMORA_FEATURE_STORE_"
+
+
+feature_store = FeatureStoreSettings()
 settings = Settings()
