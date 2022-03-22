@@ -1,11 +1,9 @@
 from amora.compilation import Compilable
-from amora.feature_store import feature_view
 from amora.models import AmoraModel, MaterializationTypes, ModelConfig
 from examples.amora_project.models.steps import Steps
 from sqlmodel import func, select, Field
 
 
-@feature_view
 class StepsAgg(AmoraModel, table=True):
     __depends_on__ = [Steps]
     __tablename__ = "steps_agg"
