@@ -1,9 +1,12 @@
+from sqlalchemy import func, literal
+
 from amora.providers.bigquery import cte_from_rows
 from amora.tests.assertions import (
     is_numeric,
     that,
     has_at_least_one_not_null_value,
     is_a_non_empty_string,
+    expression_is_true,
 )
 
 
@@ -92,3 +95,31 @@ def test_is_a_non_empty_string_with_empty_strings():
     )
 
     assert not that(cte.c.col, is_a_non_empty_string, raise_on_fail=False)
+
+
+def test_expression_is_true():
+    cte = cte_from_rows(
+        [
+            {"col": 2},
+            {"col": 4},
+            {"col": 6},
+            {"col": 8},
+        ]
+    )
+    assert expression_is_true(func.mod(cte.c.col, 2) == literal(0))
+
+
+def test_expression_is_true_with_condition():
+    cte = cte_from_rows(
+        [
+            {"col": 7},
+            {"col": 20},
+            {"col": 40},
+            {"col": 60},
+            {"col": 80},
+        ]
+    )
+    assert expression_is_true(
+        expression=func.mod(cte.c.col, 2) == literal(0),
+        condition=cte.c.col > literal(10),
+    )
