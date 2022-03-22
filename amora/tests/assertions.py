@@ -327,9 +327,12 @@ def expression_is_true(expression, condition=None) -> bool:
     ```
 
     """
-    return _test(
-        statement=select(["*"]).where(condition or and_(True)).where(~expression)
-    )
+    statement = select(["*"]).where(~expression)
+
+    if condition is not None:
+        statement = statement.where(condition)
+
+    return _test(statement)
 
 
 def equality(
