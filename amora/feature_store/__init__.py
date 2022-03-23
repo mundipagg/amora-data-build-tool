@@ -1,6 +1,6 @@
 from feast import RepoConfig, FeatureStore
 
-from amora.feature_store.config import feature_store as settings
+from amora.feature_store.config import settings
 
 repo_config = RepoConfig(
     registry=settings.REGISTRY,

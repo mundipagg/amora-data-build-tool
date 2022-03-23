@@ -43,4 +43,4 @@ class FeatureStoreSettings(BaseSettings):
         env_prefix = "AMORA_FEATURE_STORE_"
 
 
-feature_store = FeatureStoreSettings()
+settings = FeatureStoreSettings()
