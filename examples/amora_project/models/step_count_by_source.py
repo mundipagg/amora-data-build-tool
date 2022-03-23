@@ -3,7 +3,7 @@ from typing import Optional
 
 from sqlalchemy import func
 
-from amora.feature_store import feature_view
+from amora.feature_store.decorators import feature_view
 from amora.models import AmoraModel, ModelConfig, MaterializationTypes, select, Field
 from amora.types import Compilable
 from examples.amora_project.models.steps import Steps
@@ -14,13 +14,13 @@ class StepCountBySource(AmoraModel, table=True):
     __depends_on__ = [Steps]
     __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
 
-    value_avg: float = Field(is_feature=True)
-    value_sum: float = Field(is_feature=True)
-    value_count: float = Field(is_feature=True)
+    value_avg: float
+    value_sum: float
+    value_count: float
 
-    source_name: str = Field(is_entity=True)
+    source_name: str = Field(primary_key=True)
 
-    date: datetime.date
+    date: datetime.date = Field(primary_key=True)
 
     @classmethod
     def source(cls) -> Optional[Compilable]:
@@ -33,3 +33,19 @@ class StepCountBySource(AmoraModel, table=True):
                 func.date(Steps.creationDate).label(cls.date.key),
             ]
         ).group_by([cls.source_name.key, cls.date.key])
+
+    @classmethod
+    def feature_view_entities(cls):
+        return [cls.source_name]
+
+    @classmethod
+    def feature_view_features(cls):
+        return [
+            cls.value_avg,
+            cls.value_sum,
+            cls.value_count,
+        ]
+
+    @classmethod
+    def feature_view_event_timestamp(cls):
+        return cls.date
