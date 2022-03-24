@@ -1,6 +1,8 @@
-from sqlalchemy import func, String
+from sqlalchemy import func, String, DateTime, Time, Date
 from amora.models import Column
 from sqlalchemy.sql.functions import Function
+
+from amora.providers.bigquery import TimePart
 
 
 def remove_non_numbers(column: Column) -> Function:
@@ -31,3 +33,22 @@ def parse_numbers(column: Column) -> Function:
     return func.nullif(
         remove_leading_zeros(remove_non_numbers(column)), "", type_=String
     )
+
+
+def datetime_trunc_hour(column: Column) -> Function:
+    """
+    Truncate a datetime column by its HOUR part.
+    "2019-12-09T16:15:20" -> "2019-12-09T16:00:00"
+
+    E.g.: `datetime_trunc_hour(Steps.creationDate)`
+
+    ```sql
+    DATETIME(
+        DATE(`steps`.`creationDate`),
+        TIME_TRUNC(TIME(`steps`.`creationDate`), HOUR)
+    )
+    ```
+    """
+    date_part = func.date(column, type_=Date)
+    hour_part = func.time_trunc(func.time(column), TimePart.HOUR.value, type_=Time)
+    return func.datetime(date_part, hour_part, type_=DateTime)
