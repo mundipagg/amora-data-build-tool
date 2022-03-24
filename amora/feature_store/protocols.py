@@ -12,5 +12,5 @@ class FeatureViewSourceProtocol(Protocol):
         ...
 
     @classmethod
-    def feature_view_event_timestamp(cls):
+    def feature_view_event_timestamp(cls) -> str:
         ...
