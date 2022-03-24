@@ -26,7 +26,7 @@ PYTHON_TYPES_TO_FS_TYPES = {
 def feature_view(model: Model):
     if not isinstance(model, FeatureViewSourceProtocol):
         raise ValueError(
-            f"Feature view models must implement the "
+            f"Feature view models (`@feature_view`) must implement the "
             f"{FeatureViewSourceProtocol.__name__} protocol. "
             f"{model} failed the check"
         )
@@ -41,7 +41,10 @@ def feature_view(model: Model):
             )
             for col in model.feature_view_features()
         ],
-        batch_source=BigQuerySource(table_ref=get_fully_qualified_id(model)),
+        batch_source=BigQuerySource(
+            table_ref=get_fully_qualified_id(model),
+            event_timestamp_column=model.feature_view_event_timestamp(),
+        ),
         ttl=Duration(seconds=settings.DEFAULT_FEATURE_TTL_IN_SECONDS),
     )
 
