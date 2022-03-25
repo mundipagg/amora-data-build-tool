@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import sqlmodel
 from feast import ValueType, FeatureView, Feature, BigQuerySource
 from google.protobuf.duration_pb2 import Duration
@@ -23,7 +21,7 @@ PYTHON_TYPES_TO_FS_TYPES = {
 }
 
 
-def feature_view(model: Model):
+def feature_view(model: Model) -> Model:
     if not isinstance(model, FeatureViewSourceProtocol):
         raise ValueError(
             f"Feature view models (`@feature_view`) must implement the "
@@ -32,7 +30,7 @@ def feature_view(model: Model):
         )
 
     FEATURE_REGISTRY[model] = FeatureView(
-        name=model.unique_name,
+        name=model.__tablename__,
         entities=[col.name for col in model.feature_view_entities()],
         features=[
             Feature(
