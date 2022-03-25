@@ -1,11 +1,9 @@
-from amora.feature_store import feature_view
 from amora.types import Compilable
 from amora.models import AmoraModel, ModelConfig, MaterializationTypes
 from examples.amora_project.models.heart_rate import HeartRate
 from sqlmodel import func, select, Field
 
 
-@feature_view
 class HeartRateAgg(AmoraModel, table=True):
     __depends_on__ = [HeartRate]
     __tablename__ = "heart_rate_agg"
