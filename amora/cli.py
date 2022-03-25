@@ -342,12 +342,32 @@ feature_store = typer.Typer()
 app.add_typer(feature_store, name="feature-store")
 
 
+@feature_store.command(name="plan")
+def feature_store_plan():
+    from amora.feature_store import fs
+    from amora.feature_store.registry import get_repo_contents
+
+    registry_diff, infra_diff, infra = fs._plan(
+        desired_repo_contents=get_repo_contents()
+    )
+
+    typer.echo("Amora: Feature Store :: Registry diff")
+    typer.echo(registry_diff.to_string())
+
+    typer.echo("Amora: Feature Store :: Infrastructure diff")
+    typer.echo(infra_diff.to_string())
+
+
 @feature_store.command(name="list")
 def feature_store_list():
-    from feast.repo_operations import plan
-    from amora.feature_store import repo_config, fs
+    from feast.cli import feature_view_list
+    from amora.feature_store import fs
+    from amora.feature_store.registry import get_repo_contents
 
-    plan(repo_config)
+    _models = list(list_models())
+
+    for feature_view in get_repo_contents().feature_views:
+        typer.echo(feature_view)
 
 
 def main():

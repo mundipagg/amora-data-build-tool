@@ -50,4 +50,3 @@ def test_feature_view_on_valid_source_model():
         Feature(name=DriverActivity.trips_today.key, dtype=ValueType.INT64),
         Feature(name=DriverActivity.rating.key, dtype=ValueType.FLOAT),
     ]
-
