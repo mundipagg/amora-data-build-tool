@@ -32,7 +32,7 @@ SQLAlchemy = {version = "^1.4.27", extras = ["mypy"]}
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "^3.0.0"
-black = "^22.1"
+black = "^22.3"
 jupyter = "^1.0.0"
 mypy = "^0.941"
 lxml = "^4.6.3"
