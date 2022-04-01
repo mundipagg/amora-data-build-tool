@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+
 import pytest
 import typer
 from dataclasses import dataclass
@@ -364,10 +366,72 @@ def feature_store_list():
     from amora.feature_store import fs
     from amora.feature_store.registry import get_repo_contents
 
-    _models = list(list_models())
-
     for feature_view in get_repo_contents().feature_views:
         typer.echo(feature_view)
+        # todo: exibir tabela
+
+
+@feature_store.command(name="apply")
+def feature_store_apply():
+    """
+    1. Scans Python files in your amora project and find all models defined as
+    feature views.
+
+    2. Validate your feature definitions
+
+    3. Sync the metadata about feature store objects to the feature registry.
+    If a registry does not exist, then it will be instantiated.
+    The standard registry is a simple protobuf binary file
+    that is stored on disk (locally or in an object store).
+
+    4. Create all necessary feature store infrastructure.
+    The exact infrastructure that is deployed or configured depends
+    on the provider configuration. For example, setting local as
+    your provider will result in a sqlite online store being created.
+    """
+    from amora.feature_store.registry import get_repo_contents
+    from feast.repo_operations import apply_total_with_repo_instance
+    from amora.feature_store import fs
+
+    apply_total_with_repo_instance(
+        store=fs,
+        project=fs.project,
+        registry=fs.registry,
+        repo=get_repo_contents(),
+        skip_source_validation=False,
+    )
+
+
+@feature_store.command(name="materialize")
+def feature_store_materialize(
+    start_ts: str = typer.Argument(
+        None, help="Start timestamp on ISO 8601 format. E.g.: '2022-01-01T01:00:00'"
+    ),
+    end_ts: str = typer.Argument(
+        None, help="End timestamp on ISO 8601 format. E.g.: '2022-01-02T01:00:00'"
+    ),
+    models: List[str] = typer.Option(
+        None, help="A list of Feature View Amora Models to materialize"
+    ),
+):
+    """
+    Run a (non-incremental) materialization job to ingest data into the online
+    store. All data between `start_ts` and `end_ts` will be read from the offline
+    store and written into the online store. If you don't specify feature view
+    names using `--models`, all registered Feature Views will be materialized.
+    """
+    from amora.feature_store import fs
+    from amora.feature_store.registry import get_repo_contents
+
+    if models:
+        raise NotImplementedError("--models :: Feature não implementada")
+
+    repo_contents = get_repo_contents()
+    fs.materialize(
+        feature_views=[fv.name for fv in repo_contents.feature_views],
+        start_date=datetime.fromisoformat(start_ts),
+        end_date=datetime.fromisoformat(end_ts),
+    )
 
 
 def main():
