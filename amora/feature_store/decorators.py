@@ -1,24 +1,10 @@
-import sqlmodel
-from feast import ValueType, FeatureView, Feature, BigQuerySource
+from feast import FeatureView, Feature, BigQuerySource
 from google.protobuf.duration_pb2 import Duration
-from sqlalchemy.sql import sqltypes
-
 from amora.feature_store.config import settings
-from amora.feature_store.registry import FEATURE_REGISTRY
+from amora.feature_store.registry import FEATURE_REGISTRY, PYTHON_TYPES_TO_FS_TYPES
 from amora.feature_store.protocols import FeatureViewSourceProtocol
 from amora.models import Model
 from amora.providers.bigquery import get_fully_qualified_id
-
-PYTHON_TYPES_TO_FS_TYPES = {
-    sqltypes.Float: ValueType.FLOAT,
-    sqltypes.String: ValueType.STRING,
-    sqlmodel.AutoString: ValueType.STRING,
-    sqltypes.Integer: ValueType.INT64,
-    bytes: ValueType.BYTES,
-    sqltypes.Boolean: ValueType.BOOL,
-    sqltypes.Date: ValueType.UNIX_TIMESTAMP,
-    sqltypes.DateTime: ValueType.UNIX_TIMESTAMP,
-}
 
 
 def feature_view(model: Model) -> Model:

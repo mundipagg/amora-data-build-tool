@@ -1,11 +1,41 @@
-from typing import Dict
+import sqlmodel
 
-from feast import FeatureView
+from typing import Dict, Iterable
+from feast import FeatureView, Entity, ValueType
 from feast.repo_contents import RepoContents
-
+from sqlalchemy.orm import InstrumentedAttribute
+from sqlalchemy.sql import sqltypes
 from amora.models import Model, list_models
 
+
+PYTHON_TYPES_TO_FS_TYPES = {
+    sqltypes.Float: ValueType.FLOAT,
+    sqltypes.String: ValueType.STRING,
+    sqlmodel.AutoString: ValueType.STRING,
+    sqltypes.Integer: ValueType.INT64,
+    bytes: ValueType.BYTES,
+    sqltypes.Boolean: ValueType.BOOL,
+    sqltypes.Date: ValueType.UNIX_TIMESTAMP,
+    sqltypes.DateTime: ValueType.UNIX_TIMESTAMP,
+}
+
 FEATURE_REGISTRY: Dict[Model, FeatureView] = {}
+
+
+def get_entities() -> Iterable[Entity]:
+    for model, fv in FEATURE_REGISTRY.items():
+        for entity_name in fv.entities:
+            entity_column: InstrumentedAttribute = getattr(model, entity_name)
+
+            yield Entity(
+                name=entity_name,
+                value_type=PYTHON_TYPES_TO_FS_TYPES[entity_column.type.__class__],
+                description=entity_column.comment,
+            )
+
+
+def get_feature_views() -> Iterable[FeatureView]:
+    return FEATURE_REGISTRY.values()
 
 
 def get_repo_contents() -> RepoContents:
@@ -13,8 +43,8 @@ def get_repo_contents() -> RepoContents:
     _models = list(list_models())
 
     return RepoContents(
-        feature_views=set(FEATURE_REGISTRY.values()),
-        entities=set(),
+        feature_views=set(get_feature_views()),
+        entities=set(get_entities()),
         feature_services=set(),
         on_demand_feature_views=set(),
         request_feature_views=set(),
