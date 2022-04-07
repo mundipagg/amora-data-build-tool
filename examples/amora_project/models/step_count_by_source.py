@@ -48,5 +48,5 @@ class StepCountBySource(AmoraModel, table=True):
         ]
 
     @classmethod
-    def feature_view_event_timestamp(cls) -> str:
-        return cls.event_timestamp.key
+    def feature_view_event_timestamp(cls):
+        return cls.event_timestamp
