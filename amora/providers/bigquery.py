@@ -65,7 +65,7 @@ SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES = {
     DateTime: "DATETIME",
     Date: "DATE",
     Time: "TIME",
-    Float: "FLOAT64",
+    Float: "FLOAT",
     Boolean: "BOOLEAN",
     JSON: "JSON",
     TIMESTAMP: "TIMESTAMP",
@@ -113,12 +113,19 @@ def get_fully_qualified_id(model: Model) -> str:
 
 
 def get_schema(table_id: str) -> Schema:
+    """
+    Given a `table_id`, returns the `Schema` of the table by querying BigQueries API
+    """
     client = get_client()
     table = client.get_table(table_id)
     return table.schema
 
 
 def get_schema_for_model(model: Model) -> Schema:
+    """
+    Given an `AmoraModel`, returns the equivalent bigquery `Schema`
+    of the model by parsing the model SQLAlchemy column schema
+    """
     columns = model.__table__.columns
     return [
         SchemaField(
