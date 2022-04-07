@@ -64,12 +64,13 @@ class DependencyDAG(nx.DiGraph):
 
 
 def materialize(sql: str, model: Model) -> Optional[Table]:
-    materialization = model.__model_config__.materialized
+    config = model.__model_config__
+    materialization = config.materialized
 
     if materialization == MaterializationTypes.view:
         view = Table(model.unique_name)
-        view.description = model.__model_config__.description
-        view.labels = model.__model_config__.labels
+        view.description = config.description
+        view.labels = config.labels
         view.view_query = sql
 
         return Client().create_table(view, exists_ok=True)
@@ -86,9 +87,11 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
         result = query_job.result()
 
         table = client.get_table(model.unique_name)
-        table.description = model.__model_config__.description
-        table.labels = model.__model_config__.labels
-        table.clustering_fields = model.__model_config__.cluster_by
+        table.description = config.description
+        table.labels = config.labels
+
+        if config.cluster_by:
+            table.clustering_fields = config.cluster_by
 
         return client.update_table(
             table, ["description", "labels", "clustering_fields"]

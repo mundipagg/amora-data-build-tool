@@ -129,6 +129,53 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
 
 
 @patch("amora.materialization.Client", spec=Client)
+@patch("amora.materialization.QueryJobConfig", spec=QueryJobConfig)
+def test_materialize_as_table_without_clustering_configuration(
+    QueryJobConfig: MagicMock, Client: MagicMock
+):
+    table_name = uuid4().hex
+
+    class TableModel(AmoraModel, table=True):
+        __tablename__ = table_name
+        __model_config__ = ModelConfig(
+            materialized=MaterializationTypes.table,
+            partition_by=PartitionConfig(
+                field="created_at", data_type="TIMESTAMP", granularity="day"
+            ),
+            labels={"freshness": "daily"},
+            description=uuid4().hex,
+        )
+
+        x: int = Field(primary_key=True)
+        y: int = Field(primary_key=True)
+        created_at: datetime = Field(primary_key=True)
+
+    result = materialize(sql="SELECT 1", model=TableModel)
+
+    client = Client.return_value
+
+    client.get_table.assert_called_once_with(TableModel.unique_name)
+
+    client.query.assert_called_once_with(
+        "SELECT 1",
+        job_config=QueryJobConfig(
+            destination=TableModel.unique_name,
+            write_disposition="WRITE_TRUNCATE",
+        ),
+    )
+
+    table: Table = client.get_table.return_value
+    client.update_table.assert_called_once_with(
+        table,
+        ["description", "labels", "clustering_fields"],
+    )
+
+    assert table.description == TableModel.__model_config__.description
+    assert isinstance(table.clustering_fields, MagicMock)
+    assert table.labels == TableModel.__model_config__.labels
+
+
+@patch("amora.materialization.Client", spec=Client)
 def test_materialize_as_ephemeral(Client: MagicMock):
     table_name = uuid4().hex
     table_id = f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{table_name}"
