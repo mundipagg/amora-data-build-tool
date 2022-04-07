@@ -20,8 +20,6 @@ from amora.utils import model_path_for_target_path, list_files
 select = select
 Column = ColumnElement
 Columns = Iterable[Column]
-# fixme: is_feature e is_entity são excludentes. Ambos não podem ser True ao mesmo tempo
-# fixme: is_feature e is_entity não podem receber valor diferente de None em um modelo não decorado com @feature_view
 Field = Field
 Model = Type["AmoraModel"]
 MetaData = MetaData
