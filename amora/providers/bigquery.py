@@ -12,9 +12,21 @@ from google.cloud.bigquery import (
     TableReference,
 )
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
-from sqlalchemy import literal
+from sqlalchemy import (
+    literal,
+    Integer,
+    String,
+    DateTime,
+    Date,
+    Time,
+    Float,
+    Boolean,
+    JSON,
+    TIMESTAMP,
+)
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery.base import unnest
+from sqlmodel import AutoString
 
 from amora.compilation import compile_statement
 from amora.config import settings
@@ -44,6 +56,19 @@ BIGQUERY_TYPES_TO_PYTHON_TYPES = {
     "STRING": str,
     "TIME": time,
     "TIMESTAMP": datetime,
+}
+
+SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES = {
+    Integer: "INTEGER",
+    String: "STRING",
+    AutoString: "STRING",
+    DateTime: "DATETIME",
+    Date: "DATE",
+    Time: "TIME",
+    Float: "FLOAT64",
+    Boolean: "BOOLEAN",
+    JSON: "JSON",
+    TIMESTAMP: "TIMESTAMP",
 }
 
 
@@ -91,6 +116,17 @@ def get_schema(table_id: str) -> Schema:
     client = get_client()
     table = client.get_table(table_id)
     return table.schema
+
+
+def get_schema_for_model(model: Model) -> Schema:
+    columns = model.__table__.columns
+    return [
+        SchemaField(
+            name=col.name,
+            field_type=SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[col.type.__class__],
+        )
+        for col in columns
+    ]
 
 
 def run(statement: Compilable) -> RunResult:

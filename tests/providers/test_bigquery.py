@@ -1,5 +1,9 @@
+from datetime import datetime, date, time
+
 import pytest
 from google.api_core.exceptions import NotFound
+from google.cloud.bigquery.schema import SchemaField
+from sqlalchemy import TIMESTAMP, Column
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.selectable import CTE
 
@@ -12,6 +16,8 @@ from amora.providers.bigquery import (
     dry_run,
     DryRunResult,
     get_fully_qualified_id,
+    get_schema_for_model,
+    Schema,
 )
 from amora.config import settings
 from tests.models.health import Health
@@ -119,4 +125,29 @@ def test_dry_run_on_model_with_source():
     assert isinstance(result, DryRunResult)
     assert result.referenced_tables == [
         get_fully_qualified_id(dep) for dep in HeartRate.__depends_on__
+    ]
+
+
+def test_get_schema_for_model():
+    class Model(AmoraModel, table=True):
+        a_boolean: bool
+        a_date: date
+        a_datetime: datetime
+        a_float: float
+        a_string: str
+        a_time: time
+        a_timestamp: datetime = Field(sa_column=Column(TIMESTAMP))
+        an_int: int = Field(primary_key=True)
+
+    schema = get_schema_for_model(Model)
+
+    assert schema == [
+        SchemaField(name="a_timestamp", field_type="TIMESTAMP"),
+        SchemaField(name="a_boolean", field_type="BOOLEAN"),
+        SchemaField(name="a_date", field_type="DATE"),
+        SchemaField(name="a_datetime", field_type="DATETIME"),
+        SchemaField(name="a_float", field_type="FLOAT64"),
+        SchemaField(name="a_string", field_type="STRING"),
+        SchemaField(name="a_time", field_type="TIME"),
+        SchemaField(name="an_int", field_type="INTEGER"),
     ]
