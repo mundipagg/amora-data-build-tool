@@ -27,7 +27,7 @@ def feature_view(model: Model) -> Model:
         ],
         batch_source=BigQuerySource(
             table_ref=get_fully_qualified_id(model),
-            event_timestamp_column=model.feature_view_event_timestamp(),
+            event_timestamp_column=model.feature_view_event_timestamp().key,
         ),
         ttl=Duration(seconds=settings.DEFAULT_FEATURE_TTL_IN_SECONDS),
     )
