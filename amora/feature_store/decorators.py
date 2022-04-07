@@ -15,21 +15,24 @@ def feature_view(model: Model) -> Model:
             f"{model} failed the check"
         )
 
-    FEATURE_REGISTRY[model] = FeatureView(
-        name=model.__tablename__,
-        entities=[col.name for col in model.feature_view_entities()],
-        features=[
-            Feature(
-                name=col.name,
-                dtype=PYTHON_TYPES_TO_FS_TYPES[col.type.__class__],
-            )
-            for col in model.feature_view_features()
-        ],
-        batch_source=BigQuerySource(
-            table_ref=get_fully_qualified_id(model),
-            event_timestamp_column=model.feature_view_event_timestamp().key,
+    FEATURE_REGISTRY[model.__tablename__] = (
+        FeatureView(
+            name=model.__tablename__,
+            entities=[col.name for col in model.feature_view_entities()],
+            features=[
+                Feature(
+                    name=col.name,
+                    dtype=PYTHON_TYPES_TO_FS_TYPES[col.type.__class__],
+                )
+                for col in model.feature_view_features()
+            ],
+            batch_source=BigQuerySource(
+                table_ref=get_fully_qualified_id(model),
+                event_timestamp_column=model.feature_view_event_timestamp().key,
+            ),
+            ttl=Duration(seconds=settings.DEFAULT_FEATURE_TTL_IN_SECONDS),
         ),
-        ttl=Duration(seconds=settings.DEFAULT_FEATURE_TTL_IN_SECONDS),
+        model,
     )
 
     return model

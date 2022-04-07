@@ -1,6 +1,6 @@
 import sqlmodel
 
-from typing import Dict, Iterable
+from typing import Dict, Iterable, Tuple, List
 from feast import FeatureView, Entity, ValueType
 from feast.repo_contents import RepoContents
 from sqlalchemy.orm import InstrumentedAttribute
@@ -19,11 +19,11 @@ PYTHON_TYPES_TO_FS_TYPES = {
     sqltypes.DateTime: ValueType.UNIX_TIMESTAMP,
 }
 
-FEATURE_REGISTRY: Dict[Model, FeatureView] = {}
+FEATURE_REGISTRY: Dict[str, Tuple[FeatureView, Model]] = {}
 
 
 def get_entities() -> Iterable[Entity]:
-    for model, fv in FEATURE_REGISTRY.items():
+    for _, (fv, model) in FEATURE_REGISTRY.items():
         for entity_name in fv.entities:
             entity_column: InstrumentedAttribute = getattr(model, entity_name)
 
@@ -34,8 +34,8 @@ def get_entities() -> Iterable[Entity]:
             )
 
 
-def get_feature_views() -> Iterable[FeatureView]:
-    return FEATURE_REGISTRY.values()
+def get_feature_views() -> List[FeatureView]:
+    return [fv for (fv, _model) in FEATURE_REGISTRY.values()]
 
 
 def get_repo_contents() -> RepoContents:
