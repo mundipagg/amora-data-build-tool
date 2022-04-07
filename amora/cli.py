@@ -409,7 +409,7 @@ def feature_store_materialize(
     ),
     end_ts: str = typer.Argument(
         None, help="End timestamp on ISO 8601 format. E.g.: '2022-01-02T01:00:00'"
-    )
+    ),
 ):
     """
     Run a (non-incremental) materialization job to ingest data into the online
