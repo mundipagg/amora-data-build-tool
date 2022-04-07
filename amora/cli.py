@@ -409,10 +409,7 @@ def feature_store_materialize(
     ),
     end_ts: str = typer.Argument(
         None, help="End timestamp on ISO 8601 format. E.g.: '2022-01-02T01:00:00'"
-    ),
-    models: List[str] = typer.Option(
-        None, help="A list of Feature View Amora Models to materialize"
-    ),
+    )
 ):
     """
     Run a (non-incremental) materialization job to ingest data into the online
@@ -422,9 +419,6 @@ def feature_store_materialize(
     """
     from amora.feature_store import fs
     from amora.feature_store.registry import get_repo_contents
-
-    if models:
-        raise NotImplementedError("--models :: Feature não implementada")
 
     repo_contents = get_repo_contents()
     fs.materialize(
