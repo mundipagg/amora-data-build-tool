@@ -1,11 +1,14 @@
 from datetime import datetime
 
+from sqlalchemy import TIMESTAMP
+
 from amora.compilation import Compilable
 from amora.models import (
     AmoraModel,
     ModelConfig,
     PartitionConfig,
     MaterializationTypes,
+    Column,
 )
 from examples.amora_project.models.health import Health
 from sqlmodel import Field, select
@@ -20,16 +23,24 @@ class Steps(AmoraModel, table=True):
         ),
         cluster_by=["sourceName"],
         labels={"freshness": "daily"},
+        description="Health automatically counts your steps, walking, and "
+        "running distances. This table stores step measurement events",
     )
 
-    creationDate: datetime
-    device: str
-    endDate: datetime
-    id: int = Field(primary_key=True)
-    sourceName: str
-    startDate: datetime
-    unit: str
-    value: float
+    id: int = Field(primary_key=True, description="Identificador único da medida")
+    sourceName: str = Field(description="Origem dos dados")
+    unit: str = Field(description="Unidade de medida", default="count")
+    value: float = Field(description="Valor observado")
+    device: str = Field(description="Dispositivo de origem dos dados")
+    creationDate: datetime = Field(
+        description="Data de inserção dos dados", sa_column=Column(TIMESTAMP)
+    )
+    startDate: datetime = Field(
+        description="Data do início da medida", sa_column=Column(TIMESTAMP)
+    )
+    endDate: datetime = Field(
+        description="Data do fim da medida", sa_column=Column(TIMESTAMP)
+    )
 
     @classmethod
     def source(cls) -> Compilable:

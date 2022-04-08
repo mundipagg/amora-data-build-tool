@@ -1,10 +1,13 @@
 from datetime import datetime
 
+from sqlalchemy import TIMESTAMP
+
 from amora.models import (
     AmoraModel,
     MaterializationTypes,
     ModelConfig,
     Field,
+    Column,
 )
 from tests.models.heart_rate import HeartRate
 
@@ -17,7 +20,9 @@ class HeartRateOver100(AmoraModel, table=True):
         labels={"freshness": "daily"},
     )
 
-    unit: str
-    value: float
-    creationDate: datetime
-    id: int = Field(primary_key=True)
+    unit: str = Field(description="Unidade de medida")
+    value: float = Field(description="Valor observado")
+    creationDate: datetime = Field(
+        description="Data de inserção dos dados", sa_column=Column(TIMESTAMP)
+    )
+    id: int = Field(primary_key=True, description="Identificador único da medida")

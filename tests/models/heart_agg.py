@@ -10,7 +10,7 @@ class HeartRateAgg(AmoraModel, table=True):
 
     _avg: float
     _sum: float
-    _count: float
+    _count: int
     year: int = Field(primary_key=True)
     month: int = Field(primary_key=True)
 
