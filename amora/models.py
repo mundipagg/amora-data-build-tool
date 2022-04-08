@@ -10,7 +10,7 @@ from typing import Iterable, List, Optional, Union, Dict, Any, Tuple, Type
 from amora.logger import logger
 from amora.protocols import CompilableProtocol
 from amora.config import settings
-from sqlalchemy import MetaData, Table, select
+from sqlalchemy import MetaData, Table, select, Column
 from sqlmodel import SQLModel, Field, create_engine, Session
 from sqlalchemy.sql import ColumnElement
 from sqlalchemy.orm import declared_attr
@@ -18,8 +18,9 @@ from amora.types import Compilable
 from amora.utils import model_path_for_target_path, list_files
 
 select = select
-Column = ColumnElement
-Columns = Iterable[Column]
+Column = Column
+ColumnElement = ColumnElement
+Columns = Iterable[ColumnElement]
 Field = Field
 Model = Type["AmoraModel"]
 MetaData = MetaData
