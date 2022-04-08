@@ -136,6 +136,16 @@ def get_schema_for_model(model: Model) -> Schema:
     ]
 
 
+def get_schema_for_source(model: Model) -> Optional[Schema]:
+    """
+    Give an `Amora Model`, returns the bigquery `Schema` of its
+    `source` classmethod query result
+    """
+    result = dry_run(model)
+    if result:
+        return result.schema
+
+
 def run(statement: Compilable) -> RunResult:
     """
     Executes a given query and returns its results
