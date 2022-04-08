@@ -141,9 +141,12 @@ def get_schema_for_source(model: Model) -> Optional[Schema]:
     Give an `Amora Model`, returns the bigquery `Schema` of its
     `source` classmethod query result
     """
+    source = model.source()
+    if source is None:
+        return None
+
     result = dry_run(model)
-    if result:
-        return result.schema
+    return result.schema
 
 
 def run(statement: Compilable) -> RunResult:

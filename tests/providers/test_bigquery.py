@@ -1,4 +1,5 @@
 from datetime import datetime, date, time
+from typing import Optional
 
 import pytest
 from google.api_core.exceptions import NotFound
@@ -17,9 +18,10 @@ from amora.providers.bigquery import (
     DryRunResult,
     get_fully_qualified_id,
     get_schema_for_model,
-    Schema,
+    get_schema_for_source,
 )
 from amora.config import settings
+from amora.types import Compilable
 from tests.models.health import Health
 from tests.models.heart_rate import HeartRate
 from tests.models.heart_rate_over_100 import HeartRateOver100
@@ -129,7 +131,7 @@ def test_dry_run_on_model_with_source():
 
 
 def test_get_schema_for_model():
-    class Model(AmoraModel, table=True):
+    class ModelB(AmoraModel, table=True):
         a_boolean: bool
         a_date: date
         a_datetime: datetime
@@ -139,15 +141,48 @@ def test_get_schema_for_model():
         a_timestamp: datetime = Field(sa_column=Column(TIMESTAMP))
         an_int: int = Field(primary_key=True)
 
-    schema = get_schema_for_model(Model)
+    schema = get_schema_for_model(ModelB)
 
     assert schema == [
         SchemaField(name="a_timestamp", field_type="TIMESTAMP"),
         SchemaField(name="a_boolean", field_type="BOOLEAN"),
         SchemaField(name="a_date", field_type="DATE"),
         SchemaField(name="a_datetime", field_type="DATETIME"),
-        SchemaField(name="a_float", field_type="FLOAT64"),
+        SchemaField(name="a_float", field_type="FLOAT"),
         SchemaField(name="a_string", field_type="STRING"),
         SchemaField(name="a_time", field_type="TIME"),
         SchemaField(name="an_int", field_type="INTEGER"),
     ]
+
+
+def test_get_schema_for_source():
+    class Model(AmoraModel, table=True):
+        a_boolean: bool
+        a_float: float
+        a_string: str = Field(primary_key=True)
+
+        @classmethod
+        def source(cls) -> Optional[Compilable]:
+            return cte_from_rows(
+                [
+                    {"a_boolean": True, "a_float": 7.1, "a_string": "Amora"},
+                    {"a_boolean": False, "a_float": 1.7, "a_string": "Aroma"},
+                ]
+            )
+
+    schema = get_schema_for_source(Model)
+
+    assert schema == [
+        SchemaField(name="a_boolean", field_type="BOOLEAN"),
+        SchemaField(name="a_float", field_type="FLOAT"),
+        SchemaField(name="a_string", field_type="STRING"),
+    ]
+
+
+def test_get_schema_for_source_on_sourceless_model():
+    class Model(AmoraModel, table=True):
+        a_boolean: bool
+        a_float: float
+        a_string: str = Field(primary_key=True)
+
+    assert get_schema_for_source(Model) is None
