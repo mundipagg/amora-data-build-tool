@@ -1,38 +1,22 @@
-from feast import FeatureView, Feature, BigQuerySource
-from google.protobuf.duration_pb2 import Duration
-from amora.feature_store.config import settings
-from amora.feature_store.registry import FEATURE_REGISTRY, PYTHON_TYPES_TO_FS_TYPES
-from amora.feature_store.protocols import FeatureViewSourceProtocol
+from feast import FeatureService
+from amora.feature_store.feature_view import feature_view_for_model, name_for_model
+from amora.feature_store.registry import FEATURE_REGISTRY
 from amora.models import Model
-from amora.providers.bigquery import get_fully_qualified_id
 
 
 def feature_view(model: Model) -> Model:
-    if not isinstance(model, FeatureViewSourceProtocol):
-        raise ValueError(
-            f"Feature view models (`@feature_view`) must implement the "
-            f"{FeatureViewSourceProtocol.__name__} protocol. "
-            f"{model} failed the check"
-        )
+    """
+    Generates a Feature View and a Feature Service for the decorated model.
+    Models decorated with `@feature_view` must implement the `FeatureViewSourceProtocol`
 
-    FEATURE_REGISTRY[model.__tablename__] = (
-        FeatureView(
-            name=model.__tablename__,
-            entities=[col.name for col in model.feature_view_entities()],
-            features=[
-                Feature(
-                    name=col.name,
-                    dtype=PYTHON_TYPES_TO_FS_TYPES[col.type.__class__],
-                )
-                for col in model.feature_view_features()
-            ],
-            batch_source=BigQuerySource(
-                table_ref=get_fully_qualified_id(model),
-                event_timestamp_column=model.feature_view_event_timestamp().key,
-            ),
-            ttl=Duration(seconds=settings.DEFAULT_FEATURE_TTL_IN_SECONDS),
-        ),
-        model,
+    """
+    fv = feature_view_for_model(model)
+
+    service = FeatureService(
+        name=f"amora_fs__{fv.name}",
+        features=[fv],
     )
+
+    FEATURE_REGISTRY[fv.name] = (fv, service, model)
 
     return model
