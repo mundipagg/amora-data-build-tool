@@ -146,6 +146,9 @@ def get_schema_for_source(model: Model) -> Optional[Schema]:
         return None
 
     result = dry_run(model)
+    if result is None:
+        return None
+
     return result.schema
 
 
