@@ -5,7 +5,9 @@ site_description: transform data on the data warehouse (BigQuery) by writing Amo
 repo_url: https://github.com/mundipagg/amora-data-build-tool
 repo_name: amora-data-build-tool
 markdown_extensions:
+  - abbr
   - admonition
+  - def_list
   - toc:
       permalink: true
   - tables
