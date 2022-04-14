@@ -1,0 +1,1 @@
+::: amora.feature_store.protocols.FeatureViewSourceProtocol
