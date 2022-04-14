@@ -24,14 +24,20 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
 nav:
   - Amora: 'index.md'
-  - Features: 'features.md'
-  - Tutorial - User Guide:
+  - 🏗 Concepts:
       - 'models.md'
+      - Feature Store:
+        - 'feature-store/feature-store.md'
+        - 'feature-store/feature-view.md'
+        - 'feature-store/feature-service.md'
+        - 'feature-store/feature-view-protocol.md'
+  - 🧑‍🏫 User Guide:
       - 'cli.md'
-  - Examples: 'examples.md'
-  - API Reference: ''
-  - Testing:
+  - 🎁 Examples: 'examples.md'
+  - ⚙️ API Reference: ''
+  - 🧪 Testing:
       - 'tests/assertions.md'
+  -  🔖 Glossary: 'glossary.md'
 plugins:
   - autorefs
   - include-markdown
