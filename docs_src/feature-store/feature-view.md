@@ -67,7 +67,7 @@ Feature Store to consistently manage feature data across time.
 
 On Amora, defining a Feature View from an `AmoraModel` is done by decorating the model with 
 `amora.feature_store.decorators.feature_view` and implementing the [protocol](https://peps.python.org/pep-0544/) 
-[`FeatureViewProtocol`](feature-store/feature-view-protocol.md). 
+[`FeatureViewProtocol`](./feature-view-protocol.md). 
 
 E.g: `StepCountBySource` is a data model that exposes the features `value_avg`, 
 `value_sum` and `value_count` of each `source_name` entity on a given `event_timestamp`.
