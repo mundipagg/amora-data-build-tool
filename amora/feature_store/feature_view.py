@@ -1,7 +1,7 @@
 from typing import Union, NewType
 
 from feast import FeatureView, Feature, BigQuerySource
-from sqlalchemy import Table
+from sqlalchemy.orm import DeclarativeMeta
 
 from amora.feature_store import settings
 from amora.feature_store.protocols import FeatureViewSourceProtocol
@@ -11,11 +11,12 @@ from amora.providers.bigquery import get_fully_qualified_id
 from google.protobuf.duration_pb2 import Duration
 
 
-def name_for_model(model: Union[Model, Table]) -> str:
+def name_for_model(model: Model) -> str:
     """
     Feature View Name is the name of the group of features.
     """
-    return model.__tablename__
+    # fixme: type ignore não deveria ser necessário aqui
+    return model.__tablename__  # type: ignore
 
 
 def feature_view_for_model(model: Model) -> FeatureView:

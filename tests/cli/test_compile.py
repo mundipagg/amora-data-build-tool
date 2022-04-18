@@ -11,11 +11,11 @@ from amora.cli import app
 runner = CliRunner()
 
 
-def setup_function(module):
+def setup_function(_module):
     clean_compiled_files()
 
 
-def teardown_function(module):
+def teardown_function(_module):
     clean_compiled_files()
 
 
@@ -53,5 +53,5 @@ def test_compile_without_arguments_and_options():
 
     generated_target_files = [path.name for path in list_target_files()]
     assert sorted(generated_target_files) == sorted(
-        ["heart_agg.sql", "heart_rate.sql", "steps.sql"]
+        ["heart_agg.sql", "heart_rate.sql", "step_count_by_source.sql", "steps.sql"]
     )

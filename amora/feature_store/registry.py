@@ -3,6 +3,7 @@ from feast import FeatureView, Entity, FeatureService
 from feast.repo_contents import RepoContents
 from sqlalchemy.orm import InstrumentedAttribute
 
+from amora.feature_store.feature_view import name_for_model
 from amora.feature_store.type_mapping import SQLALCHEMY_TYPES_TO_FS_TYPES
 from amora.models import Model, list_models
 
@@ -26,7 +27,7 @@ def get_feature_views() -> List[FeatureView]:
 
 
 def get_feature_service(model: Model) -> FeatureService:
-    (_fv, service, _model) = FEATURE_REGISTRY[model.__tablename__]
+    (_fv, service, _model) = FEATURE_REGISTRY[name_for_model(model)]
     return service
 
 

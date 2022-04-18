@@ -25,7 +25,7 @@ def test_get_repo_contents_with_multiple_calls():
     first_call_fvs = repo_contents.feature_views
 
     repo_contents = registry.get_repo_contents()
-    assert list(first_call_fvs) == list(repo_contents.feature_views)
+    assert len(first_call_fvs) == len(repo_contents.feature_views)
 
     @feature_view
     class DriverActivity(AmoraModel, table=True):
