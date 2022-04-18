@@ -1,33 +1,31 @@
 from datetime import datetime
 
-from feast import Feature, ValueType
+import pytest
+from feast import Feature, ValueType, FeatureView, Entity
 from amora.feature_store import registry
 from amora.feature_store.decorators import feature_view
+from amora.feature_store.feature_view import name_for_model
 from amora.models import AmoraModel, Field
 
 
 def test_get_repo_contents():
     repo_contents = registry.get_repo_contents()
-    assert len(repo_contents.feature_views) == 1
-    assert len(repo_contents.entities) == 1
 
-    feature_view = repo_contents.feature_views.pop()
-    assert feature_view.features == [
-        Feature(name="value_avg", dtype=ValueType.FLOAT),
-        Feature(name="value_sum", dtype=ValueType.FLOAT),
-        Feature(name="value_count", dtype=ValueType.FLOAT),
-    ]
-    assert feature_view.entities == ["source_name"]
+    assert len(repo_contents.feature_views) > 0
+    for fv in repo_contents.feature_views:
+        assert isinstance(fv, FeatureView)
+
+    assert len(repo_contents.entities) > 0
+    for entity in repo_contents.entities:
+        assert isinstance(entity, Entity)
 
 
 def test_get_repo_contents_with_multiple_calls():
     repo_contents = registry.get_repo_contents()
-    assert len(repo_contents.feature_views) == 1
-    assert len(repo_contents.entities) == 1
+    first_call_fvs = repo_contents.feature_views
 
     repo_contents = registry.get_repo_contents()
-    assert len(repo_contents.feature_views) == 1
-    assert len(repo_contents.entities) == 1
+    assert list(first_call_fvs) == list(repo_contents.feature_views)
 
     @feature_view
     class DriverActivity(AmoraModel, table=True):
@@ -49,5 +47,11 @@ def test_get_repo_contents_with_multiple_calls():
             return cls.datetime_trunc_day
 
     repo_contents = registry.get_repo_contents()
-    assert len(repo_contents.feature_views) == 2
-    assert len(repo_contents.entities) == 2
+    expected_fv_name = name_for_model(DriverActivity)
+    for fv in repo_contents.feature_views:
+        if fv.name == expected_fv_name:
+            return
+
+    pytest.fail(
+        f"{expected_fv_name} not found in Feast's RepoContents. Repo feature views: {repo_contents.feature_views}"
+    )
