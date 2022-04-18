@@ -1,5 +1,5 @@
 from datetime import datetime
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 
 from feast import FeatureStore
 from typer.testing import CliRunner
@@ -32,10 +32,16 @@ def test_feature_store_materialize_without_options(
 
 
 @patch("amora.feature_store.fs", spec=FeatureStore)
-@patch("amora.feature_store.registry.get_repo_contents")
+@patch(
+    "amora.feature_store.registry.get_repo_contents",
+    return_value=MagicMock(feature_views=[Mock(), Mock()]),
+)
 def test_feature_store_materialize_with_models_option(
     get_repo_contents: MagicMock, fs: MagicMock
 ):
+    # readme: https://python.readthedocs.io/en/latest/library/unittest.mock.html#unittest.mock.Mock
+    get_repo_contents.return_value.feature_views[0].name = "step_count_by_source"
+
     start_ts = "2020-01-01T00:00:00"
     end_ts = "2022-01-01T00:00:00"
 
@@ -51,5 +57,9 @@ def test_feature_store_materialize_with_models_option(
         ],
     )
 
-    assert result.exit_code == 1
-    assert not get_repo_contents.called
+    assert result.exit_code == 0
+    fs.materialize.assert_called_once_with(
+        feature_views=["step_count_by_source"],
+        start_date=datetime.fromisoformat(start_ts),
+        end_date=datetime.fromisoformat(end_ts),
+    )

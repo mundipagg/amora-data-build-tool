@@ -424,6 +424,7 @@ def feature_store_materialize(
     end_ts: str = typer.Argument(
         None, help="End timestamp on ISO 8601 format. E.g.: '2022-01-02T01:00:00'"
     ),
+    models: Optional[Models] = models_option,
 ):
     """
     Run a (non-incremental) materialization job to ingest data into the online
@@ -435,8 +436,16 @@ def feature_store_materialize(
     from amora.feature_store.registry import get_repo_contents
 
     repo_contents = get_repo_contents()
+
+    if models:
+        views_to_materialize = [
+            fv.name for fv in repo_contents.feature_views if fv.name in models
+        ]
+    else:
+        views_to_materialize = [fv.name for fv in repo_contents.feature_views]
+
     fs.materialize(
-        feature_views=[fv.name for fv in repo_contents.feature_views],
+        feature_views=views_to_materialize,
         start_date=datetime.fromisoformat(start_ts),
         end_date=datetime.fromisoformat(end_ts),
     )
