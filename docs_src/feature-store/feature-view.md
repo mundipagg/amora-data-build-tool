@@ -2,10 +2,11 @@
 
 ### Entities
 
-- Used to identify the __primary key__ on which feature values are stored and retrieved. 
-- Used during the lookup of feature values from the [Online Store](./feature-store.md#storage) and the join process in point-in-time joins.
-- Are generally recognizable, concrete concepts or abstract, such as a customer email, a company identifier or a [surrogate key](https://en.wikipedia.org/wiki/Surrogate_key).
-- Act as primary keys. They are used during the lookup of features from the online store, and they are also used to match feature rows across feature views during point-in-time joins.
+Entities are used to identify the __primary key__ on which feature values are stored 
+and retrieved. They are used as keys during the lookup of feature values from the 
+[Online Store](./feature-store.md#storage) and the join process in point-in-time joins.
+Entities are generally recognizable, concrete concepts or abstract, such as a customer 
+email, a document number or a [surrogate key](https://en.wikipedia.org/wiki/Surrogate_key).
 
 It is possible to define multiple entities for a single a feature view and is also possible to have zero entities.
 
@@ -57,6 +58,23 @@ customers in the last month, `count_all_transactions_last_30d`:
 
 ### Feature View
 
+A Feature View aggregates entities, features and a data source, allowing the 
+Feature Store to consistently manage feature data across time. 
+
+!!! info
+
+    Read more on [Feast's documentation](https://docs.feast.dev/getting-started/concepts/feature-view).
+
+On Amora, defining a Feature View from an `AmoraModel` is done by decorating the model with 
+`amora.feature_store.decorators.feature_view` and implementing the [protocol](https://peps.python.org/pep-0544/) 
+[`FeatureViewProtocol`](feature-store/feature-view-protocol.md). 
+
+E.g: `StepCountBySource` is a data model that exposes the features `value_avg`, 
+`value_sum` and `value_count` of each `source_name` entity on a given `event_timestamp`.
+
+```Python
+{% include "../../examples/amora_project/models/step_count_by_source.py" %}
+```
 
 
 --8<-- "docs_src/abbreviations.md"

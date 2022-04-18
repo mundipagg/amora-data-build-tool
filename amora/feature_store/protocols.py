@@ -6,7 +6,15 @@ from amora.models import Column
 @runtime_checkable
 class FeatureViewSourceProtocol(Protocol):
     """
-    The contract needed to expose the `AmoraModel` definition as a [Feature View](feature-view.md)
+    The contract needed to expose the [AmoraModel](amora-model) definition as a [Feature View](feature-view.md)
+
+    To expose an `AmoraModel` as a Feature View, one must decorate it with
+    `amora.feature_store.decorators.feature_view` and implement the
+    `FeatureViewProcotol` class methods.
+
+    !!! hint
+        An example can be found at `examples.amora_project.models.step_count_by_source.py`
+
     """
 
     @classmethod
@@ -80,7 +88,7 @@ class FeatureViewSourceProtocol(Protocol):
 
 
         @feature_view
-        class AModel(AmoraModel, table=True):
+        class FeatureViewModel(AmoraModel, table=True):
             ...
             event_timestamp: datetime = Field(sa_column=Column(TIMESTAMP))
         ```

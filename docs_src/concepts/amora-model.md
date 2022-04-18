@@ -7,7 +7,7 @@ the [data materialization](#model-configuration) and an optional transformation 
 ## Data schema
 
 ```Python 
-{% include "../examples/amora_project/models/health.py" %}
+{% include "../../examples/amora_project/models/health.py" %}
 ```
 
 ## Model Configuration
@@ -33,7 +33,7 @@ Tables/views that already exist on the Data Warehouse and shouldn't be managed b
 
 
 ```Python
-{% include "../examples/amora_project/models/health.py" %}
+{% include "../../examples/amora_project/models/health.py" %}
 ```
 
 Source models are models managed outside the scope of Amora, without a `source` implementation and
@@ -44,6 +44,6 @@ and description are optional, and used for documentation purposes only.
 ## Materialized models
 
 ```Python
-{% include "../examples/amora_project/models/steps_agg.py" %}
+{% include "../../examples/amora_project/models/steps_agg.py" %}
 ```
 To-do

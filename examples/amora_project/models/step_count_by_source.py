@@ -7,6 +7,7 @@ from amora.feature_store.decorators import feature_view
 from amora.models import AmoraModel, ModelConfig, MaterializationTypes, select, Field
 from amora.transformations import datetime_trunc_hour
 from amora.types import Compilable
+
 from examples.amora_project.models.steps import Steps
 
 
@@ -15,11 +16,11 @@ class StepCountBySource(AmoraModel, table=True):
     __depends_on__ = [Steps]
     __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
 
-    value_avg: float
-    value_sum: float
-    value_count: float
+    value_avg: float = Field(description="Average step count of the hour")
+    value_sum: float = Field(description="Sum of the step counts of the hour")
+    value_count: float = Field(description="Count of step count samples of the hour")
 
-    source_name: str = Field(primary_key=True)
+    source_name: str = Field(primary_key=True, description="Source of the metric")
     event_timestamp: datetime = Field(primary_key=True, sa_column=Column(TIMESTAMP))
 
     @classmethod

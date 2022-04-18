@@ -346,6 +346,15 @@ app.add_typer(feature_store, name="feature-store")
 
 @feature_store.command(name="plan")
 def feature_store_plan():
+    """
+    Dry-run registering objects to the Feature Registry
+
+    The plan method dry-runs registering one or more definitions (e.g.: Entity, Feature View)
+    and produces a list of all the changes that would be introduced in the Feature Registry
+    by an `amora feature-store apply` execution.
+
+    The changes computed by the `plan` command are informational, and are not actually applied to the registry.
+    """
     from amora.feature_store import fs
     from amora.feature_store.registry import get_repo_contents
 
@@ -360,15 +369,20 @@ def feature_store_plan():
     typer.echo(infra_diff.to_string())
 
 
-@feature_store.command(name="list")
-def feature_store_list():
-    from feast.cli import feature_view_list
-    from amora.feature_store import fs
-    from amora.feature_store.registry import get_repo_contents
-
-    for feature_view in get_repo_contents().feature_views:
-        typer.echo(feature_view)
-        # todo: exibir tabela
+#
+# @feature_store.command(name="list")
+# def feature_store_list():
+#     """
+#     Lists all Amora Feature Views with details about the last materialization, stored
+#     data both on Online Storage and Offline Storage
+#     """
+#     from feast.cli import feature_view_list
+#     from amora.feature_store import fs
+#     from amora.feature_store.registry import get_repo_contents
+#
+#     for feature_view in get_repo_contents().feature_views:
+#         typer.echo(feature_view)
+#         # todo: exibir tabela
 
 
 @feature_store.command(name="apply")

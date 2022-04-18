@@ -25,12 +25,11 @@ markdown_extensions:
 nav:
   - Amora: 'index.md'
   - 🏗 Concepts:
-      - 'models.md'
+      - 'concepts/amora-model.md'
       - Feature Store:
         - 'feature-store/feature-store.md'
         - 'feature-store/feature-view.md'
-        - 'feature-store/feature-service.md'
-        - 'feature-store/feature-view-protocol.md'
+        - Feature View Protocol: 'feature-store/feature-view-protocol.md'
   - 🧑‍🏫 User Guide:
       - 'cli.md'
   - 🎁 Examples: 'examples.md'
