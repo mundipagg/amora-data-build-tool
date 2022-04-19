@@ -2,11 +2,11 @@
 
 `Data Model`
 
-:   A Data model is...
+:   A data model organizes data elements and standardizes how the data elements relate to one another. [1]
 
 `Entity`
 
-:   An entity is...
+:   Entities are used to identify the __primary key__ on which feature values are stored and retrieved.
 
 `Feature`
 
@@ -25,3 +25,6 @@ in the last month.
     - A discrepancy between how you handle data in the training and serving pipelines.
     - A change in the data between when you train and when you serve.
     - A feedback loop between your model and your algorithm.
+
+
+1. https://cedar.princeton.edu/understanding-data/what-data-model 
