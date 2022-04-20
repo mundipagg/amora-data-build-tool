@@ -11,7 +11,7 @@ from sqlalchemy import (
 )
 from sqlmodel.sql.expression import SelectOfScalar
 from amora.config import settings
-from amora.models import select, AmoraModel, Session, Column, Columns
+from amora.models import select, AmoraModel, Session, ColumnElement, Columns
 from amora.storage import local_engine
 from amora.tests.audit import AuditLog
 from amora.types import Compilable
@@ -64,7 +64,7 @@ def _test(statement: Compilable, raise_on_fail: bool = True) -> bool:
 
 
 def that(
-    column: Column,
+    column: ColumnElement,
     test: Test,
     raise_on_fail: bool = True,
     **test_kwargs,
@@ -86,7 +86,7 @@ def that(
     return _test(statement=test(column, **test_kwargs), raise_on_fail=raise_on_fail)
 
 
-def is_not_null(column: Column) -> Compilable:
+def is_not_null(column: ColumnElement) -> Compilable:
     """
     Asserts that the `column` does not contain `null` values
 
@@ -108,7 +108,7 @@ def is_not_null(column: Column) -> Compilable:
     return select(column).where(column == None)
 
 
-def is_unique(column: Column) -> Compilable:
+def is_unique(column: ColumnElement) -> Compilable:
     """
     Assert that the `column` values are unique
 
@@ -134,7 +134,7 @@ def is_unique(column: Column) -> Compilable:
     return select(column).group_by(column).having(func.count(column) > 1)
 
 
-def has_accepted_values(column: Column, values: Iterable) -> Compilable:
+def has_accepted_values(column: ColumnElement, values: Iterable) -> Compilable:
     """
     Assert that the values from the `column` should be one of the provided `values`
 
@@ -156,8 +156,8 @@ def has_accepted_values(column: Column, values: Iterable) -> Compilable:
 
 
 def relationship(
-    from_: Column,
-    to: Column,
+    from_: ColumnElement,
+    to: ColumnElement,
     from_condition=None,
     to_condition=None,
 ) -> bool:
@@ -240,7 +240,7 @@ def relationship(
     return _test(statement=exceptions)
 
 
-def is_numeric(column: Column) -> Compilable:
+def is_numeric(column: ColumnElement) -> Compilable:
     """
     Asserts that each not null value is a number
 
@@ -264,7 +264,7 @@ def is_numeric(column: Column) -> Compilable:
     return select(column).where(func.REGEXP_CONTAINS(column, "[^0-9]"))
 
 
-def is_non_negative(column: Column) -> Compilable:
+def is_non_negative(column: ColumnElement) -> Compilable:
     """
     Asserts that every column value should be >= 0
 
@@ -285,7 +285,7 @@ def is_non_negative(column: Column) -> Compilable:
     return select(column).where(column < 0)
 
 
-def is_a_non_empty_string(column: Column) -> Compilable:
+def is_a_non_empty_string(column: ColumnElement) -> Compilable:
     """
     Asserts that the column isn't an empty string
 
@@ -338,7 +338,7 @@ def expression_is_true(expression, condition=None) -> bool:
 def equality(
     model_a: AmoraModel,
     model_b: AmoraModel,
-    compare_columns: Optional[Iterable[Column]] = None,
+    compare_columns: Optional[Iterable[ColumnElement]] = None,
 ) -> bool:
     """
     This schema test asserts the equality of two models. Optionally specify a subset of columns to compare.
@@ -347,7 +347,7 @@ def equality(
 
     raise NotImplementedError
 
-    def comparable_columns(model: AmoraModel) -> Iterable[Column]:
+    def comparable_columns(model: AmoraModel) -> Iterable[ColumnElement]:
         if not compare_columns:
             return model
         return [getattr(model, column_name) for column_name in compare_columns]
@@ -364,7 +364,7 @@ def equality(
     return _test(statement=diff_union)
 
 
-def has_at_least_one_not_null_value(column: Column) -> Compilable:
+def has_at_least_one_not_null_value(column: ColumnElement) -> Compilable:
     """
     Asserts if column has at least one value.
 
@@ -388,7 +388,7 @@ def has_at_least_one_not_null_value(column: Column) -> Compilable:
     return select(func.count(column, type_=Integer)).having(func.count(column) == 0)
 
 
-def are_unique_together(columns: Iterable[Column]) -> Compilable:
+def are_unique_together(columns: Iterable[ColumnElement]) -> Compilable:
     """
     This test confirms that the combination of columns is unique.
     For example, the combination of month and product is unique,
