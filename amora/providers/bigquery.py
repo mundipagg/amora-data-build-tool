@@ -15,7 +15,7 @@ from google.cloud.bigquery import (
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
 from sqlalchemy import (
     literal,
-    literal_column
+    literal_column,
     Integer,
     String,
     DateTime,
