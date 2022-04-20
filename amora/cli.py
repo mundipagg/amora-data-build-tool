@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+
 import pytest
 import typer
 from dataclasses import dataclass
@@ -336,6 +338,117 @@ def models_import(
         bold=True,
     )
     typer.secho(f"Current File Path: `{destination_file_path.as_posix()}`")
+
+
+feature_store = typer.Typer()
+app.add_typer(feature_store, name="feature-store")
+
+
+@feature_store.command(name="plan")
+def feature_store_plan():
+    """
+    Dry-run registering objects to the Feature Registry
+
+    The plan method dry-runs registering one or more definitions (e.g.: Entity, Feature View)
+    and produces a list of all the changes that would be introduced in the Feature Registry
+    by an `amora feature-store apply` execution.
+
+    The changes computed by the `plan` command are informational, and are not actually applied to the registry.
+    """
+    from amora.feature_store import fs
+    from amora.feature_store.registry import get_repo_contents
+
+    registry_diff, infra_diff, infra = fs._plan(
+        desired_repo_contents=get_repo_contents()
+    )
+
+    typer.echo("Amora: Feature Store :: Registry diff")
+    typer.echo(registry_diff.to_string())
+
+    typer.echo("Amora: Feature Store :: Infrastructure diff")
+    typer.echo(infra_diff.to_string())
+
+
+#
+# @feature_store.command(name="list")
+# def feature_store_list():
+#     """
+#     Lists all Amora Feature Views with details about the last materialization, stored
+#     data both on Online Storage and Offline Storage
+#     """
+#     from feast.cli import feature_view_list
+#     from amora.feature_store import fs
+#     from amora.feature_store.registry import get_repo_contents
+#
+#     for feature_view in get_repo_contents().feature_views:
+#         typer.echo(feature_view)
+#         # todo: exibir tabela
+
+
+@feature_store.command(name="apply")
+def feature_store_apply():
+    """
+    1. Scans Python files in your amora project and find all models defined as
+    feature views.
+
+    2. Validate your feature definitions
+
+    3. Sync the metadata about feature store objects to the feature registry.
+    If a registry does not exist, then it will be instantiated.
+    The standard registry is a simple protobuf binary file
+    that is stored on disk (locally or in an object store).
+
+    4. Create all necessary feature store infrastructure.
+    The exact infrastructure that is deployed or configured depends
+    on the provider configuration. For example, setting local as
+    your provider will result in a sqlite online store being created.
+    """
+    from amora.feature_store.registry import get_repo_contents
+    from feast.repo_operations import apply_total_with_repo_instance
+    from amora.feature_store import fs
+
+    apply_total_with_repo_instance(
+        store=fs,
+        project=fs.project,
+        registry=fs.registry,
+        repo=get_repo_contents(),
+        skip_source_validation=False,
+    )
+
+
+@feature_store.command(name="materialize")
+def feature_store_materialize(
+    start_ts: str = typer.Argument(
+        None, help="Start timestamp on ISO 8601 format. E.g.: '2022-01-01T01:00:00'"
+    ),
+    end_ts: str = typer.Argument(
+        None, help="End timestamp on ISO 8601 format. E.g.: '2022-01-02T01:00:00'"
+    ),
+    models: Optional[Models] = models_option,
+):
+    """
+    Run a (non-incremental) materialization job to ingest data into the online
+    store. All data between `start_ts` and `end_ts` will be read from the offline
+    store and written into the online store. If you don't specify feature view
+    names using `--models`, all registered Feature Views will be materialized.
+    """
+    from amora.feature_store import fs
+    from amora.feature_store.registry import get_repo_contents
+
+    repo_contents = get_repo_contents()
+
+    if models:
+        views_to_materialize = [
+            fv.name for fv in repo_contents.feature_views if fv.name in models
+        ]
+    else:
+        views_to_materialize = [fv.name for fv in repo_contents.feature_views]
+
+    fs.materialize(
+        feature_views=views_to_materialize,
+        start_date=datetime.fromisoformat(start_ts),
+        end_date=datetime.fromisoformat(end_ts),
+    )
 
 
 def main():

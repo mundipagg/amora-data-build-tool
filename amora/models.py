@@ -68,11 +68,6 @@ class ModelConfig:
     labels: Dict[str, str] = field(default_factory=dict)
 
 
-# todo: Como defino "Objeto que tenha 2 atributos: `source` e `output`" ?
-def is_py_model(obj) -> bool:
-    return hasattr(obj, "source") and hasattr(obj, "output")
-
-
 metadata = MetaData(schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}")
 
 

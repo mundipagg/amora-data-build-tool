@@ -145,6 +145,7 @@ dbt/logs/
 
 # amora
 amora/target/**/*.sql
+examples/amora_project/**/*.sql
 tests/target/**/*.sql
 
 # Google Cloud

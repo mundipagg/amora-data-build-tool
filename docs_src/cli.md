@@ -38,7 +38,9 @@ Commands:
 
 ::: amora.cli.test
 
-## amora models list
+## amora models
+
+### amora models list
 
 ::: amora.cli.models_list
 
@@ -111,6 +113,19 @@ $ amora models list --format json
 
 ```
 
-## amora models import
-
+### amora models import
 ::: amora.cli.models_import
+
+## amora feature-store 
+
+!!! info
+    Requires the `feature-store` package extra
+
+### amora feature-store plan
+::: amora.cli.feature_store_plan
+
+### amora feature-store apply
+::: amora.cli.feature_store_apply
+
+### amora feature-store materialize
+::: amora.cli.feature_store_materialize

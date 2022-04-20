@@ -5,7 +5,9 @@ site_description: transform data on the data warehouse (BigQuery) by writing Amo
 repo_url: https://github.com/mundipagg/amora-data-build-tool
 repo_name: amora-data-build-tool
 markdown_extensions:
+  - abbr
   - admonition
+  - def_list
   - toc:
       permalink: true
   - tables
@@ -15,22 +17,26 @@ markdown_extensions:
       guess_lang: false
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_div_format
+          format: !!python/name:pymdownx.superfences.fence_code_format
 nav:
   - Amora: 'index.md'
-  - Features: 'features.md'
-  - Tutorial - User Guide:
-      - 'models.md'
+  - 🏗 Concepts:
+      - 'concepts/amora-model.md'
+      - Feature Store:
+        - 'feature-store/feature-store.md'
+        - 'feature-store/feature-view.md'
+        - Feature View Protocol: 'feature-store/feature-view-protocol.md'
+  - 🧑‍🏫 User Guide:
       - 'cli.md'
-  - Examples: 'examples.md'
-  - API Reference: ''
-  - Testing:
+  - 🎁 Examples: 'examples.md'
+  - ⚙️ API Reference: ''
+  - 🧪 Testing:
       - 'tests/assertions.md'
+  -  🔖 Glossary: 'glossary.md'
 plugins:
   - autorefs
   - include-markdown

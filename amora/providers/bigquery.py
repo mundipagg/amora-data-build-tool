@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime, date, time
+from enum import Enum
 from typing import Optional, List, Union, Iterable, Any, Dict
 
 import sqlalchemy
@@ -14,6 +15,7 @@ from google.cloud.bigquery import (
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
 from sqlalchemy import (
     literal,
+    literal_column
     Integer,
     String,
     DateTime,
@@ -70,6 +72,21 @@ SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES = {
     JSON: "JSON",
     TIMESTAMP: "TIMESTAMP",
 }
+
+
+class TimePart(Enum):
+    """
+    Since BigQuery represents time parts as an unquoted value,
+    we need to use `literal_column`
+
+    More on: https://cloud.google.com/bigquery/docs/reference/standard-sql/time_functions#time_trunc
+    """
+
+    MICROSECOND = literal_column("MICROSECOND")
+    MILLISECOND = literal_column("MILLISECOND")
+    SECOND = literal_column("SECOND")
+    MINUTE = literal_column("MINUTE")
+    HOUR = literal_column("HOUR")
 
 
 @dataclass
