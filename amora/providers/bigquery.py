@@ -13,9 +13,22 @@ from google.cloud.bigquery import (
     TableReference,
 )
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
-from sqlalchemy import literal, literal_column
+from sqlalchemy import (
+    literal,
+    literal_column,
+    Integer,
+    String,
+    DateTime,
+    Date,
+    Time,
+    Float,
+    Boolean,
+    JSON,
+    TIMESTAMP,
+)
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery.base import unnest
+from sqlmodel import AutoString
 
 from amora.compilation import compile_statement
 from amora.config import settings
@@ -45,6 +58,19 @@ BIGQUERY_TYPES_TO_PYTHON_TYPES = {
     "STRING": str,
     "TIME": time,
     "TIMESTAMP": datetime,
+}
+
+SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES = {
+    Integer: "INTEGER",
+    String: "STRING",
+    AutoString: "STRING",
+    DateTime: "DATETIME",
+    Date: "DATE",
+    Time: "TIME",
+    Float: "FLOAT",
+    Boolean: "BOOLEAN",
+    JSON: "JSON",
+    TIMESTAMP: "TIMESTAMP",
 }
 
 
@@ -104,9 +130,43 @@ def get_fully_qualified_id(model: Model) -> str:
 
 
 def get_schema(table_id: str) -> Schema:
+    """
+    Given a `table_id`, returns the `Schema` of the table by querying BigQueries API
+    """
     client = get_client()
     table = client.get_table(table_id)
     return table.schema
+
+
+def get_schema_for_model(model: Model) -> Schema:
+    """
+    Given an `AmoraModel`, returns the equivalent bigquery `Schema`
+    of the model by parsing the model SQLAlchemy column schema
+    """
+    columns = model.__table__.columns
+    return [
+        SchemaField(
+            name=col.name,
+            field_type=SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[col.type.__class__],
+        )
+        for col in columns
+    ]
+
+
+def get_schema_for_source(model: Model) -> Optional[Schema]:
+    """
+    Give an `Amora Model`, returns the bigquery `Schema` of its
+    `source` classmethod query result
+    """
+    source = model.source()
+    if source is None:
+        return None
+
+    result = dry_run(model)
+    if result is None:
+        return None
+
+    return result.schema
 
 
 def run(statement: Compilable) -> RunResult:

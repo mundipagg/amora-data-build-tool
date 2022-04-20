@@ -6,13 +6,13 @@ from amora.models import AmoraModel
 
 
 class Health(AmoraModel, table=True):
-    id: int = Field(primary_key=True)
-    type: str
-    sourceName: str
-    sourceVersion: str
-    unit: str
-    creationDate: datetime
-    startDate: datetime
-    endDate: datetime
-    value: float
-    device: str
+    creationDate: datetime = Field(description="Data de inserção dos dados")
+    device: str = Field(description="Dispositivo de origem dos dados")
+    endDate: datetime = Field(description="Data do fim da medida")
+    id: int = Field(primary_key=True, description="Identificador único da medida")
+    sourceName: str = Field(description="Origem dos dados")
+    sourceVersion: str = Field(description="Versão da origem de dados")
+    startDate: datetime = Field(description="Data do início da medida")
+    type: str = Field(description="Tipo da métrica coletada")
+    unit: str = Field(description="Unidade de medida")
+    value: float = Field(description="Valor observado")
