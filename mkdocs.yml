@@ -26,6 +26,7 @@ nav:
   - Amora: 'index.md'
   - 🏗 Concepts:
       - 'concepts/amora-model.md'
+      - 'concepts/amora-views.md'
       - 'concepts/data-question.md'
       - Feature Store:
         - 'feature-store/feature-store.md'

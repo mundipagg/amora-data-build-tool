@@ -5,15 +5,10 @@ import pandas as pd
 
 from amora.compilation import compile_statement
 from amora.providers.bigquery import run
+from amora.types import Compilable
+from amora.views import View, ViewConfig, ViewKind
 
-
-class RenderTypes:
-    big_number = "big_number"
-    bar_chart = "bar_chart"
-    column_chart = "column_chart"
-    line_chart = "line_chart"
-    table = "table"
-    pie_chart = "pie_chart"
+QuestionFunc = Callable[[], Compilable]
 
 
 class Question:
@@ -44,13 +39,11 @@ class Question:
         result = run(self.__question_func())
         return result.rows.to_dataframe()
 
-    def render(self):
+    def render(self) -> View:
         """
-
-        :return:
+        Renders the visual representation of the question's answer
         """
-        df = self.answer_df()
-        return str(df)
+        return View(data=self.answer_df(), config=ViewConfig(kind=ViewKind.table))
 
     def __str__(self):
         return f"""
@@ -62,10 +55,11 @@ class Question:
 
 ### Answer
 
-```
 {self.render()}
-```
 """
+
+    def __repr__(self):
+        return str(str)
 
 
 QUESTIONS: List[Question] = []
