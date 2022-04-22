@@ -64,16 +64,13 @@ class Question:
     |  0 | Diogo iPhone  |
     |  1 | Mi Fit        |
     |  2 | iPhone        |
-
-
-
     """
 
     def __init__(self, question_func: QuestionFunc):
-        self.__question_func = question_func
+        self.question_func = question_func
 
     def __call__(self, *args, **kwargs):
-        return self.__question_func(*args, **kwargs)
+        return self.question_func(*args, **kwargs)
 
     @property
     def name(self) -> str:
@@ -100,10 +97,10 @@ class Question:
         "What is the answer to the Ultimate Question of Life, the Universe, and Everything?"
         ```
         """
-        if self.__question_func.__doc__:
-            return self.__question_func.__doc__.strip()
+        if self.question_func.__doc__:
+            return self.question_func.__doc__.strip()
         else:
-            question = self.__question_func.__name__.replace("_", " ")
+            question = self.question_func.__name__.replace("_", " ")
             return question.capitalize() + "?"
 
     @property
@@ -116,7 +113,7 @@ class Question:
         FROM `amora-data-build-tool.amora`.`step_count_by_source`
         ```
         """
-        stmt = self.__question_func()
+        stmt = self.question_func()
         return compile_statement(stmt)
 
     def answer_df(self) -> pd.DataFrame:
@@ -150,14 +147,16 @@ class Question:
         ```
 
         """
-        result = run(self.__question_func())
+        result = run(self.question_func())
         return result.rows.to_dataframe()
 
     def render(self) -> View:
         """
         Renders the visual representation of the question's answer
         """
-        return View(data=self.answer_df(), config=ViewConfig(kind=ViewKind.table))
+        return View(
+            data=self.answer_df(), config=ViewConfig(config={}, kind=ViewKind.table)
+        )
 
     def __str__(self):
         return f"""
@@ -173,7 +172,13 @@ class Question:
 """
 
     def __repr__(self):
-        return str(str)
+        return str(self)
+
+    def __eq__(self, other):
+        if not isinstance(other, Question):
+            return False
+
+        return self.question_func == other.question_func
 
 
 QUESTIONS: List[Question] = []
@@ -186,4 +191,4 @@ def question(question_func: Callable):
 
     QUESTIONS.append(Question(question_func))
 
-    return wrapper
+    return Question(wrapper)
