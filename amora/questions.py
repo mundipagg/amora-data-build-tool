@@ -30,15 +30,13 @@ class Question:
     @question
     def what_are_the_available_data_sources():
         return select(StepCountBySource.source_name).distinct()
-
-    q = Question(what_are_the_available_data_sources)
     ```
 
     ### Query
     The query is accessible through the `sql` property:
 
     ```python
-    q.sql
+    what_are_the_available_data_sources.sql
     ```
 
     ```sql
@@ -49,14 +47,21 @@ class Question:
     ### Results
 
     ```python
-    q.answer_df()
+    what_are_the_available_data_sources.answer_df()
+    ```
+
+    ```
+        source_name
+    0  Diogo iPhone
+    1        Mi Fit
+    2        iPhone
     ```
 
     ### Visualization
 
 
     ```python
-    q.render()
+    what_are_the_available_data_sources.render()
     ```
 
     |    | source_name   |
@@ -82,7 +87,7 @@ class Question:
         def what_is_the_most_active_user():
             ...
 
-        >>> Question(what_is_the_most_active_user).name
+        >>> what_is_the_most_active_user.name
         "What is the most active user?"
 
 
@@ -93,7 +98,7 @@ class Question:
             \"""
             return select(literal(42))
 
-        >>> Question(question_2).name
+        >>> question_2.name
         "What is the answer to the Ultimate Question of Life, the Universe, and Everything?"
         ```
         """
@@ -119,24 +124,10 @@ class Question:
     def answer_df(self) -> pd.DataFrame:
         """
         Executes the question against the target database,
-        returning a `pandas.DataFrame` as the answer
+        returning a `pandas.DataFrame` as the answer.
 
         ```python
-        Question(what_is_the_current_estimated_walked_distance).sql
-        ```
-
-        ```
-        SELECT
-          sum(`step_count_by_source`.`value_sum`) * 79 AS `total_in_centimeters`,
-          (sum(`step_count_by_source`.`value_sum`) * 79) / 100 AS `total_in_meters`,
-          (sum(`step_count_by_source`.`value_sum`) * 79) / 100000 AS `total_in_kilometers`,
-          `step_count_by_source`.`source_name`
-        FROM `amora-data-build-tool.amora`.`step_count_by_source`
-        GROUP BY `step_count_by_source`.`source_name`
-        ```
-
-        ```python
-        Question(what_is_the_current_estimated_walked_distance).answer_df()
+        what_is_the_current_estimated_walked_distance.answer_df()
         ```
 
         ```
@@ -145,7 +136,6 @@ class Question:
         1           112413129.0       1124131.29           1124.13129        Mi Fit
         2            11644600.0        116446.00            116.44600        iPhone
         ```
-
         """
         result = run(self.question_func())
         return result.rows.to_dataframe()
