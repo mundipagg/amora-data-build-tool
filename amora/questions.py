@@ -71,8 +71,16 @@ class Question:
     |  2 | iPhone        |
     """
 
-    def __init__(self, question_func: QuestionFunc):
+    def __init__(self, question_func: QuestionFunc, view_config: ViewConfig = None):
+        if isinstance(question_func, Question):
+            question_func = question_func.question_func
+
         self.question_func = question_func
+
+        if view_config is None:
+            self.view_config = ViewConfig(kind=ViewKind.table, title=self.name)
+        else:
+            self.view_config = view_config
 
     def __call__(self, *args, **kwargs):
         return self.question_func(*args, **kwargs)
@@ -104,6 +112,8 @@ class Question:
         """
         if self.question_func.__doc__:
             return self.question_func.__doc__.strip()
+        elif self.question_func.__name__ == "<lambda>":
+            raise NotImplementedError
         else:
             question = self.question_func.__name__.replace("_", " ")
             return question.capitalize() + "?"
@@ -144,25 +154,26 @@ class Question:
         """
         Renders the visual representation of the question's answer
         """
-        return View(
-            data=self.answer_df(), config=ViewConfig(config={}, kind=ViewKind.table)
-        )
+        return View(data=self.answer_df(), config=self.view_config)
 
-    def __str__(self):
+    def to_markdown(self) -> str:
         return f"""
-## {self.name}
+            ## {self.name}
+            
+            ```sql
+            {self.sql}
+            ```
+            
+            ### Answer
+            
+            {self.answer_df().to_markdown()}
+        """
 
-```sql
-{self.sql}
-```
-
-### Answer
-
-{self.render()}
-"""
+    def _repr_markdown_(self):
+        return self.to_markdown()
 
     def __repr__(self):
-        return str(self)
+        return self._repr_markdown_()
 
     def __eq__(self, other):
         if not isinstance(other, Question):
