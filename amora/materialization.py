@@ -1,12 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Optional
 
-import matplotlib.pyplot as plt
-import networkx as nx
-from google.cloud.bigquery import Client, QueryJobConfig, Table
+from google.cloud.bigquery import Table, Client, QueryJobConfig
 
-from amora.config import settings
 from amora.models import MaterializationTypes, Model, amora_model_for_target_path
 
 
@@ -26,37 +23,6 @@ class Task:
 
     def __repr__(self):
         return f"{self.model.__name__} -> {self.sql_stmt}"
-
-
-class DependencyDAG(nx.DiGraph):
-    def __iter__(self):
-        # todo: validar se podemos substituir por graphlib
-        return nx.topological_sort(self)
-
-    @classmethod
-    def from_tasks(cls, tasks: Iterable[Task]) -> "DependencyDAG":
-        dag = cls()
-
-        for task in tasks:
-            dag.add_node(task.model.unique_name)
-            for dependency in getattr(task.model, "__depends_on__", []):
-                dag.add_edge(dependency.unique_name, task.model.unique_name)
-
-        return dag
-
-    def draw(self) -> None:
-        plt.figure(1, figsize=settings.CLI_MATERIALIZATION_DAG_FIGURE_SIZE)
-        nx.draw(
-            self,
-            with_labels=True,
-            font_weight="bold",
-            font_size="12",
-            linewidths=4,
-            node_size=150,
-            node_color="white",
-            font_color="green",
-        )
-        plt.show()
 
 
 def materialize(sql: str, model: Model) -> Optional[Table]:
