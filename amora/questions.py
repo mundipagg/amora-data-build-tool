@@ -175,10 +175,7 @@ QUESTIONS: List[Question] = []
 
 
 def question(question_func: Callable):
-    @wraps(question_func)
-    def wrapper(*args, **kwargs):
-        return question_func(*args, **kwargs)
+    q = Question(question_func)
+    QUESTIONS.append(q)
 
-    QUESTIONS.append(Question(question_func))
-
-    return Question(wrapper)
+    return q
