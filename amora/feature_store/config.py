@@ -39,6 +39,10 @@ class FeatureStoreSettings(BaseSettings):
     }
     DEFAULT_FEATURE_TTL_IN_SECONDS: int = 3600
 
+    HTTP_SERVER_HOST: str = "0.0.0.0"
+    HTTP_SERVER_PORT: int = 8666
+    HTTP_ACCESS_LOG_ENABLED: bool = False
+
     class Config:
         env_prefix = "AMORA_FEATURE_STORE_"
 
