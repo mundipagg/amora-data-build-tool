@@ -1,9 +1,9 @@
 from amora.tests.assertions import (
+    are_unique_together,
     expression_is_true,
+    has_at_least_one_not_null_value,
     is_non_negative,
     that,
-    are_unique_together,
-    has_at_least_one_not_null_value,
 )
 from examples.amora_project.models.heart_agg import HeartRateAgg
 

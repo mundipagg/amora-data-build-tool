@@ -2,11 +2,10 @@ import itertools
 from typing import List
 
 import pytest
-from amora.utils import clean_compiled_files, list_target_files
 from typer.testing import CliRunner
 
 from amora.cli import app
-
+from amora.utils import clean_compiled_files, list_target_files
 
 runner = CliRunner()
 

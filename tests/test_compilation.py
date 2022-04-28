@@ -2,11 +2,11 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import pytest
-from sqlalchemy import func, String, Integer
+from sqlalchemy import Integer, String, func
 from sqlalchemy_bigquery.base import BQArray
 
 from amora.compilation import compile_statement
-from amora.models import AmoraModel, select, amora_model_for_path
+from amora.models import AmoraModel, amora_model_for_path, select
 
 
 def test_amora_model_for_path_with_invalid_file_path_type():

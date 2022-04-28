@@ -1,20 +1,19 @@
 import os
 from datetime import datetime
-from typing import Optional, Iterable
+from typing import Iterable, Optional
 
 from sqlalchemy import func
 
+from amora.config import settings as default_settings
 from amora.models import (
     AmoraModel,
     Field,
-    MetaData,
-    select,
-    ModelConfig,
     MaterializationTypes,
+    ModelConfig,
     Session,
+    select,
 )
 from amora.storage import local_engine, local_metadata
-from amora.config import settings
 from amora.types import Compilable
 from amora.version import VERSION
 
@@ -56,7 +55,7 @@ class AuditLog(AmoraModel, table=True):
     )
     settings: str = Field(
         description="JSON encoded current`amora.config.settings`",
-        default=settings.json(),
+        default=default_settings.json(),
     )
     amora_version: str = Field(
         description="Current version of the amora package", default=VERSION

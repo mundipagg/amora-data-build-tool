@@ -1,8 +1,9 @@
 from datetime import datetime
-from unittest.mock import patch, MagicMock, Mock
+from unittest.mock import MagicMock, Mock, patch
 
 from feast import FeatureStore
 from typer.testing import CliRunner
+
 from amora.cli import app
 
 runner = CliRunner()

@@ -1,4 +1,4 @@
-from datetime import datetime, date, time
+from datetime import date, datetime, time
 from typing import Optional
 
 import pytest
@@ -9,19 +9,20 @@ from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.selectable import CTE
 
 from amora.compilation import compile_statement
+from amora.config import settings
 from amora.models import AmoraModel, Field
 from amora.providers.bigquery import (
+    DryRunResult,
     cte_from_rows,
+    dry_run,
     estimated_query_cost_in_usd,
     estimated_storage_cost_in_usd,
-    dry_run,
-    DryRunResult,
     get_fully_qualified_id,
     get_schema_for_model,
     get_schema_for_source,
 )
-from amora.config import settings
 from amora.types import Compilable
+
 from tests.models.health import Health
 from tests.models.heart_rate import HeartRate
 from tests.models.heart_rate_over_100 import HeartRateOver100

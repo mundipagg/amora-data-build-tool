@@ -1,7 +1,7 @@
-from sqlalchemy import func, String, DateTime, Time, Date
-from amora.models import ColumnElement
+from sqlalchemy import Date, DateTime, String, Time, func
 from sqlalchemy.sql.functions import Function
 
+from amora.models import ColumnElement
 from amora.providers.bigquery import TimePart
 
 

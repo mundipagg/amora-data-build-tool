@@ -1,5 +1,6 @@
-from typing import Dict, Iterable, Tuple, List
-from feast import FeatureView, Entity, FeatureService
+from typing import Dict, Iterable, List, Tuple
+
+from feast import Entity, FeatureService, FeatureView
 from feast.repo_contents import RepoContents
 from sqlalchemy.orm import InstrumentedAttribute
 

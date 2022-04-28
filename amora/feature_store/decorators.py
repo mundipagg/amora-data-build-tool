@@ -1,5 +1,6 @@
 from feast import FeatureService
-from amora.feature_store.feature_view import feature_view_for_model, name_for_model
+
+from amora.feature_store.feature_view import feature_view_for_model
 from amora.feature_store.registry import FEATURE_REGISTRY
 from amora.models import Model
 

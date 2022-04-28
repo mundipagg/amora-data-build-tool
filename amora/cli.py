@@ -1,33 +1,29 @@
 import json
+from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
+from typing import List, Optional
 
 import pytest
 import typer
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Optional, List
 from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
-from amora.config import settings
-from amora.models import (
-    AmoraModel,
-    list_models,
-    Model,
-)
-from amora.utils import list_target_files
-from amora.compilation import compile_statement
 from amora import materialization
+from amora.compilation import compile_statement
+from amora.config import settings
+from amora.models import Model, list_models
 from amora.providers.bigquery import (
-    dry_run,
-    get_schema,
     BIGQUERY_TYPES_TO_PYTHON_TYPES,
     DryRunResult,
+    dry_run,
     estimated_query_cost_in_usd,
     estimated_storage_cost_in_usd,
+    get_schema,
 )
+from amora.utils import list_target_files
 
 app = typer.Typer(
     help="Amora Data Build Tool enables engineers to transform data in their warehouses "
@@ -187,7 +183,7 @@ def models_list(
         @property
         def depends_on(self) -> List[str]:
             return sorted(
-                [dependency.__name__ for dependency in self.model.dependencies()]
+                dependency.__name__ for dependency in self.model.dependencies()
             )
 
         @property
@@ -305,7 +301,7 @@ def models_import(
     template = env.get_template("new-model.py.jinja2")
 
     project, dataset, table = table_reference.split(".")
-    model_name = "".join((part.title() for part in table.split("_")))
+    model_name = "".join(part.title() for part in table.split("_"))
 
     destination_file_path = Path(settings.MODELS_PATH).joinpath(
         (model_file_path or model_name.replace(".", "/")) + ".py"
@@ -403,9 +399,10 @@ def feature_store_apply():
     on the provider configuration. For example, setting local as
     your provider will result in a sqlite online store being created.
     """
-    from amora.feature_store.registry import get_repo_contents
     from feast.repo_operations import apply_total_with_repo_instance
+
     from amora.feature_store import fs
+    from amora.feature_store.registry import get_repo_contents
 
     apply_total_with_repo_instance(
         store=fs,
@@ -461,10 +458,11 @@ def feature_store_serve():
         POST /get-online-features
         GET /list-feature-views
     """
+    import uvicorn
     from feast.feature_server import get_app
+
     from amora.feature_store import fs
     from amora.feature_store.config import settings
-    import uvicorn
 
     app = get_app(store=fs)
 

@@ -2,16 +2,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Optional
 
-from google.cloud.bigquery import Table, Client, QueryJobConfig
 import matplotlib.pyplot as plt
 import networkx as nx
+from google.cloud.bigquery import Client, QueryJobConfig, Table
 
 from amora.config import settings
-from amora.models import (
-    MaterializationTypes,
-    amora_model_for_target_path,
-    Model,
-)
+from amora.models import MaterializationTypes, Model, amora_model_for_target_path
 
 
 @dataclass

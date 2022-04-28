@@ -5,11 +5,11 @@ from sqlalchemy import TIMESTAMP
 
 from amora.models import (
     AmoraModel,
-    select,
+    Column,
+    Field,
     MaterializationTypes,
     ModelConfig,
-    Field,
-    Column,
+    select,
 )
 from amora.types import Compilable
 from examples.amora_project.models.heart_rate import HeartRate

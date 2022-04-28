@@ -1,6 +1,7 @@
 import inspect
 
 from amora.compilation import compile_statement
+
 from tests.models.health import Health
 from tests.models.steps import Steps
 

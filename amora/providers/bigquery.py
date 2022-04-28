@@ -1,7 +1,7 @@
-from dataclasses import dataclass, field
-from datetime import datetime, date, time
+from dataclasses import dataclass
+from datetime import date, datetime, time
 from enum import Enum
-from typing import Optional, List, Union, Iterable, Any, Dict
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 import sqlalchemy
 from google.api_core.client_info import ClientInfo
@@ -14,17 +14,17 @@ from google.cloud.bigquery import (
 )
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
 from sqlalchemy import (
-    literal,
-    literal_column,
-    Integer,
-    String,
-    DateTime,
-    Date,
-    Time,
-    Float,
-    Boolean,
     JSON,
     TIMESTAMP,
+    Boolean,
+    Date,
+    DateTime,
+    Float,
+    Integer,
+    String,
+    Time,
+    literal,
+    literal_column,
 )
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery.base import unnest

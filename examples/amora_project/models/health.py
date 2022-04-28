@@ -1,9 +1,9 @@
 from datetime import datetime
 
 from sqlalchemy import TIMESTAMP
-
-from amora.models import AmoraModel, ModelConfig, MaterializationTypes, Column
 from sqlmodel import Field
+
+from amora.models import AmoraModel, Column, MaterializationTypes, ModelConfig
 
 
 class Health(AmoraModel, table=True):

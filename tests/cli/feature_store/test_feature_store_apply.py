@@ -1,7 +1,8 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from feast import FeatureStore
 from typer.testing import CliRunner
+
 from amora.cli import app
 
 runner = CliRunner()

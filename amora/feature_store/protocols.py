@@ -1,4 +1,4 @@
-from typing import Protocol, runtime_checkable, List
+from typing import List, Protocol, runtime_checkable
 
 from amora.models import Column
 
@@ -61,10 +61,7 @@ class FeatureViewSourceProtocol(Protocol):
         ```python
         @classmethod
         def feature_view_features(cls) -> List[Column]:
-            return [
-                cls.count_transactions_last_30d,
-                cls.sum_transactions_last_30d
-            ]
+            return [cls.count_transactions_last_30d, cls.sum_transactions_last_30d]
         ```
         """
         ...
@@ -83,7 +80,8 @@ class FeatureViewSourceProtocol(Protocol):
         At your Amora Model, the column should be defined as such:
 
         ```python
-        from sqlalchemy import Column, TIMESTAMP
+        from sqlalchemy import TIMESTAMP, Column
+
         from amora.models import AmoraModel, Field
 
 

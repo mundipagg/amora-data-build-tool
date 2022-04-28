@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Union, Iterable
+from typing import Iterable, Union
 
 from amora.config import settings
 
