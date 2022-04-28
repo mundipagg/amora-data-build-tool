@@ -1,11 +1,12 @@
 from datetime import datetime
 
 import pytest
-from feast import Feature, ValueType, FeatureView, Entity
+from feast import Feature, ValueType, FeatureView, Entity, FeatureService
 from amora.feature_store import registry
 from amora.feature_store.decorators import feature_view
 from amora.feature_store.feature_view import name_for_model
 from amora.models import AmoraModel, Field
+from tests.models.step_count_by_source import StepCountBySource
 
 
 def test_get_repo_contents():
@@ -55,3 +56,14 @@ def test_get_repo_contents_with_multiple_calls():
     pytest.fail(
         f"{expected_fv_name} not found in Feast's RepoContents. Repo feature views: {repo_contents.feature_views}"
     )
+
+
+def test_get_feature_service():
+    feature_service = registry.get_feature_service(StepCountBySource)
+
+    assert isinstance(feature_service, FeatureService)
+    assert feature_service.name == "amora_fs__step_count_by_source"
+    assert len(feature_service.feature_view_projections) == 1
+
+    feature_view_projection = feature_service.feature_view_projections[0]
+    assert feature_view_projection.name == StepCountBySource.__tablename__
