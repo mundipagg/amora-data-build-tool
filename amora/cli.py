@@ -451,6 +451,43 @@ def feature_store_materialize(
     )
 
 
+@feature_store.command(name="serve")
+def feature_store_serve():
+    """
+    Starts the feature server HTTP app.
+
+    Routes:
+
+        POST /get-online-features
+        GET /list-feature-views
+    """
+    from feast.feature_server import get_app
+    from amora.feature_store import fs
+    from amora.feature_store.config import settings
+    import uvicorn
+
+    app = get_app(store=fs)
+
+    @app.get("/list-feature-views")
+    def list_feature_views():
+        fvs = fs.list_feature_views()
+        return [
+            {
+                "name": fv.name,
+                "features": [f"{fv.name}:{feature.name}" for feature in fv.features],
+                "entities": fv.entities,
+            }
+            for fv in fvs
+        ]
+
+    uvicorn.run(
+        app,
+        host=settings.HTTP_SERVER_HOST,
+        port=settings.HTTP_SERVER_PORT,
+        access_log=settings.HTTP_ACCESS_LOG_ENABLED,
+    )
+
+
 def main():
     return app()
 
