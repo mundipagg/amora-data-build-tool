@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pytest
-from feast import FeatureView, Feature, ValueType
+from feast import Feature, FeatureView, ValueType
 
 from amora.feature_store.decorators import feature_view
 from amora.feature_store.feature_view import name_for_model

@@ -1,14 +1,10 @@
 from datetime import datetime
 
-from sqlmodel import select, Field
+from sqlmodel import Field, select
 
+from amora.models import AmoraModel, MaterializationTypes, ModelConfig, PartitionConfig
 from amora.types import Compilable
-from amora.models import (
-    ModelConfig,
-    PartitionConfig,
-    AmoraModel,
-    MaterializationTypes,
-)
+
 from tests.models.health import Health
 
 

@@ -1,4 +1,4 @@
-from feast import RepoConfig, FeatureStore
+from feast import FeatureStore, RepoConfig
 
 from amora.feature_store.config import settings
 

@@ -1,14 +1,11 @@
-from typing import Union, NewType
-
-from feast import FeatureView, Feature, BigQuerySource
-from sqlalchemy.orm import DeclarativeMeta
+from feast import BigQuerySource, Feature, FeatureView
+from google.protobuf.duration_pb2 import Duration
 
 from amora.feature_store import settings
 from amora.feature_store.protocols import FeatureViewSourceProtocol
 from amora.feature_store.type_mapping import SQLALCHEMY_TYPES_TO_FS_TYPES
 from amora.models import Model
 from amora.providers.bigquery import get_fully_qualified_id
-from google.protobuf.duration_pb2 import Duration
 
 
 def name_for_model(model: Model) -> str:

@@ -1,18 +1,18 @@
 from datetime import datetime
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
-from amora.utils import clean_compiled_files
-from amora.materialization import Task, DependencyDAG, materialize
+from amora.config import settings
+from amora.materialization import DependencyDAG, Task, materialize
 from amora.models import (
     AmoraModel,
+    Field,
+    MaterializationTypes,
     ModelConfig,
     PartitionConfig,
-    MaterializationTypes,
-    Field,
 )
-from amora.config import settings
 from amora.providers.bigquery import Client, QueryJobConfig, Table
+from amora.utils import clean_compiled_files
 
 from tests.models.heart_agg import HeartRateAgg
 from tests.models.heart_rate import HeartRate

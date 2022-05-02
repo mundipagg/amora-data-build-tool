@@ -1,7 +1,7 @@
 """
 Tests that can be reused by multiple projects
 """
-from amora.models import list_models, MaterializationTypes
+from amora.models import MaterializationTypes, list_models
 from amora.providers.bigquery import (
     get_schema,
     get_schema_for_model,

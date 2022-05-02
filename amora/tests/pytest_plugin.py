@@ -1,4 +1,5 @@
 from typing import Union
+
 from _pytest.config import ExitCode
 from _pytest.main import Session
 from rich.console import Console

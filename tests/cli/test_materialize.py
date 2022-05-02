@@ -1,12 +1,13 @@
 import inspect
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from amora.utils import clean_compiled_files
 from typer.testing import CliRunner
-from tests.models.heart_rate import HeartRate
-from tests.models.steps import Steps
 
 from amora.cli import app
+from amora.utils import clean_compiled_files
+
+from tests.models.heart_rate import HeartRate
+from tests.models.steps import Steps
 
 runner = CliRunner()
 
@@ -34,7 +35,7 @@ def test_materialize_without_arguments_and_options(materialize: MagicMock):
     assert result.exit_code == 0
 
     tables = sorted(
-        [str(call[1]["model"].__table__) for call in materialize.call_args_list]
+        str(call[1]["model"].__table__) for call in materialize.call_args_list
     )
     assert tables == sorted([str(Steps.__table__), str(HeartRate.__table__)])
 

@@ -1,7 +1,8 @@
+from sqlmodel import Field, func, select
+
+from amora.models import AmoraModel, MaterializationTypes, ModelConfig
 from amora.types import Compilable
-from amora.models import AmoraModel, ModelConfig, MaterializationTypes
 from examples.amora_project.models.heart_rate import HeartRate
-from sqlmodel import func, select, Field
 
 
 class HeartRateAgg(AmoraModel, table=True):

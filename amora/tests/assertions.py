@@ -1,23 +1,17 @@
 import json
 import os
+from typing import Callable, Iterable, Optional
+
 import pytest
-from typing import Iterable, Optional, Callable, Union
-from sqlalchemy import (
-    and_,
-    union_all,
-    Integer,
-    func,
-    literal,
-)
+from sqlalchemy import Integer, and_, func, literal, union_all
 from sqlmodel.sql.expression import SelectOfScalar
+
 from amora.config import settings
-from amora.models import select, AmoraModel, Session, ColumnElement, Columns
+from amora.models import AmoraModel, ColumnElement, Session, select
+from amora.providers.bigquery import RunResult, estimated_query_cost_in_usd, run
 from amora.storage import local_engine
 from amora.tests.audit import AuditLog
 from amora.types import Compilable
-from amora.providers.bigquery import run, RunResult, estimated_query_cost_in_usd
-from collections import defaultdict
-
 
 Test = Callable[..., SelectOfScalar]
 
@@ -258,7 +252,7 @@ def is_numeric(column: ColumnElement) -> Compilable:
     Example:
 
     ```python
-    is_numeric(func.cast(Health.value, String).label('value_as_str'))
+    is_numeric(func.cast(Health.value, String).label("value_as_str"))
     ```
     """
     return select(column).where(func.REGEXP_CONTAINS(column, "[^0-9]"))

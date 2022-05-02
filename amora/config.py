@@ -1,9 +1,9 @@
 import logging
 import os
-from uuid import uuid4
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Tuple
+from uuid import uuid4
 
 from pydantic import BaseSettings
 
