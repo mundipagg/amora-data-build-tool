@@ -16,10 +16,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ['3.9']
-        experimental: [ false ]
+        python: ["3.9"]
+        experimental: [false]
         include:
-          - python: '3.10'
+          - python: "3.10"
             experimental: true
     steps:
       - name: 🚧 Install OS dependencies
@@ -50,6 +50,24 @@ jobs:
         env:
           POETRY_VIRTUALENVS_CREATE: false
 
+      - uses: dorny/paths-filter@v2
+        name: Get modified files
+        id: file_changes
+        with:
+          list-files: shell
+          filters: |
+            python:
+              - added|modified: '**/*.py'
+              - added|modified: '**/*.md'
+              - added|modified: '**/*.rst'
+
+      - name: 🧪 pre-commit
+        if: ${{ steps.file_changes.outputs.python == 'true' }}
+        run: pre-commit run --files ${{ steps.file_changes.outputs.python_files }}
+
+      - name: 🧪 Mypy - Static type check
+        run: mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --install-types --non-interactive --pretty --no-color-output amora
+
       - name: 🚧 GCP Auth
         uses: "google-github-actions/auth@v0"
         with:
@@ -57,9 +75,6 @@ jobs:
 
       - name: 🚧 Set up GCP SDK
         uses: "google-github-actions/setup-gcloud@v0"
-
-      - name: 🎨 Black - Python format check
-        run: black -v --check amora tests
 
       - name: 🧪 pytest
         run: py.test --cov=amora --cov-report=term-missing --cov-report=xml ./tests
@@ -70,9 +85,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: 🧪 Mypy - Static type check
-        run: mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --install-types --non-interactive --pretty --no-color-output amora
 
       - name: 📤 Uploading coverage reports as an artifact
         uses: actions/upload-artifact@v2

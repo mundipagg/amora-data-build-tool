@@ -1,11 +1,11 @@
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from unittest.mock import patch, MagicMock
-from uuid import uuid4
+from unittest.mock import MagicMock, patch
 
 from google.api_core.exceptions import NotFound
 from google.cloud.bigquery import SchemaField
 from typer.testing import CliRunner
+
 from amora.cli import app
 from amora.models import AmoraModel, amora_model_for_path
 

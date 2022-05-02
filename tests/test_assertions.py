@@ -2,11 +2,11 @@ from sqlalchemy import func, literal
 
 from amora.providers.bigquery import cte_from_rows
 from amora.tests.assertions import (
-    is_numeric,
-    that,
+    expression_is_true,
     has_at_least_one_not_null_value,
     is_a_non_empty_string,
-    expression_is_true,
+    is_numeric,
+    that,
 )
 
 

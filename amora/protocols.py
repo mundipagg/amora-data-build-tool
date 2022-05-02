@@ -1,4 +1,4 @@
-from typing import runtime_checkable, Protocol
+from typing import Protocol, runtime_checkable
 
 from amora.types import Compilable
 

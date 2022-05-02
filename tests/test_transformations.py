@@ -2,9 +2,9 @@ from amora.models import select
 from amora.providers.bigquery import cte_from_rows, run
 from amora.tests.assertions import is_numeric, that
 from amora.transformations import (
-    remove_non_numbers,
-    remove_leading_zeros,
     parse_numbers,
+    remove_leading_zeros,
+    remove_non_numbers,
 )
 
 

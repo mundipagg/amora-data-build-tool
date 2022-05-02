@@ -1,17 +1,17 @@
 from datetime import datetime
 
 from sqlalchemy import TIMESTAMP
+from sqlmodel import Field, select
 
 from amora.compilation import Compilable
 from amora.models import (
     AmoraModel,
+    Column,
+    MaterializationTypes,
     ModelConfig,
     PartitionConfig,
-    MaterializationTypes,
-    Column,
 )
 from examples.amora_project.models.health import Health
-from sqlmodel import Field, select
 
 
 class Steps(AmoraModel, table=True):

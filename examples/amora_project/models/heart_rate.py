@@ -1,17 +1,17 @@
 from datetime import datetime
 
 from sqlalchemy import TIMESTAMP
+from sqlmodel import Field, select
 
-from amora.types import Compilable
 from amora.models import (
     AmoraModel,
+    Column,
+    MaterializationTypes,
     ModelConfig,
     PartitionConfig,
-    MaterializationTypes,
-    Column,
 )
+from amora.types import Compilable
 from examples.amora_project.models.health import Health
-from sqlmodel import Field, select
 
 
 class HeartRate(AmoraModel, table=True):

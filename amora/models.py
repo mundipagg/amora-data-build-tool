@@ -2,20 +2,21 @@ import inspect
 import re
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from importlib.util import spec_from_file_location, module_from_spec
+from importlib.util import module_from_spec, spec_from_file_location
 from inspect import getfile
 from pathlib import Path
-from typing import Iterable, List, Optional, Union, Dict, Any, Tuple, Type
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 
+from sqlalchemy import Column, MetaData, Table, select
+from sqlalchemy.orm import declared_attr
+from sqlalchemy.sql import ColumnElement
+from sqlmodel import Field, Session, SQLModel, create_engine
+
+from amora.config import settings
 from amora.logger import logger
 from amora.protocols import CompilableProtocol
-from amora.config import settings
-from sqlalchemy import MetaData, Table, select, Column
-from sqlmodel import SQLModel, Field, create_engine, Session
-from sqlalchemy.sql import ColumnElement
-from sqlalchemy.orm import declared_attr
 from amora.types import Compilable
-from amora.utils import model_path_for_target_path, list_files
+from amora.utils import list_files, model_path_for_target_path
 
 select = select
 Column = Column
@@ -92,9 +93,11 @@ class AmoraModel(SQLModel):
         By default, `__tablename__` is the `snake_case` class name.
 
         ```python
-        class MyModel(AmoraModel): ...
+        class MyModel(AmoraModel):
+            ...
 
-        assert MyModel.__tablename__ == 'my_model
+
+        assert MyModel.__tablename__ == "my_model"
         ```
         """
         return re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__name__).lower()

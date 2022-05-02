@@ -1,9 +1,9 @@
 from amora.tests.assertions import (
+    expression_is_true,
+    has_accepted_values,
+    is_non_negative,
     relationship,
     that,
-    is_non_negative,
-    has_accepted_values,
-    expression_is_true,
 )
 from examples.amora_project.models.health import Health
 from examples.amora_project.models.heart_rate import HeartRate

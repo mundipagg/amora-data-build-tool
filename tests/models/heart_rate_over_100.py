@@ -2,13 +2,8 @@ from datetime import datetime
 
 from sqlalchemy import TIMESTAMP
 
-from amora.models import (
-    AmoraModel,
-    MaterializationTypes,
-    ModelConfig,
-    Field,
-    Column,
-)
+from amora.models import AmoraModel, Column, Field, MaterializationTypes, ModelConfig
+
 from tests.models.heart_rate import HeartRate
 
 
