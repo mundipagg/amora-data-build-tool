@@ -416,10 +416,12 @@ def feature_store_apply():
 @feature_store.command(name="materialize")
 def feature_store_materialize(
     start_ts: str = typer.Argument(
-        None, help="Start timestamp on ISO 8601 format. E.g.: '2022-01-01T01:00:00'"
+        None,
+        help="Start timestamp on ISO 8601 format. E.g.: '2022-01-01T01:00:00'",
     ),
     end_ts: str = typer.Argument(
-        None, help="End timestamp on ISO 8601 format. E.g.: '2022-01-02T01:00:00'"
+        None,
+        help="End timestamp on ISO 8601 format. E.g.: '2022-01-02T01:00:00'",
     ),
     models: Optional[Models] = models_option,
 ):
@@ -455,8 +457,106 @@ def feature_store_serve():
 
     Routes:
 
-        POST /get-online-features
-        GET /list-feature-views
+        - `POST /get-online-features`
+
+        `curl -XPOST -H "Content-type: application/json" -d '{"features": ["step_count_by_source:value_avg", "step_count_by_source:value_sum", "step_count_by_source:value_count"], "entities": {"source_name": ["Mi Fit", "Diogo iPhone", "An invalid source"]}}' 'http://localhost:8666/get-online-features'`
+
+        ```json
+        {
+          "metadata": {
+            "feature_names": [
+              "source_name",
+              "value_count",
+              "value_sum",
+              "value_avg"
+            ]
+          },
+          "results": [
+            {
+              "values": [
+                "Mi Fit",
+                6.0,
+                809.0,
+                134.8333282470703
+              ],
+              "statuses": [
+                "PRESENT",
+                "PRESENT",
+                "PRESENT",
+                "PRESENT"
+              ],
+              "event_timestamps": [
+                "1970-01-01T00:00:00Z",
+                "2021-07-23T02:00:00Z",
+                "2021-07-23T02:00:00Z",
+                "2021-07-23T02:00:00Z"
+              ]
+            },
+            {
+              "values": [
+                "Diogo iPhone",
+                2.0,
+                17.0,
+                8.5
+              ],
+              "statuses": [
+                "PRESENT",
+                "PRESENT",
+                "PRESENT",
+                "PRESENT"
+              ],
+              "event_timestamps": [
+                "1970-01-01T00:00:00Z",
+                "2021-07-23T02:00:00Z",
+                "2021-07-23T02:00:00Z",
+                "2021-07-23T02:00:00Z"
+              ]
+            },
+            {
+              "values": [
+                "An invalid source",
+                null,
+                null,
+                null
+              ],
+              "statuses": [
+                "PRESENT",
+                "NOT_FOUND",
+                "NOT_FOUND",
+                "NOT_FOUND"
+              ],
+              "event_timestamps": [
+                "1970-01-01T00:00:00Z",
+                "2021-07-23T02:00:00Z",
+                "2021-07-23T02:00:00Z",
+                "2021-07-23T02:00:00Z"
+              ]
+            }
+          ]
+        }
+        ```
+
+        More on: https://docs.feast.dev/v/v0.9-branch/user-guide/getting-online-features
+
+        - `GET /list-feature-views`. E.g.:
+
+        `curl http://localhost:8666/list-feature-views | jq`
+
+        ```json
+        [
+            {
+                "name": "step_count_by_source",
+                "features": [
+                    "step_count_by_source:value_avg",
+                    "step_count_by_source:value_sum",
+                    "step_count_by_source:value_count"
+                ],
+                "entities": [
+                    "source_name"
+                ]
+            }
+        ]
+        ```
     """
     import uvicorn
     from feast.feature_server import get_app
