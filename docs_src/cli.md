@@ -129,3 +129,6 @@ $ amora models list --format json
 
 ### amora feature-store materialize
 ::: amora.cli.feature_store_materialize
+
+### amora feature-store serve
+::: amora.cli.feature_store_serve
