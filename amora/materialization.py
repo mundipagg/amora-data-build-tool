@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from google.cloud.bigquery import Table, Client, QueryJobConfig
+from google.cloud.bigquery import Client, QueryJobConfig, Table
 
 from amora.models import MaterializationTypes, Model, amora_model_for_target_path
 
