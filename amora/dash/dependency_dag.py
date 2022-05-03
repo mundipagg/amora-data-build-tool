@@ -1,10 +1,8 @@
-from dash import Dash, dcc, html
-
 import dash_cytoscape as cyto
+from dash import Dash, dcc, html
 
 from amora.config import settings
 from amora.dag import DependencyDAG
-
 
 dash_app = Dash(__name__)
 server = dash_app.server
