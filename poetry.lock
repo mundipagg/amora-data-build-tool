@@ -992,7 +992,6 @@ category = "main"
 optional = true
 python-versions = ">=3.7"
 
-[[package]]
 name = "jedi"
 version = "0.18.1"
 description = "An autocompletion tool for Python that can be used for text editors."
@@ -2787,6 +2786,7 @@ feature-store = ["feast"]
 lock-version = "1.1"
 python-versions = ">=3.9.6,<3.10"
 content-hash = "b36e19a060c91811f780da5275c9646aa2b7fb16b9ad8a40546efef5539b1183"
+
 
 [metadata.files]
 absl-py = [
