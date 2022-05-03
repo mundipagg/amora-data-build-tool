@@ -1,4 +1,4 @@
-from typing import Iterable, Dict, List
+from typing import Dict, Iterable, List
 
 import networkx as nx
 from matplotlib import pyplot as plt
@@ -42,6 +42,31 @@ class DependencyDAG(nx.DiGraph):
             model_to_task[task.model.unique_name] = task
 
         return cls.from_tasks(tasks=model_to_task.values())
+
+    def to_cytoscape_elements(self) -> List[Dict]:
+        """
+
+        Returns itself as a cytoscape schema compatible representation. E.g:
+
+        For a `A --> B` graph:
+
+        ```python
+        [
+            {"data": {"id": "A", "label": "A"}},
+            {"data": {"id": "B", "label": "B"}},
+            {"data": {"source": "A", "target": "B"}},
+        ]
+        ```
+        """
+        # todo: Estilizar nó de acordo com o tipo de materialização
+        # todo: Adicionar metadados para cytoscape
+        return [
+            *({"data": {"id": node, "label": node}} for node in self.nodes),
+            *(
+                {"data": {"source": source, "target": target}}
+                for source, target in self.edges
+            ),
+        ]
 
     def draw(self) -> None:
         plt.figure(1, figsize=settings.CLI_MATERIALIZATION_DAG_FIGURE_SIZE)
