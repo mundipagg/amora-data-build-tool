@@ -25,6 +25,7 @@ class Question:
     ```python
     from examples.models.step_count_by_source import StepCountBySource
 
+    from amora.models import select
     from amora.questions import question
 
 
@@ -92,29 +93,37 @@ class Question:
 
     @property
     def name(self) -> str:
-        """
+        '''
         Human readable question name. E.g.:
 
         ```python
         @question
         def what_is_the_most_active_user():
             ...
+        ```
 
+        Would result in the parsed function name:
+        ```
         >>> what_is_the_most_active_user.name
         "What is the most active user?"
+        ```
 
+        But if a question has a docstring, it will be used as the question name:
 
+        ```python
         @question
         def question_2():
-            \"""
+            """
             What is the answer to the Ultimate Question of Life, the Universe, and Everything?
-            \"""
+            """
             return select(literal(42))
+        ```
 
+        ```
         >>> question_2.name
         "What is the answer to the Ultimate Question of Life, the Universe, and Everything?"
         ```
-        """
+        '''
         if self.question_func.__doc__:
             return self.question_func.__doc__.strip()
         elif self.question_func.__name__ == "<lambda>":
