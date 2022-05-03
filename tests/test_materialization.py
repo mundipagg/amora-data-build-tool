@@ -3,7 +3,8 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 from amora.config import settings
-from amora.materialization import DependencyDAG, Task, materialize
+from amora.dag import DependencyDAG
+from amora.materialization import Task, materialize
 from amora.models import (
     AmoraModel,
     Field,

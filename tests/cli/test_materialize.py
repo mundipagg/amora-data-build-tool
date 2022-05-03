@@ -58,7 +58,7 @@ def test_materialize_with_model_options(materialize: MagicMock):
 
 
 @patch("amora.cli.materialization.materialize")
-@patch("amora.cli.materialization.DependencyDAG.draw")
+@patch("amora.dag.DependencyDAG.draw")
 def test_materialize_with_draw_dag_option(draw: MagicMock, _materialize: MagicMock):
     result = runner.invoke(
         app,

@@ -14,6 +14,7 @@ from rich.text import Text
 from amora import materialization
 from amora.compilation import compile_statement
 from amora.config import settings
+from amora.dag import DependencyDAG
 from amora.models import Model, list_models
 from amora.providers.bigquery import (
     BIGQUERY_TYPES_TO_PYTHON_TYPES,
@@ -90,7 +91,7 @@ def materialize(
         task = materialization.Task.for_target(target_file_path)
         model_to_task[task.model.unique_name] = task
 
-    dag = materialization.DependencyDAG.from_tasks(tasks=model_to_task.values())
+    dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
     if draw_dag:
         dag.draw()
