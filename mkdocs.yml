@@ -26,15 +26,17 @@ nav:
   - Amora: 'index.md'
   - 🏗 Concepts:
       - 'concepts/amora-model.md'
-      - 'concepts/amora-views.md'
-      - 'concepts/data-question.md'
       - Feature Store:
         - 'feature-store/feature-store.md'
         - 'feature-store/feature-view.md'
         - Feature View Protocol: 'feature-store/feature-view-protocol.md'
+      - 'concepts/data-questions.md'
+      - 'concepts/amora-views.md'
   - 🧑‍🏫 User Guide:
       - 'cli.md'
-  - 🎁 Examples: 'examples.md'
+  - 🎁 Examples:
+    - Amora Project: 'examples.md'
+    - Feature Store Notebook: 'notebooks/feature_store.ipynb'
   - ⚙️ API Reference: ''
   - 🧪 Testing:
       - 'tests/assertions.md'
@@ -71,6 +73,7 @@ plugins:
       minify_css: true
       htmlmin_opts:
           remove_comments: true
+  - mkdocs-jupyter
 theme:
   name: material
   icon:
