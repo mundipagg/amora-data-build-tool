@@ -14,6 +14,7 @@ class ViewKind(str, Enum):
 
 
 class ViewConfig(NamedTuple):
+    title: str
     kind: ViewKind = ViewKind.table
 
 

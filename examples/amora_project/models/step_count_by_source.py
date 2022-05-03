@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import TIMESTAMP, Column, func
+from sqlalchemy import TIMESTAMP, Column, Integer, func, literal
 
 from amora.feature_store.decorators import feature_view
 from amora.models import AmoraModel, Field, MaterializationTypes, ModelConfig, select
-from amora.questions import QUESTIONS, question
+from amora.questions import question
 from amora.transformations import datetime_trunc_hour
 from amora.types import Compilable
 from examples.amora_project.models.steps import Steps

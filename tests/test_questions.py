@@ -3,7 +3,7 @@ import pytest
 from sqlalchemy import literal
 
 from amora.models import select
-from amora.questions import question, QUESTIONS, Question
+from amora.questions import QUESTIONS, Question, question
 from amora.types import Compilable
 
 
@@ -96,3 +96,11 @@ def test_question_decorator_wraps_the_question_function_on_a_Question():
 
     wrapped_question = question(a_question)
     assert isinstance(wrapped_question, Question)
+
+
+def test_question_decorator_raises_an_error_if_the_decorated_functions_doesnt_return_a_compilable():
+    with pytest.raises(ValueError):
+
+        @question
+        def an_invalid_question():
+            return 42

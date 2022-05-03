@@ -1,7 +1,7 @@
-from functools import wraps
 from typing import Callable, List
 
 import pandas as pd
+from sqlalchemy.sql import Selectable
 
 from amora.compilation import compile_statement
 from amora.providers.bigquery import run
@@ -23,8 +23,9 @@ class Question:
     Lets define a new data question:
 
     ```python
-    from amora.questions import question
     from examples.models.step_count_by_source import StepCountBySource
+
+    from amora.questions import question
 
 
     @question
@@ -74,6 +75,10 @@ class Question:
     def __init__(self, question_func: QuestionFunc, view_config: ViewConfig = None):
         if isinstance(question_func, Question):
             question_func = question_func.question_func
+        if not isinstance(question_func(), Selectable):
+            raise ValueError(
+                "Valid questions should return a `Selectable`. Please refer to the 'data questions' documentation."
+            )
 
         self.question_func = question_func
 
@@ -185,7 +190,11 @@ class Question:
 QUESTIONS: List[Question] = []
 
 
-def question(question_func: Callable):
+def question(question_func: QuestionFunc):
+    """
+    Wraps the function into a `amora.questions.Question`. The decorated function must return a `Compilable`
+
+    """
     q = Question(question_func)
     QUESTIONS.append(q)
 
