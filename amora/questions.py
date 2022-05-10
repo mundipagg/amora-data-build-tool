@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable, Set
 
 import pandas as pd
 from sqlalchemy.sql import Selectable
@@ -199,8 +199,11 @@ class Question:
 
         return self.question_func == other.question_func
 
+    def __hash__(self):
+        return hash(self.question_func)
 
-QUESTIONS: List[Question] = []
+
+QUESTIONS: Set[Question] = set()
 
 
 def question(question_func: QuestionFunc):
@@ -209,6 +212,6 @@ def question(question_func: QuestionFunc):
 
     """
     q = Question(question_func)
-    QUESTIONS.append(q)
+    QUESTIONS.add(q)
 
     return q
