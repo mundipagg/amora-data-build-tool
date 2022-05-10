@@ -31,7 +31,7 @@ nav:
         - 'feature-store/feature-view.md'
         - Feature View Protocol: 'feature-store/feature-view-protocol.md'
       - 'concepts/data-questions.md'
-      - 'concepts/amora-views.md'
+      - 'concepts/data-visualization.md'
   - 🧑‍🏫 User Guide:
       - 'cli.md'
   - 🎁 Examples:
