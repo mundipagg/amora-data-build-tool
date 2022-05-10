@@ -4,7 +4,7 @@ from typing import NamedTuple
 import pandas as pd
 
 
-class ViewKind(str, Enum):
+class VisualizationKind(str, Enum):
     big_number = "big_number"
     bar_chart = "bar_chart"
     column_chart = "column_chart"
@@ -13,17 +13,17 @@ class ViewKind(str, Enum):
     pie_chart = "pie_chart"
 
 
-class ViewConfig(NamedTuple):
+class VisualizationConfig(NamedTuple):
     title: str
-    kind: ViewKind = ViewKind.table
+    kind: VisualizationKind = VisualizationKind.table
 
 
-class View:
+class Visualization:
     """
     The Amora visual representation of a `pandas.DataFrame`
     """
 
-    def __init__(self, data: pd.DataFrame, config: ViewConfig):
+    def __init__(self, data: pd.DataFrame, config: VisualizationConfig):
         self.data = data
         self.config = config
 

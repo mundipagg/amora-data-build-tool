@@ -6,7 +6,7 @@ from sqlalchemy.sql import Selectable
 from amora.compilation import compile_statement
 from amora.providers.bigquery import run
 from amora.types import Compilable
-from amora.views import View, ViewConfig, ViewKind
+from amora.visualization import Visualization, VisualizationConfig, VisualizationKind
 
 QuestionFunc = Callable[[], Compilable]
 
@@ -73,7 +73,9 @@ class Question:
     |  2 | iPhone        |
     """
 
-    def __init__(self, question_func: QuestionFunc, view_config: ViewConfig = None):
+    def __init__(
+        self, question_func: QuestionFunc, view_config: VisualizationConfig = None
+    ):
         if isinstance(question_func, Question):
             question_func = question_func.question_func
         if not isinstance(question_func(), Selectable):
@@ -84,7 +86,9 @@ class Question:
         self.question_func = question_func
 
         if view_config is None:
-            self.view_config = ViewConfig(kind=ViewKind.table, title=self.name)
+            self.view_config = VisualizationConfig(
+                kind=VisualizationKind.table, title=self.name
+            )
         else:
             self.view_config = view_config
 
@@ -164,11 +168,11 @@ class Question:
         result = run(self.question_func())
         return result.rows.to_dataframe()
 
-    def render(self) -> View:
+    def render(self) -> Visualization:
         """
         Renders the visual representation of the question's answer
         """
-        return View(data=self.answer_df(), config=self.view_config)
+        return Visualization(data=self.answer_df(), config=self.view_config)
 
     def to_markdown(self) -> str:
         return f"""
