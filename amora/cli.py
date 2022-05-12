@@ -77,11 +77,19 @@ def materialize(
     models: Optional[Models] = models_option,
     target: str = target_option,
     draw_dag: bool = typer.Option(False, "--draw-dag"),
+    no_compile: bool = typer.Option(
+        False,
+        "--no-compile",
+        help="Don't run `amora compile` before the materialization",
+    ),
 ) -> None:
     """
     Executes the compiled SQL against the current target database.
 
     """
+    if not no_compile:
+        compile(models=models, target=target)
+
     model_to_task = {}
 
     for target_file_path in list_target_files():
