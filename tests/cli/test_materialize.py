@@ -20,8 +20,11 @@ def teardown_function(module):
     clean_compiled_files()
 
 
+@patch("amora.cli.compile")
 @patch("amora.cli.materialization.materialize")
-def test_materialize_without_arguments_and_options(materialize: MagicMock):
+def test_materialize_without_arguments_and_options(
+    materialize: MagicMock, compile: MagicMock
+):
 
     for model in [HeartRate, Steps]:
         target_path = model.target_path(model_file_path=inspect.getfile(model))
@@ -38,10 +41,12 @@ def test_materialize_without_arguments_and_options(materialize: MagicMock):
         str(call[1]["model"].__table__) for call in materialize.call_args_list
     )
     assert tables == sorted([str(Steps.__table__), str(HeartRate.__table__)])
+    compile.assert_called_once_with(target=None, models=tuple())
 
 
+@patch("amora.cli.compile")
 @patch("amora.cli.materialization.materialize")
-def test_materialize_with_model_options(materialize: MagicMock):
+def test_materialize_with_model_options(materialize: MagicMock, compile: MagicMock):
 
     for model in [HeartRate, Steps]:
         target_path = model.target_path(model_file_path=inspect.getfile(model))
@@ -56,10 +61,15 @@ def test_materialize_with_model_options(materialize: MagicMock):
     materialize_call_model = materialize.mock_calls[0][2]["model"]
     assert materialize_call_model.__table__ == Steps.__table__
 
+    compile.assert_called_once_with(models=("steps",), target=None)
 
+
+@patch("amora.cli.compile")
 @patch("amora.cli.materialization.materialize")
 @patch("amora.dag.DependencyDAG.draw")
-def test_materialize_with_draw_dag_option(draw: MagicMock, _materialize: MagicMock):
+def test_materialize_with_draw_dag_option(
+    draw: MagicMock, _materialize: MagicMock, _compile: MagicMock
+):
     result = runner.invoke(
         app,
         ["materialize", "--draw-dag"],
@@ -67,3 +77,15 @@ def test_materialize_with_draw_dag_option(draw: MagicMock, _materialize: MagicMo
 
     assert result.exit_code == 0
     draw.assert_called_once()
+
+
+@patch("amora.cli.compile")
+@patch("amora.cli.materialization.materialize")
+def test_materialize_with_no_compile_option(materialize: MagicMock, compile: MagicMock):
+    result = runner.invoke(
+        app,
+        ["materialize", "--no-compile"],
+    )
+
+    assert result.exit_code == 0
+    compile.assert_not_called()
