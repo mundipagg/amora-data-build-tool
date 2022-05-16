@@ -150,7 +150,7 @@ class AmoraModel(SQLModel):
 
 
 def amora_model_for_path(path: Path) -> Model:
-    spec = spec_from_file_location(path.stem, path)
+    spec = spec_from_file_location(".".join(["amoramodel", path.stem]), path)
     if spec is None:
         raise ValueError(f"Invalid path `{path}`. Not a valid Python file.")
 
