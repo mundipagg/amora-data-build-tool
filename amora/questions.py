@@ -166,7 +166,7 @@ class Question:
         ```
         """
         result = run(self.question_func())
-        return result.rows.to_dataframe()
+        return result.rows.to_dataframe(create_bqstorage_client=False)
 
     def render(self) -> Visualization:
         """
