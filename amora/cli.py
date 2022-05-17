@@ -459,6 +459,37 @@ def feature_store_materialize(
     )
 
 
+@feature_store.command(name="materialize-incremental")
+def feature_store_materialize_incremental(
+    end_ts: str = typer.Argument(
+        None,
+        help="End timestamp on ISO 8601 format. E.g.: '2022-01-02T01:00:00'",
+    ),
+    models: Optional[Models] = models_option,
+):
+    """
+    Load data from feature views into the online store, beginning from either the previous `materialize`
+    or `materialize-incremental` end date, or the beginning of time.
+
+    """
+    from amora.feature_store import fs
+    from amora.feature_store.registry import get_repo_contents
+
+    repo_contents = get_repo_contents()
+
+    if models:
+        views_to_materialize = [
+            fv.name for fv in repo_contents.feature_views if fv.name in models
+        ]
+    else:
+        views_to_materialize = [fv.name for fv in repo_contents.feature_views]
+
+    fs.materialize_incremental(
+        feature_views=views_to_materialize,
+        end_date=datetime.fromisoformat(end_ts),
+    )
+
+
 @feature_store.command(name="serve")
 def feature_store_serve():
     """
