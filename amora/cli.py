@@ -7,6 +7,7 @@ from typing import List, Optional
 import pytest
 import typer
 from jinja2 import Environment, PackageLoader, select_autoescape
+from prometheus_fastapi_instrumentator import Instrumentator
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
@@ -617,6 +618,8 @@ def feature_store_serve():
             }
             for fv in fvs
         ]
+
+    Instrumentator().instrument(app).expose(app)
 
     uvicorn.run(
         app,
