@@ -14,7 +14,7 @@ name = "anyio"
 version = "3.6.1"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6.2"
 
 [package.dependencies]
@@ -461,7 +461,7 @@ name = "fastapi"
 version = "0.78.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6.1"
 
 [package.dependencies]
@@ -1894,12 +1894,24 @@ virtualenv = ">=20.0.8"
 name = "prometheus-client"
 version = "0.14.1"
 description = "Python client for the Prometheus monitoring system."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.extras]
 twisted = ["twisted"]
+
+[[package]]
+name = "prometheus-fastapi-instrumentator"
+version = "5.8.1"
+description = "Instrument your FastAPI with Prometheus metrics"
+category = "main"
+optional = false
+python-versions = ">=3.7.0,<4.0.0"
+
+[package.dependencies]
+fastapi = ">=0.38.1,<1.0.0"
+prometheus-client = ">=0.8.0,<1.0.0"
 
 [[package]]
 name = "prompt-toolkit"
@@ -2419,7 +2431,7 @@ name = "sniffio"
 version = "1.2.0"
 description = "Sniff out which async library your code is running under"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.5"
 
 [[package]]
@@ -2538,7 +2550,7 @@ name = "starlette"
 version = "0.19.1"
 description = "The little ASGI library that shines."
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -2875,7 +2887,7 @@ feature-store = ["feast"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9.6,<3.10"
-content-hash = "b167d5b7a899698517363bd5ecf06b4811612549e8af2002a1e7e846a0f5fac5"
+content-hash = "8c4cb3845b5397acde634e27fdf9fc6b17aa08c2b3a7a024463522243f6c6360"
 
 [metadata.files]
 absl-py = [
@@ -4185,6 +4197,10 @@ pre-commit = [
 prometheus-client = [
     {file = "prometheus_client-0.14.1-py3-none-any.whl", hash = "sha256:522fded625282822a89e2773452f42df14b5a8e84a86433e3f8a189c1d54dc01"},
     {file = "prometheus_client-0.14.1.tar.gz", hash = "sha256:5459c427624961076277fdc6dc50540e2bacb98eebde99886e59ec55ed92093a"},
+]
+prometheus-fastapi-instrumentator = [
+    {file = "prometheus-fastapi-instrumentator-5.8.1.tar.gz", hash = "sha256:900e191ecc09a10e928e4d8679b5bf114c47931be9f55f1fbb25baade173e16d"},
+    {file = "prometheus_fastapi_instrumentator-5.8.1-py3-none-any.whl", hash = "sha256:53b38095dda0a9e01876de5598c4dae911f5b38190967efd8d79aef8d26a83d6"},
 ]
 prompt-toolkit = [
     {file = "prompt_toolkit-3.0.29-py3-none-any.whl", hash = "sha256:62291dad495e665fca0bda814e342c69952086afb0f4094d0893d357e5c78752"},

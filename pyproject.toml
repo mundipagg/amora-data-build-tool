@@ -34,6 +34,7 @@ Werkzeug = { version = "2.0.0", optional = true }                   # Bug no das
 dash = { version = "2.1.0", optional = true }
 dash-cytoscape = { version = "0.2.0", optional = true }
 protobuf = "<3.20.0"
+prometheus-fastapi-instrumentator = "^5.8.1"
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "^3.0.0"
