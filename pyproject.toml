@@ -23,7 +23,7 @@ sqlmodel = "^0.0.4"
 sqlalchemy-bigquery = "^1.2"
 networkx = { extras = ["all"], version = "^2.6.3" }
 typer = { extras = ["all"], version = "^0.4.0" }
-pytest = "^6.2.5"
+pytest = ">=6.2.5,<8.0.0"
 pytest-xdist = { extras = ['psutil'], version = "^2.5.0" }
 rich = "^10.13.0"
 Jinja2 = "^3.0.3"
