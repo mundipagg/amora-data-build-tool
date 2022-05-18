@@ -77,6 +77,11 @@ jobs:
       - name: 🧪 Mypy - Static type check
         run: mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --install-types --non-interactive --pretty --no-color-output amora
 
+      - uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.xml
+          directory: ./mypy_coverage
+
       - name: 📤 Uploading coverage reports as an artifact
         uses: actions/upload-artifact@v2
         with:
