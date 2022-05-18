@@ -9,7 +9,7 @@ pip install amora[feature-store]
 Using Amora's Feature Store capabilities enables data teams to: 
 
 - Run the necessary data pipeline to transform the data into feature values
-- Easily productionize new features from Amora Models
+- Easily productionize new features from [Amora Models](../concepts/amora-model.md)
 - Store and manage feature data 
 - Track feature lineage, versions and related metadata
 - Serve feature data consistently for training and inference purposes
