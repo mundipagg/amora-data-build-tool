@@ -14,7 +14,7 @@ name = "anyio"
 version = "3.6.1"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6.2"
 
 [package.dependencies]
@@ -461,7 +461,7 @@ name = "fastapi"
 version = "0.78.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6.1"
 
 [package.dependencies]
@@ -1906,7 +1906,7 @@ name = "prometheus-fastapi-instrumentator"
 version = "5.8.1"
 description = "Instrument your FastAPI with Prometheus metrics"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7.0,<4.0.0"
 
 [package.dependencies]
@@ -2431,7 +2431,7 @@ name = "sniffio"
 version = "1.2.0"
 description = "Sniff out which async library your code is running under"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.5"
 
 [[package]]
@@ -2550,7 +2550,7 @@ name = "starlette"
 version = "0.19.1"
 description = "The little ASGI library that shines."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -2882,12 +2882,12 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 
 [extras]
 dash = ["dash", "dash-cytoscape", "Werkzeug"]
-feature-store = ["feast"]
+feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9.6,<3.10"
-content-hash = "8c4cb3845b5397acde634e27fdf9fc6b17aa08c2b3a7a024463522243f6c6360"
+content-hash = "bcd84633ad491dc75a6b46f561e638a6e0d1ee6b424421085a87bf10298b81e3"
 
 [metadata.files]
 absl-py = [
