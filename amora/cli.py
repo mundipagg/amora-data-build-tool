@@ -600,6 +600,7 @@ def feature_store_serve():
     """
     import uvicorn
     from feast.feature_server import get_app
+    from prometheus_fastapi_instrumentator import Instrumentator
 
     from amora.feature_store import fs
     from amora.feature_store.config import settings
@@ -617,6 +618,8 @@ def feature_store_serve():
             }
             for fv in fvs
         ]
+
+    Instrumentator().instrument(app).expose(app)
 
     uvicorn.run(
         app,
