@@ -461,9 +461,9 @@ def feature_store_materialize(
 
 @feature_store.command(name="materialize-incremental")
 def feature_store_materialize_incremental(
-    end_ts: str = typer.Argument(
+    end_ts: Optional[str] = typer.Argument(
         None,
-        help="End timestamp on ISO 8601 format. E.g.: '2022-01-02T01:00:00'",
+        help="End timestamp on ISO 8601 format. E.g.: '2022-01-02T01:00:00'. If a date isn't provided, `datetime.utcnow` is used",
     ),
     models: Optional[Models] = models_option,
 ):
@@ -484,9 +484,14 @@ def feature_store_materialize_incremental(
     else:
         views_to_materialize = [fv.name for fv in repo_contents.feature_views]
 
+    if end_ts is not None:
+        end_date = datetime.fromisoformat(end_ts)
+    else:
+        end_date = datetime.utcnow()
+
     fs.materialize_incremental(
         feature_views=views_to_materialize,
-        end_date=datetime.fromisoformat(end_ts),
+        end_date=end_date,
     )
 
 
