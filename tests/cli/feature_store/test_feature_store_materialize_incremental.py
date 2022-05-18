@@ -2,6 +2,7 @@ from datetime import datetime
 from unittest.mock import MagicMock, Mock, patch
 
 from feast import FeatureStore
+from freezegun import freeze_time
 from typer.testing import CliRunner
 
 from amora.cli import app
@@ -28,6 +29,28 @@ def test_feature_store_materialize_incremental_without_options(
         feature_views=[fv.name for fv in get_repo_contents.return_value.feature_views],
         end_date=datetime.fromisoformat(end_ts),
     )
+
+
+@patch("amora.feature_store.fs", spec=FeatureStore)
+@patch("amora.feature_store.registry.get_repo_contents")
+def test_feature_store_materialize_incremental_without_options_and_end_ts(
+    get_repo_contents: MagicMock, fs: MagicMock
+):
+    with freeze_time("2022-01-01 00:00:00"):
+        result = runner.invoke(
+            app,
+            ["feature-store", "materialize-incremental"],
+        )
+
+        assert result.exit_code == 0
+        assert get_repo_contents.called
+
+        fs.materialize_incremental.assert_called_once_with(
+            feature_views=[
+                fv.name for fv in get_repo_contents.return_value.feature_views
+            ],
+            end_date=datetime.utcnow(),
+        )
 
 
 @patch("amora.feature_store.fs", spec=FeatureStore)
