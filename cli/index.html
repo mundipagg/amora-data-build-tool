@@ -836,11 +836,16 @@
 <span class=normal><a href=#__codelineno-0-487>487</a></span>
 <span class=normal><a href=#__codelineno-0-488>488</a></span>
 <span class=normal><a href=#__codelineno-0-489>489</a></span>
-<span class=normal><a href=#__codelineno-0-490>490</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-462 name=__codelineno-0-462></a><span class=nd>@feature_store</span><span class=o>.</span><span class=n>command</span><span class=p>(</span><span class=n>name</span><span class=o>=</span><span class=s2>&quot;materialize-incremental&quot;</span><span class=p>)</span>
+<span class=normal><a href=#__codelineno-0-490>490</a></span>
+<span class=normal><a href=#__codelineno-0-491>491</a></span>
+<span class=normal><a href=#__codelineno-0-492>492</a></span>
+<span class=normal><a href=#__codelineno-0-493>493</a></span>
+<span class=normal><a href=#__codelineno-0-494>494</a></span>
+<span class=normal><a href=#__codelineno-0-495>495</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-462 name=__codelineno-0-462></a><span class=nd>@feature_store</span><span class=o>.</span><span class=n>command</span><span class=p>(</span><span class=n>name</span><span class=o>=</span><span class=s2>&quot;materialize-incremental&quot;</span><span class=p>)</span>
 <a id=__codelineno-0-463 name=__codelineno-0-463></a><span class=k>def</span> <span class=nf>feature_store_materialize_incremental</span><span class=p>(</span>
-<a id=__codelineno-0-464 name=__codelineno-0-464></a>    <span class=n>end_ts</span><span class=p>:</span> <span class=nb>str</span> <span class=o>=</span> <span class=n>typer</span><span class=o>.</span><span class=n>Argument</span><span class=p>(</span>
+<a id=__codelineno-0-464 name=__codelineno-0-464></a>    <span class=n>end_ts</span><span class=p>:</span> <span class=n>Optional</span><span class=p>[</span><span class=nb>str</span><span class=p>]</span> <span class=o>=</span> <span class=n>typer</span><span class=o>.</span><span class=n>Argument</span><span class=p>(</span>
 <a id=__codelineno-0-465 name=__codelineno-0-465></a>        <span class=kc>None</span><span class=p>,</span>
-<a id=__codelineno-0-466 name=__codelineno-0-466></a>        <span class=n>help</span><span class=o>=</span><span class=s2>&quot;End timestamp on ISO 8601 format. E.g.: &#39;2022-01-02T01:00:00&#39;&quot;</span><span class=p>,</span>
+<a id=__codelineno-0-466 name=__codelineno-0-466></a>        <span class=n>help</span><span class=o>=</span><span class=s2>&quot;End timestamp on ISO 8601 format. E.g.: &#39;2022-01-02T01:00:00&#39;. If a date isn&#39;t provided, `datetime.utcnow` is used&quot;</span><span class=p>,</span>
 <a id=__codelineno-0-467 name=__codelineno-0-467></a>    <span class=p>),</span>
 <a id=__codelineno-0-468 name=__codelineno-0-468></a>    <span class=n>models</span><span class=p>:</span> <span class=n>Optional</span><span class=p>[</span><span class=n>Models</span><span class=p>]</span> <span class=o>=</span> <span class=n>models_option</span><span class=p>,</span>
 <a id=__codelineno-0-469 name=__codelineno-0-469></a><span class=p>):</span>
@@ -861,10 +866,15 @@
 <a id=__codelineno-0-484 name=__codelineno-0-484></a>    <span class=k>else</span><span class=p>:</span>
 <a id=__codelineno-0-485 name=__codelineno-0-485></a>        <span class=n>views_to_materialize</span> <span class=o>=</span> <span class=p>[</span><span class=n>fv</span><span class=o>.</span><span class=n>name</span> <span class=k>for</span> <span class=n>fv</span> <span class=ow>in</span> <span class=n>repo_contents</span><span class=o>.</span><span class=n>feature_views</span><span class=p>]</span>
 <a id=__codelineno-0-486 name=__codelineno-0-486></a>
-<a id=__codelineno-0-487 name=__codelineno-0-487></a>    <span class=n>fs</span><span class=o>.</span><span class=n>materialize_incremental</span><span class=p>(</span>
-<a id=__codelineno-0-488 name=__codelineno-0-488></a>        <span class=n>feature_views</span><span class=o>=</span><span class=n>views_to_materialize</span><span class=p>,</span>
-<a id=__codelineno-0-489 name=__codelineno-0-489></a>        <span class=n>end_date</span><span class=o>=</span><span class=n>datetime</span><span class=o>.</span><span class=n>fromisoformat</span><span class=p>(</span><span class=n>end_ts</span><span class=p>),</span>
-<a id=__codelineno-0-490 name=__codelineno-0-490></a>    <span class=p>)</span>
+<a id=__codelineno-0-487 name=__codelineno-0-487></a>    <span class=k>if</span> <span class=n>end_ts</span> <span class=ow>is</span> <span class=ow>not</span> <span class=kc>None</span><span class=p>:</span>
+<a id=__codelineno-0-488 name=__codelineno-0-488></a>        <span class=n>end_date</span> <span class=o>=</span> <span class=n>datetime</span><span class=o>.</span><span class=n>fromisoformat</span><span class=p>(</span><span class=n>end_ts</span><span class=p>)</span>
+<a id=__codelineno-0-489 name=__codelineno-0-489></a>    <span class=k>else</span><span class=p>:</span>
+<a id=__codelineno-0-490 name=__codelineno-0-490></a>        <span class=n>end_date</span> <span class=o>=</span> <span class=n>datetime</span><span class=o>.</span><span class=n>utcnow</span><span class=p>()</span>
+<a id=__codelineno-0-491 name=__codelineno-0-491></a>
+<a id=__codelineno-0-492 name=__codelineno-0-492></a>    <span class=n>fs</span><span class=o>.</span><span class=n>materialize_incremental</span><span class=p>(</span>
+<a id=__codelineno-0-493 name=__codelineno-0-493></a>        <span class=n>feature_views</span><span class=o>=</span><span class=n>views_to_materialize</span><span class=p>,</span>
+<a id=__codelineno-0-494 name=__codelineno-0-494></a>        <span class=n>end_date</span><span class=o>=</span><span class=n>end_date</span><span class=p>,</span>
+<a id=__codelineno-0-495 name=__codelineno-0-495></a>    <span class=p>)</span>
 </code></pre></div></td></tr></table></div> </details> </div> </div> <h3 id=amora-feature-store-serve>amora feature-store serve<a class=headerlink href=#amora-feature-store-serve title="Permanent link">&para;</a></h3> <div class="doc doc-object doc-function"> <div class="doc doc-contents first"> <p>Starts the feature server HTTP app.</p> <details class=routes> <summary>Routes</summary> <ul> <li><code>POST /get-online-features</code></li> </ul> <p><code>curl -XPOST -H "Content-type: application/json" -d '{"features": ["step_count_by_source:value_avg", "step_count_by_source:value_sum", "step_count_by_source:value_count"], "entities": {"source_name": ["Mi Fit", "Diogo iPhone", "An invalid source"]}}' 'http://localhost:8666/get-online-features'</code></p> <div class=highlight><pre><span></span><code><a id=__codelineno-0-1 name=__codelineno-0-1 href=#__codelineno-0-1></a><span class=p>{</span><span class=w></span>
 <a id=__codelineno-0-2 name=__codelineno-0-2 href=#__codelineno-0-2></a><span class=w>  </span><span class=nt>&quot;metadata&quot;</span><span class=p>:</span><span class=w> </span><span class=p>{</span><span class=w></span>
 <a id=__codelineno-0-3 name=__codelineno-0-3 href=#__codelineno-0-3></a><span class=w>    </span><span class=nt>&quot;feature_names&quot;</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=w></span>
@@ -950,12 +960,7 @@
 <a id=__codelineno-1-11 name=__codelineno-1-11 href=#__codelineno-1-11></a><span class=w>        </span><span class=p>]</span><span class=w></span>
 <a id=__codelineno-1-12 name=__codelineno-1-12 href=#__codelineno-1-12></a><span class=w>    </span><span class=p>}</span><span class=w></span>
 <a id=__codelineno-1-13 name=__codelineno-1-13 href=#__codelineno-1-13></a><span class=p>]</span><span class=w></span>
-</code></pre></div> </details> <details class=quote> <summary>Source code in <code>amora/cli.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-493>493</a></span>
-<span class=normal><a href=#__codelineno-0-494>494</a></span>
-<span class=normal><a href=#__codelineno-0-495>495</a></span>
-<span class=normal><a href=#__codelineno-0-496>496</a></span>
-<span class=normal><a href=#__codelineno-0-497>497</a></span>
-<span class=normal><a href=#__codelineno-0-498>498</a></span>
+</code></pre></div> </details> <details class=quote> <summary>Source code in <code>amora/cli.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-498>498</a></span>
 <span class=normal><a href=#__codelineno-0-499>499</a></span>
 <span class=normal><a href=#__codelineno-0-500>500</a></span>
 <span class=normal><a href=#__codelineno-0-501>501</a></span>
@@ -1086,141 +1091,146 @@
 <span class=normal><a href=#__codelineno-0-626>626</a></span>
 <span class=normal><a href=#__codelineno-0-627>627</a></span>
 <span class=normal><a href=#__codelineno-0-628>628</a></span>
-<span class=normal><a href=#__codelineno-0-629>629</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-493 name=__codelineno-0-493></a><span class=nd>@feature_store</span><span class=o>.</span><span class=n>command</span><span class=p>(</span><span class=n>name</span><span class=o>=</span><span class=s2>&quot;serve&quot;</span><span class=p>)</span>
-<a id=__codelineno-0-494 name=__codelineno-0-494></a><span class=k>def</span> <span class=nf>feature_store_serve</span><span class=p>():</span>
-<a id=__codelineno-0-495 name=__codelineno-0-495></a>    <span class=sd>&quot;&quot;&quot;</span>
-<a id=__codelineno-0-496 name=__codelineno-0-496></a><span class=sd>    Starts the feature server HTTP app.</span>
-<a id=__codelineno-0-497 name=__codelineno-0-497></a>
-<a id=__codelineno-0-498 name=__codelineno-0-498></a><span class=sd>    Routes:</span>
-<a id=__codelineno-0-499 name=__codelineno-0-499></a>
-<a id=__codelineno-0-500 name=__codelineno-0-500></a><span class=sd>        - `POST /get-online-features`</span>
-<a id=__codelineno-0-501 name=__codelineno-0-501></a>
-<a id=__codelineno-0-502 name=__codelineno-0-502></a><span class=sd>        `curl -XPOST -H &quot;Content-type: application/json&quot; -d &#39;{&quot;features&quot;: [&quot;step_count_by_source:value_avg&quot;, &quot;step_count_by_source:value_sum&quot;, &quot;step_count_by_source:value_count&quot;], &quot;entities&quot;: {&quot;source_name&quot;: [&quot;Mi Fit&quot;, &quot;Diogo iPhone&quot;, &quot;An invalid source&quot;]}}&#39; &#39;http://localhost:8666/get-online-features&#39;`</span>
-<a id=__codelineno-0-503 name=__codelineno-0-503></a>
-<a id=__codelineno-0-504 name=__codelineno-0-504></a><span class=sd>        ```json</span>
-<a id=__codelineno-0-505 name=__codelineno-0-505></a><span class=sd>        {</span>
-<a id=__codelineno-0-506 name=__codelineno-0-506></a><span class=sd>          &quot;metadata&quot;: {</span>
-<a id=__codelineno-0-507 name=__codelineno-0-507></a><span class=sd>            &quot;feature_names&quot;: [</span>
-<a id=__codelineno-0-508 name=__codelineno-0-508></a><span class=sd>              &quot;source_name&quot;,</span>
-<a id=__codelineno-0-509 name=__codelineno-0-509></a><span class=sd>              &quot;value_count&quot;,</span>
-<a id=__codelineno-0-510 name=__codelineno-0-510></a><span class=sd>              &quot;value_sum&quot;,</span>
-<a id=__codelineno-0-511 name=__codelineno-0-511></a><span class=sd>              &quot;value_avg&quot;</span>
-<a id=__codelineno-0-512 name=__codelineno-0-512></a><span class=sd>            ]</span>
-<a id=__codelineno-0-513 name=__codelineno-0-513></a><span class=sd>          },</span>
-<a id=__codelineno-0-514 name=__codelineno-0-514></a><span class=sd>          &quot;results&quot;: [</span>
-<a id=__codelineno-0-515 name=__codelineno-0-515></a><span class=sd>            {</span>
-<a id=__codelineno-0-516 name=__codelineno-0-516></a><span class=sd>              &quot;values&quot;: [</span>
-<a id=__codelineno-0-517 name=__codelineno-0-517></a><span class=sd>                &quot;Mi Fit&quot;,</span>
-<a id=__codelineno-0-518 name=__codelineno-0-518></a><span class=sd>                6.0,</span>
-<a id=__codelineno-0-519 name=__codelineno-0-519></a><span class=sd>                809.0,</span>
-<a id=__codelineno-0-520 name=__codelineno-0-520></a><span class=sd>                134.8333282470703</span>
-<a id=__codelineno-0-521 name=__codelineno-0-521></a><span class=sd>              ],</span>
-<a id=__codelineno-0-522 name=__codelineno-0-522></a><span class=sd>              &quot;statuses&quot;: [</span>
-<a id=__codelineno-0-523 name=__codelineno-0-523></a><span class=sd>                &quot;PRESENT&quot;,</span>
-<a id=__codelineno-0-524 name=__codelineno-0-524></a><span class=sd>                &quot;PRESENT&quot;,</span>
-<a id=__codelineno-0-525 name=__codelineno-0-525></a><span class=sd>                &quot;PRESENT&quot;,</span>
-<a id=__codelineno-0-526 name=__codelineno-0-526></a><span class=sd>                &quot;PRESENT&quot;</span>
-<a id=__codelineno-0-527 name=__codelineno-0-527></a><span class=sd>              ],</span>
-<a id=__codelineno-0-528 name=__codelineno-0-528></a><span class=sd>              &quot;event_timestamps&quot;: [</span>
-<a id=__codelineno-0-529 name=__codelineno-0-529></a><span class=sd>                &quot;1970-01-01T00:00:00Z&quot;,</span>
-<a id=__codelineno-0-530 name=__codelineno-0-530></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
-<a id=__codelineno-0-531 name=__codelineno-0-531></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
-<a id=__codelineno-0-532 name=__codelineno-0-532></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;</span>
-<a id=__codelineno-0-533 name=__codelineno-0-533></a><span class=sd>              ]</span>
-<a id=__codelineno-0-534 name=__codelineno-0-534></a><span class=sd>            },</span>
-<a id=__codelineno-0-535 name=__codelineno-0-535></a><span class=sd>            {</span>
-<a id=__codelineno-0-536 name=__codelineno-0-536></a><span class=sd>              &quot;values&quot;: [</span>
-<a id=__codelineno-0-537 name=__codelineno-0-537></a><span class=sd>                &quot;Diogo iPhone&quot;,</span>
-<a id=__codelineno-0-538 name=__codelineno-0-538></a><span class=sd>                2.0,</span>
-<a id=__codelineno-0-539 name=__codelineno-0-539></a><span class=sd>                17.0,</span>
-<a id=__codelineno-0-540 name=__codelineno-0-540></a><span class=sd>                8.5</span>
-<a id=__codelineno-0-541 name=__codelineno-0-541></a><span class=sd>              ],</span>
-<a id=__codelineno-0-542 name=__codelineno-0-542></a><span class=sd>              &quot;statuses&quot;: [</span>
-<a id=__codelineno-0-543 name=__codelineno-0-543></a><span class=sd>                &quot;PRESENT&quot;,</span>
-<a id=__codelineno-0-544 name=__codelineno-0-544></a><span class=sd>                &quot;PRESENT&quot;,</span>
-<a id=__codelineno-0-545 name=__codelineno-0-545></a><span class=sd>                &quot;PRESENT&quot;,</span>
-<a id=__codelineno-0-546 name=__codelineno-0-546></a><span class=sd>                &quot;PRESENT&quot;</span>
-<a id=__codelineno-0-547 name=__codelineno-0-547></a><span class=sd>              ],</span>
-<a id=__codelineno-0-548 name=__codelineno-0-548></a><span class=sd>              &quot;event_timestamps&quot;: [</span>
-<a id=__codelineno-0-549 name=__codelineno-0-549></a><span class=sd>                &quot;1970-01-01T00:00:00Z&quot;,</span>
-<a id=__codelineno-0-550 name=__codelineno-0-550></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
-<a id=__codelineno-0-551 name=__codelineno-0-551></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
-<a id=__codelineno-0-552 name=__codelineno-0-552></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;</span>
-<a id=__codelineno-0-553 name=__codelineno-0-553></a><span class=sd>              ]</span>
-<a id=__codelineno-0-554 name=__codelineno-0-554></a><span class=sd>            },</span>
-<a id=__codelineno-0-555 name=__codelineno-0-555></a><span class=sd>            {</span>
-<a id=__codelineno-0-556 name=__codelineno-0-556></a><span class=sd>              &quot;values&quot;: [</span>
-<a id=__codelineno-0-557 name=__codelineno-0-557></a><span class=sd>                &quot;An invalid source&quot;,</span>
-<a id=__codelineno-0-558 name=__codelineno-0-558></a><span class=sd>                null,</span>
-<a id=__codelineno-0-559 name=__codelineno-0-559></a><span class=sd>                null,</span>
-<a id=__codelineno-0-560 name=__codelineno-0-560></a><span class=sd>                null</span>
-<a id=__codelineno-0-561 name=__codelineno-0-561></a><span class=sd>              ],</span>
-<a id=__codelineno-0-562 name=__codelineno-0-562></a><span class=sd>              &quot;statuses&quot;: [</span>
-<a id=__codelineno-0-563 name=__codelineno-0-563></a><span class=sd>                &quot;PRESENT&quot;,</span>
-<a id=__codelineno-0-564 name=__codelineno-0-564></a><span class=sd>                &quot;NOT_FOUND&quot;,</span>
-<a id=__codelineno-0-565 name=__codelineno-0-565></a><span class=sd>                &quot;NOT_FOUND&quot;,</span>
-<a id=__codelineno-0-566 name=__codelineno-0-566></a><span class=sd>                &quot;NOT_FOUND&quot;</span>
-<a id=__codelineno-0-567 name=__codelineno-0-567></a><span class=sd>              ],</span>
-<a id=__codelineno-0-568 name=__codelineno-0-568></a><span class=sd>              &quot;event_timestamps&quot;: [</span>
-<a id=__codelineno-0-569 name=__codelineno-0-569></a><span class=sd>                &quot;1970-01-01T00:00:00Z&quot;,</span>
-<a id=__codelineno-0-570 name=__codelineno-0-570></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
-<a id=__codelineno-0-571 name=__codelineno-0-571></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
-<a id=__codelineno-0-572 name=__codelineno-0-572></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;</span>
-<a id=__codelineno-0-573 name=__codelineno-0-573></a><span class=sd>              ]</span>
-<a id=__codelineno-0-574 name=__codelineno-0-574></a><span class=sd>            }</span>
-<a id=__codelineno-0-575 name=__codelineno-0-575></a><span class=sd>          ]</span>
-<a id=__codelineno-0-576 name=__codelineno-0-576></a><span class=sd>        }</span>
-<a id=__codelineno-0-577 name=__codelineno-0-577></a><span class=sd>        ```</span>
-<a id=__codelineno-0-578 name=__codelineno-0-578></a>
-<a id=__codelineno-0-579 name=__codelineno-0-579></a><span class=sd>        More on: https://docs.feast.dev/v/v0.9-branch/user-guide/getting-online-features</span>
-<a id=__codelineno-0-580 name=__codelineno-0-580></a>
-<a id=__codelineno-0-581 name=__codelineno-0-581></a><span class=sd>        - `GET /list-feature-views`. E.g.:</span>
-<a id=__codelineno-0-582 name=__codelineno-0-582></a>
-<a id=__codelineno-0-583 name=__codelineno-0-583></a><span class=sd>        `curl http://localhost:8666/list-feature-views | jq`</span>
-<a id=__codelineno-0-584 name=__codelineno-0-584></a>
-<a id=__codelineno-0-585 name=__codelineno-0-585></a><span class=sd>        ```json</span>
-<a id=__codelineno-0-586 name=__codelineno-0-586></a><span class=sd>        [</span>
-<a id=__codelineno-0-587 name=__codelineno-0-587></a><span class=sd>            {</span>
-<a id=__codelineno-0-588 name=__codelineno-0-588></a><span class=sd>                &quot;name&quot;: &quot;step_count_by_source&quot;,</span>
-<a id=__codelineno-0-589 name=__codelineno-0-589></a><span class=sd>                &quot;features&quot;: [</span>
-<a id=__codelineno-0-590 name=__codelineno-0-590></a><span class=sd>                    &quot;step_count_by_source:value_avg&quot;,</span>
-<a id=__codelineno-0-591 name=__codelineno-0-591></a><span class=sd>                    &quot;step_count_by_source:value_sum&quot;,</span>
-<a id=__codelineno-0-592 name=__codelineno-0-592></a><span class=sd>                    &quot;step_count_by_source:value_count&quot;</span>
-<a id=__codelineno-0-593 name=__codelineno-0-593></a><span class=sd>                ],</span>
-<a id=__codelineno-0-594 name=__codelineno-0-594></a><span class=sd>                &quot;entities&quot;: [</span>
-<a id=__codelineno-0-595 name=__codelineno-0-595></a><span class=sd>                    &quot;source_name&quot;</span>
-<a id=__codelineno-0-596 name=__codelineno-0-596></a><span class=sd>                ]</span>
-<a id=__codelineno-0-597 name=__codelineno-0-597></a><span class=sd>            }</span>
-<a id=__codelineno-0-598 name=__codelineno-0-598></a><span class=sd>        ]</span>
-<a id=__codelineno-0-599 name=__codelineno-0-599></a><span class=sd>        ```</span>
-<a id=__codelineno-0-600 name=__codelineno-0-600></a><span class=sd>    &quot;&quot;&quot;</span>
-<a id=__codelineno-0-601 name=__codelineno-0-601></a>    <span class=kn>import</span> <span class=nn>uvicorn</span>
-<a id=__codelineno-0-602 name=__codelineno-0-602></a>    <span class=kn>from</span> <span class=nn>feast.feature_server</span> <span class=kn>import</span> <span class=n>get_app</span>
-<a id=__codelineno-0-603 name=__codelineno-0-603></a>    <span class=kn>from</span> <span class=nn>prometheus_fastapi_instrumentator</span> <span class=kn>import</span> <span class=n>Instrumentator</span>
-<a id=__codelineno-0-604 name=__codelineno-0-604></a>
-<a id=__codelineno-0-605 name=__codelineno-0-605></a>    <span class=kn>from</span> <span class=nn>amora.feature_store</span> <span class=kn>import</span> <span class=n>fs</span>
-<a id=__codelineno-0-606 name=__codelineno-0-606></a>    <span class=kn>from</span> <span class=nn>amora.feature_store.config</span> <span class=kn>import</span> <span class=n>settings</span>
-<a id=__codelineno-0-607 name=__codelineno-0-607></a>
-<a id=__codelineno-0-608 name=__codelineno-0-608></a>    <span class=n>app</span> <span class=o>=</span> <span class=n>get_app</span><span class=p>(</span><span class=n>store</span><span class=o>=</span><span class=n>fs</span><span class=p>)</span>
+<span class=normal><a href=#__codelineno-0-629>629</a></span>
+<span class=normal><a href=#__codelineno-0-630>630</a></span>
+<span class=normal><a href=#__codelineno-0-631>631</a></span>
+<span class=normal><a href=#__codelineno-0-632>632</a></span>
+<span class=normal><a href=#__codelineno-0-633>633</a></span>
+<span class=normal><a href=#__codelineno-0-634>634</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-498 name=__codelineno-0-498></a><span class=nd>@feature_store</span><span class=o>.</span><span class=n>command</span><span class=p>(</span><span class=n>name</span><span class=o>=</span><span class=s2>&quot;serve&quot;</span><span class=p>)</span>
+<a id=__codelineno-0-499 name=__codelineno-0-499></a><span class=k>def</span> <span class=nf>feature_store_serve</span><span class=p>():</span>
+<a id=__codelineno-0-500 name=__codelineno-0-500></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-501 name=__codelineno-0-501></a><span class=sd>    Starts the feature server HTTP app.</span>
+<a id=__codelineno-0-502 name=__codelineno-0-502></a>
+<a id=__codelineno-0-503 name=__codelineno-0-503></a><span class=sd>    Routes:</span>
+<a id=__codelineno-0-504 name=__codelineno-0-504></a>
+<a id=__codelineno-0-505 name=__codelineno-0-505></a><span class=sd>        - `POST /get-online-features`</span>
+<a id=__codelineno-0-506 name=__codelineno-0-506></a>
+<a id=__codelineno-0-507 name=__codelineno-0-507></a><span class=sd>        `curl -XPOST -H &quot;Content-type: application/json&quot; -d &#39;{&quot;features&quot;: [&quot;step_count_by_source:value_avg&quot;, &quot;step_count_by_source:value_sum&quot;, &quot;step_count_by_source:value_count&quot;], &quot;entities&quot;: {&quot;source_name&quot;: [&quot;Mi Fit&quot;, &quot;Diogo iPhone&quot;, &quot;An invalid source&quot;]}}&#39; &#39;http://localhost:8666/get-online-features&#39;`</span>
+<a id=__codelineno-0-508 name=__codelineno-0-508></a>
+<a id=__codelineno-0-509 name=__codelineno-0-509></a><span class=sd>        ```json</span>
+<a id=__codelineno-0-510 name=__codelineno-0-510></a><span class=sd>        {</span>
+<a id=__codelineno-0-511 name=__codelineno-0-511></a><span class=sd>          &quot;metadata&quot;: {</span>
+<a id=__codelineno-0-512 name=__codelineno-0-512></a><span class=sd>            &quot;feature_names&quot;: [</span>
+<a id=__codelineno-0-513 name=__codelineno-0-513></a><span class=sd>              &quot;source_name&quot;,</span>
+<a id=__codelineno-0-514 name=__codelineno-0-514></a><span class=sd>              &quot;value_count&quot;,</span>
+<a id=__codelineno-0-515 name=__codelineno-0-515></a><span class=sd>              &quot;value_sum&quot;,</span>
+<a id=__codelineno-0-516 name=__codelineno-0-516></a><span class=sd>              &quot;value_avg&quot;</span>
+<a id=__codelineno-0-517 name=__codelineno-0-517></a><span class=sd>            ]</span>
+<a id=__codelineno-0-518 name=__codelineno-0-518></a><span class=sd>          },</span>
+<a id=__codelineno-0-519 name=__codelineno-0-519></a><span class=sd>          &quot;results&quot;: [</span>
+<a id=__codelineno-0-520 name=__codelineno-0-520></a><span class=sd>            {</span>
+<a id=__codelineno-0-521 name=__codelineno-0-521></a><span class=sd>              &quot;values&quot;: [</span>
+<a id=__codelineno-0-522 name=__codelineno-0-522></a><span class=sd>                &quot;Mi Fit&quot;,</span>
+<a id=__codelineno-0-523 name=__codelineno-0-523></a><span class=sd>                6.0,</span>
+<a id=__codelineno-0-524 name=__codelineno-0-524></a><span class=sd>                809.0,</span>
+<a id=__codelineno-0-525 name=__codelineno-0-525></a><span class=sd>                134.8333282470703</span>
+<a id=__codelineno-0-526 name=__codelineno-0-526></a><span class=sd>              ],</span>
+<a id=__codelineno-0-527 name=__codelineno-0-527></a><span class=sd>              &quot;statuses&quot;: [</span>
+<a id=__codelineno-0-528 name=__codelineno-0-528></a><span class=sd>                &quot;PRESENT&quot;,</span>
+<a id=__codelineno-0-529 name=__codelineno-0-529></a><span class=sd>                &quot;PRESENT&quot;,</span>
+<a id=__codelineno-0-530 name=__codelineno-0-530></a><span class=sd>                &quot;PRESENT&quot;,</span>
+<a id=__codelineno-0-531 name=__codelineno-0-531></a><span class=sd>                &quot;PRESENT&quot;</span>
+<a id=__codelineno-0-532 name=__codelineno-0-532></a><span class=sd>              ],</span>
+<a id=__codelineno-0-533 name=__codelineno-0-533></a><span class=sd>              &quot;event_timestamps&quot;: [</span>
+<a id=__codelineno-0-534 name=__codelineno-0-534></a><span class=sd>                &quot;1970-01-01T00:00:00Z&quot;,</span>
+<a id=__codelineno-0-535 name=__codelineno-0-535></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
+<a id=__codelineno-0-536 name=__codelineno-0-536></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
+<a id=__codelineno-0-537 name=__codelineno-0-537></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;</span>
+<a id=__codelineno-0-538 name=__codelineno-0-538></a><span class=sd>              ]</span>
+<a id=__codelineno-0-539 name=__codelineno-0-539></a><span class=sd>            },</span>
+<a id=__codelineno-0-540 name=__codelineno-0-540></a><span class=sd>            {</span>
+<a id=__codelineno-0-541 name=__codelineno-0-541></a><span class=sd>              &quot;values&quot;: [</span>
+<a id=__codelineno-0-542 name=__codelineno-0-542></a><span class=sd>                &quot;Diogo iPhone&quot;,</span>
+<a id=__codelineno-0-543 name=__codelineno-0-543></a><span class=sd>                2.0,</span>
+<a id=__codelineno-0-544 name=__codelineno-0-544></a><span class=sd>                17.0,</span>
+<a id=__codelineno-0-545 name=__codelineno-0-545></a><span class=sd>                8.5</span>
+<a id=__codelineno-0-546 name=__codelineno-0-546></a><span class=sd>              ],</span>
+<a id=__codelineno-0-547 name=__codelineno-0-547></a><span class=sd>              &quot;statuses&quot;: [</span>
+<a id=__codelineno-0-548 name=__codelineno-0-548></a><span class=sd>                &quot;PRESENT&quot;,</span>
+<a id=__codelineno-0-549 name=__codelineno-0-549></a><span class=sd>                &quot;PRESENT&quot;,</span>
+<a id=__codelineno-0-550 name=__codelineno-0-550></a><span class=sd>                &quot;PRESENT&quot;,</span>
+<a id=__codelineno-0-551 name=__codelineno-0-551></a><span class=sd>                &quot;PRESENT&quot;</span>
+<a id=__codelineno-0-552 name=__codelineno-0-552></a><span class=sd>              ],</span>
+<a id=__codelineno-0-553 name=__codelineno-0-553></a><span class=sd>              &quot;event_timestamps&quot;: [</span>
+<a id=__codelineno-0-554 name=__codelineno-0-554></a><span class=sd>                &quot;1970-01-01T00:00:00Z&quot;,</span>
+<a id=__codelineno-0-555 name=__codelineno-0-555></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
+<a id=__codelineno-0-556 name=__codelineno-0-556></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
+<a id=__codelineno-0-557 name=__codelineno-0-557></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;</span>
+<a id=__codelineno-0-558 name=__codelineno-0-558></a><span class=sd>              ]</span>
+<a id=__codelineno-0-559 name=__codelineno-0-559></a><span class=sd>            },</span>
+<a id=__codelineno-0-560 name=__codelineno-0-560></a><span class=sd>            {</span>
+<a id=__codelineno-0-561 name=__codelineno-0-561></a><span class=sd>              &quot;values&quot;: [</span>
+<a id=__codelineno-0-562 name=__codelineno-0-562></a><span class=sd>                &quot;An invalid source&quot;,</span>
+<a id=__codelineno-0-563 name=__codelineno-0-563></a><span class=sd>                null,</span>
+<a id=__codelineno-0-564 name=__codelineno-0-564></a><span class=sd>                null,</span>
+<a id=__codelineno-0-565 name=__codelineno-0-565></a><span class=sd>                null</span>
+<a id=__codelineno-0-566 name=__codelineno-0-566></a><span class=sd>              ],</span>
+<a id=__codelineno-0-567 name=__codelineno-0-567></a><span class=sd>              &quot;statuses&quot;: [</span>
+<a id=__codelineno-0-568 name=__codelineno-0-568></a><span class=sd>                &quot;PRESENT&quot;,</span>
+<a id=__codelineno-0-569 name=__codelineno-0-569></a><span class=sd>                &quot;NOT_FOUND&quot;,</span>
+<a id=__codelineno-0-570 name=__codelineno-0-570></a><span class=sd>                &quot;NOT_FOUND&quot;,</span>
+<a id=__codelineno-0-571 name=__codelineno-0-571></a><span class=sd>                &quot;NOT_FOUND&quot;</span>
+<a id=__codelineno-0-572 name=__codelineno-0-572></a><span class=sd>              ],</span>
+<a id=__codelineno-0-573 name=__codelineno-0-573></a><span class=sd>              &quot;event_timestamps&quot;: [</span>
+<a id=__codelineno-0-574 name=__codelineno-0-574></a><span class=sd>                &quot;1970-01-01T00:00:00Z&quot;,</span>
+<a id=__codelineno-0-575 name=__codelineno-0-575></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
+<a id=__codelineno-0-576 name=__codelineno-0-576></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;,</span>
+<a id=__codelineno-0-577 name=__codelineno-0-577></a><span class=sd>                &quot;2021-07-23T02:00:00Z&quot;</span>
+<a id=__codelineno-0-578 name=__codelineno-0-578></a><span class=sd>              ]</span>
+<a id=__codelineno-0-579 name=__codelineno-0-579></a><span class=sd>            }</span>
+<a id=__codelineno-0-580 name=__codelineno-0-580></a><span class=sd>          ]</span>
+<a id=__codelineno-0-581 name=__codelineno-0-581></a><span class=sd>        }</span>
+<a id=__codelineno-0-582 name=__codelineno-0-582></a><span class=sd>        ```</span>
+<a id=__codelineno-0-583 name=__codelineno-0-583></a>
+<a id=__codelineno-0-584 name=__codelineno-0-584></a><span class=sd>        More on: https://docs.feast.dev/v/v0.9-branch/user-guide/getting-online-features</span>
+<a id=__codelineno-0-585 name=__codelineno-0-585></a>
+<a id=__codelineno-0-586 name=__codelineno-0-586></a><span class=sd>        - `GET /list-feature-views`. E.g.:</span>
+<a id=__codelineno-0-587 name=__codelineno-0-587></a>
+<a id=__codelineno-0-588 name=__codelineno-0-588></a><span class=sd>        `curl http://localhost:8666/list-feature-views | jq`</span>
+<a id=__codelineno-0-589 name=__codelineno-0-589></a>
+<a id=__codelineno-0-590 name=__codelineno-0-590></a><span class=sd>        ```json</span>
+<a id=__codelineno-0-591 name=__codelineno-0-591></a><span class=sd>        [</span>
+<a id=__codelineno-0-592 name=__codelineno-0-592></a><span class=sd>            {</span>
+<a id=__codelineno-0-593 name=__codelineno-0-593></a><span class=sd>                &quot;name&quot;: &quot;step_count_by_source&quot;,</span>
+<a id=__codelineno-0-594 name=__codelineno-0-594></a><span class=sd>                &quot;features&quot;: [</span>
+<a id=__codelineno-0-595 name=__codelineno-0-595></a><span class=sd>                    &quot;step_count_by_source:value_avg&quot;,</span>
+<a id=__codelineno-0-596 name=__codelineno-0-596></a><span class=sd>                    &quot;step_count_by_source:value_sum&quot;,</span>
+<a id=__codelineno-0-597 name=__codelineno-0-597></a><span class=sd>                    &quot;step_count_by_source:value_count&quot;</span>
+<a id=__codelineno-0-598 name=__codelineno-0-598></a><span class=sd>                ],</span>
+<a id=__codelineno-0-599 name=__codelineno-0-599></a><span class=sd>                &quot;entities&quot;: [</span>
+<a id=__codelineno-0-600 name=__codelineno-0-600></a><span class=sd>                    &quot;source_name&quot;</span>
+<a id=__codelineno-0-601 name=__codelineno-0-601></a><span class=sd>                ]</span>
+<a id=__codelineno-0-602 name=__codelineno-0-602></a><span class=sd>            }</span>
+<a id=__codelineno-0-603 name=__codelineno-0-603></a><span class=sd>        ]</span>
+<a id=__codelineno-0-604 name=__codelineno-0-604></a><span class=sd>        ```</span>
+<a id=__codelineno-0-605 name=__codelineno-0-605></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-606 name=__codelineno-0-606></a>    <span class=kn>import</span> <span class=nn>uvicorn</span>
+<a id=__codelineno-0-607 name=__codelineno-0-607></a>    <span class=kn>from</span> <span class=nn>feast.feature_server</span> <span class=kn>import</span> <span class=n>get_app</span>
+<a id=__codelineno-0-608 name=__codelineno-0-608></a>    <span class=kn>from</span> <span class=nn>prometheus_fastapi_instrumentator</span> <span class=kn>import</span> <span class=n>Instrumentator</span>
 <a id=__codelineno-0-609 name=__codelineno-0-609></a>
-<a id=__codelineno-0-610 name=__codelineno-0-610></a>    <span class=nd>@app</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&quot;/list-feature-views&quot;</span><span class=p>)</span>
-<a id=__codelineno-0-611 name=__codelineno-0-611></a>    <span class=k>def</span> <span class=nf>list_feature_views</span><span class=p>():</span>
-<a id=__codelineno-0-612 name=__codelineno-0-612></a>        <span class=n>fvs</span> <span class=o>=</span> <span class=n>fs</span><span class=o>.</span><span class=n>list_feature_views</span><span class=p>()</span>
-<a id=__codelineno-0-613 name=__codelineno-0-613></a>        <span class=k>return</span> <span class=p>[</span>
-<a id=__codelineno-0-614 name=__codelineno-0-614></a>            <span class=p>{</span>
-<a id=__codelineno-0-615 name=__codelineno-0-615></a>                <span class=s2>&quot;name&quot;</span><span class=p>:</span> <span class=n>fv</span><span class=o>.</span><span class=n>name</span><span class=p>,</span>
-<a id=__codelineno-0-616 name=__codelineno-0-616></a>                <span class=s2>&quot;features&quot;</span><span class=p>:</span> <span class=p>[</span><span class=sa>f</span><span class=s2>&quot;</span><span class=si>{</span><span class=n>fv</span><span class=o>.</span><span class=n>name</span><span class=si>}</span><span class=s2>:</span><span class=si>{</span><span class=n>feature</span><span class=o>.</span><span class=n>name</span><span class=si>}</span><span class=s2>&quot;</span> <span class=k>for</span> <span class=n>feature</span> <span class=ow>in</span> <span class=n>fv</span><span class=o>.</span><span class=n>features</span><span class=p>],</span>
-<a id=__codelineno-0-617 name=__codelineno-0-617></a>                <span class=s2>&quot;entities&quot;</span><span class=p>:</span> <span class=n>fv</span><span class=o>.</span><span class=n>entities</span><span class=p>,</span>
-<a id=__codelineno-0-618 name=__codelineno-0-618></a>            <span class=p>}</span>
-<a id=__codelineno-0-619 name=__codelineno-0-619></a>            <span class=k>for</span> <span class=n>fv</span> <span class=ow>in</span> <span class=n>fvs</span>
-<a id=__codelineno-0-620 name=__codelineno-0-620></a>        <span class=p>]</span>
-<a id=__codelineno-0-621 name=__codelineno-0-621></a>
-<a id=__codelineno-0-622 name=__codelineno-0-622></a>    <span class=n>Instrumentator</span><span class=p>()</span><span class=o>.</span><span class=n>instrument</span><span class=p>(</span><span class=n>app</span><span class=p>)</span><span class=o>.</span><span class=n>expose</span><span class=p>(</span><span class=n>app</span><span class=p>)</span>
-<a id=__codelineno-0-623 name=__codelineno-0-623></a>
-<a id=__codelineno-0-624 name=__codelineno-0-624></a>    <span class=n>uvicorn</span><span class=o>.</span><span class=n>run</span><span class=p>(</span>
-<a id=__codelineno-0-625 name=__codelineno-0-625></a>        <span class=n>app</span><span class=p>,</span>
-<a id=__codelineno-0-626 name=__codelineno-0-626></a>        <span class=n>host</span><span class=o>=</span><span class=n>settings</span><span class=o>.</span><span class=n>HTTP_SERVER_HOST</span><span class=p>,</span>
-<a id=__codelineno-0-627 name=__codelineno-0-627></a>        <span class=n>port</span><span class=o>=</span><span class=n>settings</span><span class=o>.</span><span class=n>HTTP_SERVER_PORT</span><span class=p>,</span>
-<a id=__codelineno-0-628 name=__codelineno-0-628></a>        <span class=n>access_log</span><span class=o>=</span><span class=n>settings</span><span class=o>.</span><span class=n>HTTP_ACCESS_LOG_ENABLED</span><span class=p>,</span>
-<a id=__codelineno-0-629 name=__codelineno-0-629></a>    <span class=p>)</span>
+<a id=__codelineno-0-610 name=__codelineno-0-610></a>    <span class=kn>from</span> <span class=nn>amora.feature_store</span> <span class=kn>import</span> <span class=n>fs</span>
+<a id=__codelineno-0-611 name=__codelineno-0-611></a>    <span class=kn>from</span> <span class=nn>amora.feature_store.config</span> <span class=kn>import</span> <span class=n>settings</span>
+<a id=__codelineno-0-612 name=__codelineno-0-612></a>
+<a id=__codelineno-0-613 name=__codelineno-0-613></a>    <span class=n>app</span> <span class=o>=</span> <span class=n>get_app</span><span class=p>(</span><span class=n>store</span><span class=o>=</span><span class=n>fs</span><span class=p>)</span>
+<a id=__codelineno-0-614 name=__codelineno-0-614></a>
+<a id=__codelineno-0-615 name=__codelineno-0-615></a>    <span class=nd>@app</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&quot;/list-feature-views&quot;</span><span class=p>)</span>
+<a id=__codelineno-0-616 name=__codelineno-0-616></a>    <span class=k>def</span> <span class=nf>list_feature_views</span><span class=p>():</span>
+<a id=__codelineno-0-617 name=__codelineno-0-617></a>        <span class=n>fvs</span> <span class=o>=</span> <span class=n>fs</span><span class=o>.</span><span class=n>list_feature_views</span><span class=p>()</span>
+<a id=__codelineno-0-618 name=__codelineno-0-618></a>        <span class=k>return</span> <span class=p>[</span>
+<a id=__codelineno-0-619 name=__codelineno-0-619></a>            <span class=p>{</span>
+<a id=__codelineno-0-620 name=__codelineno-0-620></a>                <span class=s2>&quot;name&quot;</span><span class=p>:</span> <span class=n>fv</span><span class=o>.</span><span class=n>name</span><span class=p>,</span>
+<a id=__codelineno-0-621 name=__codelineno-0-621></a>                <span class=s2>&quot;features&quot;</span><span class=p>:</span> <span class=p>[</span><span class=sa>f</span><span class=s2>&quot;</span><span class=si>{</span><span class=n>fv</span><span class=o>.</span><span class=n>name</span><span class=si>}</span><span class=s2>:</span><span class=si>{</span><span class=n>feature</span><span class=o>.</span><span class=n>name</span><span class=si>}</span><span class=s2>&quot;</span> <span class=k>for</span> <span class=n>feature</span> <span class=ow>in</span> <span class=n>fv</span><span class=o>.</span><span class=n>features</span><span class=p>],</span>
+<a id=__codelineno-0-622 name=__codelineno-0-622></a>                <span class=s2>&quot;entities&quot;</span><span class=p>:</span> <span class=n>fv</span><span class=o>.</span><span class=n>entities</span><span class=p>,</span>
+<a id=__codelineno-0-623 name=__codelineno-0-623></a>            <span class=p>}</span>
+<a id=__codelineno-0-624 name=__codelineno-0-624></a>            <span class=k>for</span> <span class=n>fv</span> <span class=ow>in</span> <span class=n>fvs</span>
+<a id=__codelineno-0-625 name=__codelineno-0-625></a>        <span class=p>]</span>
+<a id=__codelineno-0-626 name=__codelineno-0-626></a>
+<a id=__codelineno-0-627 name=__codelineno-0-627></a>    <span class=n>Instrumentator</span><span class=p>()</span><span class=o>.</span><span class=n>instrument</span><span class=p>(</span><span class=n>app</span><span class=p>)</span><span class=o>.</span><span class=n>expose</span><span class=p>(</span><span class=n>app</span><span class=p>)</span>
+<a id=__codelineno-0-628 name=__codelineno-0-628></a>
+<a id=__codelineno-0-629 name=__codelineno-0-629></a>    <span class=n>uvicorn</span><span class=o>.</span><span class=n>run</span><span class=p>(</span>
+<a id=__codelineno-0-630 name=__codelineno-0-630></a>        <span class=n>app</span><span class=p>,</span>
+<a id=__codelineno-0-631 name=__codelineno-0-631></a>        <span class=n>host</span><span class=o>=</span><span class=n>settings</span><span class=o>.</span><span class=n>HTTP_SERVER_HOST</span><span class=p>,</span>
+<a id=__codelineno-0-632 name=__codelineno-0-632></a>        <span class=n>port</span><span class=o>=</span><span class=n>settings</span><span class=o>.</span><span class=n>HTTP_SERVER_PORT</span><span class=p>,</span>
+<a id=__codelineno-0-633 name=__codelineno-0-633></a>        <span class=n>access_log</span><span class=o>=</span><span class=n>settings</span><span class=o>.</span><span class=n>HTTP_ACCESS_LOG_ENABLED</span><span class=p>,</span>
+<a id=__codelineno-0-634 name=__codelineno-0-634></a>    <span class=p>)</span>
 </code></pre></div></td></tr></table></div> </details> </div> </div> <hr> <div class=md-source-file> <small> Last update: 2022-05-18 </small> </div> </article> </div> </div> </main> <footer class=md-footer> <nav class="md-footer__inner md-grid" aria-label=Footer> <a href=../concepts/data-visualization/ class="md-footer__link md-footer__link--prev" aria-label="Previous: Data Visualization" rel=prev> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg> </div> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Previous </span> Data Visualization </div> </div> </a> <a href=../examples/ class="md-footer__link md-footer__link--next" aria-label="Next: Amora Project" rel=next> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Next </span> Amora Project </div> </div> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg> </div> </a> </nav> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-copyright> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script> <script src=../assets/javascripts/bundle.6e54b5cd.min.js></script> </body> </html>
