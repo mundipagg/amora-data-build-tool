@@ -29,7 +29,7 @@ rich = ">=10.13,<13.0"
 Jinja2 = "^3.0.3"
 sqlparse = ">=0.3.1,<0.5.0"
 SQLAlchemy = { version = "1.4.36", extras = ["mypy"] }
-feast = { version = "0.18.0", extras = ["redis", "gcp"], optional = true }
+feast = { version = "0.20.1", extras = ["redis", "gcp"], optional = true }
 Werkzeug = { version = "2.0.0", optional = true }                           # Bug no dash, com issue conhecida
 dash = { version = "2.4.1", optional = true }
 dash-cytoscape = { version = "0.2.0", optional = true }
