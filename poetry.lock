@@ -1439,7 +1439,7 @@ mkdocs = ">=0.17"
 
 [[package]]
 name = "mkdocs-include-markdown-plugin"
-version = "3.4.0"
+version = "3.4.1"
 description = "Mkdocs Markdown includer plugin."
 category = "dev"
 optional = false
@@ -2899,7 +2899,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9.6,<3.10"
-content-hash = "17cb577ccdb10440542b17b451035d0ffc4263abd3fc1c2a5e4d49c4ffe6ab6c"
+content-hash = "acbab0c498e8ba0ce8138ca7315ceda414410a612b9ab76e117a0b470be2e089"
 
 [metadata.files]
 absl-py = [
@@ -3961,8 +3961,8 @@ mkdocs-git-revision-date-plugin = [
     {file = "mkdocs_git_revision_date_plugin-0.3.2-py3-none-any.whl", hash = "sha256:2e67956cb01823dd2418e2833f3623dee8604cdf223bddd005fe36226a56f6ef"},
 ]
 mkdocs-include-markdown-plugin = [
-    {file = "mkdocs_include_markdown_plugin-3.4.0-py3-none-any.whl", hash = "sha256:b538e89ded65c3cf18ea5b50aa0e2369cc80128a7e5bff77ba8ab155054f10ea"},
-    {file = "mkdocs_include_markdown_plugin-3.4.0.tar.gz", hash = "sha256:238feaa482af13ba3fc77ce215ec92bbd506fd2d1fcebe3ff35f4427865dc64a"},
+    {file = "mkdocs_include_markdown_plugin-3.4.1-py3-none-any.whl", hash = "sha256:d1cacce5f2edac32c066fe452379ff06763eec20c0850f8b431e5eac785ce5b8"},
+    {file = "mkdocs_include_markdown_plugin-3.4.1.tar.gz", hash = "sha256:d9f20fc1cdb693d54562e9ca64fd0a750603190625854d95d782009621d96fcb"},
 ]
 mkdocs-jupyter = [
     {file = "mkdocs-jupyter-0.21.0.tar.gz", hash = "sha256:c8c00ce44456e3cf50c5dc3fe0cb18fab6467fb5bafc2c0bfe1efff3e0a52470"},
