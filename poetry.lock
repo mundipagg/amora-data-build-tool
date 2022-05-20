@@ -347,7 +347,7 @@ python-versions = "*"
 
 [[package]]
 name = "dash-cytoscape"
-version = "0.2.0"
+version = "0.3.0"
 description = "A Component Library for Dash aimed at facilitating network visualization in Python, wrapped around Cytoscape.js"
 category = "main"
 optional = true
@@ -2898,7 +2898,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9.6,<3.10"
-content-hash = "f976fc55ecd19cc490b64bc039ac1410f12f38d163163ad4bb7c0eb1f01cf856"
+content-hash = "3c7f994965e3d56bedc7b4e4210f5cc4f80eed8e3e37cb54d110b6ca83f7e1e6"
 
 [metadata.files]
 absl-py = [
@@ -3207,7 +3207,8 @@ dash-core-components = [
     {file = "dash_core_components-2.0.0.tar.gz", hash = "sha256:c6733874af975e552f95a1398a16c2ee7df14ce43fa60bb3718a3c6e0b63ffee"},
 ]
 dash-cytoscape = [
-    {file = "dash_cytoscape-0.2.0.tar.gz", hash = "sha256:0669c79c197e4b150a5db7a278d1c7acebc947f3f5cbad5274835ebb44f712cd"},
+    {file = "dash_cytoscape-0.3.0-py3-none-any.whl", hash = "sha256:718dc1568b9e7bfe7f64376aa903c64a1a1fe6daed4e559b254456f18dd3135f"},
+    {file = "dash_cytoscape-0.3.0.tar.gz", hash = "sha256:a71ad4fe095570b71d4ad7c0d29199e9780c2e6796173d3b25fccc2cc58c855f"},
 ]
 dash-html-components = [
     {file = "dash_html_components-2.0.0-py3-none-any.whl", hash = "sha256:b42cc903713c9706af03b3f2548bda4be7307a7cf89b7d6eae3da872717d1b63"},
