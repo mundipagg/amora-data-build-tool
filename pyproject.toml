@@ -52,7 +52,7 @@ mkdocs-autorefs = "^0.4.1"
 mkdocstrings = { version = "^0.18.0", extras = ["python"] }
 shed = "^0.9.5"
 pre-commit = "^2.18.1"
-mkdocs-jupyter = "^0.20.1"
+mkdocs-jupyter = "^0.21.0"
 pandas-stubs = "^1.2.0"
 freezegun = "^1.2.1"
 
