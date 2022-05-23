@@ -50,7 +50,7 @@ mkdocs-git-revision-date-plugin = "^0.3.1"
 mkdocs-include-markdown-plugin = "^3.4.1"
 mkdocs-autorefs = "^0.4.1"
 mkdocstrings = { version = "^0.18.0", extras = ["python"] }
-shed = "^0.9.5"
+shed = "^0.10.0"
 pre-commit = "^2.18.1"
 mkdocs-jupyter = "^0.21.0"
 pandas-stubs = "^1.2.0"
