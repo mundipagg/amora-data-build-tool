@@ -1,7 +1,8 @@
 from datetime import datetime
 
 import pytest
-from feast import Feature, FeatureView, ValueType
+from feast import FeatureView, Field as FeastField
+from feast.types import Float64, Int64
 
 from amora.feature_store.decorators import feature_view
 from amora.feature_store.feature_view import name_for_model
@@ -44,9 +45,9 @@ def test_feature_view_on_valid_source_model():
 
     assert isinstance(fv, FeatureView)
     assert fv.name == feature_view_name
-    assert fv.input.event_timestamp_column == DriverActivity.datetime_trunc_day.key
+    assert fv.source.timestamp_field == DriverActivity.datetime_trunc_day.key
     assert fv.entities == ["driver"]
     assert fv.features == [
-        Feature(name=DriverActivity.trips_today.key, dtype=ValueType.INT64),
-        Feature(name=DriverActivity.rating.key, dtype=ValueType.FLOAT),
+        FeastField(name=DriverActivity.trips_today.key, dtype=Int64),
+        FeastField(name=DriverActivity.rating.key, dtype=Float64),
     ]
