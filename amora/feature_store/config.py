@@ -1,7 +1,7 @@
 from enum import Enum
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Dict
+from typing import Dict, Optional
 
 from pydantic import BaseSettings
 
@@ -42,6 +42,9 @@ class FeatureStoreSettings(BaseSettings):
     HTTP_SERVER_HOST: str = "0.0.0.0"
     HTTP_SERVER_PORT: int = 8666
     HTTP_ACCESS_LOG_ENABLED: bool = False
+
+    TQDM_ASCII_LOGGING: bool = False
+    TQDM_DISABLE: Optional[bool] = None
 
     class Config:
         env_prefix = "AMORA_FEATURE_STORE_"

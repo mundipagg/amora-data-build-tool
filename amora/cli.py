@@ -441,7 +441,10 @@ def feature_store_materialize(
     names using `--models`, all registered Feature Views will be materialized.
     """
     from amora.feature_store import fs
+    from amora.feature_store.logging import patch_tqdm
     from amora.feature_store.registry import get_repo_contents
+
+    patch_tqdm()
 
     repo_contents = get_repo_contents()
 
@@ -473,7 +476,10 @@ def feature_store_materialize_incremental(
 
     """
     from amora.feature_store import fs
+    from amora.feature_store.logging import patch_tqdm
     from amora.feature_store.registry import get_repo_contents
+
+    patch_tqdm()
 
     repo_contents = get_repo_contents()
 
