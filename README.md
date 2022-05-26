@@ -11,7 +11,7 @@
 
 <div align="center">
     <a href="https://www.github.com/mundipagg/amora-data-build-tool">
-        <img src="./docs_src/static/amora-stonetech-media.png" alt="Logo" />
+        <img src="https://repository-images.githubusercontent.com/411297222/d1562f7f-cef8-471d-a0c9-82624800908c" alt="Logo" />
     </a>
 </div>
 
