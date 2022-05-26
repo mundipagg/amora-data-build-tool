@@ -1,11 +1,11 @@
 # Amora Data Build Tool (ADBT)
 
 [![codecov](https://codecov.io/gh/mundipagg/amora-data-build-tool/branch/main/graph/badge.svg?token=NXCHI3026S)](https://codecov.io/gh/mundipagg/amora-data-build-tool)
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+![GitHub contributors](https://img.shields.io/github/contributors/mundipagg/amora-data-build-tool?style=flat-square)
+[![GitHub forks](https://img.shields.io/github/forks/mundipagg/amora-data-build-tool?style=flat-square)](https://github.com/mundipagg/amora-data-build-tool/network)
+[![Stargazers](https://img.shields.io/github/stars/mundipagg/amora-data-build-tool?style=flat-square)](https://github.com/mundipagg/amora-data-build-tool/stargazers)
+[![Issues](https://img.shields.io/github/issues/mundipagg/amora-data-build-tool?style=flat-square)](https://github.com/mundipagg/amora-data-build-tool/issues)
+[![MIT License](https://img.shields.io/github/license/mundipagg/amora-data-build-tool?style=flat-square)](https://github.com/mundipagg/amora-data-build-tool/blob/main/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![PyPI version](https://badge.fury.io/py/amora.svg)](https://badge.fury.io/py/amora)
 
