@@ -9,6 +9,12 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![PyPI version](https://badge.fury.io/py/amora.svg)](https://badge.fury.io/py/amora)
 
+<div align="center">
+    <a href="https://www.github.com/mundipagg/amora-data-build-tool">
+        <img src="./docs_src/static/amora-stonetech-media.png" alt="Logo" />
+    </a>
+</div>
+
 ## About The Project
 
  **Amora Data Build Tool** enables analysts and engineers to transform data on the data warehouse (BigQuery) 
