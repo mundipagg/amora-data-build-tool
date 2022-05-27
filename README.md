@@ -1,6 +1,7 @@
 # Amora Data Build Tool (ADBT)
 
 [![codecov](https://codecov.io/gh/mundipagg/amora-data-build-tool/branch/main/graph/badge.svg?token=NXCHI3026S)](https://codecov.io/gh/mundipagg/amora-data-build-tool)
+[![CodeFactor](https://www.codefactor.io/repository/github/mundipagg/amora-data-build-tool/badge)](https://www.codefactor.io/repository/github/mundipagg/amora-data-build-tool)
 ![GitHub contributors](https://img.shields.io/github/contributors/mundipagg/amora-data-build-tool?style=flat-square)
 [![GitHub forks](https://img.shields.io/github/forks/mundipagg/amora-data-build-tool?style=flat-square)](https://github.com/mundipagg/amora-data-build-tool/network)
 [![Stargazers](https://img.shields.io/github/stars/mundipagg/amora-data-build-tool?style=flat-square)](https://github.com/mundipagg/amora-data-build-tool/stargazers)
