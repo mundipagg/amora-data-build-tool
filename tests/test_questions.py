@@ -1,3 +1,4 @@
+import markdown
 import pandas
 import pytest
 from sqlalchemy import literal
@@ -5,6 +6,7 @@ from sqlalchemy import literal
 from amora.models import select
 from amora.questions import QUESTIONS, Question, question
 from amora.types import Compilable
+from amora.visualization import Visualization
 
 
 def test_Question_is_compared_through_question_function():
@@ -71,6 +73,26 @@ def test_Question_answer_df():
         return select(literal("amora").label("answer"))
 
     assert (a_question.answer_df() == pandas.DataFrame([{"answer": "amora"}])).bool()
+
+
+def test_Question_to_markdown():
+    @question
+    def a_question() -> Compilable:
+        return select(literal(42).label("col"))
+
+    assert markdown.markdown(a_question.to_markdown())
+
+
+def test_Question_render():
+    @question
+    def a_question() -> Compilable:
+        return select(literal(42).label("col"))
+
+    vis = a_question.render()
+
+    assert isinstance(vis, Visualization)
+    assert (vis.data == a_question.answer_df()).bool()
+    assert vis.config == a_question.view_config
 
 
 def test_question_decorator_storages_the_Question():
