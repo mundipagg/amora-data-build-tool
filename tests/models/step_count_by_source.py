@@ -14,7 +14,9 @@ from tests.models.steps import Steps
 @feature_view
 class StepCountBySource(AmoraModel, table=True):
     __depends_on__ = [Steps]
-    __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
+    __model_config__ = ModelConfig(
+        materialized=MaterializationTypes.table, tags={"feature-view"}
+    )
 
     value_avg: float
     value_sum: float
