@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "amora"
-version = "0.1.10"
+version = "0.1.11rc1"
 description = "Amora Data Build Tool"
 authors = ["diogommartins <diogo.martins@stone.com.br>"]
 license = "MIT"
