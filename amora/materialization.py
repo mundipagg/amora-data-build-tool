@@ -29,15 +29,23 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
     config = model.__model_config__
     materialization = config.materialized
 
+    if materialization == MaterializationTypes.ephemeral:
+        return None
+
+    client = Client()
+
     if materialization == MaterializationTypes.view:
-        view = Table(model.unique_name)
+        table_name = model.unique_name
+
+        view = Table(table_name)
         view.description = config.description
         view.labels = config.labels
         view.view_query = sql
 
-        return Client().create_table(view, exists_ok=True)
+        client.delete_table(table_name, not_found_ok=True)
+
+        return client.create_table(view)
     elif materialization == MaterializationTypes.table:
-        client = Client()
         query_job = client.query(
             sql,
             job_config=QueryJobConfig(
@@ -58,8 +66,6 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
         return client.update_table(
             table, ["description", "labels", "clustering_fields"]
         )
-    elif materialization == MaterializationTypes.ephemeral:
-        return None
     else:
         raise ValueError(
             f"Invalid model materialization configuration. "

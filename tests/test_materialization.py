@@ -75,6 +75,11 @@ def test_materialize_as_view(Client: MagicMock):
     result = materialize(sql="SELECT 1", model=ViewModel)
 
     client = Client.return_value
+
+    client.delete_table.assert_called_once_with(
+        ViewModel.unique_name, not_found_ok=True
+    )
+
     assert client.create_table.call_count == 1
     assert client.create_table.return_value == result
 
