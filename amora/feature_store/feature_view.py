@@ -1,9 +1,10 @@
-from feast import BigQuerySource, Feature, FeatureView
-from google.protobuf.duration_pb2 import Duration
+from datetime import timedelta
+
+from feast import BigQuerySource, FeatureView, Field
 
 from amora.feature_store import settings
 from amora.feature_store.protocols import FeatureViewSourceProtocol
-from amora.feature_store.type_mapping import SQLALCHEMY_TYPES_TO_FS_TYPES
+from amora.feature_store.type_mapping import SQLALCHEMY_TYPES_TO_FS_DTYPES
 from amora.models import Model
 from amora.providers.bigquery import get_fully_qualified_id
 
@@ -31,16 +32,16 @@ def feature_view_for_model(model: Model) -> FeatureView:
     return FeatureView(
         name=name_for_model(model),
         entities=[col.name for col in model.feature_view_entities()],
-        features=[
-            Feature(
+        schema=[
+            Field(
                 name=col.name,
-                dtype=SQLALCHEMY_TYPES_TO_FS_TYPES[col.type.__class__],
+                dtype=SQLALCHEMY_TYPES_TO_FS_DTYPES[col.type.__class__],
             )
             for col in model.feature_view_features()
         ],
-        batch_source=BigQuerySource(
-            table_ref=get_fully_qualified_id(model),
-            event_timestamp_column=model.feature_view_event_timestamp().key,
+        source=BigQuerySource(
+            table=get_fully_qualified_id(model),
+            timestamp_field=model.feature_view_event_timestamp().key,
         ),
-        ttl=Duration(seconds=settings.DEFAULT_FEATURE_TTL_IN_SECONDS),
+        ttl=timedelta(seconds=settings.DEFAULT_FEATURE_TTL_IN_SECONDS),
     )
