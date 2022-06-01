@@ -13,8 +13,8 @@ runner = CliRunner()
 AMORA_MODELS_COUNT = len(list(list_models()))
 
 
-@patch("amora.cli.dry_run", return_value=None)
-@patch("amora.cli.Console")
+@patch("amora.cli.models.dry_run", return_value=None)
+@patch("amora.cli.models.Console")
 def test_list_without_options(Console: MagicMock, dry_run: MagicMock):
     result = runner.invoke(
         app,
@@ -32,7 +32,7 @@ def test_list_without_options(Console: MagicMock, dry_run: MagicMock):
     dry_run.assert_not_called()
 
 
-@patch("amora.cli.dry_run", return_value=None)
+@patch("amora.cli.models.dry_run", return_value=None)
 def test_list_with_json_format(dry_run: MagicMock):
     result = runner.invoke(
         app,
@@ -48,7 +48,7 @@ def test_list_with_json_format(dry_run: MagicMock):
     dry_run.assert_not_called()
 
 
-@patch("amora.cli.dry_run", return_value=None)
+@patch("amora.cli.models.dry_run", return_value=None)
 def test_list_with_total_bytes_option(dry_run: MagicMock):
     result = runner.invoke(
         app,
@@ -60,7 +60,7 @@ def test_list_with_total_bytes_option(dry_run: MagicMock):
     assert dry_run.call_count == AMORA_MODELS_COUNT
 
 
-@patch("amora.cli.dry_run", return_value=None)
+@patch("amora.cli.models.dry_run", return_value=None)
 def test_list_json_format_and_with_total_bytes_option(dry_run: MagicMock):
     result = runner.invoke(
         app,
@@ -78,7 +78,7 @@ def test_list_json_format_and_with_total_bytes_option(dry_run: MagicMock):
 exc = BigQueryError()
 
 
-@patch("amora.cli.dry_run", side_effect=exc)
+@patch("amora.cli.models.dry_run", side_effect=exc)
 def test_list_with_total_bytes_option_and_dry_run_error(dry_run: MagicMock):
     result = runner.invoke(
         app,

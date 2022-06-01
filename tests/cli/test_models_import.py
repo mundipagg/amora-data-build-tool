@@ -15,7 +15,7 @@ runner = CliRunner()
 exc = NotFound("Table not found")
 
 
-@patch("amora.cli.get_schema", side_effect=exc)
+@patch("amora.cli.models.get_schema", side_effect=exc)
 def test_models_import_with_invalid_table_reference(get_schema: MagicMock):
     table_reference = "project.dataset.table"
 
@@ -59,7 +59,7 @@ mock_schema = [
 ]
 
 
-@patch("amora.cli.get_schema", return_value=mock_schema)
+@patch("amora.cli.models.get_schema", return_value=mock_schema)
 def test_models_import_with_valid_table_reference_and_existing_destination_file_path(
     get_schema: MagicMock,
 ):
@@ -83,7 +83,7 @@ def test_models_import_with_valid_table_reference_and_existing_destination_file_
         assert "Pass `--overwrite` to overwrite file." in result.stdout
 
 
-@patch("amora.cli.get_schema", return_value=mock_schema)
+@patch("amora.cli.models.get_schema", return_value=mock_schema)
 def test_models_import_with_valid_table_reference_and_existing_destination_file_path_and_overwrite(
     get_schema: MagicMock,
 ):
