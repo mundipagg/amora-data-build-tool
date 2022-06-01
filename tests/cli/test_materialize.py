@@ -20,8 +20,8 @@ def teardown_function(module):
     clean_compiled_files()
 
 
-@patch("amora.cli.compile")
-@patch("amora.cli.materialization.materialize")
+@patch("amora.cli.typer_app.compile")
+@patch("amora.materialization.materialize")
 def test_materialize_without_arguments_and_options(
     materialize: MagicMock, compile: MagicMock
 ):
@@ -44,8 +44,8 @@ def test_materialize_without_arguments_and_options(
     compile.assert_called_once_with(target=None, models=tuple())
 
 
-@patch("amora.cli.compile")
-@patch("amora.cli.materialization.materialize")
+@patch("amora.cli.typer_app.compile")
+@patch("amora.materialization.materialize")
 def test_materialize_with_model_options(materialize: MagicMock, compile: MagicMock):
 
     for model in [HeartRate, Steps]:
@@ -64,8 +64,8 @@ def test_materialize_with_model_options(materialize: MagicMock, compile: MagicMo
     compile.assert_called_once_with(models=("steps",), target=None)
 
 
-@patch("amora.cli.compile")
-@patch("amora.cli.materialization.materialize")
+@patch("amora.cli.typer_app.compile")
+@patch("amora.materialization.materialize")
 @patch("amora.dag.DependencyDAG.draw")
 def test_materialize_with_draw_dag_option(
     draw: MagicMock, _materialize: MagicMock, _compile: MagicMock
@@ -79,8 +79,8 @@ def test_materialize_with_draw_dag_option(
     draw.assert_called_once()
 
 
-@patch("amora.cli.compile")
-@patch("amora.cli.materialization.materialize")
+@patch("amora.cli.typer_app.compile")
+@patch("amora.materialization.materialize")
 def test_materialize_with_no_compile_option(materialize: MagicMock, compile: MagicMock):
     result = runner.invoke(
         app,
