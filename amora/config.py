@@ -38,6 +38,9 @@ class Settings(BaseSettings):
 
     TEST_RUN_ID: str = os.getenv("PYTEST_XDIST_TESTRUNUID") or f"amora-{uuid4().hex}"
 
+    DASH_HTTP_HOST: str = "127.0.0.1"
+    DASH_HTTP_PORT: str = "8050"
+
     class Config:
         env_prefix = "AMORA_"
 

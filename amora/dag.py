@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 
 from amora.config import settings
 from amora.materialization import Task
+from amora.models import AmoraModel
 from amora.utils import list_target_files
 
 
@@ -12,6 +13,23 @@ class DependencyDAG(nx.DiGraph):
     def __iter__(self):
         # todo: validar se podemos substituir por graphlib
         return nx.topological_sort(self)
+
+    @classmethod
+    def from_model(cls, model: AmoraModel) -> "DependencyDAG":
+        """
+        Builds the DependencyDAG for a given model
+        """
+        dag = cls()
+        dag.add_node(model.unique_name)
+
+        # fixme: percorrer de forma não recursiva
+        def fetch_edges(node: AmoraModel):
+            for dependency in getattr(node, "__depends_on__", []):
+                dag.add_edge(dependency.unique_name, node.unique_name)
+                fetch_edges(dependency)
+
+        fetch_edges(model)
+        return dag
 
     @classmethod
     def from_tasks(cls, tasks: Iterable[Task]) -> "DependencyDAG":
