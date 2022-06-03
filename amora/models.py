@@ -5,7 +5,7 @@ from enum import Enum, auto
 from importlib.util import module_from_spec, spec_from_file_location
 from inspect import getfile
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
 
 from sqlalchemy import Column, MetaData, Table, select
 from sqlalchemy.orm import declared_attr
@@ -49,6 +49,9 @@ class MaterializationTypes(AutoName):
     table = auto()
 
 
+Tags = Set[str]
+
+
 @dataclass
 class ModelConfig:
     """
@@ -67,6 +70,7 @@ class ModelConfig:
     partition_by: Optional[PartitionConfig] = None
     cluster_by: List[str] = field(default_factory=list)
     labels: Dict[str, str] = field(default_factory=dict)
+    tags: Optional[Tags] = None
 
 
 metadata = MetaData(schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}")
@@ -202,3 +206,10 @@ def list_models(
                 extra={"model_file_path": model_file_path},
             )
             continue
+
+
+def select_models(tags: Tags) -> Iterable[Tuple[Model, Path]]:
+    for model, model_path in list_models():
+        model_tags = model.__model_config__.tags
+        if model_tags and model_tags.intersection(tags):
+            yield model, model_path

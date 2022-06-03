@@ -14,7 +14,9 @@ from examples.amora_project.models.steps import Steps
 @feature_view
 class StepCountBySource(AmoraModel, table=True):
     __depends_on__ = [Steps]
-    __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
+    __model_config__ = ModelConfig(
+        materialized=MaterializationTypes.table, tags={"feature-view"}
+    )
 
     value_avg: float = Field(description="Average step count of the hour")
     value_sum: float = Field(description="Sum of the step counts of the hour")
