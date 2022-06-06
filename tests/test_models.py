@@ -1,6 +1,7 @@
 import inspect
 
 from amora.compilation import compile_statement
+from amora.models import AmoraModel, amora_model_for_name
 
 from tests.models.health import Health
 from tests.models.steps import Steps
@@ -26,3 +27,10 @@ def test_model_without_source():
 def test_model_with_compilable_source():
     assert Steps.source() is not None
     assert isinstance(compile_statement(Steps.source()), str)
+
+
+def test_amora_model_for_name():
+    model = amora_model_for_name(Health.unique_name)
+
+    assert issubclass(model, AmoraModel)
+    assert model.__table__ == Health.__table__
