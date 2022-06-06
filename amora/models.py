@@ -190,6 +190,13 @@ def amora_model_for_target_path(path: Path) -> Model:
     return amora_model_for_path(model_path)
 
 
+def amora_model_for_name(model_name: str) -> Model:
+    for model, path in list_models():
+        if model.unique_name == model_name:
+            return model
+    raise ValueError(f"{model_name} not found on models list")
+
+
 def list_models(
     path: Path = settings.MODELS_PATH,
 ) -> Iterable[Tuple[Model, Path]]:
