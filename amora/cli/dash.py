@@ -1,7 +1,7 @@
 import typer
 
-from amora.config import settings
 from amora.dash.app import dash_app
+from amora.dash.config import settings
 
 app = typer.Typer(help="Amora dashboards")
 
@@ -13,4 +13,4 @@ def generate():
 
 @app.command("serve")
 def serve():
-    dash_app.run(debug=True, host=settings.DASH_HTTP_HOST, port=settings.DASH_HTTP_PORT)
+    dash_app.run(debug=settings.DEBUG, host=settings.HTTP_HOST, port=settings.HTTP_PORT)
