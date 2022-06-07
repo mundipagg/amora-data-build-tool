@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 import pandas as pd
 
@@ -14,7 +14,7 @@ class VisualizationKind(str, Enum):
 
 
 class VisualizationConfig(NamedTuple):
-    title: str
+    title: Optional[str] = None
     kind: VisualizationKind = VisualizationKind.table
 
 
