@@ -22,6 +22,8 @@ jobs:
         python: [ '3.9' ]
         experimental: [ false ]
         include:
+          - python: '3.8'
+            experimental: true
           - python: '3.10'
             experimental: true
     steps:
