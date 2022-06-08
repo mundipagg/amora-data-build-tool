@@ -12,21 +12,35 @@
 
 - cachear informações
 """
-import dash_bootstrap_components as dbc
-import pandas as pd
-from dash import html
-from dash.dash_table import DataTable
-from dash.development.base_component import Component
-from feast import FeatureService, FeatureView
+from typing import Iterable
 
+import dash_bootstrap_components as dbc
+from dash import html
+from dash.development.base_component import Component
+from feast import Feature, FeatureService, FeatureView
+
+from amora.dag import DependencyDAG
+from amora.dash.components import dependency_dag, model_summary
 from amora.feature_store.registry import FEATURE_REGISTRY
+from amora.meta_queries import summarize
 from amora.models import AmoraModel, list_models
+
+
+def entities_list_items(entities: Iterable[str]):
+    for entity in entities:
+        yield dbc.ListGroupItem(entity, color="primary")
+
+
+def features_list_items(features: Iterable[Feature]):
+    for feature in features:
+        yield dbc.ListGroupItem(feature.name)
 
 
 def feature_details(
     fv: FeatureView, fs: FeatureService, model: AmoraModel
 ) -> Component:
-    df = pd.DataFrame(columns=["column_name", "column_type", "fs_type"])
+    summary = summarize(model)
+
     return dbc.Card(
         dbc.CardBody(
             [
@@ -35,7 +49,19 @@ def feature_details(
                     f"Latest time up to which the feature view has been materialized: '{fv.most_recent_end_time}'",
                     className="card-text text-muted",
                 ),
-                DataTable(),
+                html.Div(
+                    [
+                        dbc.Row(model_summary.component(summary)),
+                        dbc.Row(
+                            [
+                                dependency_dag.component(
+                                    dag=DependencyDAG.from_model(model)
+                                ),
+                                dbc.Col("Bla"),
+                            ]
+                        ),
+                    ]
+                ),
             ]
         )
     )
