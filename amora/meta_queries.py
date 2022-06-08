@@ -1,15 +1,18 @@
 import pandas as pd
 from sqlalchemy import Float, Integer, Numeric, func, literal
 
-from amora.models import AmoraModel, Column, select
+from amora.feature_store.protocols import FeatureViewSourceProtocol
+from amora.models import Column, Model, select
 from amora.providers.bigquery import run
 
 
-def summarize(model: AmoraModel) -> pd.DataFrame:
-    return pd.concat([summarize_column(column) for column in model.__table__.columns])
+def summarize(model: Model) -> pd.DataFrame:
+    return pd.concat(
+        [summarize_column(model, column) for column in model.__table__.columns]
+    )
 
 
-def summarize_column(column: Column) -> pd.DataFrame:
+def summarize_column(model: Model, column: Column) -> pd.DataFrame:
     is_numeric = isinstance(column.type, (Numeric, Integer, Float))
 
     stmt = select(
@@ -27,4 +30,11 @@ def summarize_column(column: Column) -> pd.DataFrame:
     df = pd.DataFrame.from_dict({k: [v] for k, v in dict(result.rows.next()).items()})
     df["column_name"] = column.name
     df["column_type"] = str(column.type)
+
+    if isinstance(model, FeatureViewSourceProtocol):
+        df["is_fv_feature"] = column in model.feature_view_features()
+        df["is_fv_entity"] = column in model.feature_view_entities()
+        df["is_fv_event_timestamp"] = (
+            column.name == model.feature_view_event_timestamp().name
+        )
     return df
