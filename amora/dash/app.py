@@ -2,6 +2,7 @@ from dash import Dash, Input, Output, dcc, html
 from dash.development.base_component import Component
 
 from amora.dash.components import model_details, side_bar
+from amora.dash.components.main_content import content
 from amora.dash.config import settings
 from amora.dash.css_styles import styles
 from amora.dash.routes.router import ROUTER
@@ -18,7 +19,7 @@ dash_app.layout = html.Div(
     style=styles["container"],
     children=[
         html.Div(
-            [dcc.Location(id="url"), side_bar.component()],
+            [dcc.Location(id="url"), side_bar.component(), content],
         )
     ],
 )
@@ -45,5 +46,5 @@ def render_page_content(pathname: str) -> Component:
     Input("model-select-dropdown", "value"),
     prevent_initial_call=True,
 )
-def update_model_details(value) -> Component:
+def update_model_details(value: str) -> Component:
     return model_details.component(model=amora_model_for_name(value))
