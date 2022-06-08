@@ -1,6 +1,11 @@
 from feast import FeatureStore, RepoConfig
 
 from amora.feature_store.config import settings
+from amora.feature_store.logging import patch_tqdm
+from amora.feature_store.usage_tracking import patch_usage
+
+patch_usage()
+patch_tqdm()
 
 repo_config = RepoConfig(
     registry=settings.REGISTRY,

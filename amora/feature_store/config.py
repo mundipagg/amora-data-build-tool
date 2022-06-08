@@ -3,6 +3,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Dict, Optional
 
+from feast.usage import USAGE_ENDPOINT as FEAST_USAGE_ENDPOINT
 from pydantic import BaseSettings
 
 from amora.config import ROOT_PATH
@@ -45,6 +46,9 @@ class FeatureStoreSettings(BaseSettings):
 
     TQDM_ASCII_LOGGING: bool = False
     TQDM_DISABLE: Optional[bool] = None
+
+    USAGE_TRACKING_ENABLED: bool = False
+    USAGE_ENDPOINT: str = FEAST_USAGE_ENDPOINT
 
     class Config:
         env_prefix = "AMORA_FEATURE_STORE_"
