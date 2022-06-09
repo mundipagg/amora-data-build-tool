@@ -12,9 +12,6 @@ def patch_usage() -> None:
     from feast import usage
     from feast.constants import FEAST_USAGE
 
-    if settings.USAGE_TRACKING_ENABLED:
-        return
-
     os.environ[FEAST_USAGE] = str(settings.USAGE_TRACKING_ENABLED)
 
     usage._is_enabled = settings.USAGE_TRACKING_ENABLED
