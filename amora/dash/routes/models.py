@@ -23,7 +23,8 @@ def content() -> Component:
     models = [model for (model, _path) in list_models()]
 
     return html.Div(
-        [
+        id="models-content",
+        children=[
             dbc.Row(
                 [
                     dbc.Col(
@@ -38,5 +39,5 @@ def content() -> Component:
                 ],
                 align="start",
             )
-        ]
+        ],
     )
