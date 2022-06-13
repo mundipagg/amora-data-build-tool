@@ -21,29 +21,31 @@ def answer_visualization(visualization: Visualization) -> Component:
             sort_action="native",
             # style_header={"backgroundColor": "rgb(30, 30, 30)", "color": "white"},
             # style_data={"backgroundColor": "rgb(50, 50, 50)", "color": "white"},
+            style_cell={
+                "overflow": "hidden",
+                "textOverflow": "ellipsis",
+                "maxWidth": 0,
+            },
             export_format="csv",
             export_headers="display",
         )
 
 
 def component(question: Question) -> Component:
-    return dbc.CardGroup(
-        [
-            dbc.Card(
-                dbc.CardBody(
+    return dbc.Card(
+        className="question-card",
+        children=dbc.CardBody(
+            [
+                html.H5(question.name, className="card-title"),
+                answer_visualization(question.render()),
+                dbc.Accordion(
                     [
-                        html.H5(question.name, className="card-title"),
-                        answer_visualization(question.render()),
-                        dbc.Accordion(
-                            [
-                                dbc.AccordionItem(
-                                    html.Code(question.sql, lang="sql"), title="SQL"
-                                )
-                            ],
-                            start_collapsed=True,
-                        ),
-                    ]
-                )
-            )
-        ]
+                        dbc.AccordionItem(
+                            html.Code(question.sql, lang="sql"), title="SQL"
+                        )
+                    ],
+                    start_collapsed=True,
+                ),
+            ]
+        ),
     )
