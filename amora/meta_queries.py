@@ -19,8 +19,8 @@ def summarize_column(model: Model, column: Column) -> pd.DataFrame:
         func.min(column).label("min"),
         func.max(column).label("max"),
         func.count(column.distinct()).label("unique_count"),
-        (func.avg(column) if is_numeric else literal(None)).label("avg"),
-        (func.stddev(column) if is_numeric else literal(None)).label("stddev"),
+        (func.avg(column) if is_numeric else literal(None)).label("avg"),  # type: ignore
+        (func.stddev(column) if is_numeric else literal(None)).label("stddev"),  # type: ignore
         ((literal(100) * func.countif(column == None)) / func.count(column)).label(
             "null_percentage"
         ),

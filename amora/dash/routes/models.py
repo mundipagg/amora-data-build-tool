@@ -5,10 +5,10 @@ from dash import dcc, html
 from dash.development.base_component import Component
 
 from amora.dash.components import model_details
-from amora.models import AmoraModel, list_models
+from amora.models import Model, list_models
 
 
-def models_list(models: List[AmoraModel]) -> Component:
+def models_list(models: List[Model]) -> Component:
     options = [model.unique_name for model in models]
 
     return dcc.Dropdown(

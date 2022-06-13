@@ -5,10 +5,10 @@ from dash.development.base_component import Component
 from amora.dag import DependencyDAG
 from amora.dash.components import dependency_dag, materialization_badge, model_summary
 from amora.meta_queries import summarize
-from amora.models import AmoraModel
+from amora.models import Model
 
 
-def component(model: AmoraModel) -> Component:
+def component(model: Model) -> Component:
     model_config = model.__model_config__
     return dbc.Card(
         [

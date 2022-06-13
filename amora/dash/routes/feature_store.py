@@ -23,7 +23,7 @@ from amora.dag import DependencyDAG
 from amora.dash.components import dependency_dag, model_summary
 from amora.feature_store.registry import FEATURE_REGISTRY
 from amora.meta_queries import summarize
-from amora.models import AmoraModel, list_models
+from amora.models import Model, list_models
 
 
 def entities_list_items(entities: Iterable[str]):
@@ -36,9 +36,7 @@ def features_list_items(features: Iterable[Feature]):
         yield dbc.ListGroupItem(feature.name)
 
 
-def feature_details(
-    fv: FeatureView, fs: FeatureService, model: AmoraModel
-) -> Component:
+def feature_details(fv: FeatureView, fs: FeatureService, model: Model) -> Component:
     summary = summarize(model)
 
     return dbc.Card(
