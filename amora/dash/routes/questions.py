@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+import dash_bootstrap_components as dbc
 from dash import html
 from dash.development.base_component import Component
 
@@ -11,4 +12,9 @@ from amora.questions import QUESTIONS
 @lru_cache()
 def content() -> Component:
     list(list_models())
-    return html.Div([question_details.component(question) for question in QUESTIONS])
+    return html.Div(
+        id="questions-content",
+        children=dbc.CardGroup(
+            children=[question_details.component(question) for question in QUESTIONS]
+        ),
+    )
