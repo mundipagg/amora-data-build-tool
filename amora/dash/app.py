@@ -34,7 +34,7 @@ def render_page_content(pathname: str) -> Component:
         # If the user tries to reach a different page, return a 404 message
         return html.Div(
             [
-                html.H1("404: Not found", className="text-danger"),
+                html.H1("404: Not found", className="text-danger", id="page-not-found"),
                 html.Hr(),
                 html.P(f"The pathname `{pathname}` was not recognised..."),
             ]

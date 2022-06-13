@@ -69,16 +69,19 @@ def feature_details(
 
 def content() -> Component:
     list(list_models())
+
     card_group = dbc.CardGroup(
-        [
+        id="feature-store-card-group",
+        children=[
             feature_details(fv, fs, model)
             for (fv, fs, model) in FEATURE_REGISTRY.values()
-        ]
+        ],
     )
     return html.Div(
-        [
+        id="feature-store-content",
+        children=[
             html.H1("Feature Store"),
             html.H2("Registered in this project are:"),
             card_group,
-        ]
+        ],
     )

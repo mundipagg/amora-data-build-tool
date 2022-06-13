@@ -3,11 +3,6 @@ import typer
 app = typer.Typer(help="Amora dashboards")
 
 
-@app.command("generate")
-def generate():
-    pass
-
-
 @app.command("serve")
 def serve():
     from amora.dash.app import dash_app

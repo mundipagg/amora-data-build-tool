@@ -9,10 +9,13 @@ from amora.models import AmoraModel, list_models
 
 
 def models_list(models: List[AmoraModel]) -> Component:
+    options = [model.unique_name for model in models]
+
     return dcc.Dropdown(
-        [model.unique_name for model in models],
+        options=options,
         id="model-select-dropdown",
-        value=models[0].unique_name,
+        value=options[0],
+        placeholder="Select a model",
     )
 
 
