@@ -16,6 +16,7 @@ def test_data_questions_page(dash_duo: DashComposite):
             resource_path="/questions",
             hook_id="questions-content",
             wait_for_callbacks=True,
+            stay_on_page=True,
         )
 
         question_elements = dash_duo.find_elements(".question-card")
