@@ -16,6 +16,29 @@ def component(summary: pd.DataFrame) -> Component:
         # style_header={"backgroundColor": "rgb(30, 30, 30)", "color": "white"},
         # style_data={"backgroundColor": "rgb(50, 50, 50)", "color": "white"},
         style_cell={"overflow": "hidden", "textOverflow": "ellipsis", "maxWidth": 0},
+        style_data_conditional=[
+            {
+                "if": {
+                    "filter_query": "{is_fv_entity} >= 1",
+                    "column_id": "column_name",
+                },
+                "backgroundColor": "#ddccdd",
+            },
+            {
+                "if": {
+                    "filter_query": "{is_fv_feature} >= 1",
+                    "column_id": "column_name",
+                },
+                "backgroundColor": "#ddddcc",
+            },
+            {
+                "if": {
+                    "filter_query": "{is_fv_event_timestamp} >= 1",
+                    "column_id": "column_name",
+                },
+                "backgroundColor": "#ccdddd",
+            },
+        ],
         export_format="csv",
         export_headers="display",
     )
