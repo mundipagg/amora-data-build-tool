@@ -102,4 +102,6 @@ class DependencyDAG(nx.DiGraph):
 
     def root(self):
         sorted_elements = list(self)
+        if not sorted_elements:
+            return None
         return sorted_elements[0]

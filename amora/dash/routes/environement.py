@@ -28,5 +28,6 @@ def content() -> Component:
                     for key, value in get_environment_data()
                 ]
             ),
-        ]
+        ],
+        id="environment-table",
     )

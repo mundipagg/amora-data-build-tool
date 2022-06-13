@@ -52,8 +52,8 @@ def component() -> Component:
         [
             html.H2("🌱 Amora", className="display-4"),
             html.Hr(),
-            # html.P("A simple sidebar layout with navigation links", className="lead"),
             nav(),
         ],
         style=SIDEBAR_STYLE,
+        id="side-bar",
     )
