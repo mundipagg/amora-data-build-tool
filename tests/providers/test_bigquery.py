@@ -1,18 +1,21 @@
+import string
 from datetime import date, datetime, time
 from typing import Optional
 
 import pytest
 from google.api_core.exceptions import NotFound
 from google.cloud.bigquery.schema import SchemaField
-from sqlalchemy import TIMESTAMP, Column
+from sqlalchemy import TIMESTAMP, Column, Integer, String
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.selectable import CTE
+from sqlalchemy_bigquery.base import BQArray
 
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.models import AmoraModel, Field
 from amora.providers.bigquery import (
     DryRunResult,
+    array,
     cte_from_rows,
     dry_run,
     estimated_query_cost_in_usd,
@@ -50,6 +53,13 @@ def test_cte_from_rows_with_distinguished_schema_rows():
 
     with pytest.raises(CompileError):
         compile_statement(cte)
+
+
+def test_cte_from_rows_with_repeated_fields():
+    cte = cte_from_rows([{"x": array(range(10))}, {"x": array(range(10, 20))}])
+
+    assert isinstance(cte, CTE)
+    assert compile_statement(cte)
 
 
 ONE_TERABYTE = 1 * 1024**4
@@ -187,3 +197,45 @@ def test_get_schema_for_source_on_sourceless_model():
         a_string: str = Field(primary_key=True)
 
     assert get_schema_for_source(Model) is None
+
+
+def test_array_of_integers():
+    zero_to_nine = array(range(10))
+
+    assert isinstance(zero_to_nine.type, BQArray)
+    for type_ in zero_to_nine.type.item_type.types:
+        assert isinstance(type_, Integer)
+
+
+def test_array_of_strings():
+    ascii_lowercase = array(string.ascii_lowercase)
+
+    assert isinstance(ascii_lowercase.type, BQArray)
+    for type_ in ascii_lowercase.type.item_type.types:
+        assert isinstance(type_, String)
+
+
+def test_array_raises_an_error_if_input_contains_null_values():
+    """
+    BigQuery raises an error if the query result has an ARRAY which contains NULL elements,
+    although such an ARRAY can be used inside the query.
+
+    Read more: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#array_type
+    """
+
+    with pytest.raises(ValueError):
+        array([1, None, 3])
+
+
+@pytest.mark.skip("I don't know how to implement this")
+def test_array_raises_an_error_if_input_contains_multiple_types():
+    """
+    Array elements should have a common supertype
+
+    Read more: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#declaring_an_array_type
+    """
+    with pytest.raises(ValueError):
+        array([1, "2", 3])
+
+    common_supertype_array = array([1, 2.0, 3])
+    assert isinstance(common_supertype_array, BQArray)
