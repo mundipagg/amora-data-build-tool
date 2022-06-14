@@ -198,10 +198,23 @@ def run(statement: Compilable) -> RunResult:
 
 def dry_run(model: Model) -> Optional[DryRunResult]:
     """
-    >>> dry_run(HeartRate)
+    You can use the estimate returned by the dry run to calculate query
+    costs in the pricing calculator. Also useful to verify user permissions
+    and query validity. You are not charged for performing the dry run.
+
+    Read more: https://cloud.google.com/bigquery/docs/dry-run-queries
+
+    E.g:
+    ```python
+    dry_run(HeartRate)
+    ```
+
+    Will result in:
+
+    ```python
     DryRunResult(
         total_bytes_processed=170181834,
-        query="SELECT\n  `health`.`creationDate`,\n  `health`.`device`,\n  `health`.`endDate`,\n  `health`.`id`,\n  `health`.`sourceName`,\n  `health`.`startDate`,\n  `health`.`unit`,\n  `health`.`value`\nFROM `diogo`.`health`\nWHERE `health`.`type` = 'HeartRate'",
+        query=\"SELECT\\n  `health`.`creationDate`,\\n  `health`.`device`,\\n  `health`.`endDate`,\\n  `health`.`id`,\\n  `health`.`sourceName`,\\n  `health`.`startDate`,\\n  `health`.`unit`,\\n  `health`.`value`\\nFROM `diogo`.`health`\\nWHERE `health`.`type` = 'HeartRate'\",
         model=HeartRate,
         referenced_tables=["amora-data-build-tool.diogo.health"],
         schema=[
@@ -215,12 +228,7 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
             SchemaField("value", "FLOAT", "NULLABLE", None, (), None),
         ],
     )
-
-    You can use the estimate returned by the dry run to calculate query
-    costs in the pricing calculator. Also useful to verify user permissions
-    and query validity. You are not charged for performing the dry run.
-
-    Read more: https://cloud.google.com/bigquery/docs/dry-run-queries
+    ```
     """
     client = get_client()
     source = model.source()
