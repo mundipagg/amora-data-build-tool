@@ -38,6 +38,8 @@ nav:
     - Amora Project: 'examples.md'
     - Feature Store Notebook: 'notebooks/feature_store.ipynb'
   - ⚙️ API Reference: ''
+  - ↔️ Providers:
+      - 'providers/bigquery.md'
   - 🧪 Testing:
       - 'tests/assertions.md'
   -  🔖 Glossary: 'glossary.md'
@@ -57,6 +59,7 @@ plugins:
             show_source: true
             show_root_heading: false
             show_root_toc_entry: false
+            show_root_full_path: false
             show_signature_annotations: true
           filters:
             - "!^_"  # exclude all members starting with _
