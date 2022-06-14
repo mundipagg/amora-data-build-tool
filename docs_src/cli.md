@@ -28,21 +28,21 @@ Commands:
 
 ## amora compile
 
-::: amora.cli.compile
+::: amora.cli.typer_app.compile
 
 ## amora materialize
 
-::: amora.cli.materialize
+::: amora.cli.typer_app.materialize
 
 ## amora test
 
-::: amora.cli.test
+::: amora.cli.typer_app.test
 
 ## amora models
 
 ### amora models list
 
-::: amora.cli.models_list
+::: amora.cli.models.models_list
 
 ![amora models list](static/cli/amora-models-list.png)
 
@@ -114,7 +114,7 @@ $ amora models list --format json
 ```
 
 ### amora models import
-::: amora.cli.models_import
+::: amora.cli.models.models_import
 
 ## amora feature-store 
 
@@ -122,16 +122,16 @@ $ amora models list --format json
     Requires the `feature-store` package extra
 
 ### amora feature-store plan
-::: amora.cli.feature_store_plan
+::: amora.cli.feature_store.feature_store_plan
 
 ### amora feature-store apply
-::: amora.cli.feature_store_apply
+::: amora.cli.feature_store.feature_store_apply
 
 ### amora feature-store materialize
-::: amora.cli.feature_store_materialize
+::: amora.cli.feature_store.feature_store_materialize
 
 ### amora feature-store materialize-incremental
-::: amora.cli.feature_store_materialize_incremental
+::: amora.cli.feature_store.feature_store_materialize_incremental
 
 ### amora feature-store serve
-::: amora.cli.feature_store_serve
+::: amora.cli.feature_store.feature_store_serve
