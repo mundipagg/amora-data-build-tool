@@ -16,6 +16,9 @@ class AmoraBigQueryCompiler(BigQueryCompiler):
         except ValueError:
             return f"{left}[{right}]"
 
+    def visit_array(self, element, **kw) -> str:
+        return "ARRAY[%s]" % self.visit_clauselist(element, **kw)
+
 
 dialect = BigQueryDialect()
 dialect.statement_compiler = AmoraBigQueryCompiler

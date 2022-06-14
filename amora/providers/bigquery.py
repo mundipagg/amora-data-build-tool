@@ -26,8 +26,10 @@ from sqlalchemy import (
     literal,
     literal_column,
 )
+from sqlalchemy.sql import expression, operators
 from sqlalchemy.sql.selectable import CTE
-from sqlalchemy_bigquery.base import unnest
+from sqlalchemy.sql.sqltypes import NullType
+from sqlalchemy_bigquery.base import BQArray, unnest
 from sqlmodel import AutoString
 
 from amora.compilation import compile_statement
@@ -283,8 +285,11 @@ def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
     """
     Returns a table like selectable (CTE) for the given hardcoded values.
 
-    >>> rows = [{"numeric_column": "123"}, {"numeric_column": "234"}, {"numeric_column": "345"}]
-    >>> cte_from_rows(rows)
+    E.g:
+    ```python
+    rows = [{"numeric_column": "123"}, {"numeric_column": "234"}, {"numeric_column": "345"}]
+    cte_from_rows(rows)
+    ```
 
     Will result in the following SQL
 
@@ -307,13 +312,21 @@ def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
     ```
 
     Useful both for model writing and testing purposes. Think of `cte_from_rows` as way of generating
-    a "temporary table like object", with data avaiable at runtime.
+    a "temporary table like object", with data available at runtime.
 
     """
-    selects = [
-        select([literal(value).label(name) for name, value in row.items()])
-        for row in rows
-    ]
+
+    def gen_selects(rows):
+        for row in rows:
+            cols = []
+            for name, value in row.items():
+                if isinstance(value, array):
+                    cols.append(value.label(name))
+                else:
+                    cols.append(literal(value).label(name))
+            yield select(cols)
+
+    selects = list(gen_selects(rows))
 
     if len(selects) == 1:
         return selects[0].cte()
@@ -361,3 +374,75 @@ def estimated_storage_cost_in_usd(total_bytes: int) -> float:
     return (
         total_gigabytes * settings.GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD
     )
+
+
+class array(expression.Tuple):  # type: ignore
+    """
+    A BigQuery ARRAY literal.
+
+    This is used to produce `ARRAY` literals in SQL expressions, e.g.:
+
+    ```python
+    from sqlalchemy import select
+
+    from amora.compilation import compile_statement
+    from amora.providers.bigquery import array
+
+    stmt = select([array([1, 2]).label("a"), array([3, 4, 5]).label("b")])
+
+    compile_statement(stmt)
+    ```
+    Produces the SQL:
+
+    ```sql
+    SELECT
+        ARRAY[1, 2] AS a,
+        ARRAY[3, 4, 5]) AS b
+    ```
+
+    An instance of `array` will always have the datatype `sqlalchemy_bigquery.base.BQArray`.
+    The "inner" type of the array is inferred from the values present, unless the
+    ``type_`` keyword argument is passed, e.g.:
+
+    ```python
+    array(["foo", "bar"], type_=String)
+    ```
+    """
+
+    __visit_name__ = "array"
+
+    def __init__(self, clauses, **kw):
+        super().__init__(*clauses, **kw)
+        self.type = BQArray(self.type)
+
+        for type_ in self.type.item_type.types:
+            if type(type_) is NullType:
+                raise ValueError("Array cannot have a null element")
+
+    def _bind_param(self, operator, obj, _assume_scalar=False, type_=None):
+        if _assume_scalar or operator is operators.getitem:
+            # if getitem->slice were called, Indexable produces
+            # a Slice object from that
+            assert isinstance(obj, int)
+            return expression.BindParameter(
+                None,
+                obj,
+                _compared_to_operator=operator,
+                type_=type_,
+                _compared_to_type=self.type,
+                unique=True,
+            )
+
+        else:
+            return array(
+                [
+                    self._bind_param(operator, o, _assume_scalar=True, type_=type_)
+                    for o in obj
+                ]
+            )
+
+    def self_group(self, against=None):
+        if against in (operators.any_op, operators.all_op, operators.getitem):
+            return expression.Grouping(self)
+        else:
+            return self
