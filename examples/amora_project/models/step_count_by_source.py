@@ -90,7 +90,6 @@ def what_is_the_latest_data_point():
     return select(func.max(StepCountBySource.event_timestamp).label("event_timestamp"))
 
 
-# @question(view_config=VIsualizatioNConfig(), freshness_config=)
 @question
 def what_is_the_total_step_count_to_date():
     """

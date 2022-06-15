@@ -19,8 +19,6 @@ def answer_visualization(visualization: Visualization) -> Component:
             data=visualization.data.to_dict("records"),
             row_selectable="multi",
             sort_action="native",
-            # style_header={"backgroundColor": "rgb(30, 30, 30)", "color": "white"},
-            # style_data={"backgroundColor": "rgb(50, 50, 50)", "color": "white"},
             style_cell={
                 "overflow": "hidden",
                 "textOverflow": "ellipsis",
