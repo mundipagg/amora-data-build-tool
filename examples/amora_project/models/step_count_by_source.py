@@ -53,23 +53,6 @@ class StepCountBySource(AmoraModel, table=True):
         return cls.event_timestamp
 
 
-#
-# - API alternativa
-#
-# @question(StepCountBySource)
-# def how_many_data_points_where_acquired(model):
-#     return select(func.sum(model.value_count))
-#
-#
-#
-#  - Configurar a forma de exibição em um dashboard
-#
-# @question(render_as=RenderTypes.big_number)
-# def how_many_data_points_where_acquired():
-#     return select(func.sum(StepCountBySource.value_count))
-#
-
-
 @question
 def how_many_data_points_where_acquired():
     return select(func.sum(StepCountBySource.value_count).label("total"))
@@ -112,20 +95,3 @@ def what_is_the_current_estimated_walked_distance():
         (estimation_in_cm / 100000).label("total_in_kilometers"),
         StepCountBySource.source_name,
     ).group_by(StepCountBySource.source_name)
-
-
-#
-# dashboard = Dashboard(
-#     questions=[
-#         [
-#             what_is_the_current_estimated_walked_distance,
-#             what_is_the_total_step_count_to_date,
-#         ],
-#         [what_is_the_latest_data_point, what_is_the_total_step_count_to_date],
-#     ],
-#     filters=[
-#         Filter(type="date", default="2021-01-01", title="data de início"),
-#         Filter(type="date", default="2021-01-01", title="data fim"),
-#         Filter(type="accepted_values", values=[distinct_source], title="Source device"),
-#     ],
-# )
