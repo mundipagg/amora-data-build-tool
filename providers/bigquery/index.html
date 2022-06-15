@@ -1,0 +1,635 @@
+<!doctype html><html lang=en class=no-js> <head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="transform data on the data warehouse (BigQuery) by writing Amora Models that describe the data schema using Python's PEP484 - Type Hints"><link rel=icon href=../../assets/images/favicon.png><meta name=generator content="mkdocs-1.3.0, mkdocs-material-8.2.15"><title>BigQuery - Amora Data Build Tool</title><link rel=stylesheet href=../../assets/stylesheets/main.c382b1dc.min.css><link rel=stylesheet href=../../assets/stylesheets/palette.cc9b2e1e.min.css><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback"><style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style><link rel=stylesheet href=../../assets/_mkdocstrings.css><script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script></head> <body dir=ltr data-md-color-scheme=default data-md-color-primary=teal data-md-color-accent> <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script> <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off> <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off> <label class=md-overlay for=__drawer></label> <div data-md-component=skip> <a href=#bigquery class=md-skip> Skip to content </a> </div> <div data-md-component=announce> </div> <header class=md-header data-md-component=header> <nav class="md-header__inner md-grid" aria-label=Header> <a href=../.. title="Amora Data Build Tool" class="md-header__button md-logo" aria-label="Amora Data Build Tool" data-md-component=logo> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg> </a> <label class="md-header__button md-icon" for=__drawer> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg> </label> <div class=md-header__title data-md-component=header-title> <div class=md-header__ellipsis> <div class=md-header__topic> <span class=md-ellipsis> Amora Data Build Tool </span> </div> <div class=md-header__topic data-md-component=header-topic> <span class=md-ellipsis> BigQuery </span> </div> </div> </div> <form class=md-header__option data-md-component=palette> <input class=md-option data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme=default data-md-color-primary=teal data-md-color-accent aria-label="Switch to dark mode" type=radio name=__palette id=__palette_1> <label class="md-header__button md-icon" title="Switch to dark mode" for=__palette_2 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5M7 15a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg> </label> <input class=md-option data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme=slate data-md-color-primary=teal data-md-color-accent aria-label="Switch to light mode" type=radio name=__palette id=__palette_2> <label class="md-header__button md-icon" title="Switch to light mode" for=__palette_1 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg> </label> </form> <label class="md-header__button md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg> </label> <div class=md-search data-md-component=search role=dialog> <label class=md-search__overlay for=__search></label> <div class=md-search__inner role=search> <form class=md-search__form name=search> <input type=text class=md-search__input name=query aria-label=Search placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=search-query required> <label class="md-search__icon md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg> </label> <nav class=md-search__options aria-label=Search> <button type=reset class="md-search__icon md-icon" aria-label=Clear tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg> </button> </nav> </form> <div class=md-search__output> <div class=md-search__scrollwrap data-md-scrollfix> <div class=md-search-result data-md-component=search-result> <div class=md-search-result__meta> Initializing search </div> <ol class=md-search-result__list></ol> </div> </div> </div> </div> </div> <div class=md-header__source> <a href=https://github.com/mundipagg/amora-data-build-tool title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 496 512"><!-- Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> </div> <div class=md-source__repository> amora-data-build-tool </div> </a> </div> </nav> </header> <div class=md-container data-md-component=container> <main class=md-main data-md-component=main> <div class="md-main__inner md-grid"> <div class="md-sidebar md-sidebar--primary" data-md-component=sidebar data-md-type=navigation> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--primary" aria-label=Navigation data-md-level=0> <label class=md-nav__title for=__drawer> <a href=../.. title="Amora Data Build Tool" class="md-nav__button md-logo" aria-label="Amora Data Build Tool" data-md-component=logo> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg> </a> Amora Data Build Tool </label> <div class=md-nav__source> <a href=https://github.com/mundipagg/amora-data-build-tool title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 496 512"><!-- Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> </div> <div class=md-source__repository> amora-data-build-tool </div> </a> </div> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../.. class=md-nav__link> Amora </a> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_2 type=checkbox id=__nav_2> <label class=md-nav__link for=__nav_2> 🏗 Concepts <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="🏗 Concepts" data-md-level=1> <label class=md-nav__title for=__nav_2> <span class="md-nav__icon md-icon"></span> 🏗 Concepts </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../concepts/amora-model/ class=md-nav__link> Amora Model </a> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_2_2 type=checkbox id=__nav_2_2> <label class=md-nav__link for=__nav_2_2> Feature Store <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="Feature Store" data-md-level=2> <label class=md-nav__title for=__nav_2_2> <span class="md-nav__icon md-icon"></span> Feature Store </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../feature-store/feature-store/ class=md-nav__link> Feature Store </a> </li> <li class=md-nav__item> <a href=../../feature-store/feature-view/ class=md-nav__link> Feature View </a> </li> <li class=md-nav__item> <a href=../../feature-store/feature-view-protocol/ class=md-nav__link> Feature View Protocol </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../concepts/data-questions/ class=md-nav__link> Data Question </a> </li> <li class=md-nav__item> <a href=../../concepts/data-visualization/ class=md-nav__link> Data Visualization </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_3 type=checkbox id=__nav_3> <label class=md-nav__link for=__nav_3> 🧑‍🏫 User Guide <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="🧑‍🏫 User Guide" data-md-level=1> <label class=md-nav__title for=__nav_3> <span class="md-nav__icon md-icon"></span> 🧑‍🏫 User Guide </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../cli/ class=md-nav__link> CLI </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_4 type=checkbox id=__nav_4> <label class=md-nav__link for=__nav_4> 🎁 Examples <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="🎁 Examples" data-md-level=1> <label class=md-nav__title for=__nav_4> <span class="md-nav__icon md-icon"></span> 🎁 Examples </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../examples/ class=md-nav__link> Amora Project </a> </li> <li class=md-nav__item> <a href=../../notebooks/feature_store/ class=md-nav__link> Feature Store Notebook </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../.. class=md-nav__link> ⚙️ API Reference </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_6 type=checkbox id=__nav_6 checked> <label class=md-nav__link for=__nav_6> ↔️ Providers <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="↔️ Providers" data-md-level=1> <label class=md-nav__title for=__nav_6> <span class="md-nav__icon md-icon"></span> ↔️ Providers </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--active"> <input class="md-nav__toggle md-toggle" data-md-toggle=toc type=checkbox id=__toc> <label class="md-nav__link md-nav__link--active" for=__toc> BigQuery <span class="md-nav__icon md-icon"></span> </label> <a href=./ class="md-nav__link md-nav__link--active"> BigQuery </a> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#running-queries class=md-nav__link> Running queries </a> <nav class=md-nav aria-label="Running queries"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#amora.providers.bigquery.run class=md-nav__link> run() </a> </li> <li class=md-nav__item> <a href=#amora.providers.bigquery.dry_run class=md-nav__link> dry_run() </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#building-a-cte-from-literal-values class=md-nav__link> Building a CTE from literal values </a> <nav class=md-nav aria-label="Building a CTE from literal values"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#amora.providers.bigquery.cte_from_rows class=md-nav__link> cte_from_rows() </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#cost-estimation class=md-nav__link> Cost estimation </a> <nav class=md-nav aria-label="Cost estimation"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#amora.providers.bigquery.estimated_query_cost_in_usd class=md-nav__link> estimated_query_cost_in_usd() </a> </li> <li class=md-nav__item> <a href=#amora.providers.bigquery.estimated_storage_cost_in_usd class=md-nav__link> estimated_storage_cost_in_usd() </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#data-schema class=md-nav__link> Data schema </a> <nav class=md-nav aria-label="Data schema"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#amora.providers.bigquery.get_schema class=md-nav__link> get_schema() </a> </li> <li class=md-nav__item> <a href=#amora.providers.bigquery.get_schema_for_model class=md-nav__link> get_schema_for_model() </a> </li> <li class=md-nav__item> <a href=#amora.providers.bigquery.get_schema_for_source class=md-nav__link> get_schema_for_source() </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#repeated-fields class=md-nav__link> Repeated Fields </a> <nav class=md-nav aria-label="Repeated Fields"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#amora.providers.bigquery.array class=md-nav__link> array </a> </li> </ul> </nav> </li> </ul> </nav> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle" data-md-toggle=__nav_7 type=checkbox id=__nav_7> <label class=md-nav__link for=__nav_7> 🧪 Testing <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav aria-label="🧪 Testing" data-md-level=1> <label class=md-nav__title for=__nav_7> <span class="md-nav__icon md-icon"></span> 🧪 Testing </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../tests/assertions/ class=md-nav__link> Data Assertions </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../glossary/ class=md-nav__link> 🔖 Glossary </a> </li> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=sidebar data-md-type=toc> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#running-queries class=md-nav__link> Running queries </a> <nav class=md-nav aria-label="Running queries"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#amora.providers.bigquery.run class=md-nav__link> run() </a> </li> <li class=md-nav__item> <a href=#amora.providers.bigquery.dry_run class=md-nav__link> dry_run() </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#building-a-cte-from-literal-values class=md-nav__link> Building a CTE from literal values </a> <nav class=md-nav aria-label="Building a CTE from literal values"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#amora.providers.bigquery.cte_from_rows class=md-nav__link> cte_from_rows() </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#cost-estimation class=md-nav__link> Cost estimation </a> <nav class=md-nav aria-label="Cost estimation"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#amora.providers.bigquery.estimated_query_cost_in_usd class=md-nav__link> estimated_query_cost_in_usd() </a> </li> <li class=md-nav__item> <a href=#amora.providers.bigquery.estimated_storage_cost_in_usd class=md-nav__link> estimated_storage_cost_in_usd() </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#data-schema class=md-nav__link> Data schema </a> <nav class=md-nav aria-label="Data schema"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#amora.providers.bigquery.get_schema class=md-nav__link> get_schema() </a> </li> <li class=md-nav__item> <a href=#amora.providers.bigquery.get_schema_for_model class=md-nav__link> get_schema_for_model() </a> </li> <li class=md-nav__item> <a href=#amora.providers.bigquery.get_schema_for_source class=md-nav__link> get_schema_for_source() </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#repeated-fields class=md-nav__link> Repeated Fields </a> <nav class=md-nav aria-label="Repeated Fields"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#amora.providers.bigquery.array class=md-nav__link> array </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class=md-content data-md-component=content> <article class="md-content__inner md-typeset"> <a href=https://github.com/mundipagg/amora-data-build-tool/edit/master/docs/providers/bigquery.md title="Edit this page" class="md-content__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg> </a> <h1 id=bigquery>BigQuery<a class=headerlink href=#bigquery title="Permanent link">&para;</a></h1> <h2 id=running-queries>Running queries<a class=headerlink href=#running-queries title="Permanent link">&para;</a></h2> <div class="doc doc-object doc-function"> <h3 id=amora.providers.bigquery.run class="doc doc-heading"> <code class="highlight language-python"><span class=n>run</span><span class=p>(</span><span class=n>statement</span><span class=p>:</span> <span class=n>Compilable</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>RunResult</span></code> <a href=#amora.providers.bigquery.run class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents first"> <p>Executes a given query and returns its results and metadata as an <code>amora.providers.bigquery.RunResult</code></p> <details class=quote> <summary>Source code in <code>amora/providers/bigquery.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-174>174</a></span>
+<span class=normal><a href=#__codelineno-0-175>175</a></span>
+<span class=normal><a href=#__codelineno-0-176>176</a></span>
+<span class=normal><a href=#__codelineno-0-177>177</a></span>
+<span class=normal><a href=#__codelineno-0-178>178</a></span>
+<span class=normal><a href=#__codelineno-0-179>179</a></span>
+<span class=normal><a href=#__codelineno-0-180>180</a></span>
+<span class=normal><a href=#__codelineno-0-181>181</a></span>
+<span class=normal><a href=#__codelineno-0-182>182</a></span>
+<span class=normal><a href=#__codelineno-0-183>183</a></span>
+<span class=normal><a href=#__codelineno-0-184>184</a></span>
+<span class=normal><a href=#__codelineno-0-185>185</a></span>
+<span class=normal><a href=#__codelineno-0-186>186</a></span>
+<span class=normal><a href=#__codelineno-0-187>187</a></span>
+<span class=normal><a href=#__codelineno-0-188>188</a></span>
+<span class=normal><a href=#__codelineno-0-189>189</a></span>
+<span class=normal><a href=#__codelineno-0-190>190</a></span>
+<span class=normal><a href=#__codelineno-0-191>191</a></span>
+<span class=normal><a href=#__codelineno-0-192>192</a></span>
+<span class=normal><a href=#__codelineno-0-193>193</a></span>
+<span class=normal><a href=#__codelineno-0-194>194</a></span>
+<span class=normal><a href=#__codelineno-0-195>195</a></span>
+<span class=normal><a href=#__codelineno-0-196>196</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-174 name=__codelineno-0-174></a><span class=k>def</span> <span class=nf>run</span><span class=p>(</span><span class=n>statement</span><span class=p>:</span> <span class=n>Compilable</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>RunResult</span><span class=p>:</span>
+<a id=__codelineno-0-175 name=__codelineno-0-175></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-176 name=__codelineno-0-176></a><span class=sd>    Executes a given query and returns its results</span>
+<a id=__codelineno-0-177 name=__codelineno-0-177></a><span class=sd>    and metadata as an `amora.providers.bigquery.RunResult`</span>
+<a id=__codelineno-0-178 name=__codelineno-0-178></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-179 name=__codelineno-0-179></a>    <span class=n>query</span> <span class=o>=</span> <span class=n>compile_statement</span><span class=p>(</span><span class=n>statement</span><span class=p>)</span>
+<a id=__codelineno-0-180 name=__codelineno-0-180></a>    <span class=n>query_job</span> <span class=o>=</span> <span class=n>get_client</span><span class=p>()</span><span class=o>.</span><span class=n>query</span><span class=p>(</span><span class=n>query</span><span class=p>)</span>
+<a id=__codelineno-0-181 name=__codelineno-0-181></a>    <span class=n>rows</span> <span class=o>=</span> <span class=n>query_job</span><span class=o>.</span><span class=n>result</span><span class=p>()</span>
+<a id=__codelineno-0-182 name=__codelineno-0-182></a>    <span class=n>execution_time_delta</span> <span class=o>=</span> <span class=n>query_job</span><span class=o>.</span><span class=n>ended</span> <span class=o>-</span> <span class=n>query_job</span><span class=o>.</span><span class=n>started</span>
+<a id=__codelineno-0-183 name=__codelineno-0-183></a>
+<a id=__codelineno-0-184 name=__codelineno-0-184></a>    <span class=k>return</span> <span class=n>RunResult</span><span class=p>(</span>
+<a id=__codelineno-0-185 name=__codelineno-0-185></a>        <span class=n>execution_time_in_ms</span><span class=o>=</span><span class=n>execution_time_delta</span><span class=o>.</span><span class=n>microseconds</span> <span class=o>/</span> <span class=mi>1000</span><span class=p>,</span>
+<a id=__codelineno-0-186 name=__codelineno-0-186></a>        <span class=n>job_id</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>job_id</span><span class=p>,</span>
+<a id=__codelineno-0-187 name=__codelineno-0-187></a>        <span class=n>query</span><span class=o>=</span><span class=n>query</span><span class=p>,</span>
+<a id=__codelineno-0-188 name=__codelineno-0-188></a>        <span class=n>referenced_tables</span><span class=o>=</span><span class=p>[</span>
+<a id=__codelineno-0-189 name=__codelineno-0-189></a>            <span class=s2>&quot;.&quot;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=n>table</span><span class=o>.</span><span class=n>to_api_repr</span><span class=p>()</span><span class=o>.</span><span class=n>values</span><span class=p>())</span>
+<a id=__codelineno-0-190 name=__codelineno-0-190></a>            <span class=k>for</span> <span class=n>table</span> <span class=ow>in</span> <span class=n>query_job</span><span class=o>.</span><span class=n>referenced_tables</span>
+<a id=__codelineno-0-191 name=__codelineno-0-191></a>        <span class=p>],</span>
+<a id=__codelineno-0-192 name=__codelineno-0-192></a>        <span class=n>rows</span><span class=o>=</span><span class=n>rows</span><span class=p>,</span>
+<a id=__codelineno-0-193 name=__codelineno-0-193></a>        <span class=n>schema</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>schema</span><span class=p>,</span>
+<a id=__codelineno-0-194 name=__codelineno-0-194></a>        <span class=n>total_bytes</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>total_bytes_billed</span><span class=p>,</span>
+<a id=__codelineno-0-195 name=__codelineno-0-195></a>        <span class=n>user_email</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>user_email</span><span class=p>,</span>
+<a id=__codelineno-0-196 name=__codelineno-0-196></a>    <span class=p>)</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h3 id=amora.providers.bigquery.dry_run class="doc doc-heading"> <code class="highlight language-python"><span class=n>dry_run</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>Model</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=n>DryRunResult</span><span class=p>]</span></code> <a href=#amora.providers.bigquery.dry_run class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents first"> <p>You can use the estimate returned by the dry run to calculate query costs in the pricing calculator. Also useful to verify user permissions and query validity. You are not charged for performing the dry run.</p> <p>Read more: https://cloud.google.com/bigquery/docs/dry-run-queries</p> <p>E.g: <div class=highlight><pre><span></span><code><a id=__codelineno-0-1 name=__codelineno-0-1 href=#__codelineno-0-1></a><span class=n>dry_run</span><span class=p>(</span><span class=n>HeartRate</span><span class=p>)</span>
+</code></pre></div></p> <p>Will result in:</p> <div class=highlight><pre><span></span><code><a id=__codelineno-1-1 name=__codelineno-1-1 href=#__codelineno-1-1></a><span class=n>DryRunResult</span><span class=p>(</span>
+<a id=__codelineno-1-2 name=__codelineno-1-2 href=#__codelineno-1-2></a>    <span class=n>total_bytes_processed</span><span class=o>=</span><span class=mi>170181834</span><span class=p>,</span>
+<a id=__codelineno-1-3 name=__codelineno-1-3 href=#__codelineno-1-3></a>    <span class=n>query</span><span class=o>=</span><span class=s2>&quot;SELECT</span><span class=se>\n</span><span class=s2>  `health`.`creationDate`,</span><span class=se>\n</span><span class=s2>  `health`.`device`,</span><span class=se>\n</span><span class=s2>  `health`.`endDate`,</span><span class=se>\n</span><span class=s2>  `health`.`id`,</span><span class=se>\n</span><span class=s2>  `health`.`sourceName`,</span><span class=se>\n</span><span class=s2>  `health`.`startDate`,</span><span class=se>\n</span><span class=s2>  `health`.`unit`,</span><span class=se>\n</span><span class=s2>  `health`.`value`</span><span class=se>\n</span><span class=s2>FROM `diogo`.`health`</span><span class=se>\n</span><span class=s2>WHERE `health`.`type` = &#39;HeartRate&#39;&quot;</span><span class=p>,</span>
+<a id=__codelineno-1-4 name=__codelineno-1-4 href=#__codelineno-1-4></a>    <span class=n>model</span><span class=o>=</span><span class=n>HeartRate</span><span class=p>,</span>
+<a id=__codelineno-1-5 name=__codelineno-1-5 href=#__codelineno-1-5></a>    <span class=n>referenced_tables</span><span class=o>=</span><span class=p>[</span><span class=s2>&quot;amora-data-build-tool.diogo.health&quot;</span><span class=p>],</span>
+<a id=__codelineno-1-6 name=__codelineno-1-6 href=#__codelineno-1-6></a>    <span class=n>schema</span><span class=o>=</span><span class=p>[</span>
+<a id=__codelineno-1-7 name=__codelineno-1-7 href=#__codelineno-1-7></a>        <span class=n>SchemaField</span><span class=p>(</span><span class=s2>&quot;creationDate&quot;</span><span class=p>,</span> <span class=s2>&quot;TIMESTAMP&quot;</span><span class=p>,</span> <span class=s2>&quot;NULLABLE&quot;</span><span class=p>,</span> <span class=kc>None</span><span class=p>,</span> <span class=p>(),</span> <span class=kc>None</span><span class=p>),</span>
+<a id=__codelineno-1-8 name=__codelineno-1-8 href=#__codelineno-1-8></a>        <span class=n>SchemaField</span><span class=p>(</span><span class=s2>&quot;device&quot;</span><span class=p>,</span> <span class=s2>&quot;STRING&quot;</span><span class=p>,</span> <span class=s2>&quot;NULLABLE&quot;</span><span class=p>,</span> <span class=kc>None</span><span class=p>,</span> <span class=p>(),</span> <span class=kc>None</span><span class=p>),</span>
+<a id=__codelineno-1-9 name=__codelineno-1-9 href=#__codelineno-1-9></a>        <span class=n>SchemaField</span><span class=p>(</span><span class=s2>&quot;endDate&quot;</span><span class=p>,</span> <span class=s2>&quot;TIMESTAMP&quot;</span><span class=p>,</span> <span class=s2>&quot;NULLABLE&quot;</span><span class=p>,</span> <span class=kc>None</span><span class=p>,</span> <span class=p>(),</span> <span class=kc>None</span><span class=p>),</span>
+<a id=__codelineno-1-10 name=__codelineno-1-10 href=#__codelineno-1-10></a>        <span class=n>SchemaField</span><span class=p>(</span><span class=s2>&quot;id&quot;</span><span class=p>,</span> <span class=s2>&quot;INTEGER&quot;</span><span class=p>,</span> <span class=s2>&quot;NULLABLE&quot;</span><span class=p>,</span> <span class=kc>None</span><span class=p>,</span> <span class=p>(),</span> <span class=kc>None</span><span class=p>),</span>
+<a id=__codelineno-1-11 name=__codelineno-1-11 href=#__codelineno-1-11></a>        <span class=n>SchemaField</span><span class=p>(</span><span class=s2>&quot;sourceName&quot;</span><span class=p>,</span> <span class=s2>&quot;STRING&quot;</span><span class=p>,</span> <span class=s2>&quot;NULLABLE&quot;</span><span class=p>,</span> <span class=kc>None</span><span class=p>,</span> <span class=p>(),</span> <span class=kc>None</span><span class=p>),</span>
+<a id=__codelineno-1-12 name=__codelineno-1-12 href=#__codelineno-1-12></a>        <span class=n>SchemaField</span><span class=p>(</span><span class=s2>&quot;startDate&quot;</span><span class=p>,</span> <span class=s2>&quot;TIMESTAMP&quot;</span><span class=p>,</span> <span class=s2>&quot;NULLABLE&quot;</span><span class=p>,</span> <span class=kc>None</span><span class=p>,</span> <span class=p>(),</span> <span class=kc>None</span><span class=p>),</span>
+<a id=__codelineno-1-13 name=__codelineno-1-13 href=#__codelineno-1-13></a>        <span class=n>SchemaField</span><span class=p>(</span><span class=s2>&quot;unit&quot;</span><span class=p>,</span> <span class=s2>&quot;STRING&quot;</span><span class=p>,</span> <span class=s2>&quot;NULLABLE&quot;</span><span class=p>,</span> <span class=kc>None</span><span class=p>,</span> <span class=p>(),</span> <span class=kc>None</span><span class=p>),</span>
+<a id=__codelineno-1-14 name=__codelineno-1-14 href=#__codelineno-1-14></a>        <span class=n>SchemaField</span><span class=p>(</span><span class=s2>&quot;value&quot;</span><span class=p>,</span> <span class=s2>&quot;FLOAT&quot;</span><span class=p>,</span> <span class=s2>&quot;NULLABLE&quot;</span><span class=p>,</span> <span class=kc>None</span><span class=p>,</span> <span class=p>(),</span> <span class=kc>None</span><span class=p>),</span>
+<a id=__codelineno-1-15 name=__codelineno-1-15 href=#__codelineno-1-15></a>    <span class=p>],</span>
+<a id=__codelineno-1-16 name=__codelineno-1-16 href=#__codelineno-1-16></a><span class=p>)</span>
+</code></pre></div> <details class=quote> <summary>Source code in <code>amora/providers/bigquery.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-199>199</a></span>
+<span class=normal><a href=#__codelineno-0-200>200</a></span>
+<span class=normal><a href=#__codelineno-0-201>201</a></span>
+<span class=normal><a href=#__codelineno-0-202>202</a></span>
+<span class=normal><a href=#__codelineno-0-203>203</a></span>
+<span class=normal><a href=#__codelineno-0-204>204</a></span>
+<span class=normal><a href=#__codelineno-0-205>205</a></span>
+<span class=normal><a href=#__codelineno-0-206>206</a></span>
+<span class=normal><a href=#__codelineno-0-207>207</a></span>
+<span class=normal><a href=#__codelineno-0-208>208</a></span>
+<span class=normal><a href=#__codelineno-0-209>209</a></span>
+<span class=normal><a href=#__codelineno-0-210>210</a></span>
+<span class=normal><a href=#__codelineno-0-211>211</a></span>
+<span class=normal><a href=#__codelineno-0-212>212</a></span>
+<span class=normal><a href=#__codelineno-0-213>213</a></span>
+<span class=normal><a href=#__codelineno-0-214>214</a></span>
+<span class=normal><a href=#__codelineno-0-215>215</a></span>
+<span class=normal><a href=#__codelineno-0-216>216</a></span>
+<span class=normal><a href=#__codelineno-0-217>217</a></span>
+<span class=normal><a href=#__codelineno-0-218>218</a></span>
+<span class=normal><a href=#__codelineno-0-219>219</a></span>
+<span class=normal><a href=#__codelineno-0-220>220</a></span>
+<span class=normal><a href=#__codelineno-0-221>221</a></span>
+<span class=normal><a href=#__codelineno-0-222>222</a></span>
+<span class=normal><a href=#__codelineno-0-223>223</a></span>
+<span class=normal><a href=#__codelineno-0-224>224</a></span>
+<span class=normal><a href=#__codelineno-0-225>225</a></span>
+<span class=normal><a href=#__codelineno-0-226>226</a></span>
+<span class=normal><a href=#__codelineno-0-227>227</a></span>
+<span class=normal><a href=#__codelineno-0-228>228</a></span>
+<span class=normal><a href=#__codelineno-0-229>229</a></span>
+<span class=normal><a href=#__codelineno-0-230>230</a></span>
+<span class=normal><a href=#__codelineno-0-231>231</a></span>
+<span class=normal><a href=#__codelineno-0-232>232</a></span>
+<span class=normal><a href=#__codelineno-0-233>233</a></span>
+<span class=normal><a href=#__codelineno-0-234>234</a></span>
+<span class=normal><a href=#__codelineno-0-235>235</a></span>
+<span class=normal><a href=#__codelineno-0-236>236</a></span>
+<span class=normal><a href=#__codelineno-0-237>237</a></span>
+<span class=normal><a href=#__codelineno-0-238>238</a></span>
+<span class=normal><a href=#__codelineno-0-239>239</a></span>
+<span class=normal><a href=#__codelineno-0-240>240</a></span>
+<span class=normal><a href=#__codelineno-0-241>241</a></span>
+<span class=normal><a href=#__codelineno-0-242>242</a></span>
+<span class=normal><a href=#__codelineno-0-243>243</a></span>
+<span class=normal><a href=#__codelineno-0-244>244</a></span>
+<span class=normal><a href=#__codelineno-0-245>245</a></span>
+<span class=normal><a href=#__codelineno-0-246>246</a></span>
+<span class=normal><a href=#__codelineno-0-247>247</a></span>
+<span class=normal><a href=#__codelineno-0-248>248</a></span>
+<span class=normal><a href=#__codelineno-0-249>249</a></span>
+<span class=normal><a href=#__codelineno-0-250>250</a></span>
+<span class=normal><a href=#__codelineno-0-251>251</a></span>
+<span class=normal><a href=#__codelineno-0-252>252</a></span>
+<span class=normal><a href=#__codelineno-0-253>253</a></span>
+<span class=normal><a href=#__codelineno-0-254>254</a></span>
+<span class=normal><a href=#__codelineno-0-255>255</a></span>
+<span class=normal><a href=#__codelineno-0-256>256</a></span>
+<span class=normal><a href=#__codelineno-0-257>257</a></span>
+<span class=normal><a href=#__codelineno-0-258>258</a></span>
+<span class=normal><a href=#__codelineno-0-259>259</a></span>
+<span class=normal><a href=#__codelineno-0-260>260</a></span>
+<span class=normal><a href=#__codelineno-0-261>261</a></span>
+<span class=normal><a href=#__codelineno-0-262>262</a></span>
+<span class=normal><a href=#__codelineno-0-263>263</a></span>
+<span class=normal><a href=#__codelineno-0-264>264</a></span>
+<span class=normal><a href=#__codelineno-0-265>265</a></span>
+<span class=normal><a href=#__codelineno-0-266>266</a></span>
+<span class=normal><a href=#__codelineno-0-267>267</a></span>
+<span class=normal><a href=#__codelineno-0-268>268</a></span>
+<span class=normal><a href=#__codelineno-0-269>269</a></span>
+<span class=normal><a href=#__codelineno-0-270>270</a></span>
+<span class=normal><a href=#__codelineno-0-271>271</a></span>
+<span class=normal><a href=#__codelineno-0-272>272</a></span>
+<span class=normal><a href=#__codelineno-0-273>273</a></span>
+<span class=normal><a href=#__codelineno-0-274>274</a></span>
+<span class=normal><a href=#__codelineno-0-275>275</a></span>
+<span class=normal><a href=#__codelineno-0-276>276</a></span>
+<span class=normal><a href=#__codelineno-0-277>277</a></span>
+<span class=normal><a href=#__codelineno-0-278>278</a></span>
+<span class=normal><a href=#__codelineno-0-279>279</a></span>
+<span class=normal><a href=#__codelineno-0-280>280</a></span>
+<span class=normal><a href=#__codelineno-0-281>281</a></span>
+<span class=normal><a href=#__codelineno-0-282>282</a></span>
+<span class=normal><a href=#__codelineno-0-283>283</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-199 name=__codelineno-0-199></a><span class=k>def</span> <span class=nf>dry_run</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>Model</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=n>DryRunResult</span><span class=p>]:</span>
+<a id=__codelineno-0-200 name=__codelineno-0-200></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-201 name=__codelineno-0-201></a><span class=sd>    You can use the estimate returned by the dry run to calculate query</span>
+<a id=__codelineno-0-202 name=__codelineno-0-202></a><span class=sd>    costs in the pricing calculator. Also useful to verify user permissions</span>
+<a id=__codelineno-0-203 name=__codelineno-0-203></a><span class=sd>    and query validity. You are not charged for performing the dry run.</span>
+<a id=__codelineno-0-204 name=__codelineno-0-204></a>
+<a id=__codelineno-0-205 name=__codelineno-0-205></a><span class=sd>    Read more: https://cloud.google.com/bigquery/docs/dry-run-queries</span>
+<a id=__codelineno-0-206 name=__codelineno-0-206></a>
+<a id=__codelineno-0-207 name=__codelineno-0-207></a><span class=sd>    E.g:</span>
+<a id=__codelineno-0-208 name=__codelineno-0-208></a><span class=sd>    ```python</span>
+<a id=__codelineno-0-209 name=__codelineno-0-209></a><span class=sd>    dry_run(HeartRate)</span>
+<a id=__codelineno-0-210 name=__codelineno-0-210></a><span class=sd>    ```</span>
+<a id=__codelineno-0-211 name=__codelineno-0-211></a>
+<a id=__codelineno-0-212 name=__codelineno-0-212></a><span class=sd>    Will result in:</span>
+<a id=__codelineno-0-213 name=__codelineno-0-213></a>
+<a id=__codelineno-0-214 name=__codelineno-0-214></a><span class=sd>    ```python</span>
+<a id=__codelineno-0-215 name=__codelineno-0-215></a><span class=sd>    DryRunResult(</span>
+<a id=__codelineno-0-216 name=__codelineno-0-216></a><span class=sd>        total_bytes_processed=170181834,</span>
+<a id=__codelineno-0-217 name=__codelineno-0-217></a><span class=sd>        query=\&quot;SELECT\\n  `health`.`creationDate`,\\n  `health`.`device`,\\n  `health`.`endDate`,\\n  `health`.`id`,\\n  `health`.`sourceName`,\\n  `health`.`startDate`,\\n  `health`.`unit`,\\n  `health`.`value`\\nFROM `diogo`.`health`\\nWHERE `health`.`type` = &#39;HeartRate&#39;\&quot;,</span>
+<a id=__codelineno-0-218 name=__codelineno-0-218></a><span class=sd>        model=HeartRate,</span>
+<a id=__codelineno-0-219 name=__codelineno-0-219></a><span class=sd>        referenced_tables=[&quot;amora-data-build-tool.diogo.health&quot;],</span>
+<a id=__codelineno-0-220 name=__codelineno-0-220></a><span class=sd>        schema=[</span>
+<a id=__codelineno-0-221 name=__codelineno-0-221></a><span class=sd>            SchemaField(&quot;creationDate&quot;, &quot;TIMESTAMP&quot;, &quot;NULLABLE&quot;, None, (), None),</span>
+<a id=__codelineno-0-222 name=__codelineno-0-222></a><span class=sd>            SchemaField(&quot;device&quot;, &quot;STRING&quot;, &quot;NULLABLE&quot;, None, (), None),</span>
+<a id=__codelineno-0-223 name=__codelineno-0-223></a><span class=sd>            SchemaField(&quot;endDate&quot;, &quot;TIMESTAMP&quot;, &quot;NULLABLE&quot;, None, (), None),</span>
+<a id=__codelineno-0-224 name=__codelineno-0-224></a><span class=sd>            SchemaField(&quot;id&quot;, &quot;INTEGER&quot;, &quot;NULLABLE&quot;, None, (), None),</span>
+<a id=__codelineno-0-225 name=__codelineno-0-225></a><span class=sd>            SchemaField(&quot;sourceName&quot;, &quot;STRING&quot;, &quot;NULLABLE&quot;, None, (), None),</span>
+<a id=__codelineno-0-226 name=__codelineno-0-226></a><span class=sd>            SchemaField(&quot;startDate&quot;, &quot;TIMESTAMP&quot;, &quot;NULLABLE&quot;, None, (), None),</span>
+<a id=__codelineno-0-227 name=__codelineno-0-227></a><span class=sd>            SchemaField(&quot;unit&quot;, &quot;STRING&quot;, &quot;NULLABLE&quot;, None, (), None),</span>
+<a id=__codelineno-0-228 name=__codelineno-0-228></a><span class=sd>            SchemaField(&quot;value&quot;, &quot;FLOAT&quot;, &quot;NULLABLE&quot;, None, (), None),</span>
+<a id=__codelineno-0-229 name=__codelineno-0-229></a><span class=sd>        ],</span>
+<a id=__codelineno-0-230 name=__codelineno-0-230></a><span class=sd>    )</span>
+<a id=__codelineno-0-231 name=__codelineno-0-231></a><span class=sd>    ```</span>
+<a id=__codelineno-0-232 name=__codelineno-0-232></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-233 name=__codelineno-0-233></a>    <span class=n>client</span> <span class=o>=</span> <span class=n>get_client</span><span class=p>()</span>
+<a id=__codelineno-0-234 name=__codelineno-0-234></a>    <span class=n>source</span> <span class=o>=</span> <span class=n>model</span><span class=o>.</span><span class=n>source</span><span class=p>()</span>
+<a id=__codelineno-0-235 name=__codelineno-0-235></a>    <span class=k>if</span> <span class=n>source</span> <span class=ow>is</span> <span class=kc>None</span><span class=p>:</span>
+<a id=__codelineno-0-236 name=__codelineno-0-236></a>        <span class=n>table</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=n>get_table</span><span class=p>(</span><span class=n>get_fully_qualified_id</span><span class=p>(</span><span class=n>model</span><span class=p>))</span>
+<a id=__codelineno-0-237 name=__codelineno-0-237></a>
+<a id=__codelineno-0-238 name=__codelineno-0-238></a>        <span class=k>if</span> <span class=n>table</span><span class=o>.</span><span class=n>table_type</span> <span class=o>==</span> <span class=s2>&quot;VIEW&quot;</span><span class=p>:</span>
+<a id=__codelineno-0-239 name=__codelineno-0-239></a>            <span class=n>query_job</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=n>query</span><span class=p>(</span>
+<a id=__codelineno-0-240 name=__codelineno-0-240></a>                <span class=n>query</span><span class=o>=</span><span class=n>table</span><span class=o>.</span><span class=n>view_query</span><span class=p>,</span>
+<a id=__codelineno-0-241 name=__codelineno-0-241></a>                <span class=n>job_config</span><span class=o>=</span><span class=n>QueryJobConfig</span><span class=p>(</span><span class=n>dry_run</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>use_query_cache</span><span class=o>=</span><span class=kc>False</span><span class=p>),</span>
+<a id=__codelineno-0-242 name=__codelineno-0-242></a>            <span class=p>)</span>
+<a id=__codelineno-0-243 name=__codelineno-0-243></a>            <span class=k>return</span> <span class=n>DryRunResult</span><span class=p>(</span>
+<a id=__codelineno-0-244 name=__codelineno-0-244></a>                <span class=n>job_id</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>job_id</span><span class=p>,</span>
+<a id=__codelineno-0-245 name=__codelineno-0-245></a>                <span class=n>model</span><span class=o>=</span><span class=n>model</span><span class=p>,</span>
+<a id=__codelineno-0-246 name=__codelineno-0-246></a>                <span class=n>query</span><span class=o>=</span><span class=n>table</span><span class=o>.</span><span class=n>view_query</span><span class=p>,</span>
+<a id=__codelineno-0-247 name=__codelineno-0-247></a>                <span class=n>referenced_tables</span><span class=o>=</span><span class=p>[</span>
+<a id=__codelineno-0-248 name=__codelineno-0-248></a>                    <span class=s2>&quot;.&quot;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=n>table</span><span class=o>.</span><span class=n>to_api_repr</span><span class=p>()</span><span class=o>.</span><span class=n>values</span><span class=p>())</span>
+<a id=__codelineno-0-249 name=__codelineno-0-249></a>                    <span class=k>for</span> <span class=n>table</span> <span class=ow>in</span> <span class=n>query_job</span><span class=o>.</span><span class=n>referenced_tables</span>
+<a id=__codelineno-0-250 name=__codelineno-0-250></a>                <span class=p>],</span>
+<a id=__codelineno-0-251 name=__codelineno-0-251></a>                <span class=n>schema</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>schema</span><span class=p>,</span>
+<a id=__codelineno-0-252 name=__codelineno-0-252></a>                <span class=n>total_bytes</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>total_bytes_processed</span><span class=p>,</span>
+<a id=__codelineno-0-253 name=__codelineno-0-253></a>                <span class=n>user_email</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>user_email</span><span class=p>,</span>
+<a id=__codelineno-0-254 name=__codelineno-0-254></a>            <span class=p>)</span>
+<a id=__codelineno-0-255 name=__codelineno-0-255></a>        <span class=k>else</span><span class=p>:</span>
+<a id=__codelineno-0-256 name=__codelineno-0-256></a>            <span class=k>return</span> <span class=n>DryRunResult</span><span class=p>(</span>
+<a id=__codelineno-0-257 name=__codelineno-0-257></a>                <span class=n>job_id</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span>
+<a id=__codelineno-0-258 name=__codelineno-0-258></a>                <span class=n>model</span><span class=o>=</span><span class=n>model</span><span class=p>,</span>
+<a id=__codelineno-0-259 name=__codelineno-0-259></a>                <span class=n>query</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span>
+<a id=__codelineno-0-260 name=__codelineno-0-260></a>                <span class=n>referenced_tables</span><span class=o>=</span><span class=p>[</span><span class=nb>str</span><span class=p>(</span><span class=n>table</span><span class=o>.</span><span class=n>reference</span><span class=p>)],</span>
+<a id=__codelineno-0-261 name=__codelineno-0-261></a>                <span class=n>schema</span><span class=o>=</span><span class=n>table</span><span class=o>.</span><span class=n>schema</span><span class=p>,</span>
+<a id=__codelineno-0-262 name=__codelineno-0-262></a>                <span class=n>total_bytes</span><span class=o>=</span><span class=n>table</span><span class=o>.</span><span class=n>num_bytes</span><span class=p>,</span>
+<a id=__codelineno-0-263 name=__codelineno-0-263></a>                <span class=n>user_email</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span>
+<a id=__codelineno-0-264 name=__codelineno-0-264></a>            <span class=p>)</span>
+<a id=__codelineno-0-265 name=__codelineno-0-265></a>
+<a id=__codelineno-0-266 name=__codelineno-0-266></a>    <span class=n>query</span> <span class=o>=</span> <span class=n>compile_statement</span><span class=p>(</span><span class=n>source</span><span class=p>)</span>
+<a id=__codelineno-0-267 name=__codelineno-0-267></a>
+<a id=__codelineno-0-268 name=__codelineno-0-268></a>    <span class=n>query_job</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=n>query</span><span class=p>(</span>
+<a id=__codelineno-0-269 name=__codelineno-0-269></a>        <span class=n>query</span><span class=o>=</span><span class=n>query</span><span class=p>,</span>
+<a id=__codelineno-0-270 name=__codelineno-0-270></a>        <span class=n>job_config</span><span class=o>=</span><span class=n>QueryJobConfig</span><span class=p>(</span><span class=n>dry_run</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>use_query_cache</span><span class=o>=</span><span class=kc>False</span><span class=p>),</span>
+<a id=__codelineno-0-271 name=__codelineno-0-271></a>    <span class=p>)</span>
+<a id=__codelineno-0-272 name=__codelineno-0-272></a>    <span class=k>return</span> <span class=n>DryRunResult</span><span class=p>(</span>
+<a id=__codelineno-0-273 name=__codelineno-0-273></a>        <span class=n>job_id</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>job_id</span><span class=p>,</span>
+<a id=__codelineno-0-274 name=__codelineno-0-274></a>        <span class=n>total_bytes</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>total_bytes_processed</span><span class=p>,</span>
+<a id=__codelineno-0-275 name=__codelineno-0-275></a>        <span class=n>referenced_tables</span><span class=o>=</span><span class=p>[</span>
+<a id=__codelineno-0-276 name=__codelineno-0-276></a>            <span class=s2>&quot;.&quot;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=n>table</span><span class=o>.</span><span class=n>to_api_repr</span><span class=p>()</span><span class=o>.</span><span class=n>values</span><span class=p>())</span>
+<a id=__codelineno-0-277 name=__codelineno-0-277></a>            <span class=k>for</span> <span class=n>table</span> <span class=ow>in</span> <span class=n>query_job</span><span class=o>.</span><span class=n>referenced_tables</span>
+<a id=__codelineno-0-278 name=__codelineno-0-278></a>        <span class=p>],</span>
+<a id=__codelineno-0-279 name=__codelineno-0-279></a>        <span class=n>query</span><span class=o>=</span><span class=n>query</span><span class=p>,</span>
+<a id=__codelineno-0-280 name=__codelineno-0-280></a>        <span class=n>model</span><span class=o>=</span><span class=n>model</span><span class=p>,</span>
+<a id=__codelineno-0-281 name=__codelineno-0-281></a>        <span class=n>schema</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>schema</span><span class=p>,</span>
+<a id=__codelineno-0-282 name=__codelineno-0-282></a>        <span class=n>user_email</span><span class=o>=</span><span class=n>query_job</span><span class=o>.</span><span class=n>user_email</span><span class=p>,</span>
+<a id=__codelineno-0-283 name=__codelineno-0-283></a>    <span class=p>)</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <h2 id=building-a-cte-from-literal-values>Building a CTE from literal values<a class=headerlink href=#building-a-cte-from-literal-values title="Permanent link">&para;</a></h2> <div class="doc doc-object doc-function"> <h3 id=amora.providers.bigquery.cte_from_rows class="doc doc-heading"> <code class="highlight language-python"><span class=n>cte_from_rows</span><span class=p>(</span><span class=n>rows</span><span class=p>:</span> <span class=n>Iterable</span><span class=p>[</span><span class=n>Dict</span><span class=p>[</span><span class=nb>str</span><span class=p>,</span> <span class=n>Any</span><span class=p>]])</span> <span class=o>-&gt;</span> <span class=n>CTE</span></code> <a href=#amora.providers.bigquery.cte_from_rows class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents first"> <p>Returns a table like selectable (CTE) for the given hardcoded values.</p> <p>E.g: <div class=highlight><pre><span></span><code><a id=__codelineno-0-1 name=__codelineno-0-1 href=#__codelineno-0-1></a><span class=n>rows</span> <span class=o>=</span> <span class=p>[{</span><span class=s2>&quot;numeric_column&quot;</span><span class=p>:</span> <span class=s2>&quot;123&quot;</span><span class=p>},</span> <span class=p>{</span><span class=s2>&quot;numeric_column&quot;</span><span class=p>:</span> <span class=s2>&quot;234&quot;</span><span class=p>},</span> <span class=p>{</span><span class=s2>&quot;numeric_column&quot;</span><span class=p>:</span> <span class=s2>&quot;345&quot;</span><span class=p>}]</span>
+<a id=__codelineno-0-2 name=__codelineno-0-2 href=#__codelineno-0-2></a><span class=n>cte_from_rows</span><span class=p>(</span><span class=n>rows</span><span class=p>)</span>
+</code></pre></div></p> <p>Will result in the following SQL</p> <div class=highlight><pre><span></span><code><a id=__codelineno-1-1 name=__codelineno-1-1 href=#__codelineno-1-1></a><span class=w>    </span><span class=k>WITH</span><span class=w> </span><span class=o>`</span><span class=n>annon_1</span><span class=o>`</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=p>(</span><span class=w></span>
+<a id=__codelineno-1-2 name=__codelineno-1-2 href=#__codelineno-1-2></a><span class=w>        </span><span class=k>SELECT</span><span class=w> </span><span class=ss>&quot;123&quot;</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=n>numeric_column</span><span class=w></span>
+<a id=__codelineno-1-3 name=__codelineno-1-3 href=#__codelineno-1-3></a><span class=w>        </span><span class=k>UNION</span><span class=w> </span><span class=k>ALL</span><span class=w> </span><span class=k>SELECT</span><span class=w> </span><span class=ss>&quot;234 AS numeric_column</span>
+<a id=__codelineno-1-4 name=__codelineno-1-4 href=#__codelineno-1-4></a><span class=ss>        UNION ALL SELECT &quot;</span><span class=mi>345</span><span class=err>&quot;</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=n>numeric_column</span><span class=w></span>
+<a id=__codelineno-1-5 name=__codelineno-1-5 href=#__codelineno-1-5></a><span class=w>    </span><span class=p>)</span><span class=w></span>
+</code></pre></div> <p>Which would render a table like:</p> <div class=highlight><pre><span></span><code><a id=__codelineno-2-1 name=__codelineno-2-1 href=#__codelineno-2-1></a>| numeric_column |
+<a id=__codelineno-2-2 name=__codelineno-2-2 href=#__codelineno-2-2></a>|----------------|
+<a id=__codelineno-2-3 name=__codelineno-2-3 href=#__codelineno-2-3></a>| 123            |
+<a id=__codelineno-2-4 name=__codelineno-2-4 href=#__codelineno-2-4></a>| 234            |
+<a id=__codelineno-2-5 name=__codelineno-2-5 href=#__codelineno-2-5></a>| 345            |
+</code></pre></div> <p>Useful both for model writing and testing purposes. Think of <code>cte_from_rows</code> as way of generating a "temporary table like object", with data available at runtime.</p> <details class=quote> <summary>Source code in <code>amora/providers/bigquery.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-292>292</a></span>
+<span class=normal><a href=#__codelineno-0-293>293</a></span>
+<span class=normal><a href=#__codelineno-0-294>294</a></span>
+<span class=normal><a href=#__codelineno-0-295>295</a></span>
+<span class=normal><a href=#__codelineno-0-296>296</a></span>
+<span class=normal><a href=#__codelineno-0-297>297</a></span>
+<span class=normal><a href=#__codelineno-0-298>298</a></span>
+<span class=normal><a href=#__codelineno-0-299>299</a></span>
+<span class=normal><a href=#__codelineno-0-300>300</a></span>
+<span class=normal><a href=#__codelineno-0-301>301</a></span>
+<span class=normal><a href=#__codelineno-0-302>302</a></span>
+<span class=normal><a href=#__codelineno-0-303>303</a></span>
+<span class=normal><a href=#__codelineno-0-304>304</a></span>
+<span class=normal><a href=#__codelineno-0-305>305</a></span>
+<span class=normal><a href=#__codelineno-0-306>306</a></span>
+<span class=normal><a href=#__codelineno-0-307>307</a></span>
+<span class=normal><a href=#__codelineno-0-308>308</a></span>
+<span class=normal><a href=#__codelineno-0-309>309</a></span>
+<span class=normal><a href=#__codelineno-0-310>310</a></span>
+<span class=normal><a href=#__codelineno-0-311>311</a></span>
+<span class=normal><a href=#__codelineno-0-312>312</a></span>
+<span class=normal><a href=#__codelineno-0-313>313</a></span>
+<span class=normal><a href=#__codelineno-0-314>314</a></span>
+<span class=normal><a href=#__codelineno-0-315>315</a></span>
+<span class=normal><a href=#__codelineno-0-316>316</a></span>
+<span class=normal><a href=#__codelineno-0-317>317</a></span>
+<span class=normal><a href=#__codelineno-0-318>318</a></span>
+<span class=normal><a href=#__codelineno-0-319>319</a></span>
+<span class=normal><a href=#__codelineno-0-320>320</a></span>
+<span class=normal><a href=#__codelineno-0-321>321</a></span>
+<span class=normal><a href=#__codelineno-0-322>322</a></span>
+<span class=normal><a href=#__codelineno-0-323>323</a></span>
+<span class=normal><a href=#__codelineno-0-324>324</a></span>
+<span class=normal><a href=#__codelineno-0-325>325</a></span>
+<span class=normal><a href=#__codelineno-0-326>326</a></span>
+<span class=normal><a href=#__codelineno-0-327>327</a></span>
+<span class=normal><a href=#__codelineno-0-328>328</a></span>
+<span class=normal><a href=#__codelineno-0-329>329</a></span>
+<span class=normal><a href=#__codelineno-0-330>330</a></span>
+<span class=normal><a href=#__codelineno-0-331>331</a></span>
+<span class=normal><a href=#__codelineno-0-332>332</a></span>
+<span class=normal><a href=#__codelineno-0-333>333</a></span>
+<span class=normal><a href=#__codelineno-0-334>334</a></span>
+<span class=normal><a href=#__codelineno-0-335>335</a></span>
+<span class=normal><a href=#__codelineno-0-336>336</a></span>
+<span class=normal><a href=#__codelineno-0-337>337</a></span>
+<span class=normal><a href=#__codelineno-0-338>338</a></span>
+<span class=normal><a href=#__codelineno-0-339>339</a></span>
+<span class=normal><a href=#__codelineno-0-340>340</a></span>
+<span class=normal><a href=#__codelineno-0-341>341</a></span>
+<span class=normal><a href=#__codelineno-0-342>342</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-292 name=__codelineno-0-292></a><span class=k>def</span> <span class=nf>cte_from_rows</span><span class=p>(</span><span class=n>rows</span><span class=p>:</span> <span class=n>Iterable</span><span class=p>[</span><span class=n>Dict</span><span class=p>[</span><span class=nb>str</span><span class=p>,</span> <span class=n>Any</span><span class=p>]])</span> <span class=o>-&gt;</span> <span class=n>CTE</span><span class=p>:</span>
+<a id=__codelineno-0-293 name=__codelineno-0-293></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-294 name=__codelineno-0-294></a><span class=sd>    Returns a table like selectable (CTE) for the given hardcoded values.</span>
+<a id=__codelineno-0-295 name=__codelineno-0-295></a>
+<a id=__codelineno-0-296 name=__codelineno-0-296></a><span class=sd>    E.g:</span>
+<a id=__codelineno-0-297 name=__codelineno-0-297></a><span class=sd>    ```python</span>
+<a id=__codelineno-0-298 name=__codelineno-0-298></a><span class=sd>    rows = [{&quot;numeric_column&quot;: &quot;123&quot;}, {&quot;numeric_column&quot;: &quot;234&quot;}, {&quot;numeric_column&quot;: &quot;345&quot;}]</span>
+<a id=__codelineno-0-299 name=__codelineno-0-299></a><span class=sd>    cte_from_rows(rows)</span>
+<a id=__codelineno-0-300 name=__codelineno-0-300></a><span class=sd>    ```</span>
+<a id=__codelineno-0-301 name=__codelineno-0-301></a>
+<a id=__codelineno-0-302 name=__codelineno-0-302></a><span class=sd>    Will result in the following SQL</span>
+<a id=__codelineno-0-303 name=__codelineno-0-303></a>
+<a id=__codelineno-0-304 name=__codelineno-0-304></a><span class=sd>    ```sql</span>
+<a id=__codelineno-0-305 name=__codelineno-0-305></a><span class=sd>        WITH `annon_1` AS (</span>
+<a id=__codelineno-0-306 name=__codelineno-0-306></a><span class=sd>            SELECT &quot;123&quot; AS numeric_column</span>
+<a id=__codelineno-0-307 name=__codelineno-0-307></a><span class=sd>            UNION ALL SELECT &quot;234 AS numeric_column</span>
+<a id=__codelineno-0-308 name=__codelineno-0-308></a><span class=sd>            UNION ALL SELECT &quot;345&quot; AS numeric_column</span>
+<a id=__codelineno-0-309 name=__codelineno-0-309></a><span class=sd>        )</span>
+<a id=__codelineno-0-310 name=__codelineno-0-310></a><span class=sd>    ```</span>
+<a id=__codelineno-0-311 name=__codelineno-0-311></a>
+<a id=__codelineno-0-312 name=__codelineno-0-312></a><span class=sd>    Which would render a table like:</span>
+<a id=__codelineno-0-313 name=__codelineno-0-313></a>
+<a id=__codelineno-0-314 name=__codelineno-0-314></a><span class=sd>    ```md</span>
+<a id=__codelineno-0-315 name=__codelineno-0-315></a><span class=sd>    | numeric_column |</span>
+<a id=__codelineno-0-316 name=__codelineno-0-316></a><span class=sd>    |----------------|</span>
+<a id=__codelineno-0-317 name=__codelineno-0-317></a><span class=sd>    | 123            |</span>
+<a id=__codelineno-0-318 name=__codelineno-0-318></a><span class=sd>    | 234            |</span>
+<a id=__codelineno-0-319 name=__codelineno-0-319></a><span class=sd>    | 345            |</span>
+<a id=__codelineno-0-320 name=__codelineno-0-320></a><span class=sd>    ```</span>
+<a id=__codelineno-0-321 name=__codelineno-0-321></a>
+<a id=__codelineno-0-322 name=__codelineno-0-322></a><span class=sd>    Useful both for model writing and testing purposes. Think of `cte_from_rows` as way of generating</span>
+<a id=__codelineno-0-323 name=__codelineno-0-323></a><span class=sd>    a &quot;temporary table like object&quot;, with data available at runtime.</span>
+<a id=__codelineno-0-324 name=__codelineno-0-324></a>
+<a id=__codelineno-0-325 name=__codelineno-0-325></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-326 name=__codelineno-0-326></a>
+<a id=__codelineno-0-327 name=__codelineno-0-327></a>    <span class=k>def</span> <span class=nf>gen_selects</span><span class=p>(</span><span class=n>rows</span><span class=p>):</span>
+<a id=__codelineno-0-328 name=__codelineno-0-328></a>        <span class=k>for</span> <span class=n>row</span> <span class=ow>in</span> <span class=n>rows</span><span class=p>:</span>
+<a id=__codelineno-0-329 name=__codelineno-0-329></a>            <span class=n>cols</span> <span class=o>=</span> <span class=p>[]</span>
+<a id=__codelineno-0-330 name=__codelineno-0-330></a>            <span class=k>for</span> <span class=n>name</span><span class=p>,</span> <span class=n>value</span> <span class=ow>in</span> <span class=n>row</span><span class=o>.</span><span class=n>items</span><span class=p>():</span>
+<a id=__codelineno-0-331 name=__codelineno-0-331></a>                <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>value</span><span class=p>,</span> <span class=n>array</span><span class=p>):</span>
+<a id=__codelineno-0-332 name=__codelineno-0-332></a>                    <span class=n>cols</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>value</span><span class=o>.</span><span class=n>label</span><span class=p>(</span><span class=n>name</span><span class=p>))</span>
+<a id=__codelineno-0-333 name=__codelineno-0-333></a>                <span class=k>else</span><span class=p>:</span>
+<a id=__codelineno-0-334 name=__codelineno-0-334></a>                    <span class=n>cols</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>literal</span><span class=p>(</span><span class=n>value</span><span class=p>)</span><span class=o>.</span><span class=n>label</span><span class=p>(</span><span class=n>name</span><span class=p>))</span>
+<a id=__codelineno-0-335 name=__codelineno-0-335></a>            <span class=k>yield</span> <span class=n>select</span><span class=p>(</span><span class=n>cols</span><span class=p>)</span>
+<a id=__codelineno-0-336 name=__codelineno-0-336></a>
+<a id=__codelineno-0-337 name=__codelineno-0-337></a>    <span class=n>selects</span> <span class=o>=</span> <span class=nb>list</span><span class=p>(</span><span class=n>gen_selects</span><span class=p>(</span><span class=n>rows</span><span class=p>))</span>
+<a id=__codelineno-0-338 name=__codelineno-0-338></a>
+<a id=__codelineno-0-339 name=__codelineno-0-339></a>    <span class=k>if</span> <span class=nb>len</span><span class=p>(</span><span class=n>selects</span><span class=p>)</span> <span class=o>==</span> <span class=mi>1</span><span class=p>:</span>
+<a id=__codelineno-0-340 name=__codelineno-0-340></a>        <span class=k>return</span> <span class=n>selects</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span><span class=o>.</span><span class=n>cte</span><span class=p>()</span>
+<a id=__codelineno-0-341 name=__codelineno-0-341></a>    <span class=k>else</span><span class=p>:</span>
+<a id=__codelineno-0-342 name=__codelineno-0-342></a>        <span class=k>return</span> <span class=n>selects</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span><span class=o>.</span><span class=n>union_all</span><span class=p>(</span><span class=o>*</span><span class=p>(</span><span class=n>selects</span><span class=p>[</span><span class=mi>1</span><span class=p>:]))</span><span class=o>.</span><span class=n>cte</span><span class=p>()</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <h2 id=cost-estimation>Cost estimation<a class=headerlink href=#cost-estimation title="Permanent link">&para;</a></h2> <div class="doc doc-object doc-function"> <h3 id=amora.providers.bigquery.estimated_query_cost_in_usd class="doc doc-heading"> <code class="highlight language-python"><span class=n>estimated_query_cost_in_usd</span><span class=p>(</span><span class=n>total_bytes</span><span class=p>:</span> <span class=nb>int</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>float</span></code> <a href=#amora.providers.bigquery.estimated_query_cost_in_usd class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents first"> <p>By default, queries are billed using the on-demand pricing model, where you pay for the data scanned by your queries.</p> <ul> <li>This function doesn't take into consideration that the first 1 TB per month is free.</li> <li>By default, the estimation is based on BigQuery's <code>On-demand analysis</code> pricing, which may change over time and may vary according to regions and your personal contract with GCP.</li> </ul> <p>You may set <code>AMORA_GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD</code> to the appropriate value for your use case.</p> <p>More on: https://cloud.google.com/bigquery/pricing#analysis_pricing_models</p> <p>:param total_bytes: Total data processed by the query :return: The estimated cost in USD, based on <code>On-demand</code> price</p> <details class=quote> <summary>Source code in <code>amora/providers/bigquery.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-345>345</a></span>
+<span class=normal><a href=#__codelineno-0-346>346</a></span>
+<span class=normal><a href=#__codelineno-0-347>347</a></span>
+<span class=normal><a href=#__codelineno-0-348>348</a></span>
+<span class=normal><a href=#__codelineno-0-349>349</a></span>
+<span class=normal><a href=#__codelineno-0-350>350</a></span>
+<span class=normal><a href=#__codelineno-0-351>351</a></span>
+<span class=normal><a href=#__codelineno-0-352>352</a></span>
+<span class=normal><a href=#__codelineno-0-353>353</a></span>
+<span class=normal><a href=#__codelineno-0-354>354</a></span>
+<span class=normal><a href=#__codelineno-0-355>355</a></span>
+<span class=normal><a href=#__codelineno-0-356>356</a></span>
+<span class=normal><a href=#__codelineno-0-357>357</a></span>
+<span class=normal><a href=#__codelineno-0-358>358</a></span>
+<span class=normal><a href=#__codelineno-0-359>359</a></span>
+<span class=normal><a href=#__codelineno-0-360>360</a></span>
+<span class=normal><a href=#__codelineno-0-361>361</a></span>
+<span class=normal><a href=#__codelineno-0-362>362</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-345 name=__codelineno-0-345></a><span class=k>def</span> <span class=nf>estimated_query_cost_in_usd</span><span class=p>(</span><span class=n>total_bytes</span><span class=p>:</span> <span class=nb>int</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>float</span><span class=p>:</span>
+<a id=__codelineno-0-346 name=__codelineno-0-346></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-347 name=__codelineno-0-347></a><span class=sd>    By default, queries are billed using the on-demand pricing model,</span>
+<a id=__codelineno-0-348 name=__codelineno-0-348></a><span class=sd>    where you pay for the data scanned by your queries.</span>
+<a id=__codelineno-0-349 name=__codelineno-0-349></a>
+<a id=__codelineno-0-350 name=__codelineno-0-350></a><span class=sd>    - This function doesn&#39;t take into consideration that the first 1 TB per month is free.</span>
+<a id=__codelineno-0-351 name=__codelineno-0-351></a><span class=sd>    - By default, the estimation is based on BigQuery&#39;s `On-demand analysis` pricing, which may change over time and</span>
+<a id=__codelineno-0-352 name=__codelineno-0-352></a><span class=sd>    may vary according to regions and your personal contract with GCP.</span>
+<a id=__codelineno-0-353 name=__codelineno-0-353></a>
+<a id=__codelineno-0-354 name=__codelineno-0-354></a><span class=sd>    You may set `AMORA_GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD` to the appropriate value for your use case.</span>
+<a id=__codelineno-0-355 name=__codelineno-0-355></a>
+<a id=__codelineno-0-356 name=__codelineno-0-356></a><span class=sd>    More on: https://cloud.google.com/bigquery/pricing#analysis_pricing_models</span>
+<a id=__codelineno-0-357 name=__codelineno-0-357></a>
+<a id=__codelineno-0-358 name=__codelineno-0-358></a><span class=sd>    :param total_bytes: Total data processed by the query</span>
+<a id=__codelineno-0-359 name=__codelineno-0-359></a><span class=sd>    :return: The estimated cost in USD, based on `On-demand` price</span>
+<a id=__codelineno-0-360 name=__codelineno-0-360></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-361 name=__codelineno-0-361></a>    <span class=n>total_terabytes</span> <span class=o>=</span> <span class=n>total_bytes</span> <span class=o>/</span> <span class=mi>1024</span><span class=o>**</span><span class=mi>4</span>
+<a id=__codelineno-0-362 name=__codelineno-0-362></a>    <span class=k>return</span> <span class=n>total_terabytes</span> <span class=o>*</span> <span class=n>settings</span><span class=o>.</span><span class=n>GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h3 id=amora.providers.bigquery.estimated_storage_cost_in_usd class="doc doc-heading"> <code class="highlight language-python"><span class=n>estimated_storage_cost_in_usd</span><span class=p>(</span><span class=n>total_bytes</span><span class=p>:</span> <span class=nb>int</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>float</span></code> <a href=#amora.providers.bigquery.estimated_storage_cost_in_usd class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents first"> <p>Storage pricing is the cost to store data that you load into BigQuery. <code>Active storage</code> includes any table or table partition that has been modified in the last 90 days.</p> <ul> <li>This function doesn't take into consideration that the first 10 GB of storage per month is free.</li> <li>By default, the estimation is based on BigQuery's <code>Active Storage</code> cost per GB, which may change over time and may vary according to regions and your personal contract with GCP.</li> </ul> <p>You may set <code>AMORA_GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD</code> to the appropriate value for your use case.</p> <p>More on: https://cloud.google.com/bigquery/pricing#storage</p> <p>:param total_bytes: Total bytes stored into the table :return: The estimated cost in USD, based on <code>Active storage</code> price</p> <details class=quote> <summary>Source code in <code>amora/providers/bigquery.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-365>365</a></span>
+<span class=normal><a href=#__codelineno-0-366>366</a></span>
+<span class=normal><a href=#__codelineno-0-367>367</a></span>
+<span class=normal><a href=#__codelineno-0-368>368</a></span>
+<span class=normal><a href=#__codelineno-0-369>369</a></span>
+<span class=normal><a href=#__codelineno-0-370>370</a></span>
+<span class=normal><a href=#__codelineno-0-371>371</a></span>
+<span class=normal><a href=#__codelineno-0-372>372</a></span>
+<span class=normal><a href=#__codelineno-0-373>373</a></span>
+<span class=normal><a href=#__codelineno-0-374>374</a></span>
+<span class=normal><a href=#__codelineno-0-375>375</a></span>
+<span class=normal><a href=#__codelineno-0-376>376</a></span>
+<span class=normal><a href=#__codelineno-0-377>377</a></span>
+<span class=normal><a href=#__codelineno-0-378>378</a></span>
+<span class=normal><a href=#__codelineno-0-379>379</a></span>
+<span class=normal><a href=#__codelineno-0-380>380</a></span>
+<span class=normal><a href=#__codelineno-0-381>381</a></span>
+<span class=normal><a href=#__codelineno-0-382>382</a></span>
+<span class=normal><a href=#__codelineno-0-383>383</a></span>
+<span class=normal><a href=#__codelineno-0-384>384</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-365 name=__codelineno-0-365></a><span class=k>def</span> <span class=nf>estimated_storage_cost_in_usd</span><span class=p>(</span><span class=n>total_bytes</span><span class=p>:</span> <span class=nb>int</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>float</span><span class=p>:</span>
+<a id=__codelineno-0-366 name=__codelineno-0-366></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-367 name=__codelineno-0-367></a><span class=sd>    Storage pricing is the cost to store data that you load into BigQuery.</span>
+<a id=__codelineno-0-368 name=__codelineno-0-368></a><span class=sd>    `Active storage` includes any table or table partition that has been modified in the last 90 days.</span>
+<a id=__codelineno-0-369 name=__codelineno-0-369></a>
+<a id=__codelineno-0-370 name=__codelineno-0-370></a><span class=sd>    - This function doesn&#39;t take into consideration that the first 10 GB of storage per month is free.</span>
+<a id=__codelineno-0-371 name=__codelineno-0-371></a><span class=sd>    - By default, the estimation is based on BigQuery&#39;s `Active Storage` cost per GB, which may change over time and</span>
+<a id=__codelineno-0-372 name=__codelineno-0-372></a><span class=sd>    may vary according to regions and your personal contract with GCP.</span>
+<a id=__codelineno-0-373 name=__codelineno-0-373></a>
+<a id=__codelineno-0-374 name=__codelineno-0-374></a><span class=sd>    You may set `AMORA_GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD` to the appropriate value for your use case.</span>
+<a id=__codelineno-0-375 name=__codelineno-0-375></a>
+<a id=__codelineno-0-376 name=__codelineno-0-376></a><span class=sd>    More on: https://cloud.google.com/bigquery/pricing#storage</span>
+<a id=__codelineno-0-377 name=__codelineno-0-377></a>
+<a id=__codelineno-0-378 name=__codelineno-0-378></a><span class=sd>    :param total_bytes: Total bytes stored into the table</span>
+<a id=__codelineno-0-379 name=__codelineno-0-379></a><span class=sd>    :return: The estimated cost in USD, based on `Active storage` price</span>
+<a id=__codelineno-0-380 name=__codelineno-0-380></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-381 name=__codelineno-0-381></a>    <span class=n>total_gigabytes</span> <span class=o>=</span> <span class=n>total_bytes</span> <span class=o>/</span> <span class=mi>1024</span><span class=o>**</span><span class=mi>3</span>
+<a id=__codelineno-0-382 name=__codelineno-0-382></a>    <span class=k>return</span> <span class=p>(</span>
+<a id=__codelineno-0-383 name=__codelineno-0-383></a>        <span class=n>total_gigabytes</span> <span class=o>*</span> <span class=n>settings</span><span class=o>.</span><span class=n>GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD</span>
+<a id=__codelineno-0-384 name=__codelineno-0-384></a>    <span class=p>)</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <h2 id=data-schema>Data schema<a class=headerlink href=#data-schema title="Permanent link">&para;</a></h2> <div class="doc doc-object doc-function"> <h3 id=amora.providers.bigquery.get_schema class="doc doc-heading"> <code class="highlight language-python"><span class=n>get_schema</span><span class=p>(</span><span class=n>table_id</span><span class=p>:</span> <span class=nb>str</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Schema</span></code> <a href=#amora.providers.bigquery.get_schema class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents first"> <p>Given a <code>table_id</code>, returns the <code>Schema</code> of the table by querying BigQueries API</p> <details class=quote> <summary>Source code in <code>amora/providers/bigquery.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-134>134</a></span>
+<span class=normal><a href=#__codelineno-0-135>135</a></span>
+<span class=normal><a href=#__codelineno-0-136>136</a></span>
+<span class=normal><a href=#__codelineno-0-137>137</a></span>
+<span class=normal><a href=#__codelineno-0-138>138</a></span>
+<span class=normal><a href=#__codelineno-0-139>139</a></span>
+<span class=normal><a href=#__codelineno-0-140>140</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-134 name=__codelineno-0-134></a><span class=k>def</span> <span class=nf>get_schema</span><span class=p>(</span><span class=n>table_id</span><span class=p>:</span> <span class=nb>str</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Schema</span><span class=p>:</span>
+<a id=__codelineno-0-135 name=__codelineno-0-135></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-136 name=__codelineno-0-136></a><span class=sd>    Given a `table_id`, returns the `Schema` of the table by querying BigQueries API</span>
+<a id=__codelineno-0-137 name=__codelineno-0-137></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-138 name=__codelineno-0-138></a>    <span class=n>client</span> <span class=o>=</span> <span class=n>get_client</span><span class=p>()</span>
+<a id=__codelineno-0-139 name=__codelineno-0-139></a>    <span class=n>table</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=n>get_table</span><span class=p>(</span><span class=n>table_id</span><span class=p>)</span>
+<a id=__codelineno-0-140 name=__codelineno-0-140></a>    <span class=k>return</span> <span class=n>table</span><span class=o>.</span><span class=n>schema</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h3 id=amora.providers.bigquery.get_schema_for_model class="doc doc-heading"> <code class="highlight language-python"><span class=n>get_schema_for_model</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>Model</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Schema</span></code> <a href=#amora.providers.bigquery.get_schema_for_model class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents first"> <p>Given an <code>AmoraModel</code>, returns the equivalent bigquery <code>Schema</code> of the model by parsing the model SQLAlchemy column schema</p> <details class=quote> <summary>Source code in <code>amora/providers/bigquery.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-143>143</a></span>
+<span class=normal><a href=#__codelineno-0-144>144</a></span>
+<span class=normal><a href=#__codelineno-0-145>145</a></span>
+<span class=normal><a href=#__codelineno-0-146>146</a></span>
+<span class=normal><a href=#__codelineno-0-147>147</a></span>
+<span class=normal><a href=#__codelineno-0-148>148</a></span>
+<span class=normal><a href=#__codelineno-0-149>149</a></span>
+<span class=normal><a href=#__codelineno-0-150>150</a></span>
+<span class=normal><a href=#__codelineno-0-151>151</a></span>
+<span class=normal><a href=#__codelineno-0-152>152</a></span>
+<span class=normal><a href=#__codelineno-0-153>153</a></span>
+<span class=normal><a href=#__codelineno-0-154>154</a></span>
+<span class=normal><a href=#__codelineno-0-155>155</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-143 name=__codelineno-0-143></a><span class=k>def</span> <span class=nf>get_schema_for_model</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>Model</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Schema</span><span class=p>:</span>
+<a id=__codelineno-0-144 name=__codelineno-0-144></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-145 name=__codelineno-0-145></a><span class=sd>    Given an `AmoraModel`, returns the equivalent bigquery `Schema`</span>
+<a id=__codelineno-0-146 name=__codelineno-0-146></a><span class=sd>    of the model by parsing the model SQLAlchemy column schema</span>
+<a id=__codelineno-0-147 name=__codelineno-0-147></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-148 name=__codelineno-0-148></a>    <span class=n>columns</span> <span class=o>=</span> <span class=n>model</span><span class=o>.</span><span class=n>__table__</span><span class=o>.</span><span class=n>columns</span>
+<a id=__codelineno-0-149 name=__codelineno-0-149></a>    <span class=k>return</span> <span class=p>[</span>
+<a id=__codelineno-0-150 name=__codelineno-0-150></a>        <span class=n>SchemaField</span><span class=p>(</span>
+<a id=__codelineno-0-151 name=__codelineno-0-151></a>            <span class=n>name</span><span class=o>=</span><span class=n>col</span><span class=o>.</span><span class=n>name</span><span class=p>,</span>
+<a id=__codelineno-0-152 name=__codelineno-0-152></a>            <span class=n>field_type</span><span class=o>=</span><span class=n>SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES</span><span class=p>[</span><span class=n>col</span><span class=o>.</span><span class=n>type</span><span class=o>.</span><span class=vm>__class__</span><span class=p>],</span>
+<a id=__codelineno-0-153 name=__codelineno-0-153></a>        <span class=p>)</span>
+<a id=__codelineno-0-154 name=__codelineno-0-154></a>        <span class=k>for</span> <span class=n>col</span> <span class=ow>in</span> <span class=n>columns</span>
+<a id=__codelineno-0-155 name=__codelineno-0-155></a>    <span class=p>]</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h3 id=amora.providers.bigquery.get_schema_for_source class="doc doc-heading"> <code class="highlight language-python"><span class=n>get_schema_for_source</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>Model</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=n>Schema</span><span class=p>]</span></code> <a href=#amora.providers.bigquery.get_schema_for_source class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents first"> <p>Give an <code>Amora Model</code>, returns the bigquery <code>Schema</code> of its <code>source</code> classmethod query result</p> <details class=quote> <summary>Source code in <code>amora/providers/bigquery.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-158>158</a></span>
+<span class=normal><a href=#__codelineno-0-159>159</a></span>
+<span class=normal><a href=#__codelineno-0-160>160</a></span>
+<span class=normal><a href=#__codelineno-0-161>161</a></span>
+<span class=normal><a href=#__codelineno-0-162>162</a></span>
+<span class=normal><a href=#__codelineno-0-163>163</a></span>
+<span class=normal><a href=#__codelineno-0-164>164</a></span>
+<span class=normal><a href=#__codelineno-0-165>165</a></span>
+<span class=normal><a href=#__codelineno-0-166>166</a></span>
+<span class=normal><a href=#__codelineno-0-167>167</a></span>
+<span class=normal><a href=#__codelineno-0-168>168</a></span>
+<span class=normal><a href=#__codelineno-0-169>169</a></span>
+<span class=normal><a href=#__codelineno-0-170>170</a></span>
+<span class=normal><a href=#__codelineno-0-171>171</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-158 name=__codelineno-0-158></a><span class=k>def</span> <span class=nf>get_schema_for_source</span><span class=p>(</span><span class=n>model</span><span class=p>:</span> <span class=n>Model</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=n>Schema</span><span class=p>]:</span>
+<a id=__codelineno-0-159 name=__codelineno-0-159></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-160 name=__codelineno-0-160></a><span class=sd>    Give an `Amora Model`, returns the bigquery `Schema` of its</span>
+<a id=__codelineno-0-161 name=__codelineno-0-161></a><span class=sd>    `source` classmethod query result</span>
+<a id=__codelineno-0-162 name=__codelineno-0-162></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-163 name=__codelineno-0-163></a>    <span class=n>source</span> <span class=o>=</span> <span class=n>model</span><span class=o>.</span><span class=n>source</span><span class=p>()</span>
+<a id=__codelineno-0-164 name=__codelineno-0-164></a>    <span class=k>if</span> <span class=n>source</span> <span class=ow>is</span> <span class=kc>None</span><span class=p>:</span>
+<a id=__codelineno-0-165 name=__codelineno-0-165></a>        <span class=k>return</span> <span class=kc>None</span>
+<a id=__codelineno-0-166 name=__codelineno-0-166></a>
+<a id=__codelineno-0-167 name=__codelineno-0-167></a>    <span class=n>result</span> <span class=o>=</span> <span class=n>dry_run</span><span class=p>(</span><span class=n>model</span><span class=p>)</span>
+<a id=__codelineno-0-168 name=__codelineno-0-168></a>    <span class=k>if</span> <span class=n>result</span> <span class=ow>is</span> <span class=kc>None</span><span class=p>:</span>
+<a id=__codelineno-0-169 name=__codelineno-0-169></a>        <span class=k>return</span> <span class=kc>None</span>
+<a id=__codelineno-0-170 name=__codelineno-0-170></a>
+<a id=__codelineno-0-171 name=__codelineno-0-171></a>    <span class=k>return</span> <span class=n>result</span><span class=o>.</span><span class=n>schema</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <h2 id=repeated-fields>Repeated Fields<a class=headerlink href=#repeated-fields title="Permanent link">&para;</a></h2> <p>Read more: <a href=https://cloud.google.com/bigquery/docs/nested-repeated>https://cloud.google.com/bigquery/docs/nested-repeated</a></p> <div class="doc doc-object doc-class"> <h3 id=amora.providers.bigquery.array class="doc doc-heading"> <code>array</code> <a href=#amora.providers.bigquery.array class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents first"> <p class="doc doc-class-bases"> Bases: <code><span title=sqlalchemy.sql.expression>expression</span>.<span title=sqlalchemy.sql.expression.Tuple>Tuple</span></code></p> <p>A BigQuery ARRAY literal.</p> <p>This is used to produce <code>ARRAY</code> literals in SQL expressions, e.g.:</p> <p><div class=highlight><pre><span></span><code><a id=__codelineno-0-1 name=__codelineno-0-1 href=#__codelineno-0-1></a><span class=kn>from</span> <span class=nn>sqlalchemy</span> <span class=kn>import</span> <span class=n>select</span>
+<a id=__codelineno-0-2 name=__codelineno-0-2 href=#__codelineno-0-2></a>
+<a id=__codelineno-0-3 name=__codelineno-0-3 href=#__codelineno-0-3></a><span class=kn>from</span> <span class=nn>amora.compilation</span> <span class=kn>import</span> <span class=n>compile_statement</span>
+<a id=__codelineno-0-4 name=__codelineno-0-4 href=#__codelineno-0-4></a><span class=kn>from</span> <span class=nn>amora.providers.bigquery</span> <span class=kn>import</span> <span class=n>array</span>
+<a id=__codelineno-0-5 name=__codelineno-0-5 href=#__codelineno-0-5></a>
+<a id=__codelineno-0-6 name=__codelineno-0-6 href=#__codelineno-0-6></a><span class=n>stmt</span> <span class=o>=</span> <span class=n>select</span><span class=p>([</span><span class=n>array</span><span class=p>([</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>])</span><span class=o>.</span><span class=n>label</span><span class=p>(</span><span class=s2>&quot;a&quot;</span><span class=p>),</span> <span class=n>array</span><span class=p>([</span><span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>])</span><span class=o>.</span><span class=n>label</span><span class=p>(</span><span class=s2>&quot;b&quot;</span><span class=p>)])</span>
+<a id=__codelineno-0-7 name=__codelineno-0-7 href=#__codelineno-0-7></a>
+<a id=__codelineno-0-8 name=__codelineno-0-8 href=#__codelineno-0-8></a><span class=n>compile_statement</span><span class=p>(</span><span class=n>stmt</span><span class=p>)</span>
+</code></pre></div> Produces the SQL:</p> <div class=highlight><pre><span></span><code><a id=__codelineno-1-1 name=__codelineno-1-1 href=#__codelineno-1-1></a><span class=k>SELECT</span><span class=w></span>
+<a id=__codelineno-1-2 name=__codelineno-1-2 href=#__codelineno-1-2></a><span class=w>    </span><span class=nb>ARRAY</span><span class=p>[</span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=mi>2</span><span class=p>]</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=n>a</span><span class=p>,</span><span class=w></span>
+<a id=__codelineno-1-3 name=__codelineno-1-3 href=#__codelineno-1-3></a><span class=w>    </span><span class=nb>ARRAY</span><span class=p>[</span><span class=mi>3</span><span class=p>,</span><span class=w> </span><span class=mi>4</span><span class=p>,</span><span class=w> </span><span class=mi>5</span><span class=p>])</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=n>b</span><span class=w></span>
+</code></pre></div> <p>An instance of <code>array</code> will always have the datatype <code>sqlalchemy_bigquery.base.BQArray</code>. The "inner" type of the array is inferred from the values present, unless the <code>type_</code> keyword argument is passed, e.g.:</p> <div class=highlight><pre><span></span><code><a id=__codelineno-2-1 name=__codelineno-2-1 href=#__codelineno-2-1></a><span class=n>array</span><span class=p>([</span><span class=s2>&quot;foo&quot;</span><span class=p>,</span> <span class=s2>&quot;bar&quot;</span><span class=p>],</span> <span class=n>type_</span><span class=o>=</span><span class=n>String</span><span class=p>)</span>
+</code></pre></div> <details class=quote> <summary>Source code in <code>amora/providers/bigquery.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-387>387</a></span>
+<span class=normal><a href=#__codelineno-0-388>388</a></span>
+<span class=normal><a href=#__codelineno-0-389>389</a></span>
+<span class=normal><a href=#__codelineno-0-390>390</a></span>
+<span class=normal><a href=#__codelineno-0-391>391</a></span>
+<span class=normal><a href=#__codelineno-0-392>392</a></span>
+<span class=normal><a href=#__codelineno-0-393>393</a></span>
+<span class=normal><a href=#__codelineno-0-394>394</a></span>
+<span class=normal><a href=#__codelineno-0-395>395</a></span>
+<span class=normal><a href=#__codelineno-0-396>396</a></span>
+<span class=normal><a href=#__codelineno-0-397>397</a></span>
+<span class=normal><a href=#__codelineno-0-398>398</a></span>
+<span class=normal><a href=#__codelineno-0-399>399</a></span>
+<span class=normal><a href=#__codelineno-0-400>400</a></span>
+<span class=normal><a href=#__codelineno-0-401>401</a></span>
+<span class=normal><a href=#__codelineno-0-402>402</a></span>
+<span class=normal><a href=#__codelineno-0-403>403</a></span>
+<span class=normal><a href=#__codelineno-0-404>404</a></span>
+<span class=normal><a href=#__codelineno-0-405>405</a></span>
+<span class=normal><a href=#__codelineno-0-406>406</a></span>
+<span class=normal><a href=#__codelineno-0-407>407</a></span>
+<span class=normal><a href=#__codelineno-0-408>408</a></span>
+<span class=normal><a href=#__codelineno-0-409>409</a></span>
+<span class=normal><a href=#__codelineno-0-410>410</a></span>
+<span class=normal><a href=#__codelineno-0-411>411</a></span>
+<span class=normal><a href=#__codelineno-0-412>412</a></span>
+<span class=normal><a href=#__codelineno-0-413>413</a></span>
+<span class=normal><a href=#__codelineno-0-414>414</a></span>
+<span class=normal><a href=#__codelineno-0-415>415</a></span>
+<span class=normal><a href=#__codelineno-0-416>416</a></span>
+<span class=normal><a href=#__codelineno-0-417>417</a></span>
+<span class=normal><a href=#__codelineno-0-418>418</a></span>
+<span class=normal><a href=#__codelineno-0-419>419</a></span>
+<span class=normal><a href=#__codelineno-0-420>420</a></span>
+<span class=normal><a href=#__codelineno-0-421>421</a></span>
+<span class=normal><a href=#__codelineno-0-422>422</a></span>
+<span class=normal><a href=#__codelineno-0-423>423</a></span>
+<span class=normal><a href=#__codelineno-0-424>424</a></span>
+<span class=normal><a href=#__codelineno-0-425>425</a></span>
+<span class=normal><a href=#__codelineno-0-426>426</a></span>
+<span class=normal><a href=#__codelineno-0-427>427</a></span>
+<span class=normal><a href=#__codelineno-0-428>428</a></span>
+<span class=normal><a href=#__codelineno-0-429>429</a></span>
+<span class=normal><a href=#__codelineno-0-430>430</a></span>
+<span class=normal><a href=#__codelineno-0-431>431</a></span>
+<span class=normal><a href=#__codelineno-0-432>432</a></span>
+<span class=normal><a href=#__codelineno-0-433>433</a></span>
+<span class=normal><a href=#__codelineno-0-434>434</a></span>
+<span class=normal><a href=#__codelineno-0-435>435</a></span>
+<span class=normal><a href=#__codelineno-0-436>436</a></span>
+<span class=normal><a href=#__codelineno-0-437>437</a></span>
+<span class=normal><a href=#__codelineno-0-438>438</a></span>
+<span class=normal><a href=#__codelineno-0-439>439</a></span>
+<span class=normal><a href=#__codelineno-0-440>440</a></span>
+<span class=normal><a href=#__codelineno-0-441>441</a></span>
+<span class=normal><a href=#__codelineno-0-442>442</a></span>
+<span class=normal><a href=#__codelineno-0-443>443</a></span>
+<span class=normal><a href=#__codelineno-0-444>444</a></span>
+<span class=normal><a href=#__codelineno-0-445>445</a></span>
+<span class=normal><a href=#__codelineno-0-446>446</a></span>
+<span class=normal><a href=#__codelineno-0-447>447</a></span>
+<span class=normal><a href=#__codelineno-0-448>448</a></span>
+<span class=normal><a href=#__codelineno-0-449>449</a></span>
+<span class=normal><a href=#__codelineno-0-450>450</a></span>
+<span class=normal><a href=#__codelineno-0-451>451</a></span>
+<span class=normal><a href=#__codelineno-0-452>452</a></span>
+<span class=normal><a href=#__codelineno-0-453>453</a></span>
+<span class=normal><a href=#__codelineno-0-454>454</a></span>
+<span class=normal><a href=#__codelineno-0-455>455</a></span>
+<span class=normal><a href=#__codelineno-0-456>456</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-387 name=__codelineno-0-387></a><span class=k>class</span> <span class=nc>array</span><span class=p>(</span><span class=n>expression</span><span class=o>.</span><span class=n>Tuple</span><span class=p>):</span>  <span class=c1># type: ignore</span>
+<a id=__codelineno-0-388 name=__codelineno-0-388></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-389 name=__codelineno-0-389></a><span class=sd>    A BigQuery ARRAY literal.</span>
+<a id=__codelineno-0-390 name=__codelineno-0-390></a>
+<a id=__codelineno-0-391 name=__codelineno-0-391></a><span class=sd>    This is used to produce `ARRAY` literals in SQL expressions, e.g.:</span>
+<a id=__codelineno-0-392 name=__codelineno-0-392></a>
+<a id=__codelineno-0-393 name=__codelineno-0-393></a><span class=sd>    ```python</span>
+<a id=__codelineno-0-394 name=__codelineno-0-394></a><span class=sd>    from sqlalchemy import select</span>
+<a id=__codelineno-0-395 name=__codelineno-0-395></a>
+<a id=__codelineno-0-396 name=__codelineno-0-396></a><span class=sd>    from amora.compilation import compile_statement</span>
+<a id=__codelineno-0-397 name=__codelineno-0-397></a><span class=sd>    from amora.providers.bigquery import array</span>
+<a id=__codelineno-0-398 name=__codelineno-0-398></a>
+<a id=__codelineno-0-399 name=__codelineno-0-399></a><span class=sd>    stmt = select([array([1, 2]).label(&quot;a&quot;), array([3, 4, 5]).label(&quot;b&quot;)])</span>
+<a id=__codelineno-0-400 name=__codelineno-0-400></a>
+<a id=__codelineno-0-401 name=__codelineno-0-401></a><span class=sd>    compile_statement(stmt)</span>
+<a id=__codelineno-0-402 name=__codelineno-0-402></a><span class=sd>    ```</span>
+<a id=__codelineno-0-403 name=__codelineno-0-403></a><span class=sd>    Produces the SQL:</span>
+<a id=__codelineno-0-404 name=__codelineno-0-404></a>
+<a id=__codelineno-0-405 name=__codelineno-0-405></a><span class=sd>    ```sql</span>
+<a id=__codelineno-0-406 name=__codelineno-0-406></a><span class=sd>    SELECT</span>
+<a id=__codelineno-0-407 name=__codelineno-0-407></a><span class=sd>        ARRAY[1, 2] AS a,</span>
+<a id=__codelineno-0-408 name=__codelineno-0-408></a><span class=sd>        ARRAY[3, 4, 5]) AS b</span>
+<a id=__codelineno-0-409 name=__codelineno-0-409></a><span class=sd>    ```</span>
+<a id=__codelineno-0-410 name=__codelineno-0-410></a>
+<a id=__codelineno-0-411 name=__codelineno-0-411></a><span class=sd>    An instance of `array` will always have the datatype `sqlalchemy_bigquery.base.BQArray`.</span>
+<a id=__codelineno-0-412 name=__codelineno-0-412></a><span class=sd>    The &quot;inner&quot; type of the array is inferred from the values present, unless the</span>
+<a id=__codelineno-0-413 name=__codelineno-0-413></a><span class=sd>    ``type_`` keyword argument is passed, e.g.:</span>
+<a id=__codelineno-0-414 name=__codelineno-0-414></a>
+<a id=__codelineno-0-415 name=__codelineno-0-415></a><span class=sd>    ```python</span>
+<a id=__codelineno-0-416 name=__codelineno-0-416></a><span class=sd>    array([&quot;foo&quot;, &quot;bar&quot;], type_=String)</span>
+<a id=__codelineno-0-417 name=__codelineno-0-417></a><span class=sd>    ```</span>
+<a id=__codelineno-0-418 name=__codelineno-0-418></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-419 name=__codelineno-0-419></a>
+<a id=__codelineno-0-420 name=__codelineno-0-420></a>    <span class=n>__visit_name__</span> <span class=o>=</span> <span class=s2>&quot;array&quot;</span>
+<a id=__codelineno-0-421 name=__codelineno-0-421></a>
+<a id=__codelineno-0-422 name=__codelineno-0-422></a>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>clauses</span><span class=p>,</span> <span class=o>**</span><span class=n>kw</span><span class=p>):</span>
+<a id=__codelineno-0-423 name=__codelineno-0-423></a>        <span class=nb>super</span><span class=p>()</span><span class=o>.</span><span class=fm>__init__</span><span class=p>(</span><span class=o>*</span><span class=n>clauses</span><span class=p>,</span> <span class=o>**</span><span class=n>kw</span><span class=p>)</span>
+<a id=__codelineno-0-424 name=__codelineno-0-424></a>        <span class=bp>self</span><span class=o>.</span><span class=n>type</span> <span class=o>=</span> <span class=n>BQArray</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>type</span><span class=p>)</span>
+<a id=__codelineno-0-425 name=__codelineno-0-425></a>
+<a id=__codelineno-0-426 name=__codelineno-0-426></a>        <span class=k>for</span> <span class=n>type_</span> <span class=ow>in</span> <span class=bp>self</span><span class=o>.</span><span class=n>type</span><span class=o>.</span><span class=n>item_type</span><span class=o>.</span><span class=n>types</span><span class=p>:</span>
+<a id=__codelineno-0-427 name=__codelineno-0-427></a>            <span class=k>if</span> <span class=nb>type</span><span class=p>(</span><span class=n>type_</span><span class=p>)</span> <span class=ow>is</span> <span class=n>NullType</span><span class=p>:</span>
+<a id=__codelineno-0-428 name=__codelineno-0-428></a>                <span class=k>raise</span> <span class=ne>ValueError</span><span class=p>(</span><span class=s2>&quot;Array cannot have a null element&quot;</span><span class=p>)</span>
+<a id=__codelineno-0-429 name=__codelineno-0-429></a>
+<a id=__codelineno-0-430 name=__codelineno-0-430></a>    <span class=k>def</span> <span class=nf>_bind_param</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>operator</span><span class=p>,</span> <span class=n>obj</span><span class=p>,</span> <span class=n>_assume_scalar</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span> <span class=n>type_</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+<a id=__codelineno-0-431 name=__codelineno-0-431></a>        <span class=k>if</span> <span class=n>_assume_scalar</span> <span class=ow>or</span> <span class=n>operator</span> <span class=ow>is</span> <span class=n>operators</span><span class=o>.</span><span class=n>getitem</span><span class=p>:</span>
+<a id=__codelineno-0-432 name=__codelineno-0-432></a>            <span class=c1># if getitem-&gt;slice were called, Indexable produces</span>
+<a id=__codelineno-0-433 name=__codelineno-0-433></a>            <span class=c1># a Slice object from that</span>
+<a id=__codelineno-0-434 name=__codelineno-0-434></a>            <span class=k>assert</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>obj</span><span class=p>,</span> <span class=nb>int</span><span class=p>)</span>
+<a id=__codelineno-0-435 name=__codelineno-0-435></a>            <span class=k>return</span> <span class=n>expression</span><span class=o>.</span><span class=n>BindParameter</span><span class=p>(</span>
+<a id=__codelineno-0-436 name=__codelineno-0-436></a>                <span class=kc>None</span><span class=p>,</span>
+<a id=__codelineno-0-437 name=__codelineno-0-437></a>                <span class=n>obj</span><span class=p>,</span>
+<a id=__codelineno-0-438 name=__codelineno-0-438></a>                <span class=n>_compared_to_operator</span><span class=o>=</span><span class=n>operator</span><span class=p>,</span>
+<a id=__codelineno-0-439 name=__codelineno-0-439></a>                <span class=n>type_</span><span class=o>=</span><span class=n>type_</span><span class=p>,</span>
+<a id=__codelineno-0-440 name=__codelineno-0-440></a>                <span class=n>_compared_to_type</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>type</span><span class=p>,</span>
+<a id=__codelineno-0-441 name=__codelineno-0-441></a>                <span class=n>unique</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span>
+<a id=__codelineno-0-442 name=__codelineno-0-442></a>            <span class=p>)</span>
+<a id=__codelineno-0-443 name=__codelineno-0-443></a>
+<a id=__codelineno-0-444 name=__codelineno-0-444></a>        <span class=k>else</span><span class=p>:</span>
+<a id=__codelineno-0-445 name=__codelineno-0-445></a>            <span class=k>return</span> <span class=n>array</span><span class=p>(</span>
+<a id=__codelineno-0-446 name=__codelineno-0-446></a>                <span class=p>[</span>
+<a id=__codelineno-0-447 name=__codelineno-0-447></a>                    <span class=bp>self</span><span class=o>.</span><span class=n>_bind_param</span><span class=p>(</span><span class=n>operator</span><span class=p>,</span> <span class=n>o</span><span class=p>,</span> <span class=n>_assume_scalar</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>type_</span><span class=o>=</span><span class=n>type_</span><span class=p>)</span>
+<a id=__codelineno-0-448 name=__codelineno-0-448></a>                    <span class=k>for</span> <span class=n>o</span> <span class=ow>in</span> <span class=n>obj</span>
+<a id=__codelineno-0-449 name=__codelineno-0-449></a>                <span class=p>]</span>
+<a id=__codelineno-0-450 name=__codelineno-0-450></a>            <span class=p>)</span>
+<a id=__codelineno-0-451 name=__codelineno-0-451></a>
+<a id=__codelineno-0-452 name=__codelineno-0-452></a>    <span class=k>def</span> <span class=nf>self_group</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>against</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+<a id=__codelineno-0-453 name=__codelineno-0-453></a>        <span class=k>if</span> <span class=n>against</span> <span class=ow>in</span> <span class=p>(</span><span class=n>operators</span><span class=o>.</span><span class=n>any_op</span><span class=p>,</span> <span class=n>operators</span><span class=o>.</span><span class=n>all_op</span><span class=p>,</span> <span class=n>operators</span><span class=o>.</span><span class=n>getitem</span><span class=p>):</span>
+<a id=__codelineno-0-454 name=__codelineno-0-454></a>            <span class=k>return</span> <span class=n>expression</span><span class=o>.</span><span class=n>Grouping</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span>
+<a id=__codelineno-0-455 name=__codelineno-0-455></a>        <span class=k>else</span><span class=p>:</span>
+<a id=__codelineno-0-456 name=__codelineno-0-456></a>            <span class=k>return</span> <span class=bp>self</span>
+</code></pre></div></td></tr></table></div> </details> <div class="doc doc-children"> </div> </div> </div> <hr> <div class=md-source-file> <small> Last update: 2022-06-14 </small> </div> </article> </div> </div> </main> <footer class=md-footer> <nav class="md-footer__inner md-grid" aria-label=Footer> <a href=../../notebooks/feature_store/ class="md-footer__link md-footer__link--prev" aria-label="Previous: Feature Store Notebook" rel=prev> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg> </div> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Previous </span> Feature Store Notebook </div> </div> </a> <a href=../../tests/assertions/ class="md-footer__link md-footer__link--next" aria-label="Next: Data Assertions" rel=next> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Next </span> Data Assertions </div> </div> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg> </div> </a> </nav> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-copyright> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script> <script src=../../assets/javascripts/bundle.a6c66575.min.js></script> </body> </html>
