@@ -23,10 +23,15 @@ class Settings(BaseSettings):
     CLI_CONSOLE_MAX_WIDTH: int = 160
     CLI_MATERIALIZATION_DAG_FIGURE_SIZE: Tuple[_Width, _Height] = (32, 32)
 
+    DUCKDB_ENGINE_URL: str = "duckdb:///:memory:"
+
     # https://cloud.google.com/bigquery/pricing#analysis_pricing_models
     GCP_BIGQUERY_ON_DEMAND_COST_PER_TERABYTE_IN_USD: float = 5.0
     # https://cloud.google.com/bigquery/pricing#storage
     GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD: float = 0.020
+    # https://cloud.google.com/storage/docs/interoperability
+    GCP_HMAC_ACCESS_KEY: str
+    GCP_HMAC_SECRET_KEY: str
 
     LOCAL_ENGINE_ECHO: bool = False
     LOCAL_ENGINE_SQLITE_FILE_PATH: Path = Path(
