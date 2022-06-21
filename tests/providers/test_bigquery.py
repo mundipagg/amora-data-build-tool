@@ -64,6 +64,45 @@ def test_cte_from_rows_with_repeated_fields():
     assert compile_statement(cte)
 
 
+def test_cte_from_rows_with_struct_fields():
+    class Node(AmoraModel):
+        id: str
+
+    cte = cte_from_rows(
+        [{"node": Node(id="a")}, {"node": Node(id="b")}, {"node": Node(id="c")}]
+    )
+
+    assert isinstance(cte, CTE)
+    assert compile_statement(cte)
+
+
+def test_cte_from_rows_with_record_repeated_fields():
+    class Node(AmoraModel):
+        id: str
+
+    class Edge(AmoraModel):
+        from_node: Node
+        to_node: Node
+
+    cte = cte_from_rows(
+        [
+            {
+                "id": 1,
+                "nodes": array([Node(id="a"), Node(id="b"), Node(id="c")]),
+                "edges": array(
+                    [
+                        Edge(from_node="a", to_node="b"),
+                        Edge(from_node="b", to_node="c"),
+                    ]
+                ),
+            },
+        ]
+    )
+
+    assert isinstance(cte, CTE)
+    assert compile_statement(cte)
+
+
 ONE_TERABYTE = 1 * 1024**4
 ONE_GIGABYTE = 1 * 1024**3
 

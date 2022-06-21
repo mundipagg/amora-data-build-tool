@@ -27,7 +27,9 @@ from sqlalchemy import (
     literal,
     literal_column,
 )
-from sqlalchemy.sql import expression, operators
+from sqlalchemy.sql import expression, operators, roles
+from sqlalchemy.sql.base import coercions
+from sqlalchemy.sql.elements import ClauseList, ColumnElement
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy.sql.sqltypes import ARRAY, NullType
 from sqlalchemy_bigquery import STRUCT
@@ -333,6 +335,8 @@ def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
             for name, value in row.items():
                 if isinstance(value, array):
                     cols.append(value.label(name))
+                elif isinstance(value, AmoraModel):
+                    cols.append(struct(value).label(name))
                 else:
                     cols.append(literal(value).label(name))
             yield select(cols)
@@ -410,6 +414,35 @@ def struct_for_model(model: Model) -> STRUCT:
                 raise NotImplementedError
 
     return STRUCT(*fields())
+
+
+class struct(ClauseList, ColumnElement):  # type: ignore
+    """
+    A BigQuery STRUCT/RECORD literal.
+    """
+
+    __visit_name__ = "struct"
+
+    def __init__(self, model: AmoraModel, **kw):
+        self._model = model
+        self.type = struct_for_model(model.__class__)
+        clauses = [
+            coercions.expect(
+                roles.ExpressionElementRole,
+                model.dict(),
+                type_=self.type,
+            )
+        ]
+        super().__init__(*clauses, **kw)
+
+    def bind_expression(self, bindvalue):
+        return bindvalue
+
+    def self_group(self, against=None):
+        if against in (operators.any_op, operators.all_op, operators.getitem):
+            return expression.Grouping(self)
+        else:
+            return self
 
 
 class array(expression.Tuple):  # type: ignore
