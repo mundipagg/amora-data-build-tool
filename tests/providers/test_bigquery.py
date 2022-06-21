@@ -1,6 +1,6 @@
 import string
 from datetime import date, datetime, time
-from typing import Optional
+from typing import List, Optional
 
 import pytest
 from google.api_core.exceptions import NotFound
@@ -8,6 +8,7 @@ from google.cloud.bigquery.schema import SchemaField
 from sqlalchemy import TIMESTAMP, Column, Integer, String
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.selectable import CTE
+from sqlalchemy_bigquery import ARRAY, STRUCT
 from sqlalchemy_bigquery.base import BQArray
 
 from amora.compilation import compile_statement
@@ -23,6 +24,7 @@ from amora.providers.bigquery import (
     get_fully_qualified_id,
     get_schema_for_model,
     get_schema_for_source,
+    struct_for_model,
 )
 from amora.types import Compilable
 
@@ -197,6 +199,65 @@ def test_get_schema_for_source_on_sourceless_model():
         a_string: str = Field(primary_key=True)
 
     assert get_schema_for_source(Model) is None
+
+
+def test_simple_struct():
+    class Point(AmoraModel):
+        x: float
+        y: float
+
+    point_struct = struct_for_model(Point)
+
+    assert isinstance(point_struct, STRUCT)
+    assert point_struct.get_col_spec() == "STRUCT<x FLOAT64, y FLOAT64>"
+
+
+def test_nested_struct():
+    class Node(AmoraModel):
+        id: str
+        label: str
+
+    class Edge(AmoraModel):
+        from_node: Node
+        to_node: Node
+
+    edge_struct = struct_for_model(Edge)
+
+    assert isinstance(edge_struct, STRUCT)
+    assert (
+        edge_struct.get_col_spec()
+        == "STRUCT<from_node STRUCT<id STRING, label STRING>, to_node STRUCT<id STRING, label STRING>>"
+    )
+
+    class Graph(AmoraModel):
+        nodes: List[Node]
+        edges: List[Edge]
+
+    graph_struct = struct_for_model(Graph)
+
+    assert isinstance(graph_struct, STRUCT)
+    assert (
+        graph_struct.get_col_spec()
+        == "STRUCT<nodes ARRAY<STRUCT<id STRING, label STRING>>, edges ARRAY<STRUCT<from_node STRUCT<id STRING, label STRING>, to_node STRUCT<id STRING, label STRING>>>>"
+    )
+
+
+def test_nested_repeated_struct():
+    class Point(AmoraModel):
+        x: float
+        y: float
+
+    class Line(AmoraModel):
+        points: List[Point] = Field(sa_column=ARRAY(struct_for_model(Point)))
+        tags: List[str] = Field(sa_column=ARRAY(String))
+
+    s = struct_for_model(Line)
+
+    assert isinstance(s, STRUCT)
+    assert (
+        s.get_col_spec()
+        == "STRUCT<points ARRAY<STRUCT<x FLOAT64, y FLOAT64>>, tags ARRAY<STRING>>"
+    )
 
 
 def test_array_of_integers():

@@ -13,6 +13,7 @@ from google.cloud.bigquery import (
     TableReference,
 )
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
+from pydantic.fields import SHAPE_LIST
 from sqlalchemy import (
     JSON,
     TIMESTAMP,
@@ -28,14 +29,16 @@ from sqlalchemy import (
 )
 from sqlalchemy.sql import expression, operators
 from sqlalchemy.sql.selectable import CTE
-from sqlalchemy.sql.sqltypes import NullType
+from sqlalchemy.sql.sqltypes import ARRAY, NullType
+from sqlalchemy_bigquery import STRUCT
 from sqlalchemy_bigquery.base import BQArray, unnest
 from sqlmodel import AutoString
+from sqlmodel.main import get_sqlachemy_type
 
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
-from amora.models import Model, select
+from amora.models import AmoraModel, Model, select
 from amora.types import Compilable
 from amora.version import VERSION
 
@@ -382,6 +385,31 @@ def estimated_storage_cost_in_usd(total_bytes: int) -> float:
     return (
         total_gigabytes * settings.GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD
     )
+
+
+def struct_for_model(model: Model) -> STRUCT:
+    """
+    Build a BigQuery Struct type from an AmoraModel specification
+
+    Read more: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#struct_type
+    """
+
+    def fields():
+        for field in model.__fields__.values():
+            if field.shape is SHAPE_LIST:
+                if issubclass(field.type_, AmoraModel):
+                    yield field.name, ARRAY(struct_for_model(field.type_))
+                else:
+                    yield field.name, ARRAY(get_sqlachemy_type(field))
+            elif field.sub_fields is None:
+                if issubclass(field.type_, AmoraModel):
+                    yield field.name, struct_for_model(field.type_)
+                else:
+                    yield field.name, get_sqlachemy_type(field)
+            else:
+                raise NotImplementedError
+
+    return STRUCT(*fields())
 
 
 class array(expression.Tuple):  # type: ignore
