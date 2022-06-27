@@ -64,3 +64,7 @@ Read more: [https://cloud.google.com/bigquery/docs/nested-repeated](https://clou
         heading_level: 3
         show_root_heading: true
         show_root_toc_entry: true
+
+### Zipping arrays
+
+::: amora.providers.bigquery.zip_arrays

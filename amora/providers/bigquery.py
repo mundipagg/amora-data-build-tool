@@ -397,7 +397,7 @@ def estimated_storage_cost_in_usd(total_bytes: int) -> float:
     )
 
 
-class array(expression.Tuple):  # type: ignore
+class array(expression.ClauseList, expression.ColumnElement):  # type: ignore
     """
     A BigQuery ARRAY literal.
 
@@ -433,11 +433,17 @@ class array(expression.Tuple):  # type: ignore
     __visit_name__ = "array"
 
     def __init__(self, clauses, **kw):
+        clauses = [coercions.expect(roles.ExpressionElementRole, c) for c in clauses]
         super().__init__(*clauses, **kw)
-        self.type = BQArray(self.type)
+        self._type_tuple = [arg.type for arg in clauses]
+        main_type = kw.pop(
+            "type_",
+            self._type_tuple[0] if self._type_tuple else sqltypes.NULLTYPE,
+        )
+        self.type = BQArray(main_type, dimensions=1)
 
-        for type_ in self.type.item_type.types:
-            if type(type_) is NullType:
+        for type_ in self._type_tuple:
+            if type(type_) is sqltypes.NullType:
                 raise ValueError("Array cannot have a null element")
 
     def _bind_param(self, operator, obj, _assume_scalar=False, type_=None):
@@ -467,3 +473,45 @@ class array(expression.Tuple):  # type: ignore
             return expression.Grouping(self)
         else:
             return self
+
+
+def zip_arrays(*arr_columns: Column) -> Compilable:
+    """
+    Given at least two array columns of equal size, return a table of the unnest values,
+    converting array items into rows. E.g:
+
+    A CTE with 3 array columns: `entity`, `f1`, `f2`
+
+    ```python
+    from amora.providers.bigquery import array, cte_from_rows, zip_arrays
+
+    cte = cte_from_rows(
+        [
+            {
+                "entity": array([1, 2]),
+                "f1": array(["f1v1", "f1v2"]),
+                "f2": array(["f2v1", "f2v2"]),
+            }
+        ]
+    )
+
+    zip_arrays(cte.c.entity, cte.c.f1, cte.c.f2)
+    ```
+
+    Will result in the following table:
+
+    | entity | f1   | f2   |
+    |--------|------|------|
+    | 1      | f1v1 | f2v1 |
+    | 2      | f1v2 | f2v2 |
+
+    Read more: [https://cloud.google.com/bigquery/docs/reference/standard-sql/arrays#zipping_arrays](https://cloud.google.com/bigquery/docs/reference/standard-sql/arrays#zipping_arrays)
+    """
+    offset_alias = "off"
+    offset = func.offset(literal_column(offset_alias))
+
+    return select([col[offset].label(col.key) for col in arr_columns]).join(
+        fixed_unnest(arr_columns[0]).table_valued(with_offset=offset_alias),
+        onclause=literal(1) == literal(1),
+        isouter=True,
+    )

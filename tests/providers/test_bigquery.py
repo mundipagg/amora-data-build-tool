@@ -23,6 +23,8 @@ from amora.providers.bigquery import (
     get_fully_qualified_id,
     get_schema_for_model,
     get_schema_for_source,
+    run,
+    zip_arrays,
 )
 from amora.types import Compilable
 
@@ -203,16 +205,18 @@ def test_array_of_integers():
     zero_to_nine = array(range(10))
 
     assert isinstance(zero_to_nine.type, BQArray)
-    for type_ in zero_to_nine.type.item_type.types:
-        assert isinstance(type_, Integer)
+    assert isinstance(zero_to_nine.type.item_type, Integer)
+
+    assert compile_statement(zero_to_nine)
 
 
 def test_array_of_strings():
     ascii_lowercase = array(string.ascii_lowercase)
 
     assert isinstance(ascii_lowercase.type, BQArray)
-    for type_ in ascii_lowercase.type.item_type.types:
-        assert isinstance(type_, String)
+    assert isinstance(ascii_lowercase.type.item_type, String)
+
+    assert compile_statement(ascii_lowercase)
 
 
 def test_array_raises_an_error_if_input_contains_null_values():
@@ -239,3 +243,29 @@ def test_array_raises_an_error_if_input_contains_multiple_types():
 
     common_supertype_array = array([1, 2.0, 3])
     assert isinstance(common_supertype_array, BQArray)
+
+
+def test_zip_arrays():
+    cte = cte_from_rows(
+        [
+            {
+                "entity": array([1, 2]),
+                "f1": array(["f1v1", "f1v2"]),
+                "f2": array(["f2v1", "f2v2"]),
+            },
+            {
+                "entity": array([2, 3]),
+                "f1": array(["f1v3", "f1v4"]),
+                "f2": array(["f2v3", "f2v4"]),
+            },
+        ]
+    )
+
+    result = run(statement=zip_arrays(cte.c.entity, cte.c.f1, cte.c.f2))
+
+    assert [dict(row) for row in result.rows] == [
+        {"entity": 1, "f1": "f1v1", "f2": "f2v1"},
+        {"entity": 2, "f1": "f1v2", "f2": "f2v2"},
+        {"entity": 2, "f1": "f1v3", "f2": "f2v3"},
+        {"entity": 3, "f1": "f1v4", "f2": "f2v4"},
+    ]
