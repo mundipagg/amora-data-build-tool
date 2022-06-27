@@ -23,19 +23,19 @@ from sqlalchemy import (
     Integer,
     String,
     Time,
+    func,
     literal,
     literal_column,
 )
-from sqlalchemy.sql import expression, operators
+from sqlalchemy.sql import coercions, expression, operators, roles, sqltypes
 from sqlalchemy.sql.selectable import CTE
-from sqlalchemy.sql.sqltypes import NullType
 from sqlalchemy_bigquery.base import BQArray, unnest
 from sqlmodel import AutoString
 
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
-from amora.models import Model, select
+from amora.models import Column, Model, select
 from amora.types import Compilable
 from amora.version import VERSION
 
@@ -284,9 +284,22 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
 
 
 class fixed_unnest(sqlalchemy.sql.roles.InElementRole, unnest):
+    _with_offset = None
+
     def __init__(self, *args, **kwargs):
         self.name = "unnest"
         super().__init__(*args, **kwargs)
+
+    def table_valued(self, *expr, with_offset: str = None, **kwargs):
+        new_func = self._generate()
+
+        if with_offset:
+            expr += (with_offset,)
+            new_func._with_offset = with_offset
+
+        new_func.type = new_func._table_value_type = sqltypes.TableValueType(*expr)
+
+        return new_func
 
 
 def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:

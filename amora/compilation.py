@@ -19,6 +19,12 @@ class AmoraBigQueryCompiler(BigQueryCompiler):
     def visit_array(self, element, **kw) -> str:
         return "ARRAY[%s]" % self.visit_clauselist(element, **kw)
 
+    def visit_function(self, func, add_to_result_map=None, **kwargs):
+        text = super().visit_function(func, add_to_result_map=None, **kwargs)
+        if hasattr(func, "_with_offset"):
+            text += f" WITH OFFSET AS {func._with_offset}"
+        return text
+
 
 dialect = BigQueryDialect()
 dialect.statement_compiler = AmoraBigQueryCompiler
