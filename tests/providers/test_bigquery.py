@@ -252,20 +252,46 @@ def test_zip_arrays():
                 "entity": array([1, 2]),
                 "f1": array(["f1v1", "f1v2"]),
                 "f2": array(["f2v1", "f2v2"]),
+                "event_timestamp": datetime.fromisoformat("2021-01-01T01:01:01"),
             },
             {
                 "entity": array([2, 3]),
                 "f1": array(["f1v3", "f1v4"]),
                 "f2": array(["f2v3", "f2v4"]),
+                "event_timestamp": datetime.fromisoformat("2022-02-02T02:02:02"),
             },
         ]
     )
 
-    result = run(statement=zip_arrays(cte.c.entity, cte.c.f1, cte.c.f2))
+    result = run(
+        statement=zip_arrays(
+            cte.c.entity, cte.c.f1, cte.c.f2, additional_columns=[cte.c.event_timestamp]
+        )
+    )
 
     assert [dict(row) for row in result.rows] == [
-        {"entity": 1, "f1": "f1v1", "f2": "f2v1"},
-        {"entity": 2, "f1": "f1v2", "f2": "f2v2"},
-        {"entity": 2, "f1": "f1v3", "f2": "f2v3"},
-        {"entity": 3, "f1": "f1v4", "f2": "f2v4"},
+        {
+            "entity": 1,
+            "f1": "f1v1",
+            "f2": "f2v1",
+            "event_timestamp": datetime.fromisoformat("2021-01-01T01:01:01"),
+        },
+        {
+            "entity": 2,
+            "f1": "f1v2",
+            "f2": "f2v2",
+            "event_timestamp": datetime.fromisoformat("2021-01-01T01:01:01"),
+        },
+        {
+            "entity": 2,
+            "f1": "f1v3",
+            "f2": "f2v3",
+            "event_timestamp": datetime.fromisoformat("2022-02-02T02:02:02"),
+        },
+        {
+            "entity": 3,
+            "f1": "f1v4",
+            "f2": "f2v4",
+            "event_timestamp": datetime.fromisoformat("2022-02-02T02:02:02"),
+        },
     ]
