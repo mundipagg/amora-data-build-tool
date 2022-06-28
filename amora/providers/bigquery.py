@@ -35,7 +35,7 @@ from sqlmodel import AutoString
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
-from amora.models import Column, Model, select
+from amora.models import Column, ColumnElement, Model, select
 from amora.types import Compilable
 from amora.version import VERSION
 
@@ -545,7 +545,7 @@ def zip_arrays(
     offset_alias = "off"
     offset = func.offset(literal_column(offset_alias))
 
-    columns = [col[offset].label(col.key) for col in arr_columns]
+    columns: List[ColumnElement] = [col[offset].label(col.key) for col in arr_columns]
     if additional_columns:
         columns += additional_columns
 
