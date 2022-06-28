@@ -3,7 +3,7 @@ from google.protobuf.duration_pb2 import Duration
 
 from amora.feature_store import settings
 from amora.feature_store.protocols import FeatureViewSourceProtocol
-from amora.feature_store.type_mapping import SQLALCHEMY_TYPES_TO_FS_TYPES
+from amora.feature_store.type_mapping import type_for_column
 from amora.models import Model
 from amora.providers.bigquery import get_fully_qualified_id
 
@@ -34,7 +34,7 @@ def feature_view_for_model(model: Model) -> FeatureView:
         features=[
             Feature(
                 name=col.name,
-                dtype=SQLALCHEMY_TYPES_TO_FS_TYPES[col.type.__class__],
+                dtype=type_for_column(col),
             )
             for col in model.feature_view_features()
         ],
