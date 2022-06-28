@@ -63,17 +63,6 @@ dev = ["pytest", "cogapp", "pre-commit", "wheel"]
 tests = ["pytest"]
 
 [[package]]
-name = "asgiref"
-version = "3.5.2"
-description = "ASGI specs, helper code, and adapters"
-category = "main"
-optional = true
-python-versions = ">=3.7"
-
-[package.extras]
-tests = ["pytest", "pytest-asyncio", "mypy (>=0.800)"]
-
-[[package]]
 name = "asttokens"
 version = "2.0.5"
 description = "Annotate AST trees with source code positions"
@@ -1890,18 +1879,6 @@ python-versions = "*"
 requests = ">=2.14.0"
 
 [[package]]
-name = "percy-selenium"
-version = "1.0.5"
-description = "Python client for visual testing with Percy"
-category = "dev"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-requests = ">=2.0.0,<3.0.0"
-selenium = ">=3"
-
-[[package]]
 name = "pexpect"
 version = "4.8.0"
 description = "Pexpect allows easy control of interactive console applications."
@@ -1996,7 +1973,7 @@ twisted = ["twisted"]
 
 [[package]]
 name = "prometheus-fastapi-instrumentator"
-version = "5.8.1"
+version = "5.8.2"
 description = "Instrument your FastAPI with Prometheus metrics"
 category = "main"
 optional = true
@@ -2914,14 +2891,13 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "uvicorn"
-version = "0.17.6"
+version = "0.18.2"
 description = "The lightning-fast ASGI server."
 category = "main"
 optional = true
 python-versions = ">=3.7"
 
 [package.dependencies]
-asgiref = ">=3.4.0"
 click = ">=7.0"
 colorama = {version = ">=0.4", optional = true, markers = "sys_platform == \"win32\" and extra == \"standard\""}
 h11 = ">=0.8"
@@ -2929,11 +2905,11 @@ httptools = {version = ">=0.4.0", optional = true, markers = "extra == \"standar
 python-dotenv = {version = ">=0.13", optional = true, markers = "extra == \"standard\""}
 PyYAML = {version = ">=5.1", optional = true, markers = "extra == \"standard\""}
 uvloop = {version = ">=0.14.0,<0.15.0 || >0.15.0,<0.15.1 || >0.15.1", optional = true, markers = "sys_platform != \"win32\" and sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\" and extra == \"standard\""}
-watchgod = {version = ">=0.6", optional = true, markers = "extra == \"standard\""}
+watchfiles = {version = ">=0.13", optional = true, markers = "extra == \"standard\""}
 websockets = {version = ">=10.0", optional = true, markers = "extra == \"standard\""}
 
 [package.extras]
-standard = ["websockets (>=10.0)", "httptools (>=0.4.0)", "watchgod (>=0.6)", "python-dotenv (>=0.13)", "PyYAML (>=5.1)", "uvloop (>=0.14.0,!=0.15.0,!=0.15.1)", "colorama (>=0.4)"]
+standard = ["websockets (>=10.0)", "httptools (>=0.4.0)", "watchfiles (>=0.13)", "python-dotenv (>=0.13)", "PyYAML (>=5.1)", "uvloop (>=0.14.0,!=0.15.0,!=0.15.1)", "colorama (>=0.4)"]
 
 [[package]]
 name = "uvloop"
@@ -2990,9 +2966,9 @@ python-versions = ">=3.6"
 watchmedo = ["PyYAML (>=3.10)"]
 
 [[package]]
-name = "watchgod"
-version = "0.8.2"
-description = "Simple, modern file watching and code reload in python."
+name = "watchfiles"
+version = "0.15.0"
+description = "Simple, modern and high performance file watching and code reload in python."
 category = "main"
 optional = true
 python-versions = ">=3.7"
@@ -3084,7 +3060,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9.6,<3.10"
-content-hash = "ec6814036513597eac3aa26d0f2c09dbd5db94649a824a3b0e687b1f6e3ff912"
+content-hash = "b0b8dc8e15728755b71ed2070bb075b5d92b2f3d10ca41194ce9c9c4e6889296"
 
 [metadata.files]
 absl-py = [
@@ -3125,10 +3101,6 @@ argon2-cffi-bindings = [
     {file = "argon2_cffi_bindings-21.2.0-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:20ef543a89dee4db46a1a6e206cd015360e5a75822f76df533845c3cbaf72670"},
     {file = "argon2_cffi_bindings-21.2.0-pp38-pypy38_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ed2937d286e2ad0cc79a7087d3c272832865f779430e0cc2b4f3718d3159b0cb"},
     {file = "argon2_cffi_bindings-21.2.0-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:5e00316dabdaea0b2dd82d141cc66889ced0cdcbfa599e8b471cf22c620c329a"},
-]
-asgiref = [
-    {file = "asgiref-3.5.2-py3-none-any.whl", hash = "sha256:1d2880b792ae8757289136f1db2b7b99100ce959b2aa57fd69dab783d05afac4"},
-    {file = "asgiref-3.5.2.tar.gz", hash = "sha256:4a29362a6acebe09bf1d6640db38c1dc3d9217c68e6f9f6204d72667fc19a424"},
 ]
 asttokens = [
     {file = "asttokens-2.0.5-py2.py3-none-any.whl", hash = "sha256:0844691e88552595a6f4a4281a9f7f79b8dd45ca4ccea82e5e05b4bbdb76705c"},
@@ -4373,10 +4345,6 @@ percy = [
     {file = "percy-2.0.2-py2.py3-none-any.whl", hash = "sha256:c1647b768810e9453220a7721a5d52cec560dee913d13c1e29b713703f4f223e"},
     {file = "percy-2.0.2.tar.gz", hash = "sha256:6238612dc401fa5c221c0ad7738f7ea43e48fe2695f6423e785ee2bc940f021d"},
 ]
-percy-selenium = [
-    {file = "percy-selenium-1.0.5.tar.gz", hash = "sha256:14c91ec4336823f1e9b8dc55027be0f847e737ef44cc8c2fe897e4b0b1366b57"},
-    {file = "percy_selenium-1.0.5-py3-none-any.whl", hash = "sha256:de64b4531a61f3eacd2d0eca331f74893ea835d1576cb087b5aeaecea7bcf84d"},
-]
 pexpect = [
     {file = "pexpect-4.8.0-py2.py3-none-any.whl", hash = "sha256:0b48a55dcb3c05f3329815901ea4fc1537514d6ba867a152b581d69ae3710937"},
     {file = "pexpect-4.8.0.tar.gz", hash = "sha256:fc65a43959d153d0114afe13997d439c22823a27cefceb5ff35c2178c6784c0c"},
@@ -4446,8 +4414,8 @@ prometheus-client = [
     {file = "prometheus_client-0.14.1.tar.gz", hash = "sha256:5459c427624961076277fdc6dc50540e2bacb98eebde99886e59ec55ed92093a"},
 ]
 prometheus-fastapi-instrumentator = [
-    {file = "prometheus-fastapi-instrumentator-5.8.1.tar.gz", hash = "sha256:900e191ecc09a10e928e4d8679b5bf114c47931be9f55f1fbb25baade173e16d"},
-    {file = "prometheus_fastapi_instrumentator-5.8.1-py3-none-any.whl", hash = "sha256:53b38095dda0a9e01876de5598c4dae911f5b38190967efd8d79aef8d26a83d6"},
+    {file = "prometheus-fastapi-instrumentator-5.8.2.tar.gz", hash = "sha256:f1fa362043b974d138f5245acc973c32d1fa798bd2bd98ef2754befbf385a566"},
+    {file = "prometheus_fastapi_instrumentator-5.8.2-py3-none-any.whl", hash = "sha256:5bfec239a924e1fed4ba94eb0addc73422d11821e894200b6d0e36a61c966827"},
 ]
 prompt-toolkit = [
     {file = "prompt_toolkit-3.0.29-py3-none-any.whl", hash = "sha256:62291dad495e665fca0bda814e342c69952086afb0f4094d0893d357e5c78752"},
@@ -5075,8 +5043,8 @@ urllib3 = [
     {file = "urllib3-1.26.9.tar.gz", hash = "sha256:aabaf16477806a5e1dd19aa41f8c2b7950dd3c746362d7e3223dbe6de6ac448e"},
 ]
 uvicorn = [
-    {file = "uvicorn-0.17.6-py3-none-any.whl", hash = "sha256:19e2a0e96c9ac5581c01eb1a79a7d2f72bb479691acd2b8921fce48ed5b961a6"},
-    {file = "uvicorn-0.17.6.tar.gz", hash = "sha256:5180f9d059611747d841a4a4c4ab675edf54c8489e97f96d0583ee90ac3bfc23"},
+    {file = "uvicorn-0.18.2-py3-none-any.whl", hash = "sha256:c19a057deb1c5bb060946e2e5c262fc01590c6529c0af2c3d9ce941e89bc30e0"},
+    {file = "uvicorn-0.18.2.tar.gz", hash = "sha256:cade07c403c397f9fe275492a48c1b869efd175d5d8a692df649e6e7e2ed8f4e"},
 ]
 uvloop = [
     {file = "uvloop-0.16.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:6224f1401025b748ffecb7a6e2652b17768f30b1a6a3f7b44660e5b5b690b12d"},
@@ -5131,9 +5099,19 @@ watchdog = [
     {file = "watchdog-2.1.9-py3-none-win_ia64.whl", hash = "sha256:ad576a565260d8f99d97f2e64b0f97a48228317095908568a9d5c786c829d428"},
     {file = "watchdog-2.1.9.tar.gz", hash = "sha256:43ce20ebb36a51f21fa376f76d1d4692452b2527ccd601950d69ed36b9e21609"},
 ]
-watchgod = [
-    {file = "watchgod-0.8.2-py3-none-any.whl", hash = "sha256:2f3e8137d98f493ff58af54ea00f4d1433a6afe2ed08ab331a657df468c6bfce"},
-    {file = "watchgod-0.8.2.tar.gz", hash = "sha256:cb11ff66657befba94d828e3b622d5fb76f22fbda1376f355f3e6e51e97d9450"},
+watchfiles = [
+    {file = "watchfiles-0.15.0-cp37-abi3-macosx_10_7_x86_64.whl", hash = "sha256:67d4c66e46a564059df4aeedab78f09cba0b697bf36cc77566b0a7015dfb7f5d"},
+    {file = "watchfiles-0.15.0-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:6e0e8829d32b05151e6009570449f44f891e05f518e495d25f960e0d0b2d0064"},
+    {file = "watchfiles-0.15.0-cp37-abi3-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:f7f71012e096e11256fae3b37617a9777980f281e18deb2e789e85cd5b113935"},
+    {file = "watchfiles-0.15.0-cp37-abi3-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:65ca99a94fcab29d00aa406526eb29cf198c0661854d59a315596064fed02141"},
+    {file = "watchfiles-0.15.0-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d4f45acd1143db6d3ee77a4ff12d3239bc8083108133e6174e9dcce59c1f9902"},
+    {file = "watchfiles-0.15.0-cp37-abi3-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:955e8f840e1996a8a41be57de4c03af7b1515a685b7fb6abe222f859e413a907"},
+    {file = "watchfiles-0.15.0-cp37-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:715733c2ac9da67b2790788657ff6f8b3797eb31565bfc592289b523ae907ca2"},
+    {file = "watchfiles-0.15.0-cp37-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:d1f9de6b776b3aff17898a4cf5ac5a2d0a16212ea7aad2bbe0ef6aa3e79a96af"},
+    {file = "watchfiles-0.15.0-cp37-abi3-win32.whl", hash = "sha256:56abed43e645d1f2d6def83e35999cc5758b051aff54ca1065cbfcaea15b3389"},
+    {file = "watchfiles-0.15.0-cp37-abi3-win_amd64.whl", hash = "sha256:7b81c6e404b2aa62482a719eb778e4a16d01728302dce1f1512c1e5354a73fda"},
+    {file = "watchfiles-0.15.0-cp37-abi3-win_arm64.whl", hash = "sha256:82238d08d8a49f1a1ba254278cd4329a154f6100b028393059722ebeddd2ff3d"},
+    {file = "watchfiles-0.15.0.tar.gz", hash = "sha256:cab62510f990d195986302aa6a48ed636d685b099927049120d520c96069fa49"},
 ]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},
