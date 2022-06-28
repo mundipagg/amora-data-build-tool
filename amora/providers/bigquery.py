@@ -475,7 +475,9 @@ class array(expression.ClauseList, expression.ColumnElement):  # type: ignore
             return self
 
 
-def zip_arrays(*arr_columns: Column) -> Compilable:
+def zip_arrays(
+    *arr_columns: Column, additional_columns: Optional[List[Column]] = None
+) -> Compilable:
     """
     Given at least two array columns of equal size, return a table of the unnest values,
     converting array items into rows. E.g:
@@ -505,12 +507,49 @@ def zip_arrays(*arr_columns: Column) -> Compilable:
     | 1      | f1v1 | f2v1 |
     | 2      | f1v2 | f2v2 |
 
+    If additional columns are needed from the original data, those can be selected
+    using the optional `additional_columns`:
+
+    ```python
+    from amora.providers.bigquery import array, cte_from_rows, zip_arrays
+
+    cte = cte_from_rows(
+        [
+            {
+                "entity": array([1, 2]),
+                "f1": array(["f1v1", "f1v2"]),
+                "f2": array(["f2v1", "f2v2"]),
+                "id": 1,
+            },
+            {
+                "entity": array([3, 4]),
+                "f1": array(["f1v3", "f1v4"]),
+                "f2": array(["f2v3", "f2v4"]),
+                "id": 2,
+            },
+        ]
+    )
+
+    zip_arrays(cte.c.entity, cte.c.f1, cte.c.f2, additional_columns=[cte.c.id])
+    ```
+
+    | entity | f1   | f2   | id   |
+    |--------|------|------|------|
+    | 1      | f1v1 | f2v1 | 1    |
+    | 2      | f1v2 | f2v2 | 1    |
+    | 3      | f1v3 | f2v3 | 2    |
+    | 4      | f1v4 | f2v4 | 2    |
+
     Read more: [https://cloud.google.com/bigquery/docs/reference/standard-sql/arrays#zipping_arrays](https://cloud.google.com/bigquery/docs/reference/standard-sql/arrays#zipping_arrays)
     """
     offset_alias = "off"
     offset = func.offset(literal_column(offset_alias))
 
-    return select([col[offset].label(col.key) for col in arr_columns]).join(
+    columns = [col[offset].label(col.key) for col in arr_columns]
+    if additional_columns:
+        columns += additional_columns
+
+    return select(columns).join(
         fixed_unnest(arr_columns[0]).table_valued(with_offset=offset_alias),
         onclause=literal(1) == literal(1),
         isouter=True,
