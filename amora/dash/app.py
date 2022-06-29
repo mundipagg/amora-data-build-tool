@@ -1,6 +1,7 @@
 from dash import Dash, Input, Output, dcc, html
 from dash.development.base_component import Component
 
+from amora.dash.authentication import add_auth0_login
 from amora.dash.components import model_details, side_bar
 from amora.dash.components.main_content import content
 from amora.dash.config import settings
@@ -13,6 +14,8 @@ dash_app = Dash(
     external_stylesheets=settings.external_stylesheets,
 )
 
+if settings.auth0_login_enabled:
+    add_auth0_login(dash_app)
 
 # App
 dash_app.layout = html.Div(
