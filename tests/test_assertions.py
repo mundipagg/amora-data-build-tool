@@ -1,11 +1,12 @@
 from sqlalchemy import func, literal
 
-from amora.providers.bigquery import cte_from_rows
+from amora.providers.bigquery import array, cte_from_rows
 from amora.tests.assertions import (
     are_unique_together,
     expression_is_true,
     has_accepted_values,
     has_at_least_one_not_null_value,
+    has_the_same_array_length,
     is_a_non_empty_string,
     is_non_negative,
     is_not_null,
@@ -212,3 +213,22 @@ def test_are_unique_together():
         ]
     )
     assert that([cte.c.name, cte.c.document_number], are_unique_together)
+
+
+def test_has_the_same_array_length():
+    cte = cte_from_rows(
+        [
+            {
+                "arr1": array(["a", "b"]),
+                "arr2": array([1, 2]),
+                "arr3": array(["1", "2"]),
+            },
+            {
+                "arr1": array(["c", "d"]),
+                "arr2": array([3, 4]),
+                "arr3": array(["1", "2"]),
+            },
+        ]
+    )
+
+    assert that([cte.c.arr1, cte.c.arr2, cte.c.arr3], has_the_same_array_length)
