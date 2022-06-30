@@ -1,11 +1,11 @@
 import string
 from datetime import date, datetime, time
-from typing import Optional
+from typing import List, Optional
 
 import pytest
 from google.api_core.exceptions import NotFound
 from google.cloud.bigquery.schema import SchemaField
-from sqlalchemy import TIMESTAMP, Column, Integer, String
+from sqlalchemy import ARRAY, TIMESTAMP, Column, Integer, String
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery.base import BQArray
@@ -153,18 +153,22 @@ def test_get_schema_for_model():
         a_time: time
         a_timestamp: datetime = Field(sa_column=Column(TIMESTAMP))
         an_int: int = Field(primary_key=True)
+        an_int_array: List[int] = Field(sa_column=Column(ARRAY(Integer)))
+        a_str_array: List[str] = Field(sa_column=Column(ARRAY(String)))
 
     schema = get_schema_for_model(ModelB)
 
     assert schema == [
-        SchemaField(name="a_timestamp", field_type="TIMESTAMP"),
-        SchemaField(name="a_boolean", field_type="BOOLEAN"),
-        SchemaField(name="a_date", field_type="DATE"),
-        SchemaField(name="a_datetime", field_type="DATETIME"),
-        SchemaField(name="a_float", field_type="FLOAT"),
-        SchemaField(name="a_string", field_type="STRING"),
-        SchemaField(name="a_time", field_type="TIME"),
-        SchemaField(name="an_int", field_type="INTEGER"),
+        SchemaField(name="a_timestamp", field_type="TIMESTAMP", mode="NULLABLE"),
+        SchemaField(name="an_int_array", field_type="INTEGER", mode="REPEATED"),
+        SchemaField(name="a_str_array", field_type="STRING", mode="REPEATED"),
+        SchemaField(name="a_boolean", field_type="BOOLEAN", mode="NULLABLE"),
+        SchemaField(name="a_date", field_type="DATE", mode="NULLABLE"),
+        SchemaField(name="a_datetime", field_type="DATETIME", mode="NULLABLE"),
+        SchemaField(name="a_float", field_type="FLOAT", mode="NULLABLE"),
+        SchemaField(name="a_string", field_type="STRING", mode="NULLABLE"),
+        SchemaField(name="a_time", field_type="TIME", mode="NULLABLE"),
+        SchemaField(name="an_int", field_type="INTEGER", mode="NULLABLE"),
     ]
 
 
