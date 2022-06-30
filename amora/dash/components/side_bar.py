@@ -1,5 +1,6 @@
 from typing import NamedTuple
 
+import dash
 import dash_bootstrap_components as dbc
 from dash import html
 from dash.development.base_component import Component
@@ -20,27 +21,20 @@ class NavItem(NamedTuple):
     title: str
 
 
-MENU = [
-    NavItem(fa_icon="fa-house", href="/", title="Home"),
-    NavItem(fa_icon="fa-database", href="/models", title="Models"),
-    NavItem(fa_icon="fa-shopping-cart", href="/feature-store", title="Feature Store"),
-    NavItem(fa_icon="fa-vial", href="/tests", title="Tests"),
-    NavItem(fa_icon="fa-chart-line", href="/dashboards", title="Dashboards"),
-    NavItem(fa_icon="fa-circle-question", href="/questions", title="Data Questions"),
-    NavItem(fa_icon="fa-magnifying-glass", href="/search", title="Search"),
-    NavItem(fa_icon="fa-gear", href="/environment", title="Environment"),
-]
-
-
 def nav() -> dbc.Nav:
     return dbc.Nav(
         [
             dbc.NavLink(
-                [html.I(className=f"fa-regular {item.fa_icon}"), f" {item.title}"],
-                href=item.href,
+                [
+                    html.I(className=f"fa-regular {page.get('fa_icon')}"),
+                    " ",
+                    page["name"],
+                ],
+                href=page["relative_path"],
                 active="exact",
             )
-            for item in MENU
+            for page in dash.page_registry.values()
+            if page.get("location") == "sidebar"
         ],
         vertical=True,
         pills=True,
