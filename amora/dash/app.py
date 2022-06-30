@@ -31,6 +31,7 @@ dash_app.layout = html.Div(
                         "padding": "2rem 1rem",
                         "overflow": "scroll",
                     },
+                    id="page-content",
                 ),
             ],
         ),
