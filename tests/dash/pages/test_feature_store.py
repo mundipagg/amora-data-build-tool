@@ -6,7 +6,7 @@ from dash.testing.composite import DashComposite
 
 def test_feature_store_page(amora_dash: DashComposite):
     with patch(
-        "amora.dash.routes.feature_store.summarize", return_value=pd.DataFrame()
+        "amora.dash.pages.feature_store.summarize", return_value=pd.DataFrame()
     ) as summarize:
         amora_dash.visit_and_snapshot(
             resource_path="/feature-store",
