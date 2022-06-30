@@ -14,6 +14,7 @@ from google.cloud.bigquery import (
 )
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
 from sqlalchemy import (
+    ARRAY,
     JSON,
     TIMESTAMP,
     Boolean,
@@ -146,13 +147,26 @@ def get_schema_for_model(model: Model) -> Schema:
     of the model by parsing the model SQLAlchemy column schema
     """
     columns = model.__table__.columns
-    return [
-        SchemaField(
-            name=col.name,
-            field_type=SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[col.type.__class__],
-        )
-        for col in columns
-    ]
+
+    def gen_schema():
+        for col in columns:
+            is_array = isinstance(col.type, ARRAY)
+            if is_array:
+                mode = "REPEATED"
+                field_type = SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[
+                    col.type.item_type.__class__
+                ]
+            else:
+                mode = "NULLABLE"
+                field_type = SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[col.type.__class__]
+
+            yield SchemaField(
+                name=col.name,
+                field_type=field_type,
+                mode=mode,
+            )
+
+    return list(gen_schema())
 
 
 def get_schema_for_source(model: Model) -> Optional[Schema]:
