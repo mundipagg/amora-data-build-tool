@@ -1,11 +1,14 @@
 from typing import List
 
+import dash
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 from dash.development.base_component import Component
 
 from amora.dash.components import model_details
 from amora.models import Model, list_models
+
+dash.register_page(__name__, fa_icon="fa-database", location="sidebar")
 
 
 def models_list(models: List[Model]) -> Component:
@@ -19,7 +22,7 @@ def models_list(models: List[Model]) -> Component:
     )
 
 
-def content() -> Component:
+def layout() -> Component:
     models = [model for (model, _path) in list_models()]
 
     return html.Div(

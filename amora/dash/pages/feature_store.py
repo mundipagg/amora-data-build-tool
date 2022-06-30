@@ -14,6 +14,7 @@
 """
 from typing import Iterable
 
+import dash
 import dash_bootstrap_components as dbc
 from dash import html
 from dash.development.base_component import Component
@@ -24,6 +25,8 @@ from amora.dash.components import dependency_dag, model_summary
 from amora.feature_store.registry import FEATURE_REGISTRY
 from amora.meta_queries import summarize
 from amora.models import Model, list_models
+
+dash.register_page(__name__, fa_icon="fa-shopping-cart", location="sidebar")
 
 
 def entities_list_items(entities: Iterable[str]):
@@ -65,7 +68,7 @@ def feature_details(fv: FeatureView, fs: FeatureService, model: Model) -> Compon
     )
 
 
-def content() -> Component:
+def layout() -> Component:
     list(list_models())
 
     card_group = dbc.CardGroup(
