@@ -1,7 +1,8 @@
 import logging
 import os
+from enum import Enum
 from pathlib import Path
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, mkdtemp
 from typing import Tuple
 from uuid import uuid4
 
@@ -12,6 +13,11 @@ AMORA_MODULE_PATH = ROOT_PATH.joinpath("amora")
 
 _Width = float
 _Height = float
+
+
+class StorageCacheProviders(str, Enum):
+    local = "local"
+    gcs = "gcs"
 
 
 class Settings(BaseSettings):
@@ -32,6 +38,12 @@ class Settings(BaseSettings):
     LOCAL_ENGINE_SQLITE_FILE_PATH: Path = Path(
         NamedTemporaryFile(suffix="amora-sqlite.db", delete=False).name
     )
+    STORAGE_CACHE_ENABLED: bool = True
+    STORAGE_CACHE_PROVIDER: StorageCacheProviders = StorageCacheProviders.local
+    STORAGE_GCS_BUCKET_NAME: str = "amora-storage"
+    STORAGE_LOCAL_CACHE_PATH: Path = Path(mkdtemp())
+    STORAGE_PARQUET_ENGINE: str = "pyarrow"
+
     LOGGER_LOG_LEVEL: int = logging.DEBUG
 
     MONEY_DECIMAL_PLACES: int = 4
