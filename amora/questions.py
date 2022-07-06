@@ -5,6 +5,7 @@ from sqlalchemy.sql import Selectable
 
 from amora.compilation import compile_statement
 from amora.providers.bigquery import run
+from amora.storage import cache
 from amora.types import Compilable
 from amora.visualization import Visualization, VisualizationConfig, VisualizationKind
 
@@ -148,6 +149,7 @@ class Question:
         stmt = self.question_func()
         return compile_statement(stmt)
 
+    @cache(suffix=lambda self: self.question_func.__name__)
     def answer_df(self) -> pd.DataFrame:
         """
         Executes the question against the target database,
