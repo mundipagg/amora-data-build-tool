@@ -37,7 +37,8 @@ nav:
   - 🎁 Examples:
     - Amora Project: 'examples.md'
     - Feature Store Notebook: 'notebooks/feature_store.ipynb'
-  - ⚙️ API Reference: ''
+  - ⚙️ API Reference:
+      - 'api/storage.md'
   - ↔️ Providers:
       - 'providers/bigquery.md'
   - 🧪 Testing:
