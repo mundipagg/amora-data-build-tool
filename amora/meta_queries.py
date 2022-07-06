@@ -4,8 +4,10 @@ from sqlalchemy import Float, Integer, Numeric, func, literal
 from amora.feature_store.protocols import FeatureViewSourceProtocol
 from amora.models import Column, Model, select
 from amora.providers.bigquery import run
+from amora.storage import cache
 
 
+@cache(suffix=lambda model: model.unique_name)
 def summarize(model: Model) -> pd.DataFrame:
     return pd.concat(
         [summarize_column(model, column) for column in model.__table__.columns]
