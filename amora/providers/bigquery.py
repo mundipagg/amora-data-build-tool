@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from datetime import date, datetime, time
 from enum import Enum
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 
+import pandas as pd
 import sqlalchemy
 from google.api_core.client_info import ClientInfo
 from google.cloud.bigquery import (
@@ -27,7 +28,9 @@ from sqlalchemy import (
     func,
     literal,
     literal_column,
+    tablesample,
 )
+from sqlalchemy.orm import aliased
 from sqlalchemy.sql import coercions, expression, operators, roles, sqltypes
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery.base import BQArray, unnest
@@ -106,6 +109,7 @@ class DryRunResult(BaseResult):
 class RunResult(BaseResult):
     rows: Union[RowIterator, _EmptyRowIterator]
     execution_time_in_ms: int
+    to_dataframe: Callable[..., pd.DataFrame]
     schema: Optional[Schema] = None
 
     @property
@@ -207,6 +211,7 @@ def run(statement: Compilable) -> RunResult:
         schema=query_job.schema,
         total_bytes=query_job.total_bytes_billed,
         user_email=query_job.user_email,
+        to_dataframe=query_job.to_dataframe,
     )
 
 
@@ -568,3 +573,14 @@ def zip_arrays(
         onclause=literal(1) == literal(1),
         isouter=True,
     )
+
+
+def sample(model: Model, percentage: int = 1) -> pd.DataFrame:
+    """
+    https://cloud.google.com/bigquery/docs/table-sampling?hl=pt-br
+    """
+    sampling = literal_column(f"{percentage} PERCENT")
+    sampled_alias = aliased(model, tablesample(model, sampling))
+    stmt = select(sampled_alias)
+
+    return run(stmt).to_dataframe()
