@@ -2,6 +2,7 @@ import string
 from datetime import date, datetime, time
 from typing import List, Optional
 
+import pandas as pd
 import pytest
 from google.api_core.exceptions import NotFound
 from google.cloud.bigquery.schema import SchemaField
@@ -24,6 +25,7 @@ from amora.providers.bigquery import (
     get_schema_for_model,
     get_schema_for_source,
     run,
+    sample,
     zip_arrays,
 )
 from amora.types import Compilable
@@ -31,6 +33,7 @@ from amora.types import Compilable
 from tests.models.health import Health
 from tests.models.heart_rate import HeartRate
 from tests.models.heart_rate_over_100 import HeartRateOver100
+from tests.models.step_count_by_source import StepCountBySource
 
 
 def test_cte_from_rows_with_single_row():
@@ -299,3 +302,7 @@ def test_zip_arrays():
             "event_timestamp": datetime.fromisoformat("2022-02-02T02:02:02"),
         },
     ]
+
+
+def test_table_sample():
+    assert isinstance(sample(StepCountBySource), pd.DataFrame)
