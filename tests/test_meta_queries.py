@@ -184,4 +184,4 @@ def test_summarize_feature_view_model():
 
 def test_summarize_array_column():
     col_summary = summarize_column(ArrayRepeatedFields, ArrayRepeatedFields.int_arr)
-    assert col_summary
+    assert col_summary.empty

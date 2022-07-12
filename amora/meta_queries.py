@@ -18,6 +18,11 @@ def summarize(model: Model) -> pd.DataFrame:
 
 @cache(suffix=lambda model, column: f"{model.unique_name}.{column.name}.{date.today()}")
 def summarize_column(model: Model, column: Column) -> pd.DataFrame:
+    is_array = isinstance(column.type, ARRAY)
+    if is_array:
+        # fixme:
+        return pd.DataFrame()
+
     is_numeric = isinstance(column.type, (Numeric, Integer, Float))
 
     stmt = select(
