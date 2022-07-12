@@ -208,6 +208,8 @@ def list_models(
     path: Path = settings.MODELS_PATH,
 ) -> Iterable[Tuple[Model, Path]]:
     for model_file_path in list_files(path, suffix=".py"):
+        if model_file_path.stem.startswith("_"):
+            continue
         try:
             yield amora_model_for_path(model_file_path), model_file_path
         except ValueError:
