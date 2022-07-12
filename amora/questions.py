@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Callable, Set
 
 import pandas as pd
@@ -149,7 +150,7 @@ class Question:
         stmt = self.question_func()
         return compile_statement(stmt)
 
-    @cache(suffix=lambda self: self.question_func.__name__)
+    @cache(suffix=lambda self: f"{self.question_func.__name__}.{date.today()}")
     def answer_df(self) -> pd.DataFrame:
         """
         Executes the question against the target database,
