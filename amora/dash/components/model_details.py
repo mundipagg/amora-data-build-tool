@@ -5,11 +5,10 @@ from dash.development.base_component import Component
 from amora.dag import DependencyDAG
 from amora.dash.components import (
     dependency_dag,
-    materialization_badge,
+    materialization_type_badge,
     model_code,
     model_summary,
 )
-from amora.meta_queries import summarize
 from amora.models import Model
 
 
@@ -23,7 +22,7 @@ def component(model: Model) -> Component:
             dbc.CardBody(
                 [
                     dependency_dag.component(DependencyDAG.from_model(model)),
-                    materialization_badge.component(model_config.materialized),
+                    materialization_type_badge.component(model_config.materialized),
                     html.P(
                         model_config.description,
                         className="card-text",
@@ -31,7 +30,7 @@ def component(model: Model) -> Component:
                     dbc.Accordion(
                         [
                             dbc.AccordionItem(
-                                model_summary.component(summary=summarize(model)),
+                                model_summary.component(model),
                                 title="Summary",
                             ),
                             dbc.AccordionItem(
