@@ -1,5 +1,7 @@
+from datetime import date
+
 import pandas as pd
-from sqlalchemy import ARRAY, Float, Integer, Numeric, String, cast, func, literal
+from sqlalchemy import Float, Integer, Numeric, String, cast, func, literal
 
 from amora.feature_store.protocols import FeatureViewSourceProtocol
 from amora.models import Column, Model, select
@@ -7,13 +9,14 @@ from amora.providers.bigquery import run
 from amora.storage import cache
 
 
-@cache(suffix=lambda model: model.unique_name)
+@cache(suffix=lambda model: f"{model.unique_name}.{date.today()}")
 def summarize(model: Model) -> pd.DataFrame:
     return pd.concat(
         [summarize_column(model, column) for column in model.__table__.columns]
     )
 
 
+@cache(suffix=lambda model, column: f"{model.unique_name}.{column.name}.{date.today()}")
 def summarize_column(model: Model, column: Column) -> pd.DataFrame:
     is_numeric = isinstance(column.type, (Numeric, Integer, Float))
 
