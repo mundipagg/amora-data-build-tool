@@ -1,7 +1,7 @@
 from datetime import date
 
 import pandas as pd
-from sqlalchemy import Float, Integer, Numeric, String, cast, func, literal
+from sqlalchemy import ARRAY, Float, Integer, Numeric, String, cast, func, literal
 
 from amora.feature_store.protocols import FeatureViewSourceProtocol
 from amora.models import Column, Model, select
