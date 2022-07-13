@@ -23,7 +23,6 @@ from feast import Feature, FeatureService, FeatureView
 from amora.dag import DependencyDAG
 from amora.dash.components import dependency_dag, model_summary
 from amora.feature_store.registry import FEATURE_REGISTRY
-from amora.meta_queries import summarize
 from amora.models import Model, list_models
 
 dash.register_page(__name__, fa_icon="fa-shopping-cart", location="sidebar")
@@ -40,8 +39,6 @@ def features_list_items(features: Iterable[Feature]):
 
 
 def feature_details(fv: FeatureView, fs: FeatureService, model: Model) -> Component:
-    summary = summarize(model)
-
     return dbc.Card(
         dbc.CardBody(
             [
@@ -52,7 +49,7 @@ def feature_details(fv: FeatureView, fs: FeatureService, model: Model) -> Compon
                 ),
                 html.Div(
                     [
-                        dbc.Row(model_summary.component(summary)),
+                        dbc.Row(model_summary.component(model)),
                         dbc.Row(
                             [
                                 dependency_dag.component(
