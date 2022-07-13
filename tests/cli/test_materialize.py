@@ -41,7 +41,7 @@ def test_materialize_without_arguments_and_options(
         str(call[1]["model"].__table__) for call in materialize.call_args_list
     )
     assert tables == sorted([str(Steps.__table__), str(HeartRate.__table__)])
-    compile.assert_called_once_with(target=None, models=tuple())
+    compile.assert_called_once_with(target=None, models=[])
 
 
 @patch("amora.cli.typer_app.compile")
@@ -61,7 +61,7 @@ def test_materialize_with_model_options(materialize: MagicMock, compile: MagicMo
     materialize_call_model = materialize.mock_calls[0][2]["model"]
     assert materialize_call_model.__table__ == Steps.__table__
 
-    compile.assert_called_once_with(models=("steps",), target=None)
+    compile.assert_called_once_with(models=["steps"], target=None)
 
 
 @patch("amora.cli.typer_app.compile")

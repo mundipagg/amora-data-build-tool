@@ -52,5 +52,11 @@ def test_compile_without_arguments_and_options():
 
     generated_target_files = [path.name for path in list_target_files()]
     assert sorted(generated_target_files) == sorted(
-        ["heart_agg.sql", "heart_rate.sql", "step_count_by_source.sql", "steps.sql"]
+        [
+            "array_repeated_fields.sql",
+            "heart_agg.sql",
+            "heart_rate.sql",
+            "step_count_by_source.sql",
+            "steps.sql",
+        ]
     )
