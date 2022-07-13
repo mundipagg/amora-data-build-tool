@@ -21,7 +21,7 @@ class AmoraBigQueryCompiler(BigQueryCompiler):
 
     def visit_function(self, func, add_to_result_map=None, **kwargs):
         text = super().visit_function(func, add_to_result_map=None, **kwargs)
-        if hasattr(func, "_with_offset"):
+        if hasattr(func, "_with_offset") and func._with_offset is not None:
             text += f" WITH OFFSET AS {func._with_offset}"
         return text
 
