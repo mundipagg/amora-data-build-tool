@@ -190,6 +190,16 @@ def amora_model_for_target_path(path: Path) -> Model:
     return amora_model_for_path(model_path)
 
 
+def model_path_for_model(model: Model) -> Path:
+    """
+    Returns the filepath where the model is defined.
+    """
+    for m, path in list_models():
+        if m.unique_name == model.unique_name:
+            return path
+    raise FileNotFoundError("Model file not found in the project")
+
+
 def amora_model_for_name(model_name: str) -> Model:
     for model, path in list_models():
         if model.unique_name == model_name:
