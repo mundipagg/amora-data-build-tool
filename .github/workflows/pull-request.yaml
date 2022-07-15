@@ -7,7 +7,7 @@ env:
   AMORA_TARGET_PATH: "${{ github.workspace }}/tests/target"
   AMORA_TARGET_PROJECT: amora-data-build-tool
   AMORA_TARGET_SCHEMA: amora
-
+  PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
 jobs:
   qa:
     name: 👀 Quality Assurance

@@ -8,6 +8,7 @@
 [![Issues](https://img.shields.io/github/issues/mundipagg/amora-data-build-tool?style=flat-square)](https://github.com/mundipagg/amora-data-build-tool/issues)
 [![MIT License](https://img.shields.io/github/license/mundipagg/amora-data-build-tool?style=flat-square)](https://github.com/mundipagg/amora-data-build-tool/blob/main/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+[![This project is using Percy.io for visual regression testing.](https://percy.io/static/images/percy-badge.svg)](https://percy.io/8186762a/amora-data-build-tool)
 [![PyPI version](https://badge.fury.io/py/amora.svg)](https://badge.fury.io/py/amora)
 
 <div align="center">
