@@ -51,3 +51,7 @@ class StepCountBySource(AmoraModel, table=True):
     @classmethod
     def feature_view_event_timestamp(cls):
         return cls.event_timestamp
+
+    @classmethod
+    def feature_view_fa_icon(cls):
+        return "fa-person-running"
