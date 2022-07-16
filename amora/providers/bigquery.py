@@ -36,10 +36,12 @@ from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery.base import BQArray, unnest
 from sqlmodel import AutoString
 
+from amora import logger
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
-from amora.models import Column, ColumnElement, Model, select
+from amora.models import Column, ColumnElement, MaterializationTypes, Model, select
+from amora.storage import cache
 from amora.types import Compilable
 from amora.version import VERSION
 
@@ -189,6 +191,7 @@ def get_schema_for_source(model: Model) -> Optional[Schema]:
     return result.schema
 
 
+@logger.log_execution()
 def run(statement: Compilable) -> RunResult:
     """
     Executes a given query and returns its results
@@ -215,6 +218,7 @@ def run(statement: Compilable) -> RunResult:
     )
 
 
+@logger.log_execution()
 def dry_run(model: Model) -> Optional[DryRunResult]:
     """
     You can use the estimate returned by the dry run to calculate query
@@ -575,6 +579,7 @@ def zip_arrays(
     )
 
 
+@cache(lambda model, percentage: f"{model.unique_name}.{percentage}.{date.today()}")
 def sample(model: Model, percentage: int = 1) -> pd.DataFrame:
     """
     https://cloud.google.com/bigquery/docs/table-sampling?hl=pt-br
