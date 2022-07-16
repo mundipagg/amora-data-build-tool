@@ -18,10 +18,16 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import html
 from dash.development.base_component import Component
-from feast import Feature, FeatureService, FeatureView
+from feast import Feature, FeatureView
 
-from amora.dag import DependencyDAG
-from amora.dash.components import dependency_dag, model_summary
+from amora.dash.components import (
+    materialization_badge,
+    model_columns,
+    model_datatable,
+    model_labels,
+    model_summary,
+)
+from amora.feature_store import fs as store
 from amora.feature_store.registry import FEATURE_REGISTRY
 from amora.models import Model, list_models
 
@@ -38,48 +44,74 @@ def features_list_items(features: Iterable[Feature]):
         yield dbc.ListGroupItem(feature.name)
 
 
-def feature_details(fv: FeatureView, fs: FeatureService, model: Model) -> Component:
+def icon_for_model(model: Model) -> html.I:
+    # fixme: What kind of contract should we expect from the model ?
+    icon = getattr(model, "feature_view_fa_icon", None)
+    icon = icon() if icon else "fa-square-question"
+    return html.I(className=f"fa-regular {icon}")
+
+
+def card_item(model: Model, fv: FeatureView) -> Component:
     return dbc.Card(
-        dbc.CardBody(
-            [
-                html.H5(fv.name, className="feature-view-name"),
-                html.Small(
-                    f"Latest time up to which the feature view has been materialized: '{fv.most_recent_end_time}'",
-                    className="card-text text-muted",
-                ),
-                html.Div(
+        [
+            dbc.CardHeader(
+                dbc.Row(
                     [
-                        dbc.Row(model_summary.component(model)),
-                        dbc.Row(
-                            [
-                                dependency_dag.component(
-                                    dag=DependencyDAG.from_model(model)
-                                ),
-                                dbc.Col("Bla"),
-                            ]
+                        dbc.Col(icon_for_model(model)),
+                        dbc.Col(
+                            html.H4(fv.name, className="card-title"),
                         ),
-                    ]
-                ),
-            ]
-        )
+                    ],
+                    justify="between",
+                )
+            ),
+            dbc.CardBody(
+                [
+                    model_labels.component(model),
+                    materialization_badge.component(fv.last_updated_timestamp),
+                    dbc.Accordion(
+                        [
+                            dbc.AccordionItem(
+                                model_summary.component(model),
+                                title="📈 Summary",
+                            ),
+                            dbc.AccordionItem(
+                                model_columns.component(model),
+                                title="📝 Docs",
+                            ),
+                            dbc.AccordionItem(
+                                model_datatable.component(model),
+                                title="🍰 Sample dataset",
+                            ),
+                        ],
+                        start_collapsed=True,
+                    ),
+                ]
+            ),
+        ],
+        className="w-50",
     )
 
 
 def layout() -> Component:
     list(list_models())
 
-    card_group = dbc.CardGroup(
-        id="feature-store-card-group",
-        children=[
-            feature_details(fv, fs, model)
-            for (fv, fs, model) in FEATURE_REGISTRY.values()
-        ],
+    registry_fvs = {
+        fv.name: fv for fv in store.registry.list_feature_views(store.project)
+    }
+
+    feature_views = dbc.CardGroup(
+        [
+            card_item(model=model, fv=registry_fvs[fv.name])
+            for (fv, fs, model) in list(FEATURE_REGISTRY.values())
+        ]
     )
     return html.Div(
         id="feature-store-content",
         children=[
             html.H1("Feature Store"),
             html.H2("Registered in this project are:"),
-            card_group,
+            html.Hr(),
+            feature_views,
         ],
     )
