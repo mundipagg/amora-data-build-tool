@@ -21,7 +21,11 @@ class StepCountBySource(AmoraModel, table=True):
     value_count: float = Field(description="Count of step count samples of the hour")
 
     source_name: str = Field(primary_key=True, description="Source of the metric")
-    event_timestamp: datetime = Field(primary_key=True, sa_column=Column(TIMESTAMP))
+    event_timestamp: datetime = Field(
+        primary_key=True,
+        sa_column=Column(TIMESTAMP),
+        description="Moment if time of which those features where observed",
+    )
 
     @classmethod
     def source(cls) -> Optional[Compilable]:
