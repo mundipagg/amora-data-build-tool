@@ -1,6 +1,5 @@
-import dash_table
 import pandas as pd
-from dash import html
+from dash import dash_table, html
 from dash.development.base_component import Component
 
 from amora.models import Model
