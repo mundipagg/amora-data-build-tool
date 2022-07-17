@@ -72,6 +72,7 @@ class StepCountBySource(AmoraModel, table=True):
     def feature_view_fa_icon(cls):
         return "fa-person-running"
 
+
 @question
 def how_many_data_points_where_acquired():
     return select(func.sum(StepCountBySource.value_count).label("total"))
