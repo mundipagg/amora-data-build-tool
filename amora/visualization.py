@@ -14,9 +14,18 @@ class PieChart(VisualizationConfig, BaseModel):
     names: str
 
 
+class _2DChart(VisualizationConfig, BaseModel):
+    x_func: Callable[[pd.DataFrame], str] = lambda data: data["x"]
+    y_func: Callable[[pd.DataFrame], str] = lambda data: data["y"]
+
+
 class BarChart(VisualizationConfig, BaseModel):
     x_func: Callable[[pd.DataFrame], str] = lambda data: data["x"]
     y_func: Callable[[pd.DataFrame], str] = lambda data: data["y"]
+
+
+class LineChart(_2DChart):
+    pass
 
 
 class BigNumber(VisualizationConfig, BaseModel):
