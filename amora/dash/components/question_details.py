@@ -1,16 +1,24 @@
 import dash_bootstrap_components as dbc
-from dash import dash_table, html
+import plotly.express as px
+from dash import dash_table, dcc, html
 from dash.development.base_component import Component
 
 from amora.questions import Question
-from amora.visualization import Visualization, VisualizationKind
+from amora.visualization import BigNumber, PieChart, Visualization
 
 
 def answer_visualization(visualization: Visualization) -> Component:
-    if visualization.config.kind == VisualizationKind.big_number:
-        big_number = visualization.data.get_value()
-        return html.P()
-    elif visualization.config.kind == VisualizationKind.table:
+    view_config = visualization.config
+    if isinstance(view_config, BigNumber):
+        big_number = view_config.value_func(visualization.data)
+        return html.H4(big_number)
+    elif isinstance(view_config, PieChart):
+        return dcc.Graph(
+            figure=px.pie(
+                visualization.data, values=view_config.values, names=view_config.names
+            )
+        )
+    else:
         return dash_table.DataTable(
             columns=[
                 {"name": col, "id": col, "selectable": True}
