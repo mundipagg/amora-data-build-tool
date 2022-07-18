@@ -19,9 +19,11 @@ def component(model: Model) -> Component:
         dash_table.DataTable(
             data=df.to_dict("records"),
             columns=[
-                {"name": "column", "id": "column"},
-                {"name": "description", "id": "description"},
+                {"name": "Column", "id": "column"},
+                {"name": "Description", "id": "description"},
             ],
+            style_cell={"textAlign": "left"},
+            style_as_list_view=True,
         ),
         id=f"model-columns-{model.unique_name}",
     )
