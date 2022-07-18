@@ -5,6 +5,7 @@ from amora.dash.authentication import add_auth0_login
 from amora.dash.components import side_bar
 from amora.dash.config import settings
 from amora.dash.css_styles import styles
+from amora.models import list_models
 
 dash_app = Dash(
     __name__, external_stylesheets=settings.external_stylesheets, use_pages=True
@@ -35,3 +36,6 @@ dash_app.layout = html.Div(
         ),
     ],
 )
+
+# fixme: should be in a post init callback or shouldn't be needed at all
+list(list_models())
