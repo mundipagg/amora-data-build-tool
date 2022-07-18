@@ -8,7 +8,7 @@ from amora.compilation import compile_statement
 from amora.providers.bigquery import run
 from amora.storage import cache
 from amora.types import Compilable
-from amora.visualization import Visualization, VisualizationConfig, VisualizationKind
+from amora.visualization import Table, Visualization, VisualizationConfig
 
 QuestionFunc = Callable[[], Compilable]
 
@@ -81,15 +81,14 @@ class Question:
             question_func = question_func.question_func
         if not isinstance(question_func(), Selectable):
             raise ValueError(
-                "Valid questions should return a `Selectable`. Please refer to the 'data questions' documentation."
+                "Valid questions should return a `Selectable`. "
+                "Please refer to the 'data questions' documentation."
             )
 
         self.question_func = question_func
 
         if view_config is None:
-            self.view_config = VisualizationConfig(
-                kind=VisualizationKind.table, title=self.name
-            )
+            self.view_config = Table(title=self.name)
         else:
             self.view_config = view_config
 
@@ -208,12 +207,38 @@ class Question:
 QUESTIONS: Set[Question] = set()
 
 
-def question(question_func: QuestionFunc):
+def question(view_config: VisualizationConfig = None):
     """
-    Wraps the function into a `amora.questions.Question`. The decorated function must return a `Compilable`
+    Wraps the function into a `amora.questions.Question`.
+    The decorated function must return a `Compilable`
+
+    E.g:
+    ```python
+    @question()
+    def what_are_the_available_data_sources():
+        return select(StepCountBySource.source_name).distinct()
+    ```
+
+    Optional data visualization configuration can be passed using the `view_config` arg:
+
+    ```python
+    from amora.visualization import PieChart
+
+
+    @question(view_config=PieChart(values="total", names="source_name"))
+    def what_is_the_total_step_count_to_date():
+        return select(
+            func.sum(StepCountBySource.value_sum).label("total"),
+            StepCountBySource.source_name,
+        ).group_by(StepCountBySource.source_name)
+    ```
 
     """
-    q = Question(question_func)
-    QUESTIONS.add(q)
 
-    return q
+    def decorator(question_func: QuestionFunc) -> Question:
+        q = Question(question_func, view_config=view_config)
+        QUESTIONS.add(q)
+
+        return q
+
+    return decorator
