@@ -29,7 +29,7 @@ from amora.dash.components import (
 )
 from amora.feature_store import fs as store
 from amora.feature_store.registry import FEATURE_REGISTRY
-from amora.models import Model, list_models
+from amora.models import Model
 
 dash.register_page(__name__, fa_icon="fa-shopping-cart", location="sidebar")
 
@@ -94,8 +94,6 @@ def card_item(model: Model, fv: FeatureView) -> Component:
 
 
 def layout() -> Component:
-    list(list_models())
-
     registry_fvs = {
         fv.name: fv for fv in store.registry.list_feature_views(store.project)
     }
