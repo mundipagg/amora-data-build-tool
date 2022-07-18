@@ -1,0 +1,35 @@
+from amora.dashboards import AcceptedValuesFilter, Dashboard, DateFilter
+from examples.amora_project.models.step_count_by_source import (
+    how_many_data_points_where_acquired,
+    what_is_the_current_estimated_walked_distance,
+    what_is_the_latest_data_point,
+    what_is_the_total_step_count_to_date,
+)
+
+dashboard = Dashboard(
+    id="1",
+    name=__name__,
+    questions=[
+        [
+            what_is_the_current_estimated_walked_distance,
+            what_is_the_total_step_count_to_date,
+        ],
+        [
+            what_is_the_latest_data_point,
+            what_is_the_total_step_count_to_date,
+            how_many_data_points_where_acquired,
+        ],
+    ],
+    filters=[
+        DateFilter(
+            default="2021-01-01", title="data de início", id="start-date-filter"
+        ),
+        DateFilter(default="2023-01-01", title="data fim", id="end-date-filter"),
+        AcceptedValuesFilter(
+            default="iPhone",
+            values=["Diogo's iPhone", "iPhone"],
+            title="Source device",
+            id="source-device-filter",
+        ),
+    ],
+)
