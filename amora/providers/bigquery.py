@@ -40,7 +40,7 @@ from amora import logger
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
-from amora.models import Column, ColumnElement, Model, select
+from amora.models import Column, ColumnElement, MaterializationTypes, Model, select
 from amora.storage import cache
 from amora.types import Compilable
 from amora.version import VERSION
@@ -582,8 +582,14 @@ def zip_arrays(
 @cache(lambda model, percentage: f"{model.unique_name}.{percentage}.{date.today()}")
 def sample(model: Model, percentage: int = 1) -> pd.DataFrame:
     """
-    https://cloud.google.com/bigquery/docs/table-sampling?hl=pt-br
+    https://cloud.google.com/bigquery/docs/table-sampling
     """
+    if model.__model_config__.materialized is not MaterializationTypes.table:
+        raise ValueError(
+            "TABLESAMPLE SYSTEM can only be applied directly to base tables. "
+            "More on: https://cloud.google.com/bigquery/docs/table-sampling#limitations"
+        )
+
     sampling = literal_column(f"{percentage} PERCENT")
     sampled_alias = aliased(model, tablesample(model, sampling))
     stmt = select(sampled_alias)
