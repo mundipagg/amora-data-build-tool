@@ -8,6 +8,7 @@ from amora.models import AmoraModel, Field, MaterializationTypes, ModelConfig, s
 from amora.questions import question
 from amora.transformations import datetime_trunc_hour
 from amora.types import Compilable
+from amora.visualization import BigNumber, PieChart
 from examples.amora_project.models.steps import Steps
 
 
@@ -73,27 +74,27 @@ class StepCountBySource(AmoraModel, table=True):
         return "fa-person-running"
 
 
-@question
+@question(view_config=BigNumber())
 def how_many_data_points_where_acquired():
     return select(func.sum(StepCountBySource.value_count).label("total"))
 
 
-@question
+@question()
 def what_are_the_available_data_sources():
     return select(StepCountBySource.source_name).distinct()
 
 
-@question
+@question()
 def what_is_the_observation_starting_point():
     return select(func.min(StepCountBySource.event_timestamp).label("event_timestamp"))
 
 
-@question
+@question()
 def what_is_the_latest_data_point():
     return select(func.max(StepCountBySource.event_timestamp).label("event_timestamp"))
 
 
-@question
+@question(view_config=PieChart(values="total", names="source_name"))
 def what_is_the_total_step_count_to_date():
     """
     Qual o total de passos dados até hoje?
@@ -104,7 +105,7 @@ def what_is_the_total_step_count_to_date():
     ).group_by(StepCountBySource.source_name)
 
 
-@question
+@question()
 def what_is_the_current_estimated_walked_distance():
     avg_step_length_in_cm = literal(79, type_=Integer)
     estimation_in_cm = func.sum(StepCountBySource.value_sum) * avg_step_length_in_cm
