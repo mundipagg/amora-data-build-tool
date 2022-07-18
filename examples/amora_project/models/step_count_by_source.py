@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
+import humanize
 from sqlalchemy import TIMESTAMP, Column, Integer, func, literal
 
 from amora.feature_store.decorators import feature_view
@@ -8,7 +9,7 @@ from amora.models import AmoraModel, Field, MaterializationTypes, ModelConfig, s
 from amora.questions import question
 from amora.transformations import datetime_trunc_hour
 from amora.types import Compilable
-from amora.visualization import BigNumber, PieChart
+from amora.visualization import BigNumber, LineChart, PieChart
 from examples.amora_project.models.steps import Steps
 
 
@@ -84,12 +85,18 @@ def what_are_the_available_data_sources():
     return select(StepCountBySource.source_name).distinct()
 
 
-@question()
+@question(
+    view_config=BigNumber(
+        value_func=lambda data: humanize.naturaldate(data["event_timestamp"][0])
+    )
+)
 def what_is_the_observation_starting_point():
     return select(func.min(StepCountBySource.event_timestamp).label("event_timestamp"))
 
 
-@question()
+@question(
+    BigNumber(value_func=lambda data: humanize.naturaldate(data["event_timestamp"][0]))
+)
 def what_is_the_latest_data_point():
     return select(func.max(StepCountBySource.event_timestamp).label("event_timestamp"))
 
@@ -105,7 +112,12 @@ def what_is_the_total_step_count_to_date():
     ).group_by(StepCountBySource.source_name)
 
 
-@question()
+@question(
+    view_config=BigNumber(
+        value_func=lambda data: humanize.intword(data["total_in_kilometers"][0])
+        + " Kilometers"
+    )
+)
 def what_is_the_current_estimated_walked_distance():
     avg_step_length_in_cm = literal(79, type_=Integer)
     estimation_in_cm = func.sum(StepCountBySource.value_sum) * avg_step_length_in_cm
@@ -116,3 +128,17 @@ def what_is_the_current_estimated_walked_distance():
         (estimation_in_cm / 100000).label("total_in_kilometers"),
         StepCountBySource.source_name,
     ).group_by(StepCountBySource.source_name)
+
+
+@question(
+    view_config=LineChart(
+        x_func=lambda data: data["event_timestamp"],
+        y_func=lambda data: data["value_sum"],
+    )
+)
+def what_are_the_values_observed_on_the_iphone():
+    return (
+        select(StepCountBySource.value_sum, StepCountBySource.event_timestamp)
+        .where(StepCountBySource.source_name == "iPhone")
+        .order_by(StepCountBySource.event_timestamp)
+    )
