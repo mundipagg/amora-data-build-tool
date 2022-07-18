@@ -1,21 +1,30 @@
-from enum import Enum
-from typing import NamedTuple, Union
+from abc import ABC
+from typing import Callable, Union
 
 import pandas as pd
+from pydantic import BaseModel
 
 
-class VisualizationKind(str, Enum):
-    big_number = "big_number"
-    bar_chart = "bar_chart"
-    column_chart = "column_chart"
-    line_chart = "line_chart"
-    table = "table"
-    pie_chart = "pie_chart"
+class ViewConfig(ABC):
+    pass
 
 
-class VisualizationConfig(NamedTuple):
-    title: Union[str, None]
-    kind: VisualizationKind = VisualizationKind.table
+class PieChart(ViewConfig, BaseModel):
+    values: str
+    names: str
+
+
+class BarChart(ViewConfig, BaseModel):
+    x_func: Callable[[pd.DataFrame], str] = lambda data: data["x"]
+    y_func: Callable[[pd.DataFrame], str] = lambda data: data["y"]
+
+
+class BigNumber(ViewConfig, BaseModel):
+    value_func: Callable[[pd.DataFrame], str] = lambda data: data["total"][0]
+
+
+class Table(ViewConfig, BaseModel):
+    title: Union[str, None] = None
 
 
 class Visualization:
@@ -23,7 +32,7 @@ class Visualization:
     The Amora visual representation of a `pandas.DataFrame`
     """
 
-    def __init__(self, data: pd.DataFrame, config: VisualizationConfig):
+    def __init__(self, data: pd.DataFrame, config: ViewConfig):
         self.data = data
         self.config = config
 
