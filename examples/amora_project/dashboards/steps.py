@@ -1,6 +1,8 @@
 from amora.dashboards import AcceptedValuesFilter, Dashboard, DateFilter
 from examples.amora_project.models.step_count_by_source import (
     how_many_data_points_where_acquired,
+    what_are_the_available_data_sources,
+    what_are_the_values_observed_on_the_iphone,
     what_is_the_current_estimated_walked_distance,
     what_is_the_latest_data_point,
     what_is_the_total_step_count_to_date,
@@ -11,13 +13,14 @@ dashboard = Dashboard(
     name=__name__,
     questions=[
         [
+            what_is_the_latest_data_point,
             what_is_the_current_estimated_walked_distance,
-            what_is_the_total_step_count_to_date,
+            how_many_data_points_where_acquired,
         ],
         [
-            what_is_the_latest_data_point,
             what_is_the_total_step_count_to_date,
-            how_many_data_points_where_acquired,
+            what_are_the_values_observed_on_the_iphone,
+            what_are_the_available_data_sources,
         ],
     ],
     filters=[
