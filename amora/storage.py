@@ -6,6 +6,7 @@ from typing import Callable, NamedTuple, Union
 
 import pandas as pd
 
+from amora import logger
 from amora.config import StorageCacheProviders, settings
 from amora.models import MetaData, create_engine
 
@@ -67,11 +68,13 @@ class Cache(UserDict):
         else:
             raise NotImplementedError
 
+    @logger.log_execution()
     def __setitem__(self, key: CacheKey, value: pd.DataFrame):
         value.to_parquet(
             self.filepath_for_key(key), engine=settings.STORAGE_PARQUET_ENGINE
         )
 
+    @logger.log_execution()
     def __getitem__(self, item: CacheKey) -> pd.DataFrame:
         try:
             return pd.read_parquet(self.filepath_for_key(item))
