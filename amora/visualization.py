@@ -5,25 +5,25 @@ import pandas as pd
 from pydantic import BaseModel
 
 
-class ViewConfig(ABC):
+class VisualizationConfig(ABC):
     pass
 
 
-class PieChart(ViewConfig, BaseModel):
+class PieChart(VisualizationConfig, BaseModel):
     values: str
     names: str
 
 
-class BarChart(ViewConfig, BaseModel):
+class BarChart(VisualizationConfig, BaseModel):
     x_func: Callable[[pd.DataFrame], str] = lambda data: data["x"]
     y_func: Callable[[pd.DataFrame], str] = lambda data: data["y"]
 
 
-class BigNumber(ViewConfig, BaseModel):
+class BigNumber(VisualizationConfig, BaseModel):
     value_func: Callable[[pd.DataFrame], str] = lambda data: data["total"][0]
 
 
-class Table(ViewConfig, BaseModel):
+class Table(VisualizationConfig, BaseModel):
     title: Union[str, None] = None
 
 
@@ -32,7 +32,7 @@ class Visualization:
     The Amora visual representation of a `pandas.DataFrame`
     """
 
-    def __init__(self, data: pd.DataFrame, config: ViewConfig):
+    def __init__(self, data: pd.DataFrame, config: VisualizationConfig):
         self.data = data
         self.config = config
 
