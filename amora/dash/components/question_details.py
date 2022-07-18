@@ -4,7 +4,7 @@ from dash import dash_table, dcc, html
 from dash.development.base_component import Component
 
 from amora.questions import Question
-from amora.visualization import BigNumber, PieChart, Visualization
+from amora.visualization import BigNumber, LineChart, PieChart, Visualization
 
 
 def answer_visualization(visualization: Visualization) -> Component:
@@ -12,6 +12,14 @@ def answer_visualization(visualization: Visualization) -> Component:
     if isinstance(view_config, BigNumber):
         big_number = view_config.value_func(visualization.data)
         return html.H4(big_number)
+    elif isinstance(view_config, LineChart):
+        return dcc.Graph(
+            figure=px.line(
+                visualization.data,
+                x=view_config.x_func(visualization.data),
+                y=view_config.y_func(visualization.data),
+            )
+        )
     elif isinstance(view_config, PieChart):
         return dcc.Graph(
             figure=px.pie(
