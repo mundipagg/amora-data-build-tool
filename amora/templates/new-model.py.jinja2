@@ -1,18 +1,24 @@
-from amora.models import AmoraModel
+from amora.models import AmoraModel, Field
 from datetime import date, datetime, time
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, Column
+from sqlalchemy.sql.sqltypes import *
+from typing import List
 
 
-class {{ model_name -}}(AmoraModel):
+class {{ model_name -}}(AmoraModel, table=True):
     """
         {{ project }}.{{ dataset }}.{{ table }}
 
-        Generated with `amora model-create`
+        Generated with `amora models import`
     """
     metadata = MetaData(schema='{{ project }}.{{ dataset }}')
     __tablename__ = '{{ table }}'
 
 {% for schema_field in schema %}
-    {{ schema_field.name -}}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ -}}
+    {% if schema_field.mode == 'NULLABLE' -%}
+        {{ schema_field.name -}}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ -}}
+    {% elif schema_field.mode == 'REPEATED' -%}
+        {{ schema_field.name -}}: List[{{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ -}}] = Field(sa_column=Column(ARRAY({{ BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema_field.field_type].__name__ -}})))
+    {%- endif -%}
 {% endfor %}
 

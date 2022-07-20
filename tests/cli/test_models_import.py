@@ -56,6 +56,28 @@ mock_schema = [
     SchemaField(name="STRING_COLUMN", field_type="STRING"),
     SchemaField(name="TIME_COLUMN", field_type="TIME"),
     SchemaField(name="TIMESTAMP_COLUMN", field_type="TIMESTAMP"),
+    SchemaField(name="INTEGER_ARRAY_COLUMN", field_type="INTEGER", mode="REPEATED"),
+    SchemaField(name="STRING_ARRAY_COLUMN", field_type="STRING", mode="REPEATED"),
+    SchemaField(name="FLOAT_ARRAY_COLUMN", field_type="FLOAT64", mode="REPEATED"),
+    SchemaField(
+        name="ARRAY_OF_STRUCTS_COLUMN",
+        field_type="RECORD",
+        mode="REPEATED",
+        fields=(
+            SchemaField("id", "STRING", "NULLABLE", None, (), None),
+            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+        ),
+    ),
+    SchemaField(
+        name="STRUCT_COLUMN",
+        field_type="RECORD",
+        fields=(
+            SchemaField("id", "STRING", "NULLABLE", None, (), None),
+            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+        ),
+    ),
 ]
 
 
