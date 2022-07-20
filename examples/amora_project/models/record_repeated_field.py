@@ -35,7 +35,7 @@ class RecordRepeatedFields(AmoraModel, table=True):
                             Edge(from_node="b", to_node="c"),
                         ]
                     ),
-                    "root_node": Node(id="a")
+                    "root_node": Node(id="a"),
                 },
             ]
         )
