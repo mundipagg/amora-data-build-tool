@@ -716,7 +716,7 @@ def zip_arrays(
     )
 
 
-@cache(lambda model, percentage: f"{model.unique_name}.{percentage}.{date.today()}")
+@cache(lambda model, percentage=1: f"{model.unique_name}.{percentage}.{date.today()}")
 def sample(model: Model, percentage: int = 1) -> pd.DataFrame:
     """
     https://cloud.google.com/bigquery/docs/table-sampling
