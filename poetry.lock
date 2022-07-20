@@ -160,7 +160,7 @@ cryptography = ">=3.2"
 name = "autoflake"
 version = "1.4"
 description = "Removes unused imports and unused variables"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -194,7 +194,7 @@ lxml = ["lxml"]
 name = "black"
 version = "22.6.0"
 description = "The uncompromising code formatter."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.2"
 
@@ -305,7 +305,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 name = "com2ann"
 version = "0.3.0"
 description = "Tool to translate type comments to annotations."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.8"
 
@@ -1223,7 +1223,7 @@ test = ["pytest (>=3.6.0)", "pytest-cov", "mock"]
 name = "isort"
 version = "5.10.1"
 description = "A Python utility / library to sort Python imports."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.1,<4.0"
 
@@ -1411,7 +1411,7 @@ python-versions = ">=3.7"
 name = "libcst"
 version = "0.4.5"
 description = "A concrete syntax tree with AST-like properties for Python 3.5, 3.6, 3.7, 3.8, 3.9, and 3.10 programs."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -1846,7 +1846,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "networkx"
-version = "2.8.4"
+version = "2.8.5"
 description = "Python package for creating and manipulating graphs and networks"
 category = "main"
 optional = false
@@ -2014,7 +2014,7 @@ testing = ["docopt", "pytest (<6.0.0)"]
 name = "pathspec"
 version = "0.9.0"
 description = "Utility library for gitignore style pattern matching of file paths."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 
@@ -2064,7 +2064,7 @@ tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "pa
 name = "platformdirs"
 version = "2.5.2"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -2262,7 +2262,7 @@ email = ["email-validator (>=1.0.3)"]
 name = "pyflakes"
 version = "2.4.0"
 description = "passive checker of Python programs"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
@@ -2450,7 +2450,7 @@ python-versions = "*"
 name = "pyupgrade"
 version = "2.34.0"
 description = "A tool to automatically upgrade syntax for newer versions."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -2663,7 +2663,7 @@ toml = ["setuptools (>=42)"]
 name = "shed"
 version = "0.9.7"
 description = "`shed` canonicalises Python code."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -2911,7 +2911,7 @@ test = ["pytest", "pytest-cov", "pytest-flake8", "pytest-isort", "coverage"]
 name = "tokenize-rt"
 version = "4.2.1"
 description = "A wrapper around the stdlib `tokenize` which roundtrips."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.1"
 
@@ -3028,7 +3028,7 @@ python-versions = ">=3.7"
 name = "typing-inspect"
 version = "0.7.1"
 description = "Runtime inspection utilities for typing module."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -3239,7 +3239,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9.6,<3.10"
-content-hash = "53507a18f8355ce72ab22fbcafd6dd12f1ebd6767f7c6c03f06d9a46932f5b3b"
+content-hash = "1d796dc299cc3726bb9d20b6fbefcd7b79c36a561f9d953d4862165863a07508"
 
 [metadata.files]
 absl-py = [
@@ -4605,10 +4605,7 @@ nest-asyncio = [
     {file = "nest_asyncio-1.5.5-py3-none-any.whl", hash = "sha256:b98e3ec1b246135e4642eceffa5a6c23a3ab12c82ff816a92c612d68205813b2"},
     {file = "nest_asyncio-1.5.5.tar.gz", hash = "sha256:e442291cd942698be619823a17a86a5759eabe1f8613084790de189fe9e16d65"},
 ]
-networkx = [
-    {file = "networkx-2.8.4-py3-none-any.whl", hash = "sha256:6933b9b3174a0bdf03c911bb4a1ee43a86ce3edeb813e37e1d4c553b3f4a2c4f"},
-    {file = "networkx-2.8.4.tar.gz", hash = "sha256:5e53f027c0d567cf1f884dbb283224df525644e43afd1145d64c9d88a3584762"},
-]
+networkx = []
 nodeenv = [
     {file = "nodeenv-1.7.0-py2.py3-none-any.whl", hash = "sha256:27083a7b96a25f2f5e1d8cb4b6317ee8aeda3bdd121394e5ac54e498028a042e"},
     {file = "nodeenv-1.7.0.tar.gz", hash = "sha256:e0e7f7dfb85fc5394c6fe1e8fa98131a2473e04311a45afb6508f7cf1836fa2b"},
