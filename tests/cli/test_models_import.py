@@ -40,7 +40,6 @@ def test_models_import_with_invalid_table_reference(get_schema: MagicMock):
 
 
 mock_schema = [
-    SchemaField(name="ARRAY_COLUMN", field_type="ARRAY"),
     SchemaField(name="BIGNUMERIC_COLUMN", field_type="BIGNUMERIC"),
     SchemaField(name="BOOL_COLUMN", field_type="BOOL"),
     SchemaField(name="BOOLEAN_COLUMN", field_type="BOOLEAN"),
