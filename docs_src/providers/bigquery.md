@@ -44,13 +44,38 @@
         show_root_heading: true
         show_root_toc_entry: true
 
-::: amora.providers.bigquery.get_schema_for_model
+
+::: amora.providers.bigquery.schema_for_model
     rendering:
         heading_level: 3
         show_root_heading: true
         show_root_toc_entry: true
 
-::: amora.providers.bigquery.get_schema_for_source
+::: amora.providers.bigquery.schema_for_model_source
+    rendering:
+        heading_level: 3
+        show_root_heading: true
+        show_root_toc_entry: true
+
+::: amora.providers.bigquery.schema_for_struct
+    rendering:
+        heading_level: 3
+        show_root_heading: true
+        show_root_toc_entry: true
+
+::: amora.providers.bigquery.struct_for_schema_field
+    rendering:
+        heading_level: 3
+        show_root_heading: true
+        show_root_toc_entry: true
+
+::: amora.providers.bigquery.column_for_schema_field
+    rendering:
+        heading_level: 3
+        show_root_heading: true
+        show_root_toc_entry: true
+
+::: amora.providers.bigquery.schema_field_for_column
     rendering:
         heading_level: 3
         show_root_heading: true
@@ -68,3 +93,17 @@ Read more: [https://cloud.google.com/bigquery/docs/nested-repeated](https://clou
 ### Zipping arrays
 
 ::: amora.providers.bigquery.zip_arrays
+
+## Structs and Nested Models
+
+::: amora.providers.bigquery.struct
+    rendering:
+        heading_level: 3
+        show_root_heading: true
+        show_root_toc_entry: true
+
+::: amora.providers.bigquery.struct_for_model
+    rendering:
+        heading_level: 3
+        show_root_heading: true
+        show_root_toc_entry: true
