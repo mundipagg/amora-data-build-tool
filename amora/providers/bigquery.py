@@ -23,6 +23,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     Integer,
+    Numeric,
     String,
     Time,
     func,
@@ -34,9 +35,10 @@ from sqlalchemy.orm import aliased
 from sqlalchemy.sql import coercions, expression, operators, roles, sqltypes
 from sqlalchemy.sql.base import coercions
 from sqlalchemy.sql.selectable import CTE
-from sqlalchemy.sql.sqltypes import ARRAY, NullType
+from sqlalchemy.sql.sqltypes import ARRAY
 from sqlalchemy_bigquery import STRUCT
 from sqlalchemy_bigquery.base import BQArray, unnest
+from sqlmodel import AutoString
 from sqlmodel.main import get_sqlachemy_type
 
 from amora import logger
@@ -44,9 +46,9 @@ from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
 from amora.models import (
+    AmoraModel,
     Column,
     ColumnElement,
-    Field,
     MaterializationTypes,
     Model,
     select,
@@ -62,6 +64,7 @@ BQTable = Union[Table, TableReference, str]
 BIGQUERY_TYPES_TO_PYTHON_TYPES = {
     "ARRAY": list,
     "BIGNUMERIC": int,
+    "NUMERIC": int,  # todo: remove
     "BOOL": bool,
     "BOOLEAN": bool,
     "BYTES": bytes,
@@ -76,18 +79,22 @@ BIGQUERY_TYPES_TO_PYTHON_TYPES = {
     "STRING": str,
     "TIME": time,
     "TIMESTAMP": datetime,
+    "RECORD": dict,
 }
 
 SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES = {
-    Integer: "INTEGER",
-    String: "STRING",
-    DateTime: "DATETIME",
-    Date: "DATE",
-    Time: "TIME",
-    Float: "FLOAT64",
+    AutoString: "STRING",
     Boolean: "BOOLEAN",
+    Date: "DATE",
+    DateTime: "DATETIME",
+    Float: "FLOAT64",
+    Integer: "INTEGER",
     JSON: "JSON",
+    Numeric: "NUMERIC",
+    STRUCT: "RECORD",
+    String: "STRING",
     TIMESTAMP: "TIMESTAMP",
+    Time: "TIME",
 }
 
 
@@ -162,13 +169,55 @@ def get_schema(table_id: str) -> Schema:
     return table.schema
 
 
-def get_sa_column_for_schema_field(schema: SchemaField) -> Field:
+def column_for_schema_field(schema: SchemaField) -> Column:
+    """
+    Build a Columns from a given BigQuery SchemaField (column definition)
+
+    Read more: https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#tablefieldschema
+    """
     if schema.mode == "REPEATED":
-        column_type = ARRAY(BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema.field_type])
+        if schema.field_type == "RECORD":
+            column_type = ARRAY(struct_for_schema_field(schema))
+        else:
+            column_type = ARRAY(BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema.field_type])
     else:
-        column_type = BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema.field_type]
+        if schema.field_type == "RECORD":
+            column_type = struct_for_schema_field(schema)
+        else:
+            column_type = BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema.field_type]
 
     return Column(name=schema.name, type_=column_type, comment=schema.description)
+
+
+def schema_for_struct(struct: STRUCT) -> Schema:
+    for name, sqla_type in struct._STRUCT_fields:
+        yield SchemaField(
+            name=name,
+            field_type=SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[sqla_type.__class__],
+        )
+
+
+def schema_field_for_column(column: Column) -> SchemaField:
+    fields: Optional[SchemaField] = None
+
+    if isinstance(column.type, ARRAY):
+        mode = "REPEATED"
+        item_type = column.type.item_type
+        field_type = SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[column.type.item_type.__class__]
+
+        if isinstance(item_type, STRUCT):
+            fields = tuple(schema_for_struct(item_type))
+    else:
+        mode = "NULLABLE"
+        column_type = column.type
+        field_type = SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[column_type.__class__]
+
+        if isinstance(column_type, STRUCT):
+            fields = tuple(schema_for_struct(column_type))
+
+    return SchemaField(
+        name=column.name, field_type=field_type, mode=mode, fields=fields or ()
+    )
 
 
 def get_schema_for_model(model: Model) -> Schema:
@@ -177,26 +226,7 @@ def get_schema_for_model(model: Model) -> Schema:
     of the model by parsing the model SQLAlchemy column schema
     """
     columns = model.__table__.columns
-
-    def gen_schema():
-        for col in columns:
-            is_array = isinstance(col.type, ARRAY)
-            if is_array:
-                mode = "REPEATED"
-                field_type = SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[
-                    col.type.item_type.__class__
-                ]
-            else:
-                mode = "NULLABLE"
-                field_type = SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[col.type.__class__]
-
-            yield SchemaField(
-                name=col.name,
-                field_type=field_type,
-                mode=mode,
-            )
-
-    return list(gen_schema())
+    return [schema_field_for_column(col) for col in columns]
 
 
 def get_schema_for_source(model: Model) -> Optional[Schema]:
@@ -503,7 +533,7 @@ class struct(expression.ClauseList, expression.ColumnElement):  # type: ignore
 
     __visit_name__ = "struct"
 
-    def __init__(self, model: AmoraModel, **kw):
+    def __init__(self, model: Model, **kw):
         self._model = model
         self.type = struct_for_model(model.__class__)
         clauses = [

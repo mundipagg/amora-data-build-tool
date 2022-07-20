@@ -23,7 +23,7 @@ from amora.providers.bigquery import (
     estimated_query_cost_in_usd,
     estimated_storage_cost_in_usd,
     get_fully_qualified_id,
-    get_sa_column_for_schema_field,
+    column_for_schema_field,
     get_schema_for_model,
     get_schema_for_source,
     run,
@@ -188,7 +188,11 @@ def test_dry_run_on_model_with_source():
     ]
 
 
-def test_get_schema_for_model():
+def test_schema_for_model():
+    class Node(AmoraModel):
+        id: int
+        label: str
+
     class ModelB(AmoraModel, table=True):
         a_boolean: bool
         a_date: date
@@ -200,6 +204,10 @@ def test_get_schema_for_model():
         an_int: int = Field(primary_key=True)
         an_int_array: List[int] = Field(sa_column=Column(ARRAY(Integer)))
         a_str_array: List[str] = Field(sa_column=Column(ARRAY(String)))
+        a_struct_array: List[dict] = Field(
+            sa_column=Column(ARRAY(STRUCT(key=Integer, value=String)))
+        )
+        a_struct: Node = Field(sa_column=Column(struct_for_model(Node)))
 
     schema = get_schema_for_model(ModelB)
 
@@ -207,17 +215,34 @@ def test_get_schema_for_model():
         SchemaField(name="a_timestamp", field_type="TIMESTAMP", mode="NULLABLE"),
         SchemaField(name="an_int_array", field_type="INTEGER", mode="REPEATED"),
         SchemaField(name="a_str_array", field_type="STRING", mode="REPEATED"),
+        SchemaField(
+            name="a_struct_array",
+            field_type="RECORD",
+            mode="REPEATED",
+            fields=(
+                SchemaField("key", "INTEGER"),
+                SchemaField("value", "STRING"),
+            ),
+        ),
+        SchemaField(
+            name="a_struct",
+            field_type="RECORD",
+            fields=(
+                SchemaField("id", "INTEGER"),
+                SchemaField("label", "STRING"),
+            ),
+        ),
         SchemaField(name="a_boolean", field_type="BOOLEAN", mode="NULLABLE"),
         SchemaField(name="a_date", field_type="DATE", mode="NULLABLE"),
         SchemaField(name="a_datetime", field_type="DATETIME", mode="NULLABLE"),
-        SchemaField(name="a_float", field_type="FLOAT", mode="NULLABLE"),
+        SchemaField(name="a_float", field_type="FLOAT64", mode="NULLABLE"),
         SchemaField(name="a_string", field_type="STRING", mode="NULLABLE"),
         SchemaField(name="a_time", field_type="TIME", mode="NULLABLE"),
         SchemaField(name="an_int", field_type="INTEGER", mode="NULLABLE"),
     ]
 
 
-def test_get_schema_for_source():
+def test_schema_for_source():
     class Model(AmoraModel, table=True):
         a_boolean: bool
         a_float: float
@@ -241,7 +266,7 @@ def test_get_schema_for_source():
     ]
 
 
-def test_get_schema_for_source_on_sourceless_model():
+def test_schema_for_source_on_sourceless_model():
     class Model(AmoraModel, table=True):
         a_boolean: bool
         a_float: float
@@ -250,7 +275,7 @@ def test_get_schema_for_source_on_sourceless_model():
     assert get_schema_for_source(Model) is None
 
 
-def test_get_sa_columns_for_schema_field_on_struct_field():
+def test_column_for_schema_field_on_struct_field():
     struct_field = SchemaField(
         name="point",
         field_type="RECORD",
@@ -261,11 +286,11 @@ def test_get_sa_columns_for_schema_field_on_struct_field():
             SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
         ),
     )
-    column = get_sa_column_for_schema_field(struct_field)
+    column = column_for_schema_field(struct_field)
     assert column.type.get_col_spec() == "STRUCT<id STRING, x INT64, y INT64>"
 
 
-def test_get_sa_columns_for_schema_field_on_repeated_struct_field():
+def test_columns_for_schema_field_on_repeated_struct_field():
     repeated_struct_field = SchemaField(
         name="points",
         field_type="RECORD",
@@ -276,11 +301,11 @@ def test_get_sa_columns_for_schema_field_on_repeated_struct_field():
             SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
         ),
     )
-    column = get_sa_column_for_schema_field(repeated_struct_field)
+    column = column_for_schema_field(repeated_struct_field)
     assert repr(column.type) == "ARRAY(STRUCT(id=String(), x=Integer(), y=Integer()))"
 
 
-def test_get_sa_columns_for_schema_field_on_repeated_struct_field_with_repeated_fields():
+def test_columns_for_schema_field_on_repeated_struct_field_with_repeated_fields():
     complex_struct_field = SchemaField(
         name="graph",
         field_type="RECORD",
@@ -320,7 +345,7 @@ def test_get_sa_columns_for_schema_field_on_repeated_struct_field_with_repeated_
             ),
         ),
     )
-    column = get_sa_column_for_schema_field(complex_struct_field)
+    column = column_for_schema_field(complex_struct_field)
     assert (
         repr(column.type)
         == "ARRAY(STRUCT(nodes=ARRAY(STRUCT(id=String(), label=String())), edges=ARRAY(STRUCT(from_node=STRUCT(id=String(), label=String()), to_node=STRUCT(id=String(), label=String())))))"
