@@ -471,6 +471,31 @@ def struct_for_model(model: Model) -> STRUCT:
     return STRUCT(*fields())
 
 
+def struct_for_schema_field(schema_field: SchemaField) -> STRUCT:
+    """
+    Build a BigQuery Struct type from a `google.cloud.bigquery.schema.SchemaField`
+
+    Read more: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#struct_type
+    """
+
+    def fields():
+        for field in schema_field.fields:
+            if field.mode == "REPEATED":
+                if field.field_type == "RECORD":
+                    yield field.name, ARRAY(struct_for_schema_field(field))
+                else:
+                    sqla_type = BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[field.field_type]
+                    yield field.name, ARRAY(sqla_type)
+            else:
+                if field.field_type == "RECORD":
+                    yield field.name, struct_for_schema_field(field)
+                else:
+                    sqla_type = BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[field.field_type]
+                    yield field.name, sqla_type
+
+    return STRUCT(*fields())
+
+
 class struct(expression.ClauseList, expression.ColumnElement):  # type: ignore
     """
     A BigQuery STRUCT/RECORD literal.
