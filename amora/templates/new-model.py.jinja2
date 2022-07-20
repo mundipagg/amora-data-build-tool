@@ -1,7 +1,10 @@
+from google.cloud.bigquery import SchemaField
 from amora.models import AmoraModel, Field
+from amora.providers.bigquery import get_sa_column_for_schema_field
 from datetime import date, datetime, time
 from sqlalchemy import MetaData, Column
 from sqlalchemy.sql.sqltypes import *
+from sqlalchemy_bigquery import STRUCT
 from typing import List
 
 
@@ -15,10 +18,17 @@ class {{ model_name -}}(AmoraModel, table=True):
     __tablename__ = '{{ table }}'
 
 {% for schema_field in schema %}
-    {% if schema_field.mode == 'NULLABLE' -%}
-        {{ schema_field.name -}}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ -}}
-    {% elif schema_field.mode == 'REPEATED' -%}
-        {{ schema_field.name -}}: List[{{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ -}}] = Field(sa_column=Column(ARRAY({{ BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema_field.field_type].__name__ -}})))
-    {%- endif -%}
+    {% if schema_field.mode == 'NULLABLE' %}
+        {% if schema_field.field_type == 'RECORD' %}
+    {{ schema_field.name }}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }} = Field(sa_column=get_sa_column_for_schema_field({{- schema_field -}}), {% if loop.first %}, primary_key=True{% endif %})
+
+        {% else %}
+    {{ schema_field.name }}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }} {% if loop.first %} = Field(primary_key=True) {% endif %}
+
+        {% endif %}
+    {% elif schema_field.mode == 'REPEATED' %}
+    {{ schema_field.name }}: List[{{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }}] = Field(sa_column=get_sa_column_for_schema_field({{- schema_field -}}), {% if loop.first %}, primary_key=True{% endif %})
+
+    {% endif %}
 {% endfor %}
 
