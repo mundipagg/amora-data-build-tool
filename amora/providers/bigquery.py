@@ -171,7 +171,7 @@ def get_schema(table_id: str) -> Schema:
 
 def column_for_schema_field(schema: SchemaField) -> Column:
     """
-    Build a Columns from a given BigQuery SchemaField (column definition)
+    Build a `Column` from a `google.cloud.bigquery.schema.SchemaField`
 
     Read more: https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#tablefieldschema
     """
@@ -220,7 +220,7 @@ def schema_field_for_column(column: Column) -> SchemaField:
     )
 
 
-def get_schema_for_model(model: Model) -> Schema:
+def schema_for_model(model: Model) -> Schema:
     """
     Given an `AmoraModel`, returns the equivalent bigquery `Schema`
     of the model by parsing the model SQLAlchemy column schema
@@ -229,7 +229,7 @@ def get_schema_for_model(model: Model) -> Schema:
     return [schema_field_for_column(col) for col in columns]
 
 
-def get_schema_for_source(model: Model) -> Optional[Schema]:
+def schema_for_model_source(model: Model) -> Optional[Schema]:
     """
     Give an `Amora Model`, returns the bigquery `Schema` of its
     `source` classmethod query result
@@ -529,6 +529,8 @@ def struct_for_schema_field(schema_field: SchemaField) -> STRUCT:
 class struct(expression.ClauseList, expression.ColumnElement):  # type: ignore
     """
     A BigQuery STRUCT/RECORD literal.
+
+    !!! warning "Experimental feature. You should probably use struct_for_model"
     """
 
     __visit_name__ = "struct"
