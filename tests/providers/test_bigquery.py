@@ -23,6 +23,7 @@ from amora.providers.bigquery import (
     estimated_query_cost_in_usd,
     estimated_storage_cost_in_usd,
     get_fully_qualified_id,
+    get_sa_column_for_schema_field,
     get_schema_for_model,
     get_schema_for_source,
     run,
@@ -247,6 +248,83 @@ def test_get_schema_for_source_on_sourceless_model():
         a_string: str = Field(primary_key=True)
 
     assert get_schema_for_source(Model) is None
+
+
+def test_get_sa_columns_for_schema_field_on_struct_field():
+    struct_field = SchemaField(
+        name="point",
+        field_type="RECORD",
+        mode="NULLABLE",
+        fields=(
+            SchemaField("id", "STRING", "NULLABLE", None, (), None),
+            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+        ),
+    )
+    column = get_sa_column_for_schema_field(struct_field)
+    assert column.type.get_col_spec() == "STRUCT<id STRING, x INT64, y INT64>"
+
+
+def test_get_sa_columns_for_schema_field_on_repeated_struct_field():
+    repeated_struct_field = SchemaField(
+        name="points",
+        field_type="RECORD",
+        mode="REPEATED",
+        fields=(
+            SchemaField("id", "STRING", "NULLABLE", None, (), None),
+            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+        ),
+    )
+    column = get_sa_column_for_schema_field(repeated_struct_field)
+    assert repr(column.type) == "ARRAY(STRUCT(id=String(), x=Integer(), y=Integer()))"
+
+
+def test_get_sa_columns_for_schema_field_on_repeated_struct_field_with_repeated_fields():
+    complex_struct_field = SchemaField(
+        name="graph",
+        field_type="RECORD",
+        mode="REPEATED",
+        fields=(
+            SchemaField(
+                name="nodes",
+                field_type="RECORD",
+                mode="REPEATED",
+                fields=(
+                    SchemaField(name="id", field_type="STRING"),
+                    SchemaField(name="label", field_type="STRING"),
+                ),
+            ),
+            SchemaField(
+                name="edges",
+                field_type="RECORD",
+                mode="REPEATED",
+                fields=(
+                    SchemaField(
+                        name="from_node",
+                        field_type="RECORD",
+                        fields=(
+                            SchemaField(name="id", field_type="STRING"),
+                            SchemaField(name="label", field_type="STRING"),
+                        ),
+                    ),
+                    SchemaField(
+                        name="to_node",
+                        field_type="RECORD",
+                        fields=(
+                            SchemaField(name="id", field_type="STRING"),
+                            SchemaField(name="label", field_type="STRING"),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+    column = get_sa_column_for_schema_field(complex_struct_field)
+    assert (
+        repr(column.type)
+        == "ARRAY(STRUCT(nodes=ARRAY(STRUCT(id=String(), label=String())), edges=ARRAY(STRUCT(from_node=STRUCT(id=String(), label=String()), to_node=STRUCT(id=String(), label=String())))))"
+    )
 
 
 def test_simple_struct():
