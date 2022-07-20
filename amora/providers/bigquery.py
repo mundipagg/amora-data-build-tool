@@ -37,14 +37,20 @@ from sqlalchemy.sql.selectable import CTE
 from sqlalchemy.sql.sqltypes import ARRAY, NullType
 from sqlalchemy_bigquery import STRUCT
 from sqlalchemy_bigquery.base import BQArray, unnest
-from sqlmodel import AutoString
 from sqlmodel.main import get_sqlachemy_type
 
 from amora import logger
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
-from amora.models import AmoraModel, MaterializationTypes, Model, select
+from amora.models import (
+    Column,
+    ColumnElement,
+    Field,
+    MaterializationTypes,
+    Model,
+    select,
+)
 from amora.storage import cache
 from amora.types import Compilable
 from amora.version import VERSION
@@ -75,14 +81,19 @@ BIGQUERY_TYPES_TO_PYTHON_TYPES = {
 SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES = {
     Integer: "INTEGER",
     String: "STRING",
-    AutoString: "STRING",
     DateTime: "DATETIME",
     Date: "DATE",
     Time: "TIME",
-    Float: "FLOAT",
+    Float: "FLOAT64",
     Boolean: "BOOLEAN",
     JSON: "JSON",
     TIMESTAMP: "TIMESTAMP",
+}
+
+
+BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES = {
+    bq_type: sqla_type
+    for sqla_type, bq_type in SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES.items()
 }
 
 
@@ -149,6 +160,15 @@ def get_schema(table_id: str) -> Schema:
     client = get_client()
     table = client.get_table(table_id)
     return table.schema
+
+
+def get_sa_column_for_schema_field(schema: SchemaField) -> Field:
+    if schema.mode == "REPEATED":
+        column_type = ARRAY(BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema.field_type])
+    else:
+        column_type = BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema.field_type]
+
+    return Column(name=schema.name, type_=column_type, comment=schema.description)
 
 
 def get_schema_for_model(model: Model) -> Schema:
