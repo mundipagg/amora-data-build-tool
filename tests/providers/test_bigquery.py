@@ -18,16 +18,16 @@ from amora.models import AmoraModel, Field
 from amora.providers.bigquery import (
     DryRunResult,
     array,
+    column_for_schema_field,
     cte_from_rows,
     dry_run,
     estimated_query_cost_in_usd,
     estimated_storage_cost_in_usd,
     get_fully_qualified_id,
-    column_for_schema_field,
-    get_schema_for_model,
-    get_schema_for_source,
     run,
     sample,
+    schema_for_model,
+    schema_for_model_source,
     struct_for_model,
     zip_arrays,
 )
@@ -209,7 +209,7 @@ def test_schema_for_model():
         )
         a_struct: Node = Field(sa_column=Column(struct_for_model(Node)))
 
-    schema = get_schema_for_model(ModelB)
+    schema = schema_for_model(ModelB)
 
     assert schema == [
         SchemaField(name="a_timestamp", field_type="TIMESTAMP", mode="NULLABLE"),
@@ -257,7 +257,7 @@ def test_schema_for_source():
                 ]
             )
 
-    schema = get_schema_for_source(Model)
+    schema = schema_for_model_source(Model)
 
     assert schema == [
         SchemaField(name="a_boolean", field_type="BOOLEAN"),
@@ -272,7 +272,7 @@ def test_schema_for_source_on_sourceless_model():
         a_float: float
         a_string: str = Field(primary_key=True)
 
-    assert get_schema_for_source(Model) is None
+    assert schema_for_model_source(Model) is None
 
 
 def test_column_for_schema_field_on_struct_field():

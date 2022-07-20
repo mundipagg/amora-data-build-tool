@@ -4,8 +4,8 @@ Tests that can be reused by multiple projects
 from amora.models import MaterializationTypes, list_models
 from amora.providers.bigquery import (
     get_schema,
-    get_schema_for_model,
-    get_schema_for_source,
+    schema_for_model,
+    schema_for_model_source,
 )
 
 
@@ -19,7 +19,7 @@ def test_materialized_schema_equal_local_schema():
             continue
 
         materialized_schema = get_schema(model.unique_name)
-        model_schema = get_schema_for_model(model)
+        model_schema = schema_for_model(model)
 
         assert set(materialized_schema) == set(model_schema), (
             f"Diff found between the materialized model `{model.unique_name}` "
@@ -37,8 +37,8 @@ def test_models_schema_equal_its_source_schema():
         if source is None:
             continue
 
-        model_schema = get_schema_for_model(model)
-        source_schema = get_schema_for_source(model)
+        model_schema = schema_for_model(model)
+        source_schema = schema_for_model_source(model)
 
         assert set(source_schema) == set(model_schema), (
             f"Diff found between the schema of `source` classmethod "
