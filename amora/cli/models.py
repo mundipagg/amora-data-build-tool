@@ -8,12 +8,12 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
+from shed import shed
 
 from amora.config import settings
 from amora.models import Model, list_models
 from amora.providers.bigquery import (
     BIGQUERY_TYPES_TO_PYTHON_TYPES,
-    BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
     DryRunResult,
     dry_run,
     estimated_query_cost_in_usd,
@@ -194,7 +194,12 @@ def models_import(
     ```
     """
 
-    env = Environment(loader=PackageLoader("amora"), autoescape=select_autoescape())
+    env = Environment(
+        loader=PackageLoader("amora"),
+        autoescape=select_autoescape(),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
     template = env.get_template("new-model.py.jinja2")
 
     project, dataset, table = table_reference.split(".")
@@ -214,7 +219,6 @@ def models_import(
 
     model_source_code = template.render(
         BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
-        BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES=BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
         dataset=dataset,
         dataset_id=f"{project}.{dataset}",
         model_name=model_name,
@@ -222,9 +226,10 @@ def models_import(
         schema=get_schema(table_reference),
         table=table,
     )
+    formatted_source_code = shed(model_source_code)
 
     destination_file_path.parent.mkdir(parents=True, exist_ok=True)
-    destination_file_path.write_text(model_source_code)
+    destination_file_path.write_text(data=formatted_source_code)
 
     typer.secho(
         f"🎉 Amora Model `{model_name}` (`{table_reference}`) imported!",
