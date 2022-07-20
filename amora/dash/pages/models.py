@@ -1,11 +1,14 @@
 from typing import List
 
+import dash
 import dash_bootstrap_components as dbc
-from dash import dcc, html
+from dash import Input, Output, dcc, html
 from dash.development.base_component import Component
 
 from amora.dash.components import model_details
-from amora.models import Model, list_models
+from amora.models import Model, amora_model_for_name, list_models
+
+dash.register_page(__name__, fa_icon="fa-database", location="sidebar")
 
 
 def models_list(models: List[Model]) -> Component:
@@ -14,12 +17,12 @@ def models_list(models: List[Model]) -> Component:
     return dcc.Dropdown(
         options=options,
         id="model-select-dropdown",
-        value=options[0],
+        value=None,
         placeholder="Select a model",
     )
 
 
-def content() -> Component:
+def layout() -> Component:
     models = [model for (model, _path) in list_models()]
 
     return html.Div(
@@ -41,3 +44,12 @@ def content() -> Component:
             )
         ],
     )
+
+
+@dash.callback(
+    Output("model-details", "children"),
+    Input("model-select-dropdown", "value"),
+    prevent_initial_call=True,
+)
+def update_model_details(value: str) -> Component:
+    return model_details.component(model=amora_model_for_name(value))

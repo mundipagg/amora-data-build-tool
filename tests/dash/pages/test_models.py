@@ -8,7 +8,7 @@ from tests.models.step_count_by_source import StepCountBySource
 
 def test_models_page(amora_dash: DashComposite):
     with patch(
-        "amora.dash.components.model_details.summarize", return_value=pd.DataFrame()
+        "amora.page.components.model_details.summarize", return_value=pd.DataFrame()
     ):
         amora_dash.visit_and_snapshot(
             resource_path="/models",

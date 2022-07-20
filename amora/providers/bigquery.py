@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from datetime import date, datetime, time
 from enum import Enum
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 
+import pandas as pd
 import sqlalchemy
 from google.api_core.client_info import ClientInfo
 from google.cloud.bigquery import (
@@ -24,12 +25,14 @@ from sqlalchemy import (
     Integer,
     String,
     Time,
+    func,
     literal,
     literal_column,
+    tablesample,
 )
-from sqlalchemy.sql import expression, operators, roles
+from sqlalchemy.orm import aliased
+from sqlalchemy.sql import coercions, expression, operators, roles, sqltypes
 from sqlalchemy.sql.base import coercions
-from sqlalchemy.sql.elements import ClauseList, ColumnElement
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy.sql.sqltypes import ARRAY, NullType
 from sqlalchemy_bigquery import STRUCT
@@ -37,10 +40,12 @@ from sqlalchemy_bigquery.base import BQArray, unnest
 from sqlmodel import AutoString
 from sqlmodel.main import get_sqlachemy_type
 
+from amora import logger
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
-from amora.models import AmoraModel, Model, select
+from amora.models import AmoraModel, MaterializationTypes, Model, select
+from amora.storage import cache
 from amora.types import Compilable
 from amora.version import VERSION
 
@@ -110,6 +115,7 @@ class DryRunResult(BaseResult):
 class RunResult(BaseResult):
     rows: Union[RowIterator, _EmptyRowIterator]
     execution_time_in_ms: int
+    to_dataframe: Callable[..., pd.DataFrame]
     schema: Optional[Schema] = None
 
     @property
@@ -151,13 +157,26 @@ def get_schema_for_model(model: Model) -> Schema:
     of the model by parsing the model SQLAlchemy column schema
     """
     columns = model.__table__.columns
-    return [
-        SchemaField(
-            name=col.name,
-            field_type=SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[col.type.__class__],
-        )
-        for col in columns
-    ]
+
+    def gen_schema():
+        for col in columns:
+            is_array = isinstance(col.type, ARRAY)
+            if is_array:
+                mode = "REPEATED"
+                field_type = SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[
+                    col.type.item_type.__class__
+                ]
+            else:
+                mode = "NULLABLE"
+                field_type = SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[col.type.__class__]
+
+            yield SchemaField(
+                name=col.name,
+                field_type=field_type,
+                mode=mode,
+            )
+
+    return list(gen_schema())
 
 
 def get_schema_for_source(model: Model) -> Optional[Schema]:
@@ -176,6 +195,7 @@ def get_schema_for_source(model: Model) -> Optional[Schema]:
     return result.schema
 
 
+@logger.log_execution()
 def run(statement: Compilable) -> RunResult:
     """
     Executes a given query and returns its results
@@ -198,9 +218,11 @@ def run(statement: Compilable) -> RunResult:
         schema=query_job.schema,
         total_bytes=query_job.total_bytes_billed,
         user_email=query_job.user_email,
+        to_dataframe=query_job.to_dataframe,
     )
 
 
+@logger.log_execution()
 def dry_run(model: Model) -> Optional[DryRunResult]:
     """
     You can use the estimate returned by the dry run to calculate query
@@ -289,9 +311,22 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
 
 
 class fixed_unnest(sqlalchemy.sql.roles.InElementRole, unnest):
+    _with_offset = None
+
     def __init__(self, *args, **kwargs):
         self.name = "unnest"
         super().__init__(*args, **kwargs)
+
+    def table_valued(self, *expr, with_offset: str = None, **kwargs):
+        new_func = self._generate()
+
+        if with_offset:
+            expr += (with_offset,)
+            new_func._with_offset = with_offset
+
+        new_func.type = new_func._table_value_type = sqltypes.TableValueType(*expr)
+
+        return new_func
 
 
 def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
@@ -416,7 +451,7 @@ def struct_for_model(model: Model) -> STRUCT:
     return STRUCT(*fields())
 
 
-class struct(ClauseList, ColumnElement):  # type: ignore
+class struct(expression.ClauseList, expression.ColumnElement):  # type: ignore
     """
     A BigQuery STRUCT/RECORD literal.
     """
@@ -445,7 +480,7 @@ class struct(ClauseList, ColumnElement):  # type: ignore
             return self
 
 
-class array(expression.Tuple):  # type: ignore
+class array(expression.ClauseList, expression.ColumnElement):  # type: ignore
     """
     A BigQuery ARRAY literal.
 
@@ -481,11 +516,17 @@ class array(expression.Tuple):  # type: ignore
     __visit_name__ = "array"
 
     def __init__(self, clauses, **kw):
+        clauses = [coercions.expect(roles.ExpressionElementRole, c) for c in clauses]
         super().__init__(*clauses, **kw)
-        self.type = BQArray(self.type)
+        self._type_tuple = [arg.type for arg in clauses]
+        main_type = kw.pop(
+            "type_",
+            self._type_tuple[0] if self._type_tuple else sqltypes.NULLTYPE,
+        )
+        self.type = BQArray(main_type, dimensions=1)
 
-        for type_ in self.type.item_type.types:
-            if type(type_) is NullType:
+        for type_ in self._type_tuple:
+            if type(type_) is sqltypes.NullType:
                 raise ValueError("Array cannot have a null element")
 
     def _bind_param(self, operator, obj, _assume_scalar=False, type_=None):
@@ -515,3 +556,102 @@ class array(expression.Tuple):  # type: ignore
             return expression.Grouping(self)
         else:
             return self
+
+
+def zip_arrays(
+    *arr_columns: Column, additional_columns: Optional[List[Column]] = None
+) -> Compilable:
+    """
+    Given at least two array columns of equal size, return a table of the unnest values,
+    converting array items into rows. E.g:
+
+    A CTE with 3 array columns: `entity`, `f1`, `f2`
+
+    ```python
+    from amora.providers.bigquery import array, cte_from_rows, zip_arrays
+
+    cte = cte_from_rows(
+        [
+            {
+                "entity": array([1, 2]),
+                "f1": array(["f1v1", "f1v2"]),
+                "f2": array(["f2v1", "f2v2"]),
+            }
+        ]
+    )
+
+    zip_arrays(cte.c.entity, cte.c.f1, cte.c.f2)
+    ```
+
+    Will result in the following table:
+
+    | entity | f1   | f2   |
+    |--------|------|------|
+    | 1      | f1v1 | f2v1 |
+    | 2      | f1v2 | f2v2 |
+
+    If additional columns are needed from the original data, those can be selected
+    using the optional `additional_columns`:
+
+    ```python
+    from amora.providers.bigquery import array, cte_from_rows, zip_arrays
+
+    cte = cte_from_rows(
+        [
+            {
+                "entity": array([1, 2]),
+                "f1": array(["f1v1", "f1v2"]),
+                "f2": array(["f2v1", "f2v2"]),
+                "id": 1,
+            },
+            {
+                "entity": array([3, 4]),
+                "f1": array(["f1v3", "f1v4"]),
+                "f2": array(["f2v3", "f2v4"]),
+                "id": 2,
+            },
+        ]
+    )
+
+    zip_arrays(cte.c.entity, cte.c.f1, cte.c.f2, additional_columns=[cte.c.id])
+    ```
+
+    | entity | f1   | f2   | id   |
+    |--------|------|------|------|
+    | 1      | f1v1 | f2v1 | 1    |
+    | 2      | f1v2 | f2v2 | 1    |
+    | 3      | f1v3 | f2v3 | 2    |
+    | 4      | f1v4 | f2v4 | 2    |
+
+    Read more: [https://cloud.google.com/bigquery/docs/reference/standard-sql/arrays#zipping_arrays](https://cloud.google.com/bigquery/docs/reference/standard-sql/arrays#zipping_arrays)
+    """
+    offset_alias = "off"
+    offset = func.offset(literal_column(offset_alias))
+
+    columns: List[ColumnElement] = [col[offset].label(col.key) for col in arr_columns]
+    if additional_columns:
+        columns += additional_columns
+
+    return select(columns).join(
+        fixed_unnest(arr_columns[0]).table_valued(with_offset=offset_alias),
+        onclause=literal(1) == literal(1),
+        isouter=True,
+    )
+
+
+@cache(lambda model, percentage: f"{model.unique_name}.{percentage}.{date.today()}")
+def sample(model: Model, percentage: int = 1) -> pd.DataFrame:
+    """
+    https://cloud.google.com/bigquery/docs/table-sampling
+    """
+    if model.__model_config__.materialized is not MaterializationTypes.table:
+        raise ValueError(
+            "TABLESAMPLE SYSTEM can only be applied directly to base tables. "
+            "More on: https://cloud.google.com/bigquery/docs/table-sampling#limitations"
+        )
+
+    sampling = literal_column(f"{percentage} PERCENT")
+    sampled_alias = aliased(model, tablesample(model, sampling))
+    stmt = select(sampled_alias)
+
+    return run(stmt).to_dataframe()

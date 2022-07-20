@@ -2,10 +2,11 @@ import string
 from datetime import date, datetime, time
 from typing import List, Optional
 
+import pandas as pd
 import pytest
 from google.api_core.exceptions import NotFound
 from google.cloud.bigquery.schema import SchemaField
-from sqlalchemy import TIMESTAMP, Column, Integer, String
+from sqlalchemy import ARRAY, TIMESTAMP, Column, Integer, String
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery import ARRAY, STRUCT
@@ -24,13 +25,17 @@ from amora.providers.bigquery import (
     get_fully_qualified_id,
     get_schema_for_model,
     get_schema_for_source,
+    run,
+    sample,
     struct_for_model,
+    zip_arrays,
 )
 from amora.types import Compilable
 
 from tests.models.health import Health
 from tests.models.heart_rate import HeartRate
 from tests.models.heart_rate_over_100 import HeartRateOver100
+from tests.models.step_count_by_source import StepCountBySource
 
 
 def test_cte_from_rows_with_single_row():
@@ -192,18 +197,22 @@ def test_get_schema_for_model():
         a_time: time
         a_timestamp: datetime = Field(sa_column=Column(TIMESTAMP))
         an_int: int = Field(primary_key=True)
+        an_int_array: List[int] = Field(sa_column=Column(ARRAY(Integer)))
+        a_str_array: List[str] = Field(sa_column=Column(ARRAY(String)))
 
     schema = get_schema_for_model(ModelB)
 
     assert schema == [
-        SchemaField(name="a_timestamp", field_type="TIMESTAMP"),
-        SchemaField(name="a_boolean", field_type="BOOLEAN"),
-        SchemaField(name="a_date", field_type="DATE"),
-        SchemaField(name="a_datetime", field_type="DATETIME"),
-        SchemaField(name="a_float", field_type="FLOAT"),
-        SchemaField(name="a_string", field_type="STRING"),
-        SchemaField(name="a_time", field_type="TIME"),
-        SchemaField(name="an_int", field_type="INTEGER"),
+        SchemaField(name="a_timestamp", field_type="TIMESTAMP", mode="NULLABLE"),
+        SchemaField(name="an_int_array", field_type="INTEGER", mode="REPEATED"),
+        SchemaField(name="a_str_array", field_type="STRING", mode="REPEATED"),
+        SchemaField(name="a_boolean", field_type="BOOLEAN", mode="NULLABLE"),
+        SchemaField(name="a_date", field_type="DATE", mode="NULLABLE"),
+        SchemaField(name="a_datetime", field_type="DATETIME", mode="NULLABLE"),
+        SchemaField(name="a_float", field_type="FLOAT", mode="NULLABLE"),
+        SchemaField(name="a_string", field_type="STRING", mode="NULLABLE"),
+        SchemaField(name="a_time", field_type="TIME", mode="NULLABLE"),
+        SchemaField(name="an_int", field_type="INTEGER", mode="NULLABLE"),
     ]
 
 
@@ -303,16 +312,18 @@ def test_array_of_integers():
     zero_to_nine = array(range(10))
 
     assert isinstance(zero_to_nine.type, BQArray)
-    for type_ in zero_to_nine.type.item_type.types:
-        assert isinstance(type_, Integer)
+    assert isinstance(zero_to_nine.type.item_type, Integer)
+
+    assert compile_statement(zero_to_nine)
 
 
 def test_array_of_strings():
     ascii_lowercase = array(string.ascii_lowercase)
 
     assert isinstance(ascii_lowercase.type, BQArray)
-    for type_ in ascii_lowercase.type.item_type.types:
-        assert isinstance(type_, String)
+    assert isinstance(ascii_lowercase.type.item_type, String)
+
+    assert compile_statement(ascii_lowercase)
 
 
 def test_array_raises_an_error_if_input_contains_null_values():
@@ -339,3 +350,64 @@ def test_array_raises_an_error_if_input_contains_multiple_types():
 
     common_supertype_array = array([1, 2.0, 3])
     assert isinstance(common_supertype_array, BQArray)
+
+
+def test_zip_arrays():
+    cte = cte_from_rows(
+        [
+            {
+                "entity": array([1, 2]),
+                "f1": array(["f1v1", "f1v2"]),
+                "f2": array(["f2v1", "f2v2"]),
+                "event_timestamp": datetime.fromisoformat("2021-01-01T01:01:01"),
+            },
+            {
+                "entity": array([2, 3]),
+                "f1": array(["f1v3", "f1v4"]),
+                "f2": array(["f2v3", "f2v4"]),
+                "event_timestamp": datetime.fromisoformat("2022-02-02T02:02:02"),
+            },
+        ]
+    )
+
+    result = run(
+        statement=zip_arrays(
+            cte.c.entity, cte.c.f1, cte.c.f2, additional_columns=[cte.c.event_timestamp]
+        )
+    )
+
+    assert [dict(row) for row in result.rows] == [
+        {
+            "entity": 1,
+            "f1": "f1v1",
+            "f2": "f2v1",
+            "event_timestamp": datetime.fromisoformat("2021-01-01T01:01:01"),
+        },
+        {
+            "entity": 2,
+            "f1": "f1v2",
+            "f2": "f2v2",
+            "event_timestamp": datetime.fromisoformat("2021-01-01T01:01:01"),
+        },
+        {
+            "entity": 2,
+            "f1": "f1v3",
+            "f2": "f2v3",
+            "event_timestamp": datetime.fromisoformat("2022-02-02T02:02:02"),
+        },
+        {
+            "entity": 3,
+            "f1": "f1v4",
+            "f2": "f2v4",
+            "event_timestamp": datetime.fromisoformat("2022-02-02T02:02:02"),
+        },
+    ]
+
+
+def test_table_sample():
+    sample_df = sample(StepCountBySource)
+    assert isinstance(sample_df, pd.DataFrame)
+    assert not sample_df.empty
+    assert set(sample_df.columns) == {
+        c.key for c in StepCountBySource.__table__.columns
+    }

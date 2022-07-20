@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Callable, Set
 
 import pandas as pd
@@ -5,6 +6,7 @@ from sqlalchemy.sql import Selectable
 
 from amora.compilation import compile_statement
 from amora.providers.bigquery import run
+from amora.storage import cache
 from amora.types import Compilable
 from amora.visualization import Visualization, VisualizationConfig, VisualizationKind
 
@@ -23,10 +25,9 @@ class Question:
     Lets define a new data question:
 
     ```python
-    from examples.models.step_count_by_source import StepCountBySource
-
     from amora.models import select
     from amora.questions import question
+    from examples.models.step_count_by_source import StepCountBySource
 
 
     @question
@@ -149,6 +150,7 @@ class Question:
         stmt = self.question_func()
         return compile_statement(stmt)
 
+    @cache(suffix=lambda self: f"{self.question_func.__name__}.{date.today()}")
     def answer_df(self) -> pd.DataFrame:
         """
         Executes the question against the target database,

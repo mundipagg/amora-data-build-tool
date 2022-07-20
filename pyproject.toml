@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "amora"
-version = "0.1.11rc4"
+version = "0.1.11rc9"
 description = "Amora Data Build Tool"
 authors = ["diogommartins <diogo.martins@stone.com.br>"]
 license = "MIT"
@@ -31,11 +31,15 @@ sqlparse = ">=0.3.1,<0.5.0"
 SQLAlchemy = { version = "1.4.36", extras = ["mypy"] }
 feast = { version = "0.18.0", extras = ["redis", "gcp"], optional = true }
 Werkzeug = { version = "2.1.2", optional = true }
-dash = { version = "2.4.1", extras = ["testing"], optional = true }
+dash = { version = "2.5.1", extras = ["testing"], optional = true }
 dash-cytoscape = { version = "0.3.0", optional = true }
 protobuf = "<3.20.0"
 prometheus-fastapi-instrumentator = { version = "^5.8.1", optional = true }
 dash-bootstrap-components = { version = "^1.1.0", optional = true }
+Authlib = { version = ">=1.0", optional = true }
+dash-ace = {version = "^0.2.1", optional = true}
+fsspec = "^2022.5.0"
+gcsfs = "^2022.5.0"
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "^3.0.0"
@@ -60,7 +64,7 @@ selenium = "^4.2.0"
 
 [tool.poetry.extras]
 feature-store = ["feast", "prometheus-fastapi-instrumentator"]
-dash = ["dash", "dash-cytoscape", "dash-bootstrap-components", "Werkzeug"]
+dash = ["dash", "dash-cytoscape", "dash-bootstrap-components", "Werkzeug", "Authlib", "dash-ace"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

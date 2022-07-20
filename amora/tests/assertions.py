@@ -1,9 +1,10 @@
+import itertools
 import json
 import os
 from typing import Callable, Iterable, Optional
 
 import pytest
-from sqlalchemy import Integer, and_, func, literal, union_all
+from sqlalchemy import ARRAY, Integer, and_, func, literal, or_, union_all
 from sqlmodel.sql.expression import SelectOfScalar
 
 from amora.config import settings
@@ -396,3 +397,35 @@ def are_unique_together(columns: Iterable[ColumnElement]) -> Compilable:
 
     """
     return select(columns).group_by(*columns).having(func.count(type_=Integer) > 1)
+
+
+def has_the_same_array_length(columns: Iterable[ColumnElement[ARRAY]]) -> Compilable:
+    """
+    Asserts that all array columns has the same length
+
+    Example SQL:
+
+    ```sql
+    SELECT
+        arr_col1,
+        arr_col2,
+        arr_col3
+    FROM
+        {{ model }}
+    WHERE
+        ARRAY_LENGTH(arr_col1) != ARRAY_LENGTH(arr_col2)
+        OR ARRAY_LENGTH(arr_col1) != ARRAY_LENGTH(arr_col3)
+        OR ARRAY_LENGTH(arr_col2) != ARRAY_LENGTH(arr_col3)
+    ```
+
+    Example:
+
+    ```python
+    assert that([Model.arr_col1, Model.arr_col2, Model.arr_col3], has_the_same_array_length)
+    ```
+    """
+    conditions = (
+        func.array_length(a) != func.array_length(b)
+        for (a, b) in itertools.combinations(columns, 2)
+    )
+    return select(columns).where(or_(*conditions))

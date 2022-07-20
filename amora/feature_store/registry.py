@@ -5,7 +5,7 @@ from feast.repo_contents import RepoContents
 from sqlalchemy.orm import InstrumentedAttribute
 
 from amora.feature_store.feature_view import name_for_model
-from amora.feature_store.type_mapping import SQLALCHEMY_TYPES_TO_FS_TYPES
+from amora.feature_store.type_mapping import type_for_column
 from amora.models import Model, list_models
 
 FEATURE_REGISTRY: Dict[str, Tuple[FeatureView, FeatureService, Model]] = {}
@@ -18,7 +18,7 @@ def get_entities() -> Iterable[Entity]:
 
             yield Entity(
                 name=entity_name,
-                value_type=SQLALCHEMY_TYPES_TO_FS_TYPES[entity_column.type.__class__],
+                value_type=type_for_column(entity_column),
                 description=entity_column.comment,
             )
 

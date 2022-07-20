@@ -23,6 +23,12 @@ class AmoraBigQueryCompiler(BigQueryCompiler):
         clause_list = self.visit_clauselist(element, **kwargs)
         return f"{element.type.get_col_spec()}{clause_list}"
 
+    def visit_function(self, func, add_to_result_map=None, **kwargs):
+        text = super().visit_function(func, add_to_result_map=None, **kwargs)
+        if hasattr(func, "_with_offset") and func._with_offset is not None:
+            text += f" WITH OFFSET AS {func._with_offset}"
+        return text
+
 
 dialect = BigQueryDialect()
 dialect.statement_compiler = AmoraBigQueryCompiler

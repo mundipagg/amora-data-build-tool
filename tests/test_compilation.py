@@ -7,6 +7,9 @@ from sqlalchemy_bigquery.base import BQArray
 
 from amora.compilation import compile_statement
 from amora.models import AmoraModel, amora_model_for_path, select
+from amora.providers.bigquery import fixed_unnest
+
+from tests.models.array_repeated_fields import ArrayRepeatedFields
 
 
 def test_amora_model_for_path_with_invalid_file_path_type():
@@ -61,3 +64,19 @@ def test_AmoraBigQueryCompiler_array__getitem__with_function_item():
         query_str
         == "SELECT CAST((split('123.45', '.'))[safe_ordinal(2)] AS INT64) AS `anon_1`"
     )
+
+
+def test_AmoraBigQueryCompiler_visit_function_with_offset():
+    offset_alias = "off_alias"
+    stmt = fixed_unnest(ArrayRepeatedFields.int_arr).table_valued(
+        with_offset=offset_alias
+    )
+    compiled = compile_statement(stmt)
+    assert compiled.endswith(f"OFFSET AS {offset_alias}")
+
+
+def test_AmoraBigQueryCompiler_visit_function_without_offset():
+    stmt = fixed_unnest(ArrayRepeatedFields.int_arr).table_valued()
+    compiled = compile_statement(stmt)
+
+    assert compiled == "unnest(`array_repeated_fields`.`int_arr`)"
