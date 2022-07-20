@@ -40,6 +40,7 @@ Authlib = { version = ">=1.0", optional = true }
 dash-ace = {version = "^0.2.1", optional = true}
 fsspec = "^2022.5.0"
 gcsfs = "^2022.5.0"
+shed = "^0.9.5"
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "^3.0.0"
@@ -55,7 +56,6 @@ mkdocs-git-revision-date-plugin = "^0.3.1"
 mkdocs-include-markdown-plugin = "^3.4.1"
 mkdocs-autorefs = "^0.4.1"
 mkdocstrings = { version = "^0.18.0", extras = ["python"] }
-shed = "^0.9.5"
 pre-commit = "^2.18.1"
 mkdocs-jupyter = "^0.21.0"
 pandas-stubs = "^1.2.0"
