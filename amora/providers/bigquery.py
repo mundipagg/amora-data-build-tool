@@ -14,8 +14,8 @@ from google.cloud.bigquery import (
     TableReference,
 )
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
+from pydantic.fields import SHAPE_LIST
 from sqlalchemy import (
-    ARRAY,
     JSON,
     TIMESTAMP,
     Boolean,
@@ -32,15 +32,19 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import coercions, expression, operators, roles, sqltypes
+from sqlalchemy.sql.base import coercions
 from sqlalchemy.sql.selectable import CTE
+from sqlalchemy.sql.sqltypes import ARRAY, NullType
+from sqlalchemy_bigquery import STRUCT
 from sqlalchemy_bigquery.base import BQArray, unnest
 from sqlmodel import AutoString
+from sqlmodel.main import get_sqlachemy_type
 
 from amora import logger
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
-from amora.models import Column, ColumnElement, MaterializationTypes, Model, select
+from amora.models import AmoraModel, MaterializationTypes, Model, select
 from amora.storage import cache
 from amora.types import Compilable
 from amora.version import VERSION
@@ -366,6 +370,8 @@ def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
             for name, value in row.items():
                 if isinstance(value, array):
                     cols.append(value.label(name))
+                elif isinstance(value, AmoraModel):
+                    cols.append(struct(value).label(name))
                 else:
                     cols.append(literal(value).label(name))
             yield select(cols)
@@ -418,6 +424,60 @@ def estimated_storage_cost_in_usd(total_bytes: int) -> float:
     return (
         total_gigabytes * settings.GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD
     )
+
+
+def struct_for_model(model: Model) -> STRUCT:
+    """
+    Build a BigQuery Struct type from an AmoraModel specification
+
+    Read more: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#struct_type
+    """
+
+    def fields():
+        for field in model.__fields__.values():
+            if field.shape is SHAPE_LIST:
+                if issubclass(field.type_, AmoraModel):
+                    yield field.name, ARRAY(struct_for_model(field.type_))
+                else:
+                    yield field.name, ARRAY(get_sqlachemy_type(field))
+            elif field.sub_fields is None:
+                if issubclass(field.type_, AmoraModel):
+                    yield field.name, struct_for_model(field.type_)
+                else:
+                    yield field.name, get_sqlachemy_type(field)
+            else:
+                raise NotImplementedError
+
+    return STRUCT(*fields())
+
+
+class struct(expression.ClauseList, expression.ColumnElement):  # type: ignore
+    """
+    A BigQuery STRUCT/RECORD literal.
+    """
+
+    __visit_name__ = "struct"
+
+    def __init__(self, model: AmoraModel, **kw):
+        self._model = model
+        self.type = struct_for_model(model.__class__)
+        clauses = [
+            coercions.expect(
+                roles.ExpressionElementRole,
+                model.dict(),
+                type_=self.type,
+            )
+        ]
+        super().__init__(*clauses, **kw)
+
+    def bind_expression(self, bindvalue):
+        return bindvalue
+
+    def self_group(self, against=None):
+        if against in (operators.any_op, operators.all_op, operators.getitem):
+            return expression.Grouping(self)
+        else:
+            return self
 
 
 class array(expression.ClauseList, expression.ColumnElement):  # type: ignore

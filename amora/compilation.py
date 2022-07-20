@@ -6,9 +6,9 @@ from amora.types import Compilable
 
 
 class AmoraBigQueryCompiler(BigQueryCompiler):
-    def visit_getitem_binary(self, binary, operator_, **kw):
-        left = self.process(binary.left, **kw)
-        right = self.process(binary.right, **kw)
+    def visit_getitem_binary(self, binary, operator_, **kwargs):
+        left = self.process(binary.left, **kwargs)
+        right = self.process(binary.right, **kwargs)
 
         try:
             # Only integer values should be wrapped in OFFSET
@@ -16,8 +16,12 @@ class AmoraBigQueryCompiler(BigQueryCompiler):
         except ValueError:
             return f"{left}[{right}]"
 
-    def visit_array(self, element, **kw) -> str:
-        return "ARRAY[%s]" % self.visit_clauselist(element, **kw)
+    def visit_array(self, element, **kwargs) -> str:
+        return "ARRAY[%s]" % self.visit_clauselist(element, **kwargs)
+
+    def visit_struct(self, element, **kwargs) -> str:
+        clause_list = self.visit_clauselist(element, **kwargs)
+        return f"{element.type.get_col_spec()}{clause_list}"
 
     def visit_function(self, func, add_to_result_map=None, **kwargs):
         text = super().visit_function(func, add_to_result_map=None, **kwargs)
