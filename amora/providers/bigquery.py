@@ -588,11 +588,26 @@ class array(expression.ClauseList, expression.ColumnElement):  # type: ignore
     ```python
     array(["foo", "bar"], type_=String)
     ```
+
+    Arrays can also be constructed using `AmoraModel` instances,
+    which would compile into a array of structs. E.g:
+
+    ```python
+    class Point(AmoraModel):
+        x: int
+        y: int
+
+
+    array([Point(x=4, y=4), Point(x=2, y=2)])
+    ```
     """
 
     __visit_name__ = "array"
 
     def __init__(self, clauses, **kw):
+        if clauses and isinstance(clauses[0], AmoraModel):
+            clauses = [struct(c) for c in clauses]
+
         clauses = [coercions.expect(roles.ExpressionElementRole, c) for c in clauses]
         super().__init__(*clauses, **kw)
         self._type_tuple = [arg.type for arg in clauses]
