@@ -19,7 +19,6 @@ from pydantic.fields import SHAPE_LIST
 from sqlalchemy import func, literal, literal_column, tablesample
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import coercions, expression, operators, roles, sqltypes
-from sqlalchemy.sql.base import coercions
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy.sql.sqltypes import ARRAY
 from sqlalchemy_bigquery import STRUCT
@@ -192,11 +191,13 @@ def column_for_schema_field(schema: SchemaField) -> Column:
 
 
 def schema_for_struct(struct: STRUCT) -> Schema:
-    for name, sqla_type in struct._STRUCT_fields:
-        yield SchemaField(
+    return [
+        SchemaField(
             name=name,
             field_type=SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES[sqla_type.__class__],
         )
+        for name, sqla_type in struct._STRUCT_fields
+    ]
 
 
 def schema_field_for_column(column: Column) -> SchemaField:
@@ -478,7 +479,7 @@ def estimated_storage_cost_in_usd(total_bytes: int) -> float:
     )
 
 
-def struct_for_model(model: Model) -> STRUCT:
+def struct_for_model(model: Union[Model, AmoraModel]) -> STRUCT:
     """
     Build a BigQuery Struct type from an AmoraModel specification
 
@@ -537,9 +538,9 @@ class struct(expression.ClauseList, expression.ColumnElement):  # type: ignore
 
     __visit_name__ = "struct"
 
-    def __init__(self, model: Model, **kw):
+    def __init__(self, model: AmoraModel, **kw):
         self._model = model
-        self.type = struct_for_model(model.__class__)
+        self.type = struct_for_model(model)
         clauses = [
             coercions.expect(
                 roles.ExpressionElementRole,
@@ -745,7 +746,8 @@ def sample(model: Model, percentage: int = 1) -> pd.DataFrame:
         )
 
     sampling = literal_column(f"{percentage} PERCENT")
-    sampled_alias = aliased(model, tablesample(model, sampling))
+    model_sample = tablesample(model, sampling)  # type: ignore
+    sampled_alias = aliased(model, model_sample)
     stmt = select(sampled_alias)
 
     return run(stmt).to_dataframe()
