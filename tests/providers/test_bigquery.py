@@ -45,6 +45,7 @@ def test_cte_from_rows_with_single_row():
     assert isinstance(cte, CTE)
     assert cte.c.keys() == ["x", "y"]
     assert compile_statement(cte)
+    assert run(cte)
 
 
 def test_cte_from_rows_with_multiple_rows():
@@ -53,6 +54,7 @@ def test_cte_from_rows_with_multiple_rows():
     assert isinstance(cte, CTE)
     assert cte.c.keys() == ["x", "y"]
     assert compile_statement(cte)
+    assert run(cte)
 
 
 def test_cte_from_rows_with_distinguished_schema_rows():
@@ -68,6 +70,7 @@ def test_cte_from_rows_with_repeated_fields():
 
     assert isinstance(cte, CTE)
     assert compile_statement(cte)
+    assert run(cte)
 
 
 def test_cte_from_rows_with_struct_fields():
@@ -80,6 +83,7 @@ def test_cte_from_rows_with_struct_fields():
 
     assert isinstance(cte, CTE)
     assert compile_statement(cte)
+    assert run(cte)
 
 
 @pytest.mark.skip(
