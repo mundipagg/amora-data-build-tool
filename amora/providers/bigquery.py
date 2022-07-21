@@ -1,3 +1,4 @@
+import decimal
 from dataclasses import dataclass
 from datetime import date, datetime, time
 from enum import Enum
@@ -15,31 +16,16 @@ from google.cloud.bigquery import (
 )
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
 from pydantic.fields import SHAPE_LIST
-from sqlalchemy import (
-    JSON,
-    TIMESTAMP,
-    Boolean,
-    Date,
-    DateTime,
-    Float,
-    Integer,
-    Numeric,
-    String,
-    Time,
-    func,
-    literal,
-    literal_column,
-    tablesample,
-)
+from sqlalchemy import func, literal, literal_column, tablesample
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import coercions, expression, operators, roles, sqltypes
 from sqlalchemy.sql.base import coercions
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy.sql.sqltypes import ARRAY
 from sqlalchemy_bigquery import STRUCT
-from sqlalchemy_bigquery.base import BQArray, unnest
-from sqlmodel import AutoString
+from sqlalchemy_bigquery.base import BQArray, BQBinary, unnest
 from sqlmodel.main import get_sqlachemy_type
+from sqlmodel.sql import sqltypes as sqlmodel_types
 
 from amora import logger
 from amora.compilation import compile_statement
@@ -60,11 +46,10 @@ from amora.version import VERSION
 Schema = List[SchemaField]
 BQTable = Union[Table, TableReference, str]
 
-# todo: cobrir todos os tipos
 BIGQUERY_TYPES_TO_PYTHON_TYPES = {
     "ARRAY": list,
-    "BIGNUMERIC": int,
-    "NUMERIC": int,  # todo: remove
+    "BIGNUMERIC": decimal.Decimal,  # todo: test coverage
+    "NUMERIC": decimal.Decimal,  # todo: test coverage
     "BOOL": bool,
     "BOOLEAN": bool,
     "BYTES": bytes,
@@ -72,7 +57,6 @@ BIGQUERY_TYPES_TO_PYTHON_TYPES = {
     "DATETIME": datetime,
     "FLOAT64": float,
     "FLOAT": float,
-    "GEOGRAPHY": str,
     "INT64": int,
     "INTEGER": int,
     "JSON": dict,
@@ -80,27 +64,45 @@ BIGQUERY_TYPES_TO_PYTHON_TYPES = {
     "TIME": time,
     "TIMESTAMP": datetime,
     "RECORD": dict,
+    "STRUCT": dict,
 }
-
-SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES = {
-    AutoString: "STRING",
-    Boolean: "BOOLEAN",
-    Date: "DATE",
-    DateTime: "DATETIME",
-    Float: "FLOAT64",
-    Integer: "INTEGER",
-    JSON: "JSON",
-    Numeric: "NUMERIC",
-    STRUCT: "RECORD",
-    String: "STRING",
-    TIMESTAMP: "TIMESTAMP",
-    Time: "TIME",
-}
-
 
 BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES = {
-    bq_type: sqla_type
-    for sqla_type, bq_type in SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES.items()
+    "ARRAY": BQArray,
+    "BIGNUMERIC": sqltypes.Numeric,
+    "BOOL": sqltypes.Boolean,
+    "BOOLEAN": sqltypes.Boolean,
+    "BYTES": BQBinary,
+    "DATE": sqltypes.Date,
+    "DATETIME": sqltypes.DateTime,
+    "FLOAT": sqltypes.Float,
+    "FLOAT64": sqltypes.Float,
+    "INT64": sqltypes.Integer,
+    "INTEGER": sqltypes.Integer,
+    "JSON": sqltypes.JSON,
+    "NUMERIC": sqltypes.Numeric,
+    "RECORD": STRUCT,
+    "STRING": sqltypes.String,
+    "STRUCT": STRUCT,
+    "TIME": sqltypes.Time,
+    "TIMESTAMP": sqltypes.TIMESTAMP,
+}
+
+
+SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES = {
+    BQBinary: "BYTES",
+    STRUCT: "RECORD",
+    sqlmodel_types.AutoString: "STRING",
+    sqltypes.Boolean: "BOOLEAN",
+    sqltypes.Date: "DATE",
+    sqltypes.DateTime: "DATETIME",
+    sqltypes.Float: "FLOAT64",
+    sqltypes.Integer: "INTEGER",
+    sqltypes.JSON: "JSON",
+    sqltypes.Numeric: "NUMERIC",
+    sqltypes.String: "STRING",
+    sqltypes.TIMESTAMP: "TIMESTAMP",
+    sqltypes.Time: "TIME",
 }
 
 
