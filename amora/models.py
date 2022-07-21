@@ -166,7 +166,8 @@ def amora_model_for_path(path: Path) -> Model:
     is_amora_model = (
         lambda x: isinstance(x, CompilableProtocol)
         and inspect.isclass(x)
-        and issubclass(x, AmoraModel)  # type: ignore
+        and issubclass(x, AmoraModel)
+        and hasattr(x, "__table__")  # type: ignore
     )
     compilables = inspect.getmembers(
         module,
