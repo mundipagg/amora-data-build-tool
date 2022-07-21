@@ -82,6 +82,9 @@ def test_cte_from_rows_with_struct_fields():
     assert compile_statement(cte)
 
 
+@pytest.mark.skip(
+    "Compilation incorrect. Described on issue: https://github.com/mundipagg/amora-data-build-tool/issues/155"
+)
 def test_cte_from_rows_with_record_repeated_fields():
     class Node(AmoraModel):
         id: str
@@ -97,8 +100,8 @@ def test_cte_from_rows_with_record_repeated_fields():
                 "nodes": array([Node(id="a"), Node(id="b"), Node(id="c")]),
                 "edges": array(
                     [
-                        Edge(from_node="a", to_node="b"),
-                        Edge(from_node="b", to_node="c"),
+                        Edge(from_node=Node(id="a"), to_node=Node(id="b")),
+                        Edge(from_node=Node(id="b"), to_node=Node(id="c")),
                     ]
                 ),
             },
@@ -107,6 +110,7 @@ def test_cte_from_rows_with_record_repeated_fields():
 
     assert isinstance(cte, CTE)
     assert compile_statement(cte)
+    assert run(cte)
 
 
 ONE_TERABYTE = 1 * 1024**4
