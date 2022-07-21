@@ -1,5 +1,5 @@
 import sqlparse
-from sqlalchemy_bigquery import BigQueryDialect
+from sqlalchemy_bigquery import STRUCT, BigQueryDialect
 from sqlalchemy_bigquery.base import BigQueryCompiler
 
 from amora.types import Compilable
@@ -28,6 +28,15 @@ class AmoraBigQueryCompiler(BigQueryCompiler):
         if hasattr(func, "_with_offset") and func._with_offset is not None:
             text += f" WITH OFFSET AS {func._with_offset}"
         return text
+
+    def render_literal_value(self, value, type_):
+        if isinstance(type_, STRUCT):
+            values = ",".join(
+                self.render_literal_value(v, type_._STRUCT_byname[k])
+                for k, v in value.items()
+            )
+            return f"({values})"
+        return super().render_literal_value(value, type_)
 
 
 dialect = BigQueryDialect()
