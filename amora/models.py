@@ -5,7 +5,18 @@ from enum import Enum, auto
 from importlib.util import module_from_spec, spec_from_file_location
 from inspect import getfile
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 from sqlalchemy import Column, MetaData, Table, select
 from sqlalchemy.orm import declared_attr
@@ -263,3 +274,38 @@ def list_models(
                 extra={"model_file_path": model_file_path},
             )
             continue
+
+
+def select_models_with_labels(labels: Labels) -> Iterable[Tuple[Model, Path]]:
+    def matches_labels(item: Tuple[Model, Path]) -> bool:
+        model, _model_path = item
+        return match_labels(model, labels)
+
+    return filter(matches_labels, list_models())
+
+
+def select_models_with_label_keys(
+    label_keys: LabelKeys,
+) -> Iterable[Tuple[Model, Path]]:
+    keys = set(label_keys)
+
+    def matches_labels(item: Tuple[Model, Path]) -> bool:
+        model, _model_path = item
+        return match_label_keys(model, keys)
+
+    return filter(matches_labels, list_models())
+
+
+def match_label_keys(model: Model, label_keys: Iterable[LabelKey]) -> bool:
+    for key in label_keys:
+        for (k, v) in model.__model_config__.labels:
+            if key == k:
+                return True
+    return False
+
+
+def match_labels(model: Model, labels: Labels) -> bool:
+    for label in labels:
+        if label in model.__model_config__.labels:
+            return True
+    return False

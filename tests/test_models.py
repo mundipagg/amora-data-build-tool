@@ -1,9 +1,16 @@
 import inspect
 
 from amora.compilation import compile_statement
-from amora.models import AmoraModel, amora_model_for_name
+from amora.models import (
+    AmoraModel,
+    Label,
+    amora_model_for_name,
+    select_models_with_label_keys,
+    select_models_with_labels,
+)
 
 from tests.models.health import Health
+from tests.models.step_count_by_source import StepCountBySource
 from tests.models.steps import Steps
 
 
@@ -34,3 +41,37 @@ def test_amora_model_for_name():
 
     assert issubclass(model, AmoraModel)
     assert model.__table__ == Health.__table__
+
+
+def test_select_models_with_labels():
+    models = list(select_models_with_labels({Label("domain", "health")}))
+
+    assert len(models) == 1
+    [(model, model_path)] = models
+
+    assert model.unique_name == StepCountBySource.unique_name
+    assert model_path == StepCountBySource.model_file_path()
+
+
+def test_select_models_with_labels_without_matches():
+    assert not list(select_models_with_labels({Label("domain", "🐣")}))
+
+
+def test_select_models_with_label_keys():
+    models = list(select_models_with_label_keys({"downstream"}))
+
+    assert len(models) == 1
+    [(model, model_path)] = models
+
+    assert model.unique_name == StepCountBySource.unique_name
+    assert model_path == StepCountBySource.model_file_path()
+
+
+def test_select_models_with_label_keys_without_matches():
+    label_keys = {"🥚", "🐣", "🐥", "🐓", "🍗"}
+    assert not list(select_models_with_label_keys(label_keys))
+
+
+def test_label__eq__():
+    assert Label("domain", "health") == Label("domain", "health")
+    assert Label("domain", "health") == "domain:health"
