@@ -2,7 +2,13 @@ from datetime import datetime
 
 from sqlmodel import Field, select
 
-from amora.models import AmoraModel, MaterializationTypes, ModelConfig, PartitionConfig
+from amora.models import (
+    AmoraModel,
+    Label,
+    MaterializationTypes,
+    ModelConfig,
+    PartitionConfig,
+)
 from amora.types import Compilable
 
 from tests.models.health import Health
@@ -17,7 +23,7 @@ class HeartRate(AmoraModel, table=True):
             field="creationDate", data_type="TIMESTAMP", granularity="day"
         ),
         cluster_by=["sourceName"],
-        labels={"freshness": "daily"},
+        labels={Label("freshness", "daily")},
     )
 
     creationDate: datetime
