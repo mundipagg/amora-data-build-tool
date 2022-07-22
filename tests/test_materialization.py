@@ -8,6 +8,7 @@ from amora.materialization import Task, materialize
 from amora.models import (
     AmoraModel,
     Field,
+    Label,
     MaterializationTypes,
     ModelConfig,
     PartitionConfig,
@@ -69,7 +70,7 @@ def test_materialize_as_view(Client: MagicMock):
                 field="creationDate", data_type="TIMESTAMP", granularity="day"
             ),
             cluster_by=["sourceName"],
-            labels={"freshness": "daily"},
+            labels={Label("freshness", "daily")},
         )
 
     result = materialize(sql="SELECT 1", model=ViewModel)
@@ -101,7 +102,7 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
                 field="created_at", data_type="TIMESTAMP", granularity="day"
             ),
             cluster_by=["x", "y"],
-            labels={"freshness": "daily"},
+            labels={Label("freshness", "daily")},
             description=uuid4().hex,
         )
 
@@ -148,7 +149,7 @@ def test_materialize_as_table_without_clustering_configuration(
             partition_by=PartitionConfig(
                 field="created_at", data_type="TIMESTAMP", granularity="day"
             ),
-            labels={"freshness": "daily"},
+            labels={Label("freshness", "daily")},
             description=uuid4().hex,
         )
 
