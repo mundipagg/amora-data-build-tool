@@ -209,12 +209,14 @@ def amora_model_for_path(path: Path) -> Model:
     module = module_from_spec(spec)
 
     if spec.loader is None:
-        raise ValueError(f"Invalid path `{path}`. Unable to load module.")
+        raise ValueError(f"Invalid AmoraModel path `{path}`. Unable to load module.")
 
     try:
         spec.loader.exec_module(module)  # type: ignore
     except ImportError as e:
-        raise ValueError(f"Invalid path `{path}`. Unable to load module.") from e
+        raise ValueError(
+            f"Invalid AmoraModel path `{path}`. Unable to load module."
+        ) from e
     is_amora_model = (
         lambda x: isinstance(x, CompilableProtocol)
         and inspect.isclass(x)
