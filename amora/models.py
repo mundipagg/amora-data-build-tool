@@ -5,7 +5,18 @@ from enum import Enum, auto
 from importlib.util import module_from_spec, spec_from_file_location
 from inspect import getfile
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 from sqlalchemy import Column, MetaData, Table, select
 from sqlalchemy.orm import declared_attr
@@ -28,6 +39,47 @@ MetaData = MetaData
 Models = Iterable[Model]
 Session = Session
 create_engine = create_engine
+
+LabelKey = str
+LabelValue = str
+LabelKeys = Iterable[LabelKey]
+
+
+class Label(NamedTuple):
+    """
+    A label is a (key, value) pair that can also be represented as a "key:value" string. E.g.:
+
+    ```python
+    Label("freshness", "daily")
+    ```
+    """
+
+    key: LabelKey
+    value: LabelValue
+
+    def __str__(self):
+        return f"{self.key}:{self.value}"
+
+    def __repr__(self):
+        return str(self)
+
+    def __eq__(self, other):
+        if not isinstance(other, str):
+            return self.key == other.key and self.value == other.value
+        else:
+            return self == Label.from_str(other)
+
+    @classmethod
+    def from_str(cls, label: str):
+        """
+        >>> Label.from_str("domain:health")
+        Label(key="domain", value="health")
+        """
+
+        return cls(*label.split(":"))
+
+
+Labels = Set[Union[Label, str]]
 
 
 @dataclass
@@ -57,7 +109,7 @@ class ModelConfig:
     Attributes:
         cluster_by (List[str]): BigQuery tables can be [clustered](https://cloud.google.com/bigquery/docs/clustered-tables) to colocate related data. Expects a list of columns, as strings.
         description (Optional[str]): A string description of the model, used for documentation
-        labels (Dict[str,str]): A dict of labels that can be used for resource selection
+        labels (Labels): Labels that can be used for data catalog and resource selection
         materialized (amora.models.MaterializationTypes): The materialization configuration: `view`, `table`, `ephemeral`. Default: `view`
         partition_by (Optional[PartitionConfig]): BigQuery supports the use of a [partition by](https://cloud.google.com/bigquery/docs/partitioned-tables) clause to easily partition a table by a column or expression. This option can help decrease latency and cost when querying large tables.
     """
@@ -66,7 +118,7 @@ class ModelConfig:
     materialized: MaterializationTypes = MaterializationTypes.view
     partition_by: Optional[PartitionConfig] = None
     cluster_by: List[str] = field(default_factory=list)
-    labels: Dict[str, str] = field(default_factory=dict)
+    labels: Labels = field(default_factory=list)
 
 
 metadata = MetaData(schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}")
@@ -157,12 +209,14 @@ def amora_model_for_path(path: Path) -> Model:
     module = module_from_spec(spec)
 
     if spec.loader is None:
-        raise ValueError(f"Invalid path `{path}`. Unable to load module.")
+        raise ValueError(f"Invalid AmoraModel path `{path}`. Unable to load module.")
 
     try:
         spec.loader.exec_module(module)  # type: ignore
     except ImportError as e:
-        raise ValueError(f"Invalid path `{path}`. Unable to load module.") from e
+        raise ValueError(
+            f"Invalid AmoraModel path `{path}`. Unable to load module."
+        ) from e
     is_amora_model = (
         lambda x: isinstance(x, CompilableProtocol)
         and inspect.isclass(x)
@@ -217,8 +271,43 @@ def list_models(
         try:
             yield amora_model_for_path(model_file_path), model_file_path
         except ValueError:
-            logger.warning(
+            logger.exception(
                 "Unable to load amora model for path",
                 extra={"model_file_path": model_file_path},
             )
             continue
+
+
+def select_models_with_labels(labels: Labels) -> Iterable[Tuple[Model, Path]]:
+    def matches_labels(item: Tuple[Model, Path]) -> bool:
+        model, _model_path = item
+        return match_labels(model, labels)
+
+    return filter(matches_labels, list_models())
+
+
+def select_models_with_label_keys(
+    label_keys: LabelKeys,
+) -> Iterable[Tuple[Model, Path]]:
+    keys = set(label_keys)
+
+    def matches_labels(item: Tuple[Model, Path]) -> bool:
+        model, _model_path = item
+        return match_label_keys(model, keys)
+
+    return filter(matches_labels, list_models())
+
+
+def match_label_keys(model: Model, label_keys: Iterable[LabelKey]) -> bool:
+    for key in label_keys:
+        for (k, v) in model.__model_config__.labels:
+            if key == k:
+                return True
+    return False
+
+
+def match_labels(model: Model, labels: Labels) -> bool:
+    for label in labels:
+        if label in model.__model_config__.labels:
+            return True
+    return False

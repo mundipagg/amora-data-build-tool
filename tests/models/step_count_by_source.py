@@ -4,7 +4,14 @@ from typing import Optional
 from sqlalchemy import TIMESTAMP, Column, func
 
 from amora.feature_store.decorators import feature_view
-from amora.models import AmoraModel, Field, MaterializationTypes, ModelConfig, select
+from amora.models import (
+    AmoraModel,
+    Field,
+    Label,
+    MaterializationTypes,
+    ModelConfig,
+    select,
+)
 from amora.transformations import datetime_trunc_hour
 from amora.types import Compilable
 
@@ -14,7 +21,15 @@ from tests.models.steps import Steps
 @feature_view
 class StepCountBySource(AmoraModel, table=True):
     __depends_on__ = [Steps]
-    __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
+    __model_config__ = ModelConfig(
+        materialized=MaterializationTypes.table,
+        labels=[
+            Label("quality", "golden"),
+            Label("upstream", "apple_health"),
+            Label("downstream", "dashboards"),
+            Label("domain", "health"),
+        ],
+    )
 
     value_avg: float
     value_sum: float

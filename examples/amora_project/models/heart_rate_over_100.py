@@ -7,6 +7,7 @@ from amora.models import (
     AmoraModel,
     Column,
     Field,
+    Label,
     MaterializationTypes,
     ModelConfig,
     select,
@@ -20,7 +21,7 @@ class HeartRateOver100(AmoraModel, table=True):
     __depends_on__ = [HeartRate]
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.view,
-        labels={"freshness": "daily"},
+        labels={Label("freshness", "daily")},
     )
 
     unit: str = Field(description="Unidade de medida")

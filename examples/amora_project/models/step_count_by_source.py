@@ -5,7 +5,14 @@ import humanize
 from sqlalchemy import TIMESTAMP, Column, Integer, func, literal
 
 from amora.feature_store.decorators import feature_view
-from amora.models import AmoraModel, Field, MaterializationTypes, ModelConfig, select
+from amora.models import (
+    AmoraModel,
+    Field,
+    Label,
+    MaterializationTypes,
+    ModelConfig,
+    select,
+)
 from amora.questions import question
 from amora.transformations import datetime_trunc_hour
 from amora.types import Compilable
@@ -18,7 +25,11 @@ class StepCountBySource(AmoraModel, table=True):
     __depends_on__ = [Steps]
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.table,
-        labels={"quality": "golden", "upstream": "apple_health", "domain": "health"},
+        labels=[
+            Label("quality", "golden"),
+            Label("upstream", "apple_health"),
+            Label("domain", "health"),
+        ],
     )
 
     value_avg: float = Field(
