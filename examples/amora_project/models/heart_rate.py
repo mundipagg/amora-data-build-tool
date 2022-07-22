@@ -6,6 +6,7 @@ from sqlmodel import Field, select
 from amora.models import (
     AmoraModel,
     Column,
+    Label,
     MaterializationTypes,
     ModelConfig,
     PartitionConfig,
@@ -23,7 +24,7 @@ class HeartRate(AmoraModel, table=True):
             field="creationDate", data_type="TIMESTAMP", granularity="day"
         ),
         cluster_by=["sourceName"],
-        labels={"freshness": "daily"},
+        labels={Label("freshness", "daily")},
     )
 
     id: int = Field(primary_key=True, description="Identificador único da medida")

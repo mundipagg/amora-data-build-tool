@@ -29,6 +29,47 @@ Models = Iterable[Model]
 Session = Session
 create_engine = create_engine
 
+LabelKey = str
+LabelValue = str
+LabelKeys = Iterable[LabelKey]
+
+
+class Label(NamedTuple):
+    """
+    A label is a (key, value) pair that can also be represented as a "key:value" string. E.g.:
+
+    ```python
+    Label("freshness", "daily")
+    ```
+    """
+
+    key: LabelKey
+    value: LabelValue
+
+    def __str__(self):
+        return f"{self.key}:{self.value}"
+
+    def __repr__(self):
+        return str(self)
+
+    def __eq__(self, other):
+        if not isinstance(other, str):
+            return self.key == other.key and self.value == other.value
+        else:
+            return self == Label.from_str(other)
+
+    @classmethod
+    def from_str(cls, label: str):
+        """
+        >>> Label.from_str("domain:health")
+        Label(key="domain", value="health")
+        """
+
+        return cls(*label.split(":"))
+
+
+Labels = Set[Union[Label, str]]
+
 
 @dataclass
 class PartitionConfig:
@@ -57,7 +98,7 @@ class ModelConfig:
     Attributes:
         cluster_by (List[str]): BigQuery tables can be [clustered](https://cloud.google.com/bigquery/docs/clustered-tables) to colocate related data. Expects a list of columns, as strings.
         description (Optional[str]): A string description of the model, used for documentation
-        labels (Dict[str,str]): A dict of labels that can be used for resource selection
+        labels (Labels): Labels that can be used for data catalog and resource selection
         materialized (amora.models.MaterializationTypes): The materialization configuration: `view`, `table`, `ephemeral`. Default: `view`
         partition_by (Optional[PartitionConfig]): BigQuery supports the use of a [partition by](https://cloud.google.com/bigquery/docs/partitioned-tables) clause to easily partition a table by a column or expression. This option can help decrease latency and cost when querying large tables.
     """
@@ -66,7 +107,7 @@ class ModelConfig:
     materialized: MaterializationTypes = MaterializationTypes.view
     partition_by: Optional[PartitionConfig] = None
     cluster_by: List[str] = field(default_factory=list)
-    labels: Dict[str, str] = field(default_factory=dict)
+    labels: Labels = field(default_factory=list)
 
 
 metadata = MetaData(schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}")
