@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     LOCAL_ENGINE_SQLITE_FILE_PATH: Path = Path(
         NamedTemporaryFile(suffix="amora-sqlite.db", delete=False).name
     )
-    STORAGE_CACHE_ENABLED: bool = True
+    STORAGE_CACHE_ENABLED: bool = False
     STORAGE_CACHE_PROVIDER: StorageCacheProviders = StorageCacheProviders.local
     STORAGE_GCS_BUCKET_NAME: str = "amora-storage"
     STORAGE_LOCAL_CACHE_PATH: Path = Path(mkdtemp())
