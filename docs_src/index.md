@@ -5,12 +5,6 @@ by writing *Amora Models* that describe the data schema using Python's [PEP484 -
 and select statements with [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy). Amora is able to transform Python 
 code into SQL data transformation jobs that run inside the warehouse.
 
-## When should I use? 
-
-- Use case 1
-- Use case 2
-- Use case 3
-
 ## Installation
 
 ### Pypi
