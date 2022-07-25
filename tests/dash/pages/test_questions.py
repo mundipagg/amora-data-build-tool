@@ -1,11 +1,13 @@
 from unittest.mock import patch
 
 import pandas as pd
+import pytest
 from dash.testing.composite import DashComposite
 
 from amora.questions import QUESTIONS
 
 
+@pytest.mark.skip
 def test_data_questions_page(amora_dash: DashComposite):
     # patching so we don't have to run the question on bigquery
     with patch("amora.questions.Question.answer_df", return_value=pd.DataFrame()):

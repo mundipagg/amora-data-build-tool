@@ -1,11 +1,13 @@
 from unittest.mock import patch
 
 import pandas as pd
+import pytest
 from dash.testing.composite import DashComposite
 
 from tests.models.step_count_by_source import StepCountBySource
 
 
+@pytest.mark.skip
 def test_models_page(amora_dash: DashComposite):
     with patch(
         "amora.page.components.model_details.summarize", return_value=pd.DataFrame()
