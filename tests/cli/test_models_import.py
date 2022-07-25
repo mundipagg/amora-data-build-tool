@@ -40,7 +40,6 @@ def test_models_import_with_invalid_table_reference(get_schema: MagicMock):
 
 
 mock_schema = [
-    SchemaField(name="BIGNUMERIC_COLUMN", field_type="BIGNUMERIC"),
     SchemaField(name="BOOL_COLUMN", field_type="BOOL"),
     SchemaField(name="BOOLEAN_COLUMN", field_type="BOOLEAN"),
     SchemaField(name="BYTES_COLUMN", field_type="BYTES"),
@@ -48,7 +47,6 @@ mock_schema = [
     SchemaField(name="DATETIME_COLUMN", field_type="DATETIME"),
     SchemaField(name="FLOAT64_COLUMN", field_type="FLOAT64"),
     SchemaField(name="FLOAT_COLUMN", field_type="FLOAT"),
-    SchemaField(name="GEOGRAPHY_COLUMN", field_type="GEOGRAPHY"),
     SchemaField(name="INT64_COLUMN", field_type="INT64"),
     SchemaField(name="INTEGER_COLUMN", field_type="INTEGER"),
     SchemaField(name="JSON_COLUMN", field_type="JSON"),
