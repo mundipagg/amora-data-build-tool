@@ -121,6 +121,10 @@ class ModelConfig:
     cluster_by: List[str] = field(default_factory=list)
     labels: Labels = field(default_factory=set)
 
+    @property
+    def labels_dict(self) -> Dict[str, str]:
+        return {label.key: label.value for label in self.labels}
+
 
 metadata = MetaData(schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}")
 

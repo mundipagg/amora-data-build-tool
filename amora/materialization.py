@@ -39,7 +39,7 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
 
         view = Table(table_name)
         view.description = config.description
-        view.labels = config.labels
+        view.labels = config.labels_dict
         view.view_query = sql
 
         client.delete_table(table_name, not_found_ok=True)
@@ -58,7 +58,7 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
 
         table = client.get_table(model.unique_name)
         table.description = config.description
-        table.labels = config.labels
+        table.labels = config.labels_dict
 
         if config.cluster_by:
             table.clustering_fields = config.cluster_by

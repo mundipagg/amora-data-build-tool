@@ -86,7 +86,7 @@ def test_materialize_as_view(Client: MagicMock):
 
     view: Table = client.create_table.call_args_list[0][0][0]
     assert view.description == ViewModel.__model_config__.description
-    assert view.labels == ViewModel.__model_config__.labels
+    assert view.labels == {"freshness": "daily"}
 
 
 @patch("amora.materialization.Client", spec=Client)
@@ -132,7 +132,7 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
 
     assert table.description == TableModel.__model_config__.description
     assert table.clustering_fields == TableModel.__model_config__.cluster_by
-    assert table.labels == TableModel.__model_config__.labels
+    assert table.labels == {"freshness": "daily"}
 
 
 @patch("amora.materialization.Client", spec=Client)
@@ -179,7 +179,7 @@ def test_materialize_as_table_without_clustering_configuration(
 
     assert table.description == TableModel.__model_config__.description
     assert isinstance(table.clustering_fields, MagicMock)
-    assert table.labels == TableModel.__model_config__.labels
+    assert table.labels == {"freshness": "daily"}
 
 
 @patch("amora.materialization.Client", spec=Client)
