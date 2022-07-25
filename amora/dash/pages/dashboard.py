@@ -66,6 +66,4 @@ def layout(dashboard_id: str = None) -> Component:
     prevent_initial_call=True,
 )
 def update_dashboard_details(value: str) -> Component:
-    dashboard = DASHBOARDS.get(value)
-    component = render(dashboard)
-    return component
+    return render(dashboard=DASHBOARDS[value])

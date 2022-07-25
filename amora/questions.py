@@ -86,11 +86,7 @@ class Question:
             )
 
         self.question_func = question_func
-
-        if view_config is None:
-            self.view_config = Table(title=self.name)
-        else:
-            self.view_config = view_config
+        self.view_config = view_config or Table(title=self.name)
 
     def __call__(self, *args, **kwargs):
         return self.question_func(*args, **kwargs)

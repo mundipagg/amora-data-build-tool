@@ -7,8 +7,5 @@ from amora.models import Model
 
 def component(model: Model) -> Component:
     return html.Span(
-        [
-            dbc.Badge(f"{key}: {value}", color="info")
-            for key, value in model.__model_config__.labels.items()
-        ]
+        [dbc.Badge(label, color="info") for label in model.__model_config__.labels]
     )

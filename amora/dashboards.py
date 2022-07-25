@@ -1,5 +1,5 @@
 from datetime import date
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -9,7 +9,7 @@ from amora.questions import Question
 class Filter(BaseModel):
     type: str
     id: str
-    default: str
+    default: Any
     title: str
 
 

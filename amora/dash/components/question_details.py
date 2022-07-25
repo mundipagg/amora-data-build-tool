@@ -15,7 +15,7 @@ def answer_visualization(visualization: Visualization) -> Component:
     elif isinstance(view_config, LineChart):
         return dcc.Graph(
             figure=px.line(
-                visualization.data,
+                data_frame=visualization.data,
                 x=view_config.x_func(visualization.data),
                 y=view_config.y_func(visualization.data),
             )
@@ -23,7 +23,9 @@ def answer_visualization(visualization: Visualization) -> Component:
     elif isinstance(view_config, PieChart):
         return dcc.Graph(
             figure=px.pie(
-                visualization.data, values=view_config.values, names=view_config.names
+                data_frame=visualization.data,
+                values=view_config.values,
+                names=view_config.names,
             )
         )
     else:

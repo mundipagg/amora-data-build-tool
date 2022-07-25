@@ -1,8 +1,19 @@
 from abc import ABC
-from typing import Callable, Union
+from typing import Any, Protocol, Union
 
 import pandas as pd
+from pandas import Series
 from pydantic import BaseModel
+
+
+class SeriesSelectorFunc(Protocol):
+    def __call__(self, df: pd.DataFrame) -> Series[Any]:
+        pass
+
+
+class ValueSelectorFunc(Protocol):
+    def __call__(self, df: pd.DataFrame) -> str:
+        pass
 
 
 class VisualizationConfig(ABC):
@@ -15,13 +26,13 @@ class PieChart(VisualizationConfig, BaseModel):
 
 
 class _2DChart(VisualizationConfig, BaseModel):
-    x_func: Callable[[pd.DataFrame], str] = lambda data: data["x"]
-    y_func: Callable[[pd.DataFrame], str] = lambda data: data["y"]
+    x_func: SeriesSelectorFunc = lambda data: data["x"]
+    y_func: SeriesSelectorFunc = lambda data: data["y"]
 
 
 class BarChart(VisualizationConfig, BaseModel):
-    x_func: Callable[[pd.DataFrame], str] = lambda data: data["x"]
-    y_func: Callable[[pd.DataFrame], str] = lambda data: data["y"]
+    x_func: SeriesSelectorFunc = lambda data: data["x"]
+    y_func: SeriesSelectorFunc = lambda data: data["y"]
 
 
 class LineChart(_2DChart):
@@ -29,7 +40,7 @@ class LineChart(_2DChart):
 
 
 class BigNumber(VisualizationConfig, BaseModel):
-    value_func: Callable[[pd.DataFrame], str] = lambda data: data["total"][0]
+    value_func: ValueSelectorFunc = lambda data: data["total"][0]
 
 
 class Table(VisualizationConfig, BaseModel):

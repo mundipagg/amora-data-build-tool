@@ -79,7 +79,8 @@ class Label(NamedTuple):
         return cls(*label.split(":"))
 
 
-Labels = Set[Union[Label, str]]
+LabelRepr = Union[Label, str]
+Labels = Set[Label]
 
 
 @dataclass
@@ -118,7 +119,7 @@ class ModelConfig:
     materialized: MaterializationTypes = MaterializationTypes.view
     partition_by: Optional[PartitionConfig] = None
     cluster_by: List[str] = field(default_factory=list)
-    labels: Labels = field(default_factory=list)
+    labels: Labels = field(default_factory=set)
 
 
 metadata = MetaData(schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}")
@@ -300,8 +301,8 @@ def select_models_with_label_keys(
 
 def match_label_keys(model: Model, label_keys: Iterable[LabelKey]) -> bool:
     for key in label_keys:
-        for (k, v) in model.__model_config__.labels:
-            if key == k:
+        for label in model.__model_config__.labels:
+            if label.key == key:
                 return True
     return False
 
