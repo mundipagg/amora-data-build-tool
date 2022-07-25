@@ -1,16 +1,18 @@
 from abc import ABC
-from typing import Any, Protocol, Union
+from typing import Protocol, Union, runtime_checkable
 
 import pandas as pd
 from pandas import Series
 from pydantic import BaseModel
 
 
+@runtime_checkable
 class SeriesSelectorFunc(Protocol):
-    def __call__(self, df: pd.DataFrame) -> Series[Any]:
+    def __call__(self, df: pd.DataFrame) -> Series:
         pass
 
 
+@runtime_checkable
 class ValueSelectorFunc(Protocol):
     def __call__(self, df: pd.DataFrame) -> str:
         pass
@@ -29,10 +31,16 @@ class _2DChart(VisualizationConfig, BaseModel):
     x_func: SeriesSelectorFunc = lambda data: data["x"]
     y_func: SeriesSelectorFunc = lambda data: data["y"]
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 class BarChart(VisualizationConfig, BaseModel):
     x_func: SeriesSelectorFunc = lambda data: data["x"]
     y_func: SeriesSelectorFunc = lambda data: data["y"]
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class LineChart(_2DChart):
@@ -41,6 +49,9 @@ class LineChart(_2DChart):
 
 class BigNumber(VisualizationConfig, BaseModel):
     value_func: ValueSelectorFunc = lambda data: data["total"][0]
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class Table(VisualizationConfig, BaseModel):
