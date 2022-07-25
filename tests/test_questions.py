@@ -23,7 +23,7 @@ def test_Question_is_compared_through_question_function():
         return select(literal(42).label("answer"))
 
     assert Question(a_question) != a_question
-    assert Question(a_question) == question(a_question)
+    assert Question(a_question) == question()(a_question)
     assert Question(a_question) == Question(a_question)
     assert Question(a_question) != Question(another_question)
 
@@ -68,7 +68,7 @@ def test_Question_sql():
 
 
 def test_Question_answer_df():
-    @question
+    @question()
     def a_question() -> Compilable:
         return select(literal("amora").label("answer"))
 
@@ -76,7 +76,7 @@ def test_Question_answer_df():
 
 
 def test_Question_to_markdown():
-    @question
+    @question()
     def a_question() -> Compilable:
         return select(literal(42).label("col"))
 
@@ -84,7 +84,7 @@ def test_Question_to_markdown():
 
 
 def test_Question_render():
-    @question
+    @question()
     def a_question() -> Compilable:
         return select(literal(42).label("col"))
 
@@ -104,7 +104,7 @@ def test_question_decorator_storages_the_Question():
 
     assert Question(a_question) not in QUESTIONS
 
-    question(a_question)
+    question()(a_question)
 
     assert Question(a_question) in QUESTIONS
 
@@ -116,13 +116,13 @@ def test_question_decorator_wraps_the_question_function_on_a_Question():
         """
         return select(literal(42).label("answer"))
 
-    wrapped_question = question(a_question)
+    wrapped_question = question()(a_question)
     assert isinstance(wrapped_question, Question)
 
 
 def test_question_decorator_raises_an_error_if_the_decorated_functions_doesnt_return_a_compilable():
     with pytest.raises(ValueError):
 
-        @question
+        @question()
         def an_invalid_question():
             return 42
