@@ -1,6 +1,7 @@
 from datetime import date
 
 import pandas as pd
+from numpy import nan
 from sqlalchemy import ARRAY, Float, Integer, Numeric, String, cast, func, literal
 
 from amora.feature_store.protocols import FeatureViewSourceProtocol
@@ -18,6 +19,19 @@ def summarize(model: Model) -> pd.DataFrame:
 
 @cache(suffix=lambda model, column: f"{model.unique_name}.{column.name}.{date.today()}")
 def summarize_column(model: Model, column: Column) -> pd.DataFrame:
+    df = pd.DataFrame(
+        columns=[
+            "column_name",
+            "column_type",
+            "min",
+            "max",
+            "avg",
+            "unique_count",
+            "null_percentage",
+            "stddev",
+        ]
+    )
+
     is_array = isinstance(column.type, ARRAY)
     if is_array:
         # fixme:
@@ -37,7 +51,7 @@ def summarize_column(model: Model, column: Column) -> pd.DataFrame:
     )
     result = run(stmt)
 
-    df = pd.DataFrame.from_dict({k: [v] for k, v in dict(result.rows.next()).items()})
+    df = df.append(result.to_dataframe(), ignore_index=True)
     df["column_name"] = column.name
     df["column_type"] = str(column.type)
 
@@ -51,4 +65,12 @@ def summarize_column(model: Model, column: Column) -> pd.DataFrame:
         df["is_fv_event_timestamp"] = (
             column.name == model.feature_view_event_timestamp().name
         )
-    return df
+    else:
+        feature_view_columns = [
+            "is_fv_feature",
+            "is_fv_entity",
+            "is_fv_event_timestamp",
+        ]
+        df[feature_view_columns] = False
+
+    return df.replace({nan: None})
