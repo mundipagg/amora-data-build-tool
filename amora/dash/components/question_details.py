@@ -9,32 +9,33 @@ from amora.visualization import BigNumber, LineChart, PieChart, Visualization
 
 def answer_visualization(visualization: Visualization) -> Component:
     view_config = visualization.config
+
+    df = visualization.data
+    if df.empty:
+        return dbc.Alert("⚠️ No data", color="warning")
+
     if isinstance(view_config, BigNumber):
-        big_number = view_config.value_func(visualization.data)
+        big_number = view_config.value_func(df)
         return html.H4(big_number)
     elif isinstance(view_config, LineChart):
         return dcc.Graph(
             figure=px.line(
-                data_frame=visualization.data,
-                x=view_config.x_func(visualization.data),
-                y=view_config.y_func(visualization.data),
+                df,
+                x=view_config.x_func(df),
+                y=view_config.y_func(df),
             )
         )
     elif isinstance(view_config, PieChart):
         return dcc.Graph(
-            figure=px.pie(
-                data_frame=visualization.data,
-                values=view_config.values,
-                names=view_config.names,
-            )
+            figure=px.pie(df, values=view_config.values, names=view_config.names)
         )
     else:
         return dash_table.DataTable(
             columns=[
                 {"name": col, "id": col, "selectable": True}
-                for col in visualization.data.columns.values
+                for col in df.columns.values
             ],
-            data=visualization.data.to_dict("records"),
+            data=df.to_dict("records"),
             row_selectable="multi",
             sort_action="native",
             style_cell={
