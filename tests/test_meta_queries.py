@@ -1,8 +1,7 @@
 import pytest
 
-from amora.meta_queries import summarize, summarize_column
+from amora.meta_queries import summarize
 
-from tests.models.array_repeated_fields import ArrayRepeatedFields
 from tests.models.health import Health
 from tests.models.step_count_by_source import StepCountBySource
 
@@ -222,8 +221,3 @@ def step_count_by_source_model_summary():
 def test_summarize_feature_view_model(step_count_by_source_model_summary):
     summary = summarize(StepCountBySource).to_dict(orient="records")
     assert summary == step_count_by_source_model_summary
-
-
-def test_summarize_array_column():
-    col_summary = summarize_column(ArrayRepeatedFields, ArrayRepeatedFields.int_arr)
-    assert col_summary.empty
