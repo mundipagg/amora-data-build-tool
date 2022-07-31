@@ -217,13 +217,14 @@ def models_import(
         )
         raise typer.Exit(1)
 
+    sorted_schema = sorted(get_schema(table_reference), key=lambda field: field.name)
     model_source_code = template.render(
         BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
         dataset=dataset,
         dataset_id=f"{project}.{dataset}",
         model_name=model_name,
         project=project,
-        schema=get_schema(table_reference),
+        schema=sorted_schema,
         table=table,
     )
     formatted_source_code = shed(model_source_code)
