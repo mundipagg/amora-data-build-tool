@@ -657,7 +657,7 @@ def zip_arrays(
     *arr_columns: Column, additional_columns: Optional[List[Column]] = None
 ) -> Compilable:
     """
-    Given at least two array columns of equal size, return a table of the unnest values,
+    Given at least two array columns of equal length, returns a table of the unnest values,
     converting array items into rows. E.g:
 
     A CTE with 3 array columns: `entity`, `f1`, `f2`
@@ -719,6 +719,10 @@ def zip_arrays(
     | 4      | f1v4 | f2v4 | 2    |
 
     Read more: [https://cloud.google.com/bigquery/docs/reference/standard-sql/arrays#zipping_arrays](https://cloud.google.com/bigquery/docs/reference/standard-sql/arrays#zipping_arrays)
+
+    Args:
+        *arr_columns: Array columns of equal length
+        additional_columns: Additional columns needed from the original data
     """
     offset_alias = "off"
     offset = func.offset(literal_column(offset_alias))
@@ -747,7 +751,20 @@ def sample(
     limit: int = settings.GCP_BIGQUERY_DEFAULT_LIMIT_SIZE,
 ) -> pd.DataFrame:
     """
-    https://cloud.google.com/bigquery/docs/table-sampling
+    Given a model, returns a random sample of the data.
+
+    Read more: [https://cloud.google.com/bigquery/docs/table-sampling](https://cloud.google.com/bigquery/docs/table-sampling)
+
+
+
+    Args:
+        model: AmoraModel to extract the extract the sample
+        percentage: The percentage of the sample. E.g: percentage=10 is 10% of the data.
+        limit: The maximum number of rows to be returned
+    Returns:
+        The sample data as a `pandas.DataFrame`
+    Raises:
+        ValueError: TABLESAMPLE SYSTEM can only be applied directly to tables.
     """
     if model.__model_config__.materialized is not MaterializationTypes.table:
         raise ValueError(

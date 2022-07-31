@@ -81,6 +81,14 @@
         show_root_heading: true
         show_root_toc_entry: true
 
+## Data Sample
+
+::: amora.providers.bigquery.sample
+    rendering:
+        heading_level: 3
+        show_root_heading: true
+        show_root_toc_entry: true
+
 ## Repeated Fields
 Read more: [https://cloud.google.com/bigquery/docs/nested-repeated](https://cloud.google.com/bigquery/docs/nested-repeated)
 
@@ -93,6 +101,9 @@ Read more: [https://cloud.google.com/bigquery/docs/nested-repeated](https://clou
 ### Zipping arrays
 
 ::: amora.providers.bigquery.zip_arrays
+    rendering:
+        heading_level: 4
+        show_root_heading: true
 
 ## Structs and Nested Models
 
