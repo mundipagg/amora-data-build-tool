@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     # https://cloud.google.com/bigquery/pricing#storage
     GCP_BIGQUERY_ACTIVE_STORAGE_COST_PER_GIGABYTE_IN_USD: float = 0.020
 
+    GCP_BIGQUERY_DEFAULT_LIMIT_SIZE: int = 1000
+
     LOCAL_ENGINE_ECHO: bool = False
     LOCAL_ENGINE_SQLITE_FILE_PATH: Path = Path(
         NamedTemporaryFile(suffix="amora-sqlite.db", delete=False).name

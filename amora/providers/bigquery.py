@@ -734,20 +734,30 @@ def zip_arrays(
     )
 
 
-@cache(lambda model, percentage=1: f"{model.unique_name}.{percentage}.{date.today()}")
-def sample(model: Model, percentage: int = 1) -> pd.DataFrame:
+def _sample_cache_key(
+    model, percentage=1, limit=settings.GCP_BIGQUERY_DEFAULT_LIMIT_SIZE
+) -> str:
+    return f"{model.unique_name}.{percentage}.{limit}.{date.today()}"
+
+
+@cache(_sample_cache_key)
+def sample(
+    model: Model,
+    percentage: int = 1,
+    limit: int = settings.GCP_BIGQUERY_DEFAULT_LIMIT_SIZE,
+) -> pd.DataFrame:
     """
     https://cloud.google.com/bigquery/docs/table-sampling
     """
     if model.__model_config__.materialized is not MaterializationTypes.table:
         raise ValueError(
-            "TABLESAMPLE SYSTEM can only be applied directly to base tables. "
+            "TABLESAMPLE SYSTEM can only be applied directly to tables. "
             "More on: https://cloud.google.com/bigquery/docs/table-sampling#limitations"
         )
 
     sampling = literal_column(f"{percentage} PERCENT")
     model_sample = tablesample(model, sampling)  # type: ignore
     sampled_alias = aliased(model, model_sample)
-    stmt = select(sampled_alias)
+    stmt = select(sampled_alias).limit(limit)
 
     return run(stmt).to_dataframe()
