@@ -7,6 +7,8 @@ from amora.dash.components import (
     dependency_dag,
     materialization_type_badge,
     model_code,
+    model_columns,
+    model_datatable,
     model_summary,
 )
 from amora.models import Model
@@ -31,16 +33,32 @@ def component(model: Model) -> Component:
                         [
                             dbc.AccordionItem(
                                 model_summary.component(model),
-                                title="Summary",
+                                title="📈 Summary",
+                                item_id="summary",
                             ),
                             dbc.AccordionItem(
-                                model_code.python_component(model), title="Python Code"
+                                model_columns.component(model),
+                                title="📝 Docs",
+                                item_id="docs",
                             ),
                             dbc.AccordionItem(
-                                model_code.sql_component(model), title="SQL Code"
+                                model_datatable.component(model),
+                                title="🍰 Sample dataset",
+                                item_id="sample",
+                            ),
+                            dbc.AccordionItem(
+                                model_code.python_component(model),
+                                title="🐍 Python Code",
+                                item_id="python_code",
+                            ),
+                            dbc.AccordionItem(
+                                model_code.sql_component(model),
+                                title="🏗 SQL Code",
+                                item_id="sql_code",
                             ),
                         ],
                         start_collapsed=True,
+                        id="model-details-accordion",
                     ),
                 ]
             ),
