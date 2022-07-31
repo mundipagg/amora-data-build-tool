@@ -34,7 +34,7 @@ def layout() -> Component:
                         [
                             models_list(models),
                             html.Div(
-                                model_details.component(models[0]),
+                                "Select a model to begin the exploration",
                                 id="model-details",
                             ),
                         ]
