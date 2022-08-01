@@ -56,7 +56,7 @@ def _summarize_columns(model: Model) -> pd.DataFrame:
         _stddev = func.stddev(column) if is_numeric else literal(None)
         _null_percentage = (
             func.safe_divide(
-                (literal(100) * func.countif(column == None)), func.count(column)
+                (literal(100) * func.countif(column == None)), func.count(0)
             )
             if is_supported
             else literal(None)
