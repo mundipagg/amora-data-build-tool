@@ -48,7 +48,7 @@ def icon_for_model(model: Model) -> html.I:
     # fixme: What kind of contract should we expect from the model ?
     icon = getattr(model, "feature_view_fa_icon", None)
     icon = icon() if icon else "fa-square-question"
-    return html.I(className=f"fa-regular {icon}")
+    return html.I(className=f"fa-solid {icon}")
 
 
 def card_item(model: Model, fv: FeatureView) -> Component:
