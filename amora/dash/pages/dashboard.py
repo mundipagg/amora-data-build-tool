@@ -1,3 +1,5 @@
+from typing import Dict
+
 import dash
 import dash_bootstrap_components as dbc
 from dash import Input, Output, dcc, html
@@ -6,7 +8,6 @@ from dash.development.base_component import Component
 from amora.dash.components import question_details
 from amora.dash.components.filters import filter
 from amora.dashboards import Dashboard
-from examples.amora_project.dashboards import steps
 
 dash.register_page(
     __name__,
@@ -16,7 +17,7 @@ dash.register_page(
 )
 
 # fixme: Mocked. Replace me with a call to list_dashboards()
-DASHBOARDS = {steps.dashboard.id: steps.dashboard}
+DASHBOARDS: Dict = {}
 
 
 def render(dashboard: Dashboard) -> Component:
