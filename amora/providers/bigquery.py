@@ -170,7 +170,7 @@ def get_schema(table_id: str) -> Schema:
     return table.schema
 
 
-def column_for_schema_field(schema: SchemaField) -> Column:
+def column_for_schema_field(schema: SchemaField, **kwargs) -> Column:
     """
     Build a `Column` from a `google.cloud.bigquery.schema.SchemaField`
 
@@ -187,7 +187,9 @@ def column_for_schema_field(schema: SchemaField) -> Column:
         else:
             column_type = BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema.field_type]
 
-    return Column(name=schema.name, type_=column_type, comment=schema.description)
+    return Column(
+        name=schema.name, type_=column_type, comment=schema.description, **kwargs
+    )
 
 
 def schema_for_struct(struct: STRUCT) -> Schema:
