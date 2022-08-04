@@ -7,7 +7,7 @@ from typer.testing import CliRunner
 from amora.cli import app
 from amora.utils import clean_compiled_files, list_target_files
 
-runner = CliRunner()
+runner = CliRunner(mix_stderr=False)
 
 
 def setup_function(_module):
@@ -33,8 +33,7 @@ def test_compile_with_models_options(
     # todo: clean_target()
     models_args = [("--model", model) for model in models]
     result = runner.invoke(
-        app,
-        ["compile", *itertools.chain.from_iterable(models_args)],
+        app, ["compile", *itertools.chain.from_iterable(models_args)]
     )
     assert result.exit_code == expected_exit_code
     # todo: adicionar verbosidade e testes sobre o output em stdout
