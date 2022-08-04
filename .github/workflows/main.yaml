@@ -79,7 +79,7 @@ jobs:
       - name: 🧪 Mypy - Static type check
         run: mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --install-types --non-interactive --pretty --no-color-output amora
 
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
           directory: ./mypy_coverage
