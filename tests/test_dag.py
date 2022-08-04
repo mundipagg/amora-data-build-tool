@@ -1,6 +1,7 @@
 from amora.dag import DependencyDAG
 from amora.utils import clean_compiled_files
 
+from tests.models.health import Health
 from tests.models.heart_rate import HeartRate
 
 
@@ -39,6 +40,6 @@ def test_DependencyDAG_from_target():
 
     dag = DependencyDAG.from_target()
     assert list(dag.nodes) == [
-        "amora-data-build-tool.amora.heart_rate",
-        "amora-data-build-tool.amora.health",
+        HeartRate.__table__.fullname,
+        Health.__table__.fullname,
     ]
