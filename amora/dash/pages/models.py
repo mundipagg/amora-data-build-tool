@@ -8,7 +8,9 @@ from dash.development.base_component import Component
 from amora.dash.components import model_details
 from amora.models import Model, amora_model_for_name, list_models
 
-dash.register_page(__name__, fa_icon="fa-database", location="sidebar")
+dash.register_page(
+    __name__, fa_icon="fa-database", location="sidebar", name="Data Models"
+)
 
 
 def models_list(models: List[Model]) -> Component:
@@ -43,6 +45,7 @@ def layout() -> Component:
                 align="start",
             )
         ],
+        style={"min-height": "600px"},
     )
 
 

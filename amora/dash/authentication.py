@@ -9,13 +9,13 @@ from amora.dash.config import settings
 
 def add_auth0_login(dash_app: Dash) -> None:
     flask_app = dash_app.server
-    flask_app.secret_key = settings.APP_SECRET_KEY
+    flask_app.secret_key = settings.APP_SECRET_KEY.get_secret_value()
     oauth = OAuth(flask_app)
 
     oauth.register(
         "auth0",
         client_id=settings.AUTH0_CLIENT_ID,
-        client_secret=settings.AUTH0_CLIENT_SECRET,
+        client_secret=settings.AUTH0_CLIENT_SECRET.get_secret_value(),  # type: ignore
         client_kwargs={
             "scope": settings.AUTH0_SCOPE,
         },

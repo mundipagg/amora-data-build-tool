@@ -1,17 +1,3 @@
-"""
-- Lista de feature views
-    - data lineage
-    - colunas
-        - nome
-        - tipo
-    - nome
-    - total de chaves na online store
-    - summary da offline store
-    - estimativa de custo da online store?
-    - timestamp da última materialização
-
-- cachear informações
-"""
 from typing import Iterable
 
 import dash
@@ -31,7 +17,9 @@ from amora.feature_store import fs as store
 from amora.feature_store.registry import FEATURE_REGISTRY
 from amora.models import Model
 
-dash.register_page(__name__, fa_icon="fa-shopping-cart", location="sidebar")
+dash.register_page(
+    __name__, fa_icon="fa-shopping-cart", location="sidebar", name="Feature Store"
+)
 
 
 def entities_list_items(entities: Iterable[str]):
@@ -89,7 +77,6 @@ def card_item(model: Model, fv: FeatureView) -> Component:
                 ]
             ),
         ],
-        className="w-50",
     )
 
 
@@ -98,9 +85,9 @@ def layout() -> Component:
         fv.name: fv for fv in store.registry.list_feature_views(store.project)
     }
 
-    feature_views = dbc.CardGroup(
+    feature_views = html.Div(
         [
-            card_item(model=model, fv=registry_fvs[fv.name])
+            card_item(model=model, fv=registry_fvs.get(fv.name))
             for (fv, fs, model) in list(FEATURE_REGISTRY.values())
         ]
     )
@@ -108,7 +95,6 @@ def layout() -> Component:
         id="feature-store-content",
         children=[
             html.H1("Feature Store"),
-            html.H2("Registered in this project are:"),
             html.Hr(),
             feature_views,
         ],
