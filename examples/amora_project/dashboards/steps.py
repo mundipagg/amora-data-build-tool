@@ -9,8 +9,8 @@ from examples.amora_project.models.step_count_by_source import (
 )
 
 dashboard = Dashboard(
-    id="1",
-    name=__name__,
+    uid="1",
+    name="Health :: Step Analysis",
     questions=[
         [
             what_is_the_latest_data_point,
