@@ -8,7 +8,7 @@ from pydantic import BaseSettings, validator
 class DashSettings(BaseSettings):
     HTTP_HOST: str = "127.0.0.1"
     HTTP_PORT: str = "8050"
-    DBC_THEME: str = "MATERIA"
+    DBC_THEME: str = "SKETCHY"
     DEBUG: bool = False
 
     APP_SECRET_KEY: str = uuid4().hex
