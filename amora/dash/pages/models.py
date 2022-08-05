@@ -45,6 +45,7 @@ def layout() -> Component:
                 align="start",
             )
         ],
+        style={"min-height": "600px"},
     )
 
 

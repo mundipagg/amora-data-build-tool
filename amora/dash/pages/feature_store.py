@@ -89,7 +89,6 @@ def card_item(model: Model, fv: FeatureView) -> Component:
                 ]
             ),
         ],
-        className="w-50",
     )
 
 
@@ -98,9 +97,9 @@ def layout() -> Component:
         fv.name: fv for fv in store.registry.list_feature_views(store.project)
     }
 
-    feature_views = dbc.CardGroup(
+    feature_views = html.Div(
         [
-            card_item(model=model, fv=registry_fvs[fv.name])
+            card_item(model=model, fv=registry_fvs.get(fv.name))
             for (fv, fs, model) in list(FEATURE_REGISTRY.values())
         ]
     )
