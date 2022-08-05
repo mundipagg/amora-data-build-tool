@@ -243,7 +243,7 @@ def test_schema_for_model():
         SchemaField(name="a_boolean", field_type="BOOLEAN", mode="NULLABLE"),
         SchemaField(name="a_date", field_type="DATE", mode="NULLABLE"),
         SchemaField(name="a_datetime", field_type="DATETIME", mode="NULLABLE"),
-        SchemaField(name="a_float", field_type="FLOAT64", mode="NULLABLE"),
+        SchemaField(name="a_float", field_type="FLOAT", mode="NULLABLE"),
         SchemaField(name="a_string", field_type="STRING", mode="NULLABLE"),
         SchemaField(name="a_time", field_type="TIME", mode="NULLABLE"),
         SchemaField(name="an_int", field_type="INTEGER", mode="NULLABLE"),
