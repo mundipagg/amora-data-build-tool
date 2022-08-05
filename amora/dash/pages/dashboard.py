@@ -5,8 +5,7 @@ from dash.development.base_component import Component
 
 from amora.dash.components import question_details
 from amora.dash.components.filters import filter
-from amora.dashboards import Dashboard
-from examples.amora_project.dashboards import steps
+from amora.dashboards import DASHBOARDS, Dashboard, list_dashboards
 
 dash.register_page(
     __name__,
@@ -15,8 +14,7 @@ dash.register_page(
     path_template="/dashboards/<dashboard_id>",
 )
 
-# fixme: Mocked. Replace me with a call to list_dashboards()
-DASHBOARDS = {steps.dashboard.id: steps.dashboard}
+list_dashboards()
 
 
 def render(dashboard: Dashboard) -> Component:
@@ -36,7 +34,7 @@ def render(dashboard: Dashboard) -> Component:
 
 def dashboards_list():
     options = [
-        {"label": dashboard.name, "value": dashboard.id}
+        {"label": dashboard.name, "value": dashboard.uid}
         for dashboard in DASHBOARDS.values()
     ]
     return dcc.Dropdown(
