@@ -17,7 +17,6 @@ from google.cloud.bigquery import (
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
 from pydantic.fields import SHAPE_LIST
 from sqlalchemy import func, literal, literal_column, tablesample
-from sqlalchemy.orm import aliased
 from sqlalchemy.sql import coercions, expression, operators, roles, sqltypes
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy.sql.sqltypes import ARRAY
@@ -170,7 +169,7 @@ def get_schema(table_id: str) -> Schema:
     return table.schema
 
 
-def column_for_schema_field(schema: SchemaField) -> Column:
+def column_for_schema_field(schema: SchemaField, **kwargs) -> Column:
     """
     Build a `Column` from a `google.cloud.bigquery.schema.SchemaField`
 
@@ -187,7 +186,9 @@ def column_for_schema_field(schema: SchemaField) -> Column:
         else:
             column_type = BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema.field_type]
 
-    return Column(name=schema.name, type_=column_type, comment=schema.description)
+    return Column(
+        name=schema.name, type_=column_type, comment=schema.description, **kwargs
+    )
 
 
 def schema_for_struct(struct: STRUCT) -> Schema:
@@ -774,7 +775,6 @@ def sample(
 
     sampling = literal_column(f"{percentage} PERCENT")
     model_sample = tablesample(model, sampling)  # type: ignore
-    sampled_alias = aliased(model, model_sample)
-    stmt = select(sampled_alias).limit(limit)
+    stmt = select(model_sample).limit(limit)
 
     return run(stmt).to_dataframe()

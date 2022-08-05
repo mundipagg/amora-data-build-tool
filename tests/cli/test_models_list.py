@@ -8,7 +8,7 @@ from typer.testing import CliRunner
 from amora.cli import app
 from amora.models import list_models
 
-runner = CliRunner()
+runner = CliRunner(mix_stderr=False)
 
 AMORA_MODELS_COUNT = len(list(list_models()))
 
@@ -16,10 +16,7 @@ AMORA_MODELS_COUNT = len(list(list_models()))
 @patch("amora.cli.models.dry_run", return_value=None)
 @patch("amora.cli.models.Console")
 def test_list_without_options(Console: MagicMock, dry_run: MagicMock):
-    result = runner.invoke(
-        app,
-        ["models", "list"],
-    )
+    result = runner.invoke(app, ["models", "list"])
 
     assert result.exit_code == 0, result.stderr
 

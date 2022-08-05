@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: 🐍 Install python ${{ matrix.python }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
 
@@ -78,7 +78,7 @@ jobs:
       - name: 🧪 Mypy - Static type check
         run: mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --install-types --non-interactive --pretty --no-color-output amora
 
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
           directory: ./mypy_coverage

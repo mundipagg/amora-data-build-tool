@@ -40,8 +40,8 @@ class RecordRepeatedFields(AmoraModel, table=True):
                     "nodes": array([Node(id="a"), Node(id="b"), Node(id="c")]),
                     "edges": array(
                         [
-                            Edge(from_node="a", to_node="b"),
-                            Edge(from_node="b", to_node="c"),
+                            Edge(from_node=Node(id="a"), to_node=Node(id="b")),
+                            Edge(from_node=Node(id="b"), to_node=Node(id="c")),
                         ]
                     ),
                     "root_node": Node(id="a"),

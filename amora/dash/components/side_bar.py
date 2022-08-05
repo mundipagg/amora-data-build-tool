@@ -26,7 +26,7 @@ def nav() -> dbc.Nav:
         [
             dbc.NavLink(
                 [
-                    html.I(className=f"fa-regular {page.get('fa_icon')}"),
+                    html.I(className=f"fa-solid {page.get('fa_icon')}"),
                     " ",
                     page["name"],
                 ],

@@ -1,5 +1,4 @@
-import dash_table
-from dash import html
+from dash import dash_table, html
 
 from amora.models import Model
 from amora.providers.bigquery import sample
