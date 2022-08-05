@@ -17,7 +17,6 @@ from google.cloud.bigquery import (
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
 from pydantic.fields import SHAPE_LIST
 from sqlalchemy import func, literal, literal_column, tablesample
-from sqlalchemy.orm import aliased
 from sqlalchemy.sql import coercions, expression, operators, roles, sqltypes
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy.sql.sqltypes import ARRAY
@@ -776,7 +775,6 @@ def sample(
 
     sampling = literal_column(f"{percentage} PERCENT")
     model_sample = tablesample(model, sampling)  # type: ignore
-    sampled_alias = aliased(model, model_sample)
-    stmt = select(sampled_alias).limit(limit)
+    stmt = select(model_sample).limit(limit)
 
     return run(stmt).to_dataframe()
