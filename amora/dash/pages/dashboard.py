@@ -11,6 +11,7 @@ dash.register_page(
     __name__,
     fa_icon="fa-chart-line",
     location="sidebar",
+    path="/dashboards",
     path_template="/dashboards/<dashboard_id>",
 )
 
@@ -32,7 +33,7 @@ def render(dashboard: Dashboard) -> Component:
     return html.Div([html.Div(filters), html.Div(questions)])
 
 
-def dashboards_list():
+def dashboards_dropdown() -> Component:
     options = [
         {"label": dashboard.name, "value": dashboard.uid}
         for dashboard in DASHBOARDS.values()
@@ -45,17 +46,22 @@ def dashboards_list():
     )
 
 
+def dashboards_selector() -> Component:
+    return html.Div(
+        [
+            html.H1("🧑‍🔬 Select a dashboard and start exploring"),
+            dashboards_dropdown(),
+        ],
+        id="dashboard-content",
+        style={"min-height": "600px"},
+    )
+
+
 def layout(dashboard_id: str = None) -> Component:
-    dashboard = DASHBOARDS.get(dashboard_id)
-    if not dashboard:
-        return html.Div(
-            [
-                html.H1("🧑‍🔬 Select a dashboard and start exploring"),
-                dashboards_list(),
-            ],
-            id="dashboard-content",
-            style={"min-height": "600px"},
-        )
+    if not dashboard_id:
+        return dashboards_selector()
+
+    dashboard = DASHBOARDS[dashboard_id]
     return html.Div([html.H1(dashboard.name), render(dashboard)])
 
 
