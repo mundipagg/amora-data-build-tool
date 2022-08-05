@@ -125,7 +125,7 @@ def dashboard_for_path(path: Path) -> Dashboard:
 
 
 def list_dashboards(
-    path: Path = settings.DASHBOARDS_PATH,
+    path: Path = settings.dashboards_path,
 ) -> Dict[DashboardUid, Dashboard]:
     """
     Searches for python files with

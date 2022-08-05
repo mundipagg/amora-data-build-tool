@@ -93,5 +93,20 @@ class Settings(BaseSettings):
             raise ValueError(f"{v.as_posix()} must be a valid directory")
         return v
 
+    @property
+    def models_path(self) -> Path:
+        assert isinstance(self.MODELS_PATH, Path)
+        return self.MODELS_PATH
+
+    @property
+    def target_path(self) -> Path:
+        assert isinstance(self.TARGET_PATH, Path)
+        return self.TARGET_PATH
+
+    @property
+    def dashboards_path(self) -> Path:
+        assert isinstance(self.DASHBOARDS_PATH, Path)
+        return self.DASHBOARDS_PATH
+
 
 settings = Settings()
