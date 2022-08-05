@@ -1,6 +1,5 @@
 import json
 from dataclasses import dataclass
-from pathlib import Path
 from typing import List, Optional
 
 import typer
@@ -205,7 +204,7 @@ def models_import(
     project, dataset, table = table_reference.split(".")
     model_name = "".join(part.title() for part in table.split("_"))
 
-    destination_file_path = Path(settings.MODELS_PATH).joinpath(
+    destination_file_path = settings.models_path.joinpath(
         (model_file_path or model_name.replace(".", "/")) + ".py"
     )
 

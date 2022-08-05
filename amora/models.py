@@ -187,10 +187,10 @@ class AmoraModel(SQLModel):
     @classmethod
     def target_path(cls, model_file_path: Union[str, Path]) -> Path:
         # {settings.dbt_models_path}/a_model/a_model.py -> a_model/a_model.py
-        strip_path = settings.MODELS_PATH.as_posix()
+        strip_path = settings.models_path.as_posix()
         relative_model_path = str(model_file_path).split(strip_path)[1][1:]
         # a_model/a_model.py -> ~/project/amora/target/a_model/a_model.sql
-        target_file_path = settings.TARGET_PATH.joinpath(
+        target_file_path = settings.target_path.joinpath(
             relative_model_path.replace(".py", ".sql")
         )
 
@@ -268,7 +268,7 @@ def amora_model_for_name(model_name: str) -> Model:
 
 
 def list_models(
-    path: Path = settings.MODELS_PATH,
+    path: Path = settings.models_path,
 ) -> Iterable[Tuple[Model, Path]]:
     for model_file_path in list_files(path, suffix=".py"):
         if model_file_path.stem.startswith("_"):

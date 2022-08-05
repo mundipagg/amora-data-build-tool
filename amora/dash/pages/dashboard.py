@@ -1,5 +1,3 @@
-from typing import Dict
-
 import dash
 import dash_bootstrap_components as dbc
 from dash import Input, Output, dcc, html
@@ -7,17 +5,17 @@ from dash.development.base_component import Component
 
 from amora.dash.components import question_details
 from amora.dash.components.filters import filter
-from amora.dashboards import Dashboard
+from amora.dashboards import DASHBOARDS, Dashboard, list_dashboards
 
 dash.register_page(
     __name__,
     fa_icon="fa-chart-line",
     location="sidebar",
+    path="/dashboards",
     path_template="/dashboards/<dashboard_id>",
 )
 
-# fixme: Mocked. Replace me with a call to list_dashboards()
-DASHBOARDS: Dict = {}
+list_dashboards()
 
 
 def render(dashboard: Dashboard) -> Component:
@@ -35,9 +33,9 @@ def render(dashboard: Dashboard) -> Component:
     return html.Div([html.Div(filters), html.Div(questions)])
 
 
-def dashboards_list():
+def dashboards_dropdown() -> Component:
     options = [
-        {"label": dashboard.name, "value": dashboard.id}
+        {"label": dashboard.name, "value": dashboard.uid}
         for dashboard in DASHBOARDS.values()
     ]
     return dcc.Dropdown(
@@ -48,16 +46,22 @@ def dashboards_list():
     )
 
 
+def dashboards_selector() -> Component:
+    return html.Div(
+        [
+            html.H1("🧑‍🔬 Select a dashboard and start exploring"),
+            dashboards_dropdown(),
+        ],
+        id="dashboard-content",
+        style={"min-height": "600px"},
+    )
+
+
 def layout(dashboard_id: str = None) -> Component:
-    dashboard = DASHBOARDS.get(dashboard_id)
-    if not dashboard:
-        return html.Div(
-            [
-                html.H1(f"Dashboard not found for id `{dashboard_id}`"),
-                dashboards_list(),
-            ],
-            id="dashboard-content",
-        )
+    if not dashboard_id:
+        return dashboards_selector()
+
+    dashboard = DASHBOARDS[dashboard_id]
     return html.Div([html.H1(dashboard.name), render(dashboard)])
 
 

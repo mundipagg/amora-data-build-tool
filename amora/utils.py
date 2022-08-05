@@ -12,7 +12,7 @@ def list_files(path: Union[str, Path], suffix: str) -> Iterable[Path]:
 def model_path_for_target_path(path: Path) -> Path:
     return Path(
         str(path)
-        .replace(settings.TARGET_PATH.as_posix(), settings.MODELS_PATH.as_posix())
+        .replace(settings.target_path.as_posix(), settings.models_path.as_posix())
         .replace(".sql", ".py"),
     )
 
@@ -20,7 +20,7 @@ def model_path_for_target_path(path: Path) -> Path:
 def target_path_for_model_path(path: Path) -> Path:
     return Path(
         str(path)
-        .replace(settings.MODELS_PATH.as_posix(), settings.TARGET_PATH.as_posix())
+        .replace(settings.models_path.as_posix(), settings.target_path.as_posix())
         .replace(".py", ".sql")
     )
 
@@ -31,4 +31,4 @@ def clean_compiled_files() -> None:
 
 
 def list_target_files() -> Iterable[Path]:
-    return list_files(settings.TARGET_PATH, suffix=".sql")
+    return list_files(settings.target_path, suffix=".sql")

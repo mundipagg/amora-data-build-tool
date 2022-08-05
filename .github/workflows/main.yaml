@@ -6,9 +6,8 @@ on:
 
 env:
   gcp_service_account: ${{ secrets.GCP_SA_KEY }}
-  AMORA_MODELS_PATH: "${{ github.workspace }}/tests/models"
+  AMORA_PROJECT_PATH: "${{ github.workspace }}/tests"
   AMORA_TARGET_SCHEMA: amora
-  AMORA_TARGET_PATH: "${{ github.workspace }}/tests/target"
   AMORA_TARGET_PROJECT: amora-data-build-tool
 
 jobs:
