@@ -94,7 +94,7 @@ SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES = {
     sqltypes.Boolean: "BOOLEAN",
     sqltypes.Date: "DATE",
     sqltypes.DateTime: "DATETIME",
-    sqltypes.Float: "FLOAT64",
+    sqltypes.Float: "FLOAT",
     sqltypes.Integer: "INTEGER",
     sqltypes.JSON: "JSON",
     sqltypes.Numeric: "NUMERIC",
