@@ -2,7 +2,7 @@ from typing import List, Optional
 from uuid import uuid4
 
 import dash_bootstrap_components as dbc
-from pydantic import BaseSettings, validator
+from pydantic import BaseSettings, SecretStr, validator
 
 
 class DashSettings(BaseSettings):
@@ -11,10 +11,10 @@ class DashSettings(BaseSettings):
     DBC_THEME: str = "SKETCHY"
     DEBUG: bool = False
 
-    APP_SECRET_KEY: str = uuid4().hex
+    APP_SECRET_KEY: SecretStr = SecretStr(uuid4().hex)
 
     AUTH0_CLIENT_ID: Optional[str] = None
-    AUTH0_CLIENT_SECRET: Optional[str] = None
+    AUTH0_CLIENT_SECRET: Optional[SecretStr] = None
     AUTH0_DOMAIN: Optional[str] = None
     AUTH0_LOGIN_PATH: str = "/login"
     AUTH0_LOGOUT_PATH: str = "/logout"
