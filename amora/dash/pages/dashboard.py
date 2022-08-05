@@ -50,10 +50,11 @@ def layout(dashboard_id: str = None) -> Component:
     if not dashboard:
         return html.Div(
             [
-                html.H1(f"Dashboard not found for id `{dashboard_id}`"),
+                html.H1("🧑‍🔬 Select a dashboard and start exploring"),
                 dashboards_list(),
             ],
             id="dashboard-content",
+            style={"min-height": "600px"},
         )
     return html.Div([html.H1(dashboard.name), render(dashboard)])
 
