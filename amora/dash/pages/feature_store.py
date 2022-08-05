@@ -1,17 +1,3 @@
-"""
-- Lista de feature views
-    - data lineage
-    - colunas
-        - nome
-        - tipo
-    - nome
-    - total de chaves na online store
-    - summary da offline store
-    - estimativa de custo da online store?
-    - timestamp da última materialização
-
-- cachear informações
-"""
 from typing import Iterable
 
 import dash
@@ -31,7 +17,9 @@ from amora.feature_store import fs as store
 from amora.feature_store.registry import FEATURE_REGISTRY
 from amora.models import Model
 
-dash.register_page(__name__, fa_icon="fa-shopping-cart", location="sidebar")
+dash.register_page(
+    __name__, fa_icon="fa-shopping-cart", location="sidebar", name="Feature Store"
+)
 
 
 def entities_list_items(entities: Iterable[str]):
@@ -107,7 +95,6 @@ def layout() -> Component:
         id="feature-store-content",
         children=[
             html.H1("Feature Store"),
-            html.H2("Registered in this project are:"),
             html.Hr(),
             feature_views,
         ],
