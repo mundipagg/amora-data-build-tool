@@ -23,9 +23,11 @@ class StorageCacheProviders(str, Enum):
 class Settings(BaseSettings):
     TARGET_PROJECT: str
     TARGET_SCHEMA: str
+
     PROJECT_PATH: Path
-    TARGET_PATH: Optional[Path]
+    DASHBOARDS_PATH: Optional[Path]
     MODELS_PATH: Optional[Path]
+    TARGET_PATH: Optional[Path]
 
     CLI_CONSOLE_MAX_WIDTH: int = 160
     CLI_MATERIALIZATION_DAG_FIGURE_SIZE: Tuple[_Width, _Height] = (32, 32)
@@ -65,6 +67,14 @@ class Settings(BaseSettings):
         return values
 
     @root_validator
+    def compute_DASHBOARDS_PATH(cls, values: dict) -> dict:
+        if values["DASHBOARDS_PATH"] is not None:
+            return values
+
+        values["DASHBOARDS_PATH"] = values["PROJECT_PATH"].joinpath("dashboards")
+        return values
+
+    @root_validator
     def compute_TARGET_PATH(cls, values: dict) -> dict:
         if values["TARGET_PATH"] is not None:
             return values
@@ -76,10 +86,6 @@ class Settings(BaseSettings):
         values["TARGET_PATH"] = target_path
 
         return values
-
-    @property
-    def DASHBOARDS_PATH(self) -> Path:
-        return self.PROJECT_PATH.joinpath("dashboards")
 
     @validator("PROJECT_PATH")
     def project_path_is_a_valid_path(cls, v: Path) -> Path:
