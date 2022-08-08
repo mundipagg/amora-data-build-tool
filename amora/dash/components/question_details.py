@@ -3,11 +3,17 @@ import plotly.express as px
 from dash import dash_table, dcc, html
 from dash.development.base_component import Component
 
+from amora.logger import logger
 from amora.questions import Question
-from amora.visualization import BarChart, BigNumber, LineChart, PieChart, Visualization
+from amora.visualization import BarChart, BigNumber, LineChart, PieChart
 
 
-def answer_visualization(visualization: Visualization) -> Component:
+def answer_visualization(question: Question) -> Component:
+    try:
+        visualization = question.render()
+    except Exception:
+        logger.exception("Unable to render question answer")
+        return dbc.Alert("⚠️ Unable to render question answer", color="warning")
     view_config = visualization.config
 
     df = visualization.data
@@ -62,7 +68,7 @@ def component(question: Question) -> Component:
         children=dbc.CardBody(
             [
                 html.H5(question.name, className="card-title"),
-                answer_visualization(question.render()),
+                answer_visualization(question),
                 dbc.Accordion(
                     [
                         dbc.AccordionItem(
