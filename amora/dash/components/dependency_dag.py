@@ -1,6 +1,6 @@
 import dash_bootstrap_components as dbc
 import dash_cytoscape
-from dash import html
+from dash import Input, Output, callback, dcc
 from dash.development.base_component import Component
 
 from amora.dag import DependencyDAG
@@ -32,6 +32,17 @@ def component(dag: DependencyDAG, height: str = "400px") -> Component:
                     },
                 ],
                 responsive=True,
-            )
+            ),
+            dbc.Row(id="cytoscape-output"),
         ],
     )
+
+
+@callback(
+    Output("cytoscape-output", "children"),
+    Input("cytoscape-layout", "tapNodeData"),
+    prevent_initial_call=True,
+)
+def redirect_to_model(data):
+    unique_identifier = data["id"]
+    return dcc.Location(pathname=f"/models/{unique_identifier}", id=unique_identifier)
