@@ -2,8 +2,10 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import Input, Output, dcc, html
 from dash.development.base_component import Component
+from dash_extensions import Lottie
 
 from amora.dash.components import question_details
+from amora.dash.components.animation import Lotties
 from amora.dash.components.filters import filter
 from amora.dashboards import DASHBOARDS, Dashboard, list_dashboards
 
@@ -51,6 +53,15 @@ def dashboards_selector() -> Component:
         [
             html.H1("🧑‍🔬 Select a dashboard and start exploring"),
             dashboards_dropdown(),
+            Lottie(
+                options=dict(
+                    loop=True,
+                    autoplay=True,
+                    rendererSettings=dict(preserveAspectRatio="xMidYMid slice"),
+                ),
+                width="70%",
+                url=Lotties.green_bi_dashboard,
+            ),
         ],
         id="dashboard-content",
         style={"min-height": "600px"},
