@@ -4,8 +4,9 @@ import networkx as nx
 from matplotlib import pyplot as plt
 
 from amora.config import settings
+from amora.feature_store.feature_view import is_feature_view
 from amora.materialization import Task
-from amora.models import Model
+from amora.models import MaterializationTypes, Model
 from amora.utils import list_target_files
 
 
@@ -20,12 +21,11 @@ class DependencyDAG(nx.DiGraph):
         Builds the DependencyDAG for a given model
         """
         dag = cls()
-        dag.add_node(model.unique_name)
+        dag.add_node(model)
 
-        # fixme: percorrer de forma não recursiva
         def fetch_edges(node: Model):
             for dependency in getattr(node, "__depends_on__", []):
-                dag.add_edge(dependency.unique_name, node.unique_name)
+                dag.add_edge(dependency, node)
                 fetch_edges(dependency)
 
         fetch_edges(model)
@@ -36,9 +36,9 @@ class DependencyDAG(nx.DiGraph):
         dag = cls()
 
         for task in tasks:
-            dag.add_node(task.model.unique_name)
+            dag.add_node(task.model)
             for dependency in getattr(task.model, "__depends_on__", []):
-                dag.add_edge(dependency.unique_name, task.model.unique_name)
+                dag.add_edge(dependency, task.model)
 
         return dag
 
@@ -76,12 +76,36 @@ class DependencyDAG(nx.DiGraph):
         ]
         ```
         """
-        # todo: Estilizar nó de acordo com o tipo de materialização
-        # todo: Adicionar metadados para cytoscape
+
+        def border_color_for_model(model: Model) -> str:
+            if is_feature_view(model):
+                return "green"
+            return "grey"
+
+        def background_color_for_model(model: Model) -> str:
+            return {
+                MaterializationTypes.table: "black",
+                MaterializationTypes.view: "grey",
+                MaterializationTypes.ephemeral: "white",
+            }[model.__model_config__.materialized]
+
         return [
-            *({"data": {"id": node, "label": node}} for node in self.nodes),
             *(
-                {"data": {"source": source, "target": target}}
+                {
+                    "data": {
+                        "id": model.unique_name,
+                        "label": model.__tablename__,
+                    },
+                    "style": {
+                        "border-color": border_color_for_model(model),
+                        "border-width": 3,
+                        "background-color": background_color_for_model(model),
+                    },
+                }
+                for model in self.nodes
+            ),
+            *(
+                {"data": {"source": source.unique_name, "target": target.unique_name}}
                 for source, target in self.edges
             ),
         ]
