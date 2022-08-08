@@ -48,3 +48,20 @@ class DashSettings(BaseSettings):
 
 
 settings = DashSettings()
+
+
+class Size(str, Enum):
+    extra_small = "xs"
+    small = "sm"
+    medium = "md"
+    large = "lg"
+    extra_large = "xl"
+
+
+class Color(str, Enum):
+    primary = "primary"
+    secondary = "secondary"
+    success = "success"
+    warning = "warning"
+    info = "info"
+    danger = "danger"
