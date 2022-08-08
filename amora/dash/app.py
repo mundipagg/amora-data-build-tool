@@ -1,14 +1,11 @@
-from typing import Optional
-
 import dash
 import dash_bootstrap_components as dbc
 from dash_extensions import EventListener
-from dash_extensions.enrich import Dash, Input, Output, State, dcc
+from dash_extensions.enrich import Dash, dcc
 
 from amora.dash.authentication import add_auth0_login
 from amora.dash.components import side_bar
 from amora.dash.config import settings
-from amora.logger import logger
 from amora.models import list_models
 
 dash_app = Dash(
@@ -18,6 +15,12 @@ dash_app = Dash(
 if settings.auth0_login_enabled:
     add_auth0_login(dash_app)
 
+LISTENABLE_EVENTS = [
+    {
+        "event": "keydown",
+        "props": ["key", "altKey", "ctrlKey", "shiftKey", "metaKey"],
+    },
+]
 # App
 dash_app.layout = dbc.Container(
     children=[

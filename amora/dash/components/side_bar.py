@@ -4,7 +4,7 @@ import dash
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 from authlib.oidc.core import UserInfo
-from dash import html
+from dash import State, html
 from dash.development.base_component import Component
 from dash_extensions.enrich import Input, Output, callback
 from flask import session
@@ -38,6 +38,9 @@ def nav() -> dbc.Nav:
     )
 
 
+layout_id = "side-bar"
+
+
 def layout() -> Component:
     return dbc.Offcanvas(
         [
@@ -54,7 +57,7 @@ def layout() -> Component:
                 )
             ),
         ],
-        id="side-bar",
+        id=layout_id,
         is_open=True,
     )
 
@@ -70,3 +73,16 @@ def display_user(pathname):
         )
     else:
         return user_avatar.layout(user["userinfo"])
+
+
+@callback(
+    Output(layout_id, "is_open"),
+    Input("event-listener", "n_events"),
+    [State(layout_id, "is_open"), State("event-listener", "event")],
+)
+def toggle_menu_on_keydown(
+    n_events: Optional[int], is_open: bool, event: Optional[dict]
+) -> bool:
+    if n_events and event["metaKey"]:
+        return not is_open
+    return is_open
