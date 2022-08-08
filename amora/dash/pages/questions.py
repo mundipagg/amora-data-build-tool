@@ -19,7 +19,8 @@ def questions_selector() -> Component:
         id="questions-selector",
         placeholder="🔍 Search or select",
         options=[
-            {"label": question.name, "value": question.uid} for question in QUESTIONS
+            {"label": question.name, "value": question.uid}
+            for question in sorted(QUESTIONS, key=lambda q: q.name)
         ],
         multi=True,
         searchable=True,
