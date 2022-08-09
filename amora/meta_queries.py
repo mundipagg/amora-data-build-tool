@@ -21,7 +21,7 @@ from amora.providers.bigquery import run
 from amora.storage import cache
 
 
-@cache(suffix=lambda model: f"{model.unique_name}.{date.today()}")
+@cache(suffix=lambda model: f"{model.unique_name()}.{date.today()}")
 def summarize(model: Model) -> pd.DataFrame:
     return _summarize_columns(model)
 

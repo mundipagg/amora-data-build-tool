@@ -742,7 +742,7 @@ def zip_arrays(
 def _sample_cache_key(
     model, percentage=1, limit=settings.GCP_BIGQUERY_DEFAULT_LIMIT_SIZE
 ) -> str:
-    return f"{model.unique_name}.{percentage}.{limit}.{date.today()}"
+    return f"{model.unique_name()}.{percentage}.{limit}.{date.today()}"
 
 
 @cache(_sample_cache_key)

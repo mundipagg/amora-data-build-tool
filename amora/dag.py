@@ -20,12 +20,12 @@ class DependencyDAG(nx.DiGraph):
         Builds the DependencyDAG for a given model
         """
         dag = cls()
-        dag.add_node(model.unique_name)
+        dag.add_node(model.unique_name())
 
         # fixme: percorrer de forma não recursiva
         def fetch_edges(node: Model):
             for dependency in getattr(node, "__depends_on__", []):
-                dag.add_edge(dependency.unique_name, node.unique_name)
+                dag.add_edge(dependency.unique_name(), node.unique_name())
                 fetch_edges(dependency)
 
         fetch_edges(model)
@@ -36,9 +36,9 @@ class DependencyDAG(nx.DiGraph):
         dag = cls()
 
         for task in tasks:
-            dag.add_node(task.model.unique_name)
+            dag.add_node(task.model.unique_name())
             for dependency in getattr(task.model, "__depends_on__", []):
-                dag.add_edge(dependency.unique_name, task.model.unique_name)
+                dag.add_edge(dependency.unique_name(), task.model.unique_name())
 
         return dag
 
@@ -57,7 +57,7 @@ class DependencyDAG(nx.DiGraph):
                 continue
 
             task = Task.for_target(target_file_path)
-            model_to_task[task.model.unique_name] = task
+            model_to_task[task.model.unique_name()] = task
 
         return cls.from_tasks(tasks=model_to_task.values())
 

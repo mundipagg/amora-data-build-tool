@@ -25,5 +25,5 @@ def component(model: Model) -> Component:
             style_cell={"textAlign": "left"},
             style_as_list_view=True,
         ),
-        id=f"model-columns-{model.unique_name}",
+        id=f"model-columns-{model.unique_name()}",
     )

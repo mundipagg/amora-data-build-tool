@@ -20,8 +20,8 @@ def test_models_page(amora_dash: DashComposite):
         )
 
         amora_dash.select_dcc_dropdown(
-            "div#model-select-dropdown", value=StepCountBySource.unique_name
+            "div#model-select-dropdown", value=StepCountBySource.unique_name()
         )
         amora_dash.wait_for_text_to_equal(
-            selector="H4.card-title", text=StepCountBySource.unique_name
+            selector="H4.card-title", text=StepCountBySource.unique_name()
         )
