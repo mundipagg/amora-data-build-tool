@@ -12,7 +12,7 @@ from amora.models import (
     ModelConfig,
     select,
 )
-from amora.types import Compilable
+from amora.protocols import Compilable
 from examples.amora_project.models.heart_rate import HeartRate
 
 
