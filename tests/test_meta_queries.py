@@ -147,7 +147,9 @@ def health_model_summary():
 
 def test_summarize(health_model_summary):
     summary = summarize(Health)
-    assert summary.to_dict(orient="records") == health_model_summary
+    assert sorted(
+        summary.to_dict(orient="records"), key=lambda column: column["column_name"]
+    ) == sorted(health_model_summary, key=lambda column: column["column_name"])
 
 
 @pytest.fixture(scope="module")
@@ -223,4 +225,6 @@ def step_count_by_source_model_summary():
 
 def test_summarize_feature_view_model(step_count_by_source_model_summary):
     summary = summarize(StepCountBySource).to_dict(orient="records")
-    assert summary == step_count_by_source_model_summary
+    assert sorted(summary, key=lambda column: column["column_name"]) == sorted(
+        step_count_by_source_model_summary, key=lambda column: column["column_name"]
+    )

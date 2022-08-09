@@ -62,6 +62,10 @@ mkdocs-jupyter = "^0.21.0"
 pandas-stubs = "^1.2.0"
 freezegun = "^1.2.1"
 selenium = "^4.2.0"
+types-Markdown = "^3.4.0"
+types-typed-ast = "^1.5.7"
+types-setuptools = "^63.4.0"
+types-protobuf = "^3.19.22"
 
 [tool.poetry.extras]
 feature-store = ["feast", "prometheus-fastapi-instrumentator"]

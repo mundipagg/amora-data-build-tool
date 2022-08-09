@@ -18,12 +18,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [ '3.9' ]
-        experimental: [ false ]
+        python: ["3.9"]
+        experimental: [false]
         include:
-          - python: '3.8'
+          - python: "3.8"
             experimental: true
-          - python: '3.10'
+          - python: "3.10"
             experimental: true
     steps:
       - name: 🚧 Install OS dependencies
@@ -41,18 +41,17 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ~/cache
             ~/.cache
-            !~/cache/exclude
+            ${{ github.workspace }}/.venv
           key: ${{ runner.os }}-${{ matrix.python }}-${{ hashFiles('poetry.lock') }}
 
       - name: 🐍 Install Pip and Poetry
-        run: pip install -U pip==21.2.4 poetry==1.1.9
+        run: pip install -U pip==22.2.2 poetry==1.1.14
 
       - name: 🐍 poetry install - Installing python dependencies
-        run: poetry install --no-interaction -E feature-store -E dash
+        run: poetry install --no-interaction -E feature-store -E dash --remove-untracked
         env:
-          POETRY_VIRTUALENVS_CREATE: false
+          POETRY_VIRTUALENVS_IN_PROJECT: true
 
       - name: 🚧 GCP Auth
         uses: "google-github-actions/auth@v0"
@@ -62,21 +61,11 @@ jobs:
       - name: 🚧 Set up GCP SDK
         uses: "google-github-actions/setup-gcloud@v0"
 
-      - name: 🎨 Black - Python format check
-        run: black -v --check amora tests
-
       - name: 🧪 pytest
-        run: py.test --headless --cov=amora --cov-report=term-missing --cov-report=xml ./tests
-
-      - name: 🧪 SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        if: ${{ matrix.python == '3.10' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: poetry run py.test --headless --cov=amora --cov-report=term-missing --cov-report=xml ./tests
 
       - name: 🧪 Mypy - Static type check
-        run: mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --install-types --non-interactive --pretty --no-color-output amora
+        run: poetry run mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --pretty --no-color-output amora
 
       - uses: codecov/codecov-action@v3
         with:
@@ -90,10 +79,11 @@ jobs:
           path: |
             coverage.xml
             .mypy_coverage
-          retention-days: 7
+          retention-days: 3
 
       - name: 📝 Build documentation
-        run: mkdocs build
+        if: ${{ matrix.python == '3.9' }}
+        run: poetry run mkdocs build
 
       - name: 📝 Deploy documentation
         uses: JamesIves/github-pages-deploy-action@v4
