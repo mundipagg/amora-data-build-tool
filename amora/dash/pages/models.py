@@ -14,7 +14,7 @@ dash.register_page(
 
 
 def models_list(models: List[Model]) -> Component:
-    options = [model.unique_name for model in models]
+    options = [model.unique_name() for model in models]
 
     return dcc.Dropdown(
         options=options,

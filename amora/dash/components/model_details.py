@@ -19,7 +19,7 @@ def component(model: Model) -> Component:
     return dbc.Card(
         [
             dbc.CardHeader(
-                html.H4(model.unique_name, className="card-title"),
+                html.H4(model.unique_name(), className="card-title"),
             ),
             dbc.CardBody(
                 [

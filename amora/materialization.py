@@ -35,7 +35,7 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
     client = Client()
 
     if materialization == MaterializationTypes.view:
-        table_name = model.unique_name
+        table_name = model.unique_name()
 
         view = Table(table_name)
         view.description = config.description
@@ -49,14 +49,14 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
         query_job = client.query(
             sql,
             job_config=QueryJobConfig(
-                destination=model.unique_name,
+                destination=model.unique_name(),
                 write_disposition="WRITE_TRUNCATE",
             ),
         )
 
         result = query_job.result()
 
-        table = client.get_table(model.unique_name)
+        table = client.get_table(model.unique_name())
         table.description = config.description
         table.labels = config.labels_dict
 

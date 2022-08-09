@@ -201,7 +201,6 @@ class AmoraModel(SQLModel):
         return Path(getfile(cls))
 
     @classmethod
-    @property
     def unique_name(cls) -> str:
         return str(cls.__table__)
 
@@ -255,14 +254,14 @@ def model_path_for_model(model: Model) -> Path:
     Returns the filepath where the model is defined.
     """
     for m, path in list_models():
-        if m.unique_name == model.unique_name:
+        if m.unique_name() == model.unique_name():
             return path
     raise FileNotFoundError("Model file not found in the project")
 
 
 def amora_model_for_name(model_name: str) -> Model:
     for model, path in list_models():
-        if model.unique_name == model_name:
+        if model.unique_name() == model_name:
             return model
     raise ValueError(f"{model_name} not found on models list")
 

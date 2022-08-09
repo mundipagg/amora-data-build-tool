@@ -37,7 +37,7 @@ def test_model_with_compilable_source():
 
 
 def test_amora_model_for_name():
-    model = amora_model_for_name(Health.unique_name)
+    model = amora_model_for_name(Health.unique_name())
 
     assert issubclass(model, AmoraModel)
     assert model.__table__ == Health.__table__
@@ -49,7 +49,7 @@ def test_select_models_with_labels():
     assert len(models) == 1
     [(model, model_path)] = models
 
-    assert model.unique_name == StepCountBySource.unique_name
+    assert model.unique_name() == StepCountBySource.unique_name()
     assert model_path == StepCountBySource.model_file_path()
 
 
@@ -63,7 +63,7 @@ def test_select_models_with_label_keys():
     assert len(models) == 1
     [(model, model_path)] = models
 
-    assert model.unique_name == StepCountBySource.unique_name
+    assert model.unique_name() == StepCountBySource.unique_name()
     assert model_path == StepCountBySource.model_file_path()
 
 

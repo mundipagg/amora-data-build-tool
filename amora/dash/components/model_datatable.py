@@ -8,7 +8,7 @@ def component(model: Model) -> dash_table.DataTable:
     try:
         df = sample(model, percentage=1)
     except ValueError:
-        return html.Div(f"Sample not implemented for model {model.unique_name}")
+        return html.Div(f"Sample not implemented for model {model.unique_name()}")
     else:
         return dash_table.DataTable(
             data=df.to_dict("records"),

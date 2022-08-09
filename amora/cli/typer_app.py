@@ -69,7 +69,7 @@ def materialize(
             continue
 
         task = materialization.Task.for_target(target_file_path)
-        model_to_task[task.model.unique_name] = task
+        model_to_task[task.model.unique_name()] = task
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 

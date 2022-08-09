@@ -78,7 +78,7 @@ def test_materialize_as_view(Client: MagicMock):
     client = Client.return_value
 
     client.delete_table.assert_called_once_with(
-        ViewModel.unique_name, not_found_ok=True
+        ViewModel.unique_name(), not_found_ok=True
     )
 
     assert client.create_table.call_count == 1
@@ -114,12 +114,12 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
 
     client = Client.return_value
 
-    client.get_table.assert_called_once_with(TableModel.unique_name)
+    client.get_table.assert_called_once_with(TableModel.unique_name())
 
     client.query.assert_called_once_with(
         "SELECT 1",
         job_config=QueryJobConfig(
-            destination=TableModel.unique_name,
+            destination=TableModel.unique_name(),
             write_disposition="WRITE_TRUNCATE",
         ),
     )
@@ -161,12 +161,12 @@ def test_materialize_as_table_without_clustering_configuration(
 
     client = Client.return_value
 
-    client.get_table.assert_called_once_with(TableModel.unique_name)
+    client.get_table.assert_called_once_with(TableModel.unique_name())
 
     client.query.assert_called_once_with(
         "SELECT 1",
         job_config=QueryJobConfig(
-            destination=TableModel.unique_name,
+            destination=TableModel.unique_name(),
             write_disposition="WRITE_TRUNCATE",
         ),
     )
