@@ -9,10 +9,10 @@ from sqlmodel.sql.expression import SelectOfScalar
 
 from amora.config import settings
 from amora.models import AmoraModel, ColumnElement, Session, select
+from amora.protocols import Compilable
 from amora.providers.bigquery import RunResult, estimated_query_cost_in_usd, run
 from amora.storage import local_engine
 from amora.tests.audit import AuditLog
-from amora.types import Compilable
 
 Test = Callable[..., SelectOfScalar]
 

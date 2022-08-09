@@ -5,9 +5,9 @@ import pandas as pd
 from sqlalchemy.sql import Selectable
 
 from amora.compilation import compile_statement
+from amora.protocols import Compilable
 from amora.providers.bigquery import run
 from amora.storage import cache
-from amora.types import Compilable
 from amora.visualization import Table, Visualization, VisualizationConfig
 
 QuestionFunc = Callable[[], Compilable]

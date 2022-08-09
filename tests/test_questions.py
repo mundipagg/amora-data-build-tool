@@ -4,8 +4,8 @@ import pytest
 from sqlalchemy import literal
 
 from amora.models import select
+from amora.protocols import Compilable
 from amora.questions import QUESTIONS, Question, question
-from amora.types import Compilable
 from amora.visualization import Visualization
 
 

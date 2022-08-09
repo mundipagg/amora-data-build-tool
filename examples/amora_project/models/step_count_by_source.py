@@ -13,9 +13,9 @@ from amora.models import (
     ModelConfig,
     select,
 )
+from amora.protocols import Compilable
 from amora.questions import question
 from amora.transformations import datetime_trunc_hour
-from amora.types import Compilable
 from amora.visualization import BigNumber, LineChart, PieChart
 from examples.amora_project.models.steps import Steps
 

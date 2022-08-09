@@ -37,8 +37,8 @@ from amora.models import (
     Model,
     select,
 )
+from amora.protocols import Compilable
 from amora.storage import cache
-from amora.types import Compilable
 from amora.version import VERSION
 
 Schema = List[SchemaField]

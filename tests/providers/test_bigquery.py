@@ -15,6 +15,7 @@ from sqlalchemy_bigquery.base import BQArray
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.models import AmoraModel, Field
+from amora.protocols import Compilable
 from amora.providers.bigquery import (
     DryRunResult,
     array,
@@ -31,7 +32,6 @@ from amora.providers.bigquery import (
     struct_for_model,
     zip_arrays,
 )
-from amora.types import Compilable
 
 from tests.models.health import Health
 from tests.models.heart_rate import HeartRate

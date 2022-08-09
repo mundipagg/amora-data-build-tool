@@ -26,8 +26,7 @@ from sqlmodel import Field, Session, SQLModel, create_engine
 
 from amora.config import settings
 from amora.logger import logger
-from amora.protocols import CompilableProtocol
-from amora.types import Compilable
+from amora.protocols import Compilable, CompilableProtocol
 from amora.utils import list_files, model_path_for_target_path
 
 select = select
