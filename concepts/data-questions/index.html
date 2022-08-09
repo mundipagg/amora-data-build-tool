@@ -201,7 +201,8 @@
 <span class=normal><a href=#__codelineno-0-198>198</a></span>
 <span class=normal><a href=#__codelineno-0-199>199</a></span>
 <span class=normal><a href=#__codelineno-0-200>200</a></span>
-<span class=normal><a href=#__codelineno-0-201>201</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-16 name=__codelineno-0-16></a><span class=k>class</span> <span class=nc>Question</span><span class=p>:</span>
+<span class=normal><a href=#__codelineno-0-201>201</a></span>
+<span class=normal><a href=#__codelineno-0-202>202</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-16 name=__codelineno-0-16></a><span class=k>class</span> <span class=nc>Question</span><span class=p>:</span>
 <a id=__codelineno-0-17 name=__codelineno-0-17></a>    <span class=sd>&quot;&quot;&quot;</span>
 <a id=__codelineno-0-18 name=__codelineno-0-18></a><span class=sd>    A Data Question is a __query__, its __results__, and its __visualization__.</span>
 <a id=__codelineno-0-19 name=__codelineno-0-19></a>
@@ -315,85 +316,85 @@
 <a id=__codelineno-0-127 name=__codelineno-0-127></a><span class=sd>        &#39;&#39;&#39;</span>
 <a id=__codelineno-0-128 name=__codelineno-0-128></a>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__doc__</span><span class=p>:</span>
 <a id=__codelineno-0-129 name=__codelineno-0-129></a>            <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__doc__</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span>
-<a id=__codelineno-0-130 name=__codelineno-0-130></a>        <span class=k>elif</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span> <span class=o>==</span> <span class=s2>&quot;&lt;lambda&gt;&quot;</span><span class=p>:</span>
-<a id=__codelineno-0-131 name=__codelineno-0-131></a>            <span class=k>raise</span> <span class=ne>NotImplementedError</span>
-<a id=__codelineno-0-132 name=__codelineno-0-132></a>        <span class=k>else</span><span class=p>:</span>
-<a id=__codelineno-0-133 name=__codelineno-0-133></a>            <span class=n>question</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s2>&quot;_&quot;</span><span class=p>,</span> <span class=s2>&quot; &quot;</span><span class=p>)</span>
-<a id=__codelineno-0-134 name=__codelineno-0-134></a>            <span class=k>return</span> <span class=n>question</span><span class=o>.</span><span class=n>capitalize</span><span class=p>()</span> <span class=o>+</span> <span class=s2>&quot;?&quot;</span>
-<a id=__codelineno-0-135 name=__codelineno-0-135></a>
-<a id=__codelineno-0-136 name=__codelineno-0-136></a>    <span class=nd>@property</span>
-<a id=__codelineno-0-137 name=__codelineno-0-137></a>    <span class=k>def</span> <span class=nf>sql</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
-<a id=__codelineno-0-138 name=__codelineno-0-138></a>        <span class=sd>&quot;&quot;&quot;</span>
-<a id=__codelineno-0-139 name=__codelineno-0-139></a><span class=sd>        Returns the Question as SQL. E.g:</span>
-<a id=__codelineno-0-140 name=__codelineno-0-140></a>
-<a id=__codelineno-0-141 name=__codelineno-0-141></a><span class=sd>        ```sql</span>
-<a id=__codelineno-0-142 name=__codelineno-0-142></a><span class=sd>        SELECT sum(`step_count_by_source`.`value_count`) AS `total`</span>
-<a id=__codelineno-0-143 name=__codelineno-0-143></a><span class=sd>        FROM `amora-data-build-tool.amora`.`step_count_by_source`</span>
-<a id=__codelineno-0-144 name=__codelineno-0-144></a><span class=sd>        ```</span>
-<a id=__codelineno-0-145 name=__codelineno-0-145></a><span class=sd>        &quot;&quot;&quot;</span>
-<a id=__codelineno-0-146 name=__codelineno-0-146></a>        <span class=n>stmt</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=p>()</span>
-<a id=__codelineno-0-147 name=__codelineno-0-147></a>        <span class=k>return</span> <span class=n>compile_statement</span><span class=p>(</span><span class=n>stmt</span><span class=p>)</span>
-<a id=__codelineno-0-148 name=__codelineno-0-148></a>
-<a id=__codelineno-0-149 name=__codelineno-0-149></a>    <span class=nd>@cache</span><span class=p>(</span><span class=n>suffix</span><span class=o>=</span><span class=k>lambda</span> <span class=bp>self</span><span class=p>:</span> <span class=sa>f</span><span class=s2>&quot;</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span><span class=si>}</span><span class=s2>.</span><span class=si>{</span><span class=n>date</span><span class=o>.</span><span class=n>today</span><span class=p>()</span><span class=si>}</span><span class=s2>&quot;</span><span class=p>)</span>
-<a id=__codelineno-0-150 name=__codelineno-0-150></a>    <span class=k>def</span> <span class=nf>answer_df</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>pd</span><span class=o>.</span><span class=n>DataFrame</span><span class=p>:</span>
-<a id=__codelineno-0-151 name=__codelineno-0-151></a>        <span class=sd>&quot;&quot;&quot;</span>
-<a id=__codelineno-0-152 name=__codelineno-0-152></a><span class=sd>        Executes the question against the target database,</span>
-<a id=__codelineno-0-153 name=__codelineno-0-153></a><span class=sd>        returning a `pandas.DataFrame` as the answer.</span>
-<a id=__codelineno-0-154 name=__codelineno-0-154></a>
-<a id=__codelineno-0-155 name=__codelineno-0-155></a><span class=sd>        ```python</span>
-<a id=__codelineno-0-156 name=__codelineno-0-156></a><span class=sd>        what_is_the_current_estimated_walked_distance.answer_df()</span>
-<a id=__codelineno-0-157 name=__codelineno-0-157></a><span class=sd>        ```</span>
-<a id=__codelineno-0-158 name=__codelineno-0-158></a>
-<a id=__codelineno-0-159 name=__codelineno-0-159></a><span class=sd>        ```</span>
-<a id=__codelineno-0-160 name=__codelineno-0-160></a><span class=sd>           total_in_centimeters  total_in_meters  total_in_kilometers   source_name</span>
-<a id=__codelineno-0-161 name=__codelineno-0-161></a><span class=sd>        0            93030637.0        930306.37            930.30637  Diogo iPhone</span>
-<a id=__codelineno-0-162 name=__codelineno-0-162></a><span class=sd>        1           112413129.0       1124131.29           1124.13129        Mi Fit</span>
-<a id=__codelineno-0-163 name=__codelineno-0-163></a><span class=sd>        2            11644600.0        116446.00            116.44600        iPhone</span>
-<a id=__codelineno-0-164 name=__codelineno-0-164></a><span class=sd>        ```</span>
-<a id=__codelineno-0-165 name=__codelineno-0-165></a><span class=sd>        &quot;&quot;&quot;</span>
-<a id=__codelineno-0-166 name=__codelineno-0-166></a>        <span class=n>result</span> <span class=o>=</span> <span class=n>run</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=p>())</span>
-<a id=__codelineno-0-167 name=__codelineno-0-167></a>        <span class=k>return</span> <span class=n>result</span><span class=o>.</span><span class=n>rows</span><span class=o>.</span><span class=n>to_dataframe</span><span class=p>(</span><span class=n>create_bqstorage_client</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
-<a id=__codelineno-0-168 name=__codelineno-0-168></a>
-<a id=__codelineno-0-169 name=__codelineno-0-169></a>    <span class=k>def</span> <span class=nf>render</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Visualization</span><span class=p>:</span>
-<a id=__codelineno-0-170 name=__codelineno-0-170></a>        <span class=sd>&quot;&quot;&quot;</span>
-<a id=__codelineno-0-171 name=__codelineno-0-171></a><span class=sd>        Renders the visual representation of the question&#39;s answer</span>
-<a id=__codelineno-0-172 name=__codelineno-0-172></a><span class=sd>        &quot;&quot;&quot;</span>
-<a id=__codelineno-0-173 name=__codelineno-0-173></a>        <span class=k>return</span> <span class=n>Visualization</span><span class=p>(</span><span class=n>data</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>answer_df</span><span class=p>(),</span> <span class=n>config</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>view_config</span><span class=p>)</span>
-<a id=__codelineno-0-174 name=__codelineno-0-174></a>
-<a id=__codelineno-0-175 name=__codelineno-0-175></a>    <span class=k>def</span> <span class=nf>to_markdown</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
-<a id=__codelineno-0-176 name=__codelineno-0-176></a>        <span class=k>return</span> <span class=sa>f</span><span class=s2>&quot;&quot;&quot;</span>
-<a id=__codelineno-0-177 name=__codelineno-0-177></a><span class=s2>            ## </span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>name</span><span class=si>}</span><span class=s2></span>
-<a id=__codelineno-0-178 name=__codelineno-0-178></a>
-<a id=__codelineno-0-179 name=__codelineno-0-179></a><span class=s2>            ```sql</span>
-<a id=__codelineno-0-180 name=__codelineno-0-180></a><span class=s2>            </span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>sql</span><span class=si>}</span><span class=s2></span>
-<a id=__codelineno-0-181 name=__codelineno-0-181></a><span class=s2>            ```</span>
-<a id=__codelineno-0-182 name=__codelineno-0-182></a>
-<a id=__codelineno-0-183 name=__codelineno-0-183></a><span class=s2>            ### Answer</span>
-<a id=__codelineno-0-184 name=__codelineno-0-184></a>
-<a id=__codelineno-0-185 name=__codelineno-0-185></a><span class=s2>            </span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>answer_df</span><span class=p>()</span><span class=o>.</span><span class=n>to_markdown</span><span class=p>()</span><span class=si>}</span><span class=s2></span>
-<a id=__codelineno-0-186 name=__codelineno-0-186></a><span class=s2>        &quot;&quot;&quot;</span>
-<a id=__codelineno-0-187 name=__codelineno-0-187></a>
-<a id=__codelineno-0-188 name=__codelineno-0-188></a>    <span class=k>def</span> <span class=nf>_repr_markdown_</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
-<a id=__codelineno-0-189 name=__codelineno-0-189></a>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>to_markdown</span><span class=p>()</span>
-<a id=__codelineno-0-190 name=__codelineno-0-190></a>
-<a id=__codelineno-0-191 name=__codelineno-0-191></a>    <span class=k>def</span> <span class=fm>__repr__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
-<a id=__codelineno-0-192 name=__codelineno-0-192></a>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>_repr_markdown_</span><span class=p>()</span>
-<a id=__codelineno-0-193 name=__codelineno-0-193></a>
-<a id=__codelineno-0-194 name=__codelineno-0-194></a>    <span class=k>def</span> <span class=fm>__eq__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>
-<a id=__codelineno-0-195 name=__codelineno-0-195></a>        <span class=k>if</span> <span class=ow>not</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>other</span><span class=p>,</span> <span class=n>Question</span><span class=p>):</span>
-<a id=__codelineno-0-196 name=__codelineno-0-196></a>            <span class=k>return</span> <span class=kc>False</span>
-<a id=__codelineno-0-197 name=__codelineno-0-197></a>
-<a id=__codelineno-0-198 name=__codelineno-0-198></a>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span> <span class=o>==</span> <span class=n>other</span><span class=o>.</span><span class=n>question_func</span>
-<a id=__codelineno-0-199 name=__codelineno-0-199></a>
-<a id=__codelineno-0-200 name=__codelineno-0-200></a>    <span class=k>def</span> <span class=fm>__hash__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
-<a id=__codelineno-0-201 name=__codelineno-0-201></a>        <span class=k>return</span> <span class=nb>hash</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=p>)</span>
+<a id=__codelineno-0-130 name=__codelineno-0-130></a>
+<a id=__codelineno-0-131 name=__codelineno-0-131></a>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span> <span class=o>==</span> <span class=s2>&quot;&lt;lambda&gt;&quot;</span><span class=p>:</span>
+<a id=__codelineno-0-132 name=__codelineno-0-132></a>            <span class=k>raise</span> <span class=ne>NotImplementedError</span>
+<a id=__codelineno-0-133 name=__codelineno-0-133></a>
+<a id=__codelineno-0-134 name=__codelineno-0-134></a>        <span class=n>question</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s2>&quot;_&quot;</span><span class=p>,</span> <span class=s2>&quot; &quot;</span><span class=p>)</span>
+<a id=__codelineno-0-135 name=__codelineno-0-135></a>        <span class=k>return</span> <span class=n>question</span><span class=o>.</span><span class=n>capitalize</span><span class=p>()</span> <span class=o>+</span> <span class=s2>&quot;?&quot;</span>
+<a id=__codelineno-0-136 name=__codelineno-0-136></a>
+<a id=__codelineno-0-137 name=__codelineno-0-137></a>    <span class=nd>@property</span>
+<a id=__codelineno-0-138 name=__codelineno-0-138></a>    <span class=k>def</span> <span class=nf>sql</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+<a id=__codelineno-0-139 name=__codelineno-0-139></a>        <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-140 name=__codelineno-0-140></a><span class=sd>        Returns the Question as SQL. E.g:</span>
+<a id=__codelineno-0-141 name=__codelineno-0-141></a>
+<a id=__codelineno-0-142 name=__codelineno-0-142></a><span class=sd>        ```sql</span>
+<a id=__codelineno-0-143 name=__codelineno-0-143></a><span class=sd>        SELECT sum(`step_count_by_source`.`value_count`) AS `total`</span>
+<a id=__codelineno-0-144 name=__codelineno-0-144></a><span class=sd>        FROM `amora-data-build-tool.amora`.`step_count_by_source`</span>
+<a id=__codelineno-0-145 name=__codelineno-0-145></a><span class=sd>        ```</span>
+<a id=__codelineno-0-146 name=__codelineno-0-146></a><span class=sd>        &quot;&quot;&quot;</span>
+<a id=__codelineno-0-147 name=__codelineno-0-147></a>        <span class=n>stmt</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=p>()</span>
+<a id=__codelineno-0-148 name=__codelineno-0-148></a>        <span class=k>return</span> <span class=n>compile_statement</span><span class=p>(</span><span class=n>stmt</span><span class=p>)</span>
+<a id=__codelineno-0-149 name=__codelineno-0-149></a>
+<a id=__codelineno-0-150 name=__codelineno-0-150></a>    <span class=nd>@cache</span><span class=p>(</span><span class=n>suffix</span><span class=o>=</span><span class=k>lambda</span> <span class=bp>self</span><span class=p>:</span> <span class=sa>f</span><span class=s2>&quot;</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span><span class=si>}</span><span class=s2>.</span><span class=si>{</span><span class=n>date</span><span class=o>.</span><span class=n>today</span><span class=p>()</span><span class=si>}</span><span class=s2>&quot;</span><span class=p>)</span>
+<a id=__codelineno-0-151 name=__codelineno-0-151></a>    <span class=k>def</span> <span class=nf>answer_df</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>pd</span><span class=o>.</span><span class=n>DataFrame</span><span class=p>:</span>
+<a id=__codelineno-0-152 name=__codelineno-0-152></a>        <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-153 name=__codelineno-0-153></a><span class=sd>        Executes the question against the target database,</span>
+<a id=__codelineno-0-154 name=__codelineno-0-154></a><span class=sd>        returning a `pandas.DataFrame` as the answer.</span>
+<a id=__codelineno-0-155 name=__codelineno-0-155></a>
+<a id=__codelineno-0-156 name=__codelineno-0-156></a><span class=sd>        ```python</span>
+<a id=__codelineno-0-157 name=__codelineno-0-157></a><span class=sd>        what_is_the_current_estimated_walked_distance.answer_df()</span>
+<a id=__codelineno-0-158 name=__codelineno-0-158></a><span class=sd>        ```</span>
+<a id=__codelineno-0-159 name=__codelineno-0-159></a>
+<a id=__codelineno-0-160 name=__codelineno-0-160></a><span class=sd>        ```</span>
+<a id=__codelineno-0-161 name=__codelineno-0-161></a><span class=sd>           total_in_centimeters  total_in_meters  total_in_kilometers   source_name</span>
+<a id=__codelineno-0-162 name=__codelineno-0-162></a><span class=sd>        0            93030637.0        930306.37            930.30637  Diogo iPhone</span>
+<a id=__codelineno-0-163 name=__codelineno-0-163></a><span class=sd>        1           112413129.0       1124131.29           1124.13129        Mi Fit</span>
+<a id=__codelineno-0-164 name=__codelineno-0-164></a><span class=sd>        2            11644600.0        116446.00            116.44600        iPhone</span>
+<a id=__codelineno-0-165 name=__codelineno-0-165></a><span class=sd>        ```</span>
+<a id=__codelineno-0-166 name=__codelineno-0-166></a><span class=sd>        &quot;&quot;&quot;</span>
+<a id=__codelineno-0-167 name=__codelineno-0-167></a>        <span class=n>result</span> <span class=o>=</span> <span class=n>run</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=p>())</span>
+<a id=__codelineno-0-168 name=__codelineno-0-168></a>        <span class=k>return</span> <span class=n>result</span><span class=o>.</span><span class=n>rows</span><span class=o>.</span><span class=n>to_dataframe</span><span class=p>(</span><span class=n>create_bqstorage_client</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+<a id=__codelineno-0-169 name=__codelineno-0-169></a>
+<a id=__codelineno-0-170 name=__codelineno-0-170></a>    <span class=k>def</span> <span class=nf>render</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Visualization</span><span class=p>:</span>
+<a id=__codelineno-0-171 name=__codelineno-0-171></a>        <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-172 name=__codelineno-0-172></a><span class=sd>        Renders the visual representation of the question&#39;s answer</span>
+<a id=__codelineno-0-173 name=__codelineno-0-173></a><span class=sd>        &quot;&quot;&quot;</span>
+<a id=__codelineno-0-174 name=__codelineno-0-174></a>        <span class=k>return</span> <span class=n>Visualization</span><span class=p>(</span><span class=n>data</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>answer_df</span><span class=p>(),</span> <span class=n>config</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>view_config</span><span class=p>)</span>
+<a id=__codelineno-0-175 name=__codelineno-0-175></a>
+<a id=__codelineno-0-176 name=__codelineno-0-176></a>    <span class=k>def</span> <span class=nf>to_markdown</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+<a id=__codelineno-0-177 name=__codelineno-0-177></a>        <span class=k>return</span> <span class=sa>f</span><span class=s2>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-178 name=__codelineno-0-178></a><span class=s2>            ## </span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>name</span><span class=si>}</span><span class=s2></span>
+<a id=__codelineno-0-179 name=__codelineno-0-179></a>
+<a id=__codelineno-0-180 name=__codelineno-0-180></a><span class=s2>            ```sql</span>
+<a id=__codelineno-0-181 name=__codelineno-0-181></a><span class=s2>            </span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>sql</span><span class=si>}</span><span class=s2></span>
+<a id=__codelineno-0-182 name=__codelineno-0-182></a><span class=s2>            ```</span>
+<a id=__codelineno-0-183 name=__codelineno-0-183></a>
+<a id=__codelineno-0-184 name=__codelineno-0-184></a><span class=s2>            ### Answer</span>
+<a id=__codelineno-0-185 name=__codelineno-0-185></a>
+<a id=__codelineno-0-186 name=__codelineno-0-186></a><span class=s2>            </span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>answer_df</span><span class=p>()</span><span class=o>.</span><span class=n>to_markdown</span><span class=p>()</span><span class=si>}</span><span class=s2></span>
+<a id=__codelineno-0-187 name=__codelineno-0-187></a><span class=s2>        &quot;&quot;&quot;</span>
+<a id=__codelineno-0-188 name=__codelineno-0-188></a>
+<a id=__codelineno-0-189 name=__codelineno-0-189></a>    <span class=k>def</span> <span class=nf>_repr_markdown_</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+<a id=__codelineno-0-190 name=__codelineno-0-190></a>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>to_markdown</span><span class=p>()</span>
+<a id=__codelineno-0-191 name=__codelineno-0-191></a>
+<a id=__codelineno-0-192 name=__codelineno-0-192></a>    <span class=k>def</span> <span class=fm>__repr__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+<a id=__codelineno-0-193 name=__codelineno-0-193></a>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>_repr_markdown_</span><span class=p>()</span>
+<a id=__codelineno-0-194 name=__codelineno-0-194></a>
+<a id=__codelineno-0-195 name=__codelineno-0-195></a>    <span class=k>def</span> <span class=fm>__eq__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>
+<a id=__codelineno-0-196 name=__codelineno-0-196></a>        <span class=k>if</span> <span class=ow>not</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>other</span><span class=p>,</span> <span class=n>Question</span><span class=p>):</span>
+<a id=__codelineno-0-197 name=__codelineno-0-197></a>            <span class=k>return</span> <span class=kc>False</span>
+<a id=__codelineno-0-198 name=__codelineno-0-198></a>
+<a id=__codelineno-0-199 name=__codelineno-0-199></a>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span> <span class=o>==</span> <span class=n>other</span><span class=o>.</span><span class=n>question_func</span>
+<a id=__codelineno-0-200 name=__codelineno-0-200></a>
+<a id=__codelineno-0-201 name=__codelineno-0-201></a>    <span class=k>def</span> <span class=fm>__hash__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+<a id=__codelineno-0-202 name=__codelineno-0-202></a>        <span class=k>return</span> <span class=nb>hash</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=p>)</span>
 </code></pre></div></td></tr></table></div> </details> <div class="doc doc-children"> <div class="doc doc-object doc-function"> <h3 id=amora.questions.Question.answer_df class="doc doc-heading"> <code class="highlight language-python"><span class=n>answer_df</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=n>pd</span><span class=o>.</span><span class=n>DataFrame</span></code> <a href=#amora.questions.Question.answer_df class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents "> <p>Executes the question against the target database, returning a <code>pandas.DataFrame</code> as the answer.</p> <div class=highlight><pre><span></span><code><a id=__codelineno-0-1 name=__codelineno-0-1 href=#__codelineno-0-1></a><span class=n>what_is_the_current_estimated_walked_distance</span><span class=o>.</span><span class=n>answer_df</span><span class=p>()</span>
 </code></pre></div> <div class=highlight><pre><span></span><code><a id=__codelineno-1-1 name=__codelineno-1-1 href=#__codelineno-1-1></a>   total_in_centimeters  total_in_meters  total_in_kilometers   source_name
 <a id=__codelineno-1-2 name=__codelineno-1-2 href=#__codelineno-1-2></a>0            93030637.0        930306.37            930.30637  Diogo iPhone
 <a id=__codelineno-1-3 name=__codelineno-1-3 href=#__codelineno-1-3></a>1           112413129.0       1124131.29           1124.13129        Mi Fit
 <a id=__codelineno-1-4 name=__codelineno-1-4 href=#__codelineno-1-4></a>2            11644600.0        116446.00            116.44600        iPhone
-</code></pre></div> <details class=quote> <summary>Source code in <code>amora/questions.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-149>149</a></span>
-<span class=normal><a href=#__codelineno-0-150>150</a></span>
+</code></pre></div> <details class=quote> <summary>Source code in <code>amora/questions.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-150>150</a></span>
 <span class=normal><a href=#__codelineno-0-151>151</a></span>
 <span class=normal><a href=#__codelineno-0-152>152</a></span>
 <span class=normal><a href=#__codelineno-0-153>153</a></span>
@@ -410,25 +411,26 @@
 <span class=normal><a href=#__codelineno-0-164>164</a></span>
 <span class=normal><a href=#__codelineno-0-165>165</a></span>
 <span class=normal><a href=#__codelineno-0-166>166</a></span>
-<span class=normal><a href=#__codelineno-0-167>167</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-149 name=__codelineno-0-149></a><span class=nd>@cache</span><span class=p>(</span><span class=n>suffix</span><span class=o>=</span><span class=k>lambda</span> <span class=bp>self</span><span class=p>:</span> <span class=sa>f</span><span class=s2>&quot;</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span><span class=si>}</span><span class=s2>.</span><span class=si>{</span><span class=n>date</span><span class=o>.</span><span class=n>today</span><span class=p>()</span><span class=si>}</span><span class=s2>&quot;</span><span class=p>)</span>
-<a id=__codelineno-0-150 name=__codelineno-0-150></a><span class=k>def</span> <span class=nf>answer_df</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>pd</span><span class=o>.</span><span class=n>DataFrame</span><span class=p>:</span>
-<a id=__codelineno-0-151 name=__codelineno-0-151></a>    <span class=sd>&quot;&quot;&quot;</span>
-<a id=__codelineno-0-152 name=__codelineno-0-152></a><span class=sd>    Executes the question against the target database,</span>
-<a id=__codelineno-0-153 name=__codelineno-0-153></a><span class=sd>    returning a `pandas.DataFrame` as the answer.</span>
-<a id=__codelineno-0-154 name=__codelineno-0-154></a>
-<a id=__codelineno-0-155 name=__codelineno-0-155></a><span class=sd>    ```python</span>
-<a id=__codelineno-0-156 name=__codelineno-0-156></a><span class=sd>    what_is_the_current_estimated_walked_distance.answer_df()</span>
-<a id=__codelineno-0-157 name=__codelineno-0-157></a><span class=sd>    ```</span>
-<a id=__codelineno-0-158 name=__codelineno-0-158></a>
-<a id=__codelineno-0-159 name=__codelineno-0-159></a><span class=sd>    ```</span>
-<a id=__codelineno-0-160 name=__codelineno-0-160></a><span class=sd>       total_in_centimeters  total_in_meters  total_in_kilometers   source_name</span>
-<a id=__codelineno-0-161 name=__codelineno-0-161></a><span class=sd>    0            93030637.0        930306.37            930.30637  Diogo iPhone</span>
-<a id=__codelineno-0-162 name=__codelineno-0-162></a><span class=sd>    1           112413129.0       1124131.29           1124.13129        Mi Fit</span>
-<a id=__codelineno-0-163 name=__codelineno-0-163></a><span class=sd>    2            11644600.0        116446.00            116.44600        iPhone</span>
-<a id=__codelineno-0-164 name=__codelineno-0-164></a><span class=sd>    ```</span>
-<a id=__codelineno-0-165 name=__codelineno-0-165></a><span class=sd>    &quot;&quot;&quot;</span>
-<a id=__codelineno-0-166 name=__codelineno-0-166></a>    <span class=n>result</span> <span class=o>=</span> <span class=n>run</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=p>())</span>
-<a id=__codelineno-0-167 name=__codelineno-0-167></a>    <span class=k>return</span> <span class=n>result</span><span class=o>.</span><span class=n>rows</span><span class=o>.</span><span class=n>to_dataframe</span><span class=p>(</span><span class=n>create_bqstorage_client</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+<span class=normal><a href=#__codelineno-0-167>167</a></span>
+<span class=normal><a href=#__codelineno-0-168>168</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-150 name=__codelineno-0-150></a><span class=nd>@cache</span><span class=p>(</span><span class=n>suffix</span><span class=o>=</span><span class=k>lambda</span> <span class=bp>self</span><span class=p>:</span> <span class=sa>f</span><span class=s2>&quot;</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span><span class=si>}</span><span class=s2>.</span><span class=si>{</span><span class=n>date</span><span class=o>.</span><span class=n>today</span><span class=p>()</span><span class=si>}</span><span class=s2>&quot;</span><span class=p>)</span>
+<a id=__codelineno-0-151 name=__codelineno-0-151></a><span class=k>def</span> <span class=nf>answer_df</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>pd</span><span class=o>.</span><span class=n>DataFrame</span><span class=p>:</span>
+<a id=__codelineno-0-152 name=__codelineno-0-152></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-153 name=__codelineno-0-153></a><span class=sd>    Executes the question against the target database,</span>
+<a id=__codelineno-0-154 name=__codelineno-0-154></a><span class=sd>    returning a `pandas.DataFrame` as the answer.</span>
+<a id=__codelineno-0-155 name=__codelineno-0-155></a>
+<a id=__codelineno-0-156 name=__codelineno-0-156></a><span class=sd>    ```python</span>
+<a id=__codelineno-0-157 name=__codelineno-0-157></a><span class=sd>    what_is_the_current_estimated_walked_distance.answer_df()</span>
+<a id=__codelineno-0-158 name=__codelineno-0-158></a><span class=sd>    ```</span>
+<a id=__codelineno-0-159 name=__codelineno-0-159></a>
+<a id=__codelineno-0-160 name=__codelineno-0-160></a><span class=sd>    ```</span>
+<a id=__codelineno-0-161 name=__codelineno-0-161></a><span class=sd>       total_in_centimeters  total_in_meters  total_in_kilometers   source_name</span>
+<a id=__codelineno-0-162 name=__codelineno-0-162></a><span class=sd>    0            93030637.0        930306.37            930.30637  Diogo iPhone</span>
+<a id=__codelineno-0-163 name=__codelineno-0-163></a><span class=sd>    1           112413129.0       1124131.29           1124.13129        Mi Fit</span>
+<a id=__codelineno-0-164 name=__codelineno-0-164></a><span class=sd>    2            11644600.0        116446.00            116.44600        iPhone</span>
+<a id=__codelineno-0-165 name=__codelineno-0-165></a><span class=sd>    ```</span>
+<a id=__codelineno-0-166 name=__codelineno-0-166></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-167 name=__codelineno-0-167></a>    <span class=n>result</span> <span class=o>=</span> <span class=n>run</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=p>())</span>
+<a id=__codelineno-0-168 name=__codelineno-0-168></a>    <span class=k>return</span> <span class=n>result</span><span class=o>.</span><span class=n>rows</span><span class=o>.</span><span class=n>to_dataframe</span><span class=p>(</span><span class=n>create_bqstorage_client</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
 </code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h3 id=amora.questions.Question.name class="doc doc-heading"> <code class="highlight language-python"><span class=n>name</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=nb>str</span></code> <span class="doc doc-properties"> <small class="doc doc-label doc-label-property"><code>property</code></small> </span> <a href=#amora.questions.Question.name class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents "> <p>Human readable question name. E.g.:</p> <div class=highlight><pre><span></span><code><a id=__codelineno-0-1 name=__codelineno-0-1 href=#__codelineno-0-1></a><span class=nd>@question</span>
 <a id=__codelineno-0-2 name=__codelineno-0-2 href=#__codelineno-0-2></a><span class=k>def</span> <span class=nf>what_is_the_most_active_user</span><span class=p>():</span>
 <a id=__codelineno-0-3 name=__codelineno-0-3 href=#__codelineno-0-3></a>    <span class=o>...</span>
@@ -481,7 +483,8 @@
 <span class=normal><a href=#__codelineno-0-131>131</a></span>
 <span class=normal><a href=#__codelineno-0-132>132</a></span>
 <span class=normal><a href=#__codelineno-0-133>133</a></span>
-<span class=normal><a href=#__codelineno-0-134>134</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-95 name=__codelineno-0-95></a><span class=nd>@property</span>
+<span class=normal><a href=#__codelineno-0-134>134</a></span>
+<span class=normal><a href=#__codelineno-0-135>135</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-95 name=__codelineno-0-95></a><span class=nd>@property</span>
 <a id=__codelineno-0-96 name=__codelineno-0-96></a><span class=k>def</span> <span class=nf>name</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
 <a id=__codelineno-0-97 name=__codelineno-0-97></a>    <span class=sd>&#39;&#39;&#39;</span>
 <a id=__codelineno-0-98 name=__codelineno-0-98></a><span class=sd>    Human readable question name. E.g.:</span>
@@ -516,24 +519,24 @@
 <a id=__codelineno-0-127 name=__codelineno-0-127></a><span class=sd>    &#39;&#39;&#39;</span>
 <a id=__codelineno-0-128 name=__codelineno-0-128></a>    <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__doc__</span><span class=p>:</span>
 <a id=__codelineno-0-129 name=__codelineno-0-129></a>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__doc__</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span>
-<a id=__codelineno-0-130 name=__codelineno-0-130></a>    <span class=k>elif</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span> <span class=o>==</span> <span class=s2>&quot;&lt;lambda&gt;&quot;</span><span class=p>:</span>
-<a id=__codelineno-0-131 name=__codelineno-0-131></a>        <span class=k>raise</span> <span class=ne>NotImplementedError</span>
-<a id=__codelineno-0-132 name=__codelineno-0-132></a>    <span class=k>else</span><span class=p>:</span>
-<a id=__codelineno-0-133 name=__codelineno-0-133></a>        <span class=n>question</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s2>&quot;_&quot;</span><span class=p>,</span> <span class=s2>&quot; &quot;</span><span class=p>)</span>
-<a id=__codelineno-0-134 name=__codelineno-0-134></a>        <span class=k>return</span> <span class=n>question</span><span class=o>.</span><span class=n>capitalize</span><span class=p>()</span> <span class=o>+</span> <span class=s2>&quot;?&quot;</span>
-</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h3 id=amora.questions.Question.render class="doc doc-heading"> <code class="highlight language-python"><span class=n>render</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=n>Visualization</span></code> <a href=#amora.questions.Question.render class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents "> <p>Renders the visual representation of the question's answer</p> <details class=quote> <summary>Source code in <code>amora/questions.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-169>169</a></span>
-<span class=normal><a href=#__codelineno-0-170>170</a></span>
+<a id=__codelineno-0-130 name=__codelineno-0-130></a>
+<a id=__codelineno-0-131 name=__codelineno-0-131></a>    <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span> <span class=o>==</span> <span class=s2>&quot;&lt;lambda&gt;&quot;</span><span class=p>:</span>
+<a id=__codelineno-0-132 name=__codelineno-0-132></a>        <span class=k>raise</span> <span class=ne>NotImplementedError</span>
+<a id=__codelineno-0-133 name=__codelineno-0-133></a>
+<a id=__codelineno-0-134 name=__codelineno-0-134></a>    <span class=n>question</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=o>.</span><span class=vm>__name__</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s2>&quot;_&quot;</span><span class=p>,</span> <span class=s2>&quot; &quot;</span><span class=p>)</span>
+<a id=__codelineno-0-135 name=__codelineno-0-135></a>    <span class=k>return</span> <span class=n>question</span><span class=o>.</span><span class=n>capitalize</span><span class=p>()</span> <span class=o>+</span> <span class=s2>&quot;?&quot;</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h3 id=amora.questions.Question.render class="doc doc-heading"> <code class="highlight language-python"><span class=n>render</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=n>Visualization</span></code> <a href=#amora.questions.Question.render class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents "> <p>Renders the visual representation of the question's answer</p> <details class=quote> <summary>Source code in <code>amora/questions.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-170>170</a></span>
 <span class=normal><a href=#__codelineno-0-171>171</a></span>
 <span class=normal><a href=#__codelineno-0-172>172</a></span>
-<span class=normal><a href=#__codelineno-0-173>173</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-169 name=__codelineno-0-169></a><span class=k>def</span> <span class=nf>render</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Visualization</span><span class=p>:</span>
-<a id=__codelineno-0-170 name=__codelineno-0-170></a>    <span class=sd>&quot;&quot;&quot;</span>
-<a id=__codelineno-0-171 name=__codelineno-0-171></a><span class=sd>    Renders the visual representation of the question&#39;s answer</span>
-<a id=__codelineno-0-172 name=__codelineno-0-172></a><span class=sd>    &quot;&quot;&quot;</span>
-<a id=__codelineno-0-173 name=__codelineno-0-173></a>    <span class=k>return</span> <span class=n>Visualization</span><span class=p>(</span><span class=n>data</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>answer_df</span><span class=p>(),</span> <span class=n>config</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>view_config</span><span class=p>)</span>
+<span class=normal><a href=#__codelineno-0-173>173</a></span>
+<span class=normal><a href=#__codelineno-0-174>174</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-170 name=__codelineno-0-170></a><span class=k>def</span> <span class=nf>render</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Visualization</span><span class=p>:</span>
+<a id=__codelineno-0-171 name=__codelineno-0-171></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-172 name=__codelineno-0-172></a><span class=sd>    Renders the visual representation of the question&#39;s answer</span>
+<a id=__codelineno-0-173 name=__codelineno-0-173></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-174 name=__codelineno-0-174></a>    <span class=k>return</span> <span class=n>Visualization</span><span class=p>(</span><span class=n>data</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>answer_df</span><span class=p>(),</span> <span class=n>config</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>view_config</span><span class=p>)</span>
 </code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h3 id=amora.questions.Question.sql class="doc doc-heading"> <code class="highlight language-python"><span class=n>sql</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=nb>str</span></code> <span class="doc doc-properties"> <small class="doc doc-label doc-label-property"><code>property</code></small> </span> <a href=#amora.questions.Question.sql class=headerlink title="Permanent link">&para;</a></h3> <div class="doc doc-contents "> <p>Returns the Question as SQL. E.g:</p> <div class=highlight><pre><span></span><code><a id=__codelineno-0-1 name=__codelineno-0-1 href=#__codelineno-0-1></a><span class=k>SELECT</span><span class=w> </span><span class=k>sum</span><span class=p>(</span><span class=o>`</span><span class=n>step_count_by_source</span><span class=o>`</span><span class=p>.</span><span class=o>`</span><span class=n>value_count</span><span class=o>`</span><span class=p>)</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=o>`</span><span class=n>total</span><span class=o>`</span><span class=w></span>
 <a id=__codelineno-0-2 name=__codelineno-0-2 href=#__codelineno-0-2></a><span class=k>FROM</span><span class=w> </span><span class=o>`</span><span class=n>amora</span><span class=o>-</span><span class=k>data</span><span class=o>-</span><span class=n>build</span><span class=o>-</span><span class=n>tool</span><span class=p>.</span><span class=n>amora</span><span class=o>`</span><span class=p>.</span><span class=o>`</span><span class=n>step_count_by_source</span><span class=o>`</span><span class=w></span>
-</code></pre></div> <details class=quote> <summary>Source code in <code>amora/questions.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-136>136</a></span>
-<span class=normal><a href=#__codelineno-0-137>137</a></span>
+</code></pre></div> <details class=quote> <summary>Source code in <code>amora/questions.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-137>137</a></span>
 <span class=normal><a href=#__codelineno-0-138>138</a></span>
 <span class=normal><a href=#__codelineno-0-139>139</a></span>
 <span class=normal><a href=#__codelineno-0-140>140</a></span>
@@ -543,18 +546,19 @@
 <span class=normal><a href=#__codelineno-0-144>144</a></span>
 <span class=normal><a href=#__codelineno-0-145>145</a></span>
 <span class=normal><a href=#__codelineno-0-146>146</a></span>
-<span class=normal><a href=#__codelineno-0-147>147</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-136 name=__codelineno-0-136></a><span class=nd>@property</span>
-<a id=__codelineno-0-137 name=__codelineno-0-137></a><span class=k>def</span> <span class=nf>sql</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
-<a id=__codelineno-0-138 name=__codelineno-0-138></a>    <span class=sd>&quot;&quot;&quot;</span>
-<a id=__codelineno-0-139 name=__codelineno-0-139></a><span class=sd>    Returns the Question as SQL. E.g:</span>
-<a id=__codelineno-0-140 name=__codelineno-0-140></a>
-<a id=__codelineno-0-141 name=__codelineno-0-141></a><span class=sd>    ```sql</span>
-<a id=__codelineno-0-142 name=__codelineno-0-142></a><span class=sd>    SELECT sum(`step_count_by_source`.`value_count`) AS `total`</span>
-<a id=__codelineno-0-143 name=__codelineno-0-143></a><span class=sd>    FROM `amora-data-build-tool.amora`.`step_count_by_source`</span>
-<a id=__codelineno-0-144 name=__codelineno-0-144></a><span class=sd>    ```</span>
-<a id=__codelineno-0-145 name=__codelineno-0-145></a><span class=sd>    &quot;&quot;&quot;</span>
-<a id=__codelineno-0-146 name=__codelineno-0-146></a>    <span class=n>stmt</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=p>()</span>
-<a id=__codelineno-0-147 name=__codelineno-0-147></a>    <span class=k>return</span> <span class=n>compile_statement</span><span class=p>(</span><span class=n>stmt</span><span class=p>)</span>
+<span class=normal><a href=#__codelineno-0-147>147</a></span>
+<span class=normal><a href=#__codelineno-0-148>148</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-137 name=__codelineno-0-137></a><span class=nd>@property</span>
+<a id=__codelineno-0-138 name=__codelineno-0-138></a><span class=k>def</span> <span class=nf>sql</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+<a id=__codelineno-0-139 name=__codelineno-0-139></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-140 name=__codelineno-0-140></a><span class=sd>    Returns the Question as SQL. E.g:</span>
+<a id=__codelineno-0-141 name=__codelineno-0-141></a>
+<a id=__codelineno-0-142 name=__codelineno-0-142></a><span class=sd>    ```sql</span>
+<a id=__codelineno-0-143 name=__codelineno-0-143></a><span class=sd>    SELECT sum(`step_count_by_source`.`value_count`) AS `total`</span>
+<a id=__codelineno-0-144 name=__codelineno-0-144></a><span class=sd>    FROM `amora-data-build-tool.amora`.`step_count_by_source`</span>
+<a id=__codelineno-0-145 name=__codelineno-0-145></a><span class=sd>    ```</span>
+<a id=__codelineno-0-146 name=__codelineno-0-146></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-147 name=__codelineno-0-147></a>    <span class=n>stmt</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>question_func</span><span class=p>()</span>
+<a id=__codelineno-0-148 name=__codelineno-0-148></a>    <span class=k>return</span> <span class=n>compile_statement</span><span class=p>(</span><span class=n>stmt</span><span class=p>)</span>
 </code></pre></div></td></tr></table></div> </details> </div> </div> </div> </div> </div> <div class="doc doc-object doc-function"> <h2 id=amora.questions.question class="doc doc-heading"> <code class="highlight language-python"><span class=n>question</span><span class=p>(</span><span class=n>view_config</span><span class=p>:</span> <span class=n>VisualizationConfig</span> <span class=o>=</span> <span class=kc>None</span><span class=p>)</span></code> <a href=#amora.questions.question class=headerlink title="Permanent link">&para;</a></h2> <div class="doc doc-contents first"> <p>Wraps the function into a <code>amora.questions.Question</code>. The decorated function must return a <code>Compilable</code></p> <p>E.g: <div class=highlight><pre><span></span><code><a id=__codelineno-0-1 name=__codelineno-0-1 href=#__codelineno-0-1></a><span class=nd>@question</span><span class=p>()</span>
 <a id=__codelineno-0-2 name=__codelineno-0-2 href=#__codelineno-0-2></a><span class=k>def</span> <span class=nf>what_are_the_available_data_sources</span><span class=p>():</span>
 <a id=__codelineno-0-3 name=__codelineno-0-3 href=#__codelineno-0-3></a>    <span class=k>return</span> <span class=n>select</span><span class=p>(</span><span class=n>StepCountBySource</span><span class=o>.</span><span class=n>source_name</span><span class=p>)</span><span class=o>.</span><span class=n>distinct</span><span class=p>()</span>
@@ -567,8 +571,7 @@
 <a id=__codelineno-1-7 name=__codelineno-1-7 href=#__codelineno-1-7></a>        <span class=n>func</span><span class=o>.</span><span class=n>sum</span><span class=p>(</span><span class=n>StepCountBySource</span><span class=o>.</span><span class=n>value_sum</span><span class=p>)</span><span class=o>.</span><span class=n>label</span><span class=p>(</span><span class=s2>&quot;total&quot;</span><span class=p>),</span>
 <a id=__codelineno-1-8 name=__codelineno-1-8 href=#__codelineno-1-8></a>        <span class=n>StepCountBySource</span><span class=o>.</span><span class=n>source_name</span><span class=p>,</span>
 <a id=__codelineno-1-9 name=__codelineno-1-9 href=#__codelineno-1-9></a>    <span class=p>)</span><span class=o>.</span><span class=n>group_by</span><span class=p>(</span><span class=n>StepCountBySource</span><span class=o>.</span><span class=n>source_name</span><span class=p>)</span>
-</code></pre></div> <details class=quote> <summary>Source code in <code>amora/questions.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-207>207</a></span>
-<span class=normal><a href=#__codelineno-0-208>208</a></span>
+</code></pre></div> <details class=quote> <summary>Source code in <code>amora/questions.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal><a href=#__codelineno-0-208>208</a></span>
 <span class=normal><a href=#__codelineno-0-209>209</a></span>
 <span class=normal><a href=#__codelineno-0-210>210</a></span>
 <span class=normal><a href=#__codelineno-0-211>211</a></span>
@@ -601,39 +604,40 @@
 <span class=normal><a href=#__codelineno-0-238>238</a></span>
 <span class=normal><a href=#__codelineno-0-239>239</a></span>
 <span class=normal><a href=#__codelineno-0-240>240</a></span>
-<span class=normal><a href=#__codelineno-0-241>241</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-207 name=__codelineno-0-207></a><span class=k>def</span> <span class=nf>question</span><span class=p>(</span><span class=n>view_config</span><span class=p>:</span> <span class=n>VisualizationConfig</span> <span class=o>=</span> <span class=kc>None</span><span class=p>):</span>
-<a id=__codelineno-0-208 name=__codelineno-0-208></a>    <span class=sd>&quot;&quot;&quot;</span>
-<a id=__codelineno-0-209 name=__codelineno-0-209></a><span class=sd>    Wraps the function into a `amora.questions.Question`.</span>
-<a id=__codelineno-0-210 name=__codelineno-0-210></a><span class=sd>    The decorated function must return a `Compilable`</span>
-<a id=__codelineno-0-211 name=__codelineno-0-211></a>
-<a id=__codelineno-0-212 name=__codelineno-0-212></a><span class=sd>    E.g:</span>
-<a id=__codelineno-0-213 name=__codelineno-0-213></a><span class=sd>    ```python</span>
-<a id=__codelineno-0-214 name=__codelineno-0-214></a><span class=sd>    @question()</span>
-<a id=__codelineno-0-215 name=__codelineno-0-215></a><span class=sd>    def what_are_the_available_data_sources():</span>
-<a id=__codelineno-0-216 name=__codelineno-0-216></a><span class=sd>        return select(StepCountBySource.source_name).distinct()</span>
-<a id=__codelineno-0-217 name=__codelineno-0-217></a><span class=sd>    ```</span>
-<a id=__codelineno-0-218 name=__codelineno-0-218></a>
-<a id=__codelineno-0-219 name=__codelineno-0-219></a><span class=sd>    Optional data visualization configuration can be passed using the `view_config` arg:</span>
-<a id=__codelineno-0-220 name=__codelineno-0-220></a>
-<a id=__codelineno-0-221 name=__codelineno-0-221></a><span class=sd>    ```python</span>
-<a id=__codelineno-0-222 name=__codelineno-0-222></a><span class=sd>    from amora.visualization import PieChart</span>
-<a id=__codelineno-0-223 name=__codelineno-0-223></a>
+<span class=normal><a href=#__codelineno-0-241>241</a></span>
+<span class=normal><a href=#__codelineno-0-242>242</a></span></pre></div></td><td class=code><div><pre><span></span><code><a id=__codelineno-0-208 name=__codelineno-0-208></a><span class=k>def</span> <span class=nf>question</span><span class=p>(</span><span class=n>view_config</span><span class=p>:</span> <span class=n>VisualizationConfig</span> <span class=o>=</span> <span class=kc>None</span><span class=p>):</span>
+<a id=__codelineno-0-209 name=__codelineno-0-209></a>    <span class=sd>&quot;&quot;&quot;</span>
+<a id=__codelineno-0-210 name=__codelineno-0-210></a><span class=sd>    Wraps the function into a `amora.questions.Question`.</span>
+<a id=__codelineno-0-211 name=__codelineno-0-211></a><span class=sd>    The decorated function must return a `Compilable`</span>
+<a id=__codelineno-0-212 name=__codelineno-0-212></a>
+<a id=__codelineno-0-213 name=__codelineno-0-213></a><span class=sd>    E.g:</span>
+<a id=__codelineno-0-214 name=__codelineno-0-214></a><span class=sd>    ```python</span>
+<a id=__codelineno-0-215 name=__codelineno-0-215></a><span class=sd>    @question()</span>
+<a id=__codelineno-0-216 name=__codelineno-0-216></a><span class=sd>    def what_are_the_available_data_sources():</span>
+<a id=__codelineno-0-217 name=__codelineno-0-217></a><span class=sd>        return select(StepCountBySource.source_name).distinct()</span>
+<a id=__codelineno-0-218 name=__codelineno-0-218></a><span class=sd>    ```</span>
+<a id=__codelineno-0-219 name=__codelineno-0-219></a>
+<a id=__codelineno-0-220 name=__codelineno-0-220></a><span class=sd>    Optional data visualization configuration can be passed using the `view_config` arg:</span>
+<a id=__codelineno-0-221 name=__codelineno-0-221></a>
+<a id=__codelineno-0-222 name=__codelineno-0-222></a><span class=sd>    ```python</span>
+<a id=__codelineno-0-223 name=__codelineno-0-223></a><span class=sd>    from amora.visualization import PieChart</span>
 <a id=__codelineno-0-224 name=__codelineno-0-224></a>
-<a id=__codelineno-0-225 name=__codelineno-0-225></a><span class=sd>    @question(view_config=PieChart(values=&quot;total&quot;, names=&quot;source_name&quot;))</span>
-<a id=__codelineno-0-226 name=__codelineno-0-226></a><span class=sd>    def what_is_the_total_step_count_to_date():</span>
-<a id=__codelineno-0-227 name=__codelineno-0-227></a><span class=sd>        return select(</span>
-<a id=__codelineno-0-228 name=__codelineno-0-228></a><span class=sd>            func.sum(StepCountBySource.value_sum).label(&quot;total&quot;),</span>
-<a id=__codelineno-0-229 name=__codelineno-0-229></a><span class=sd>            StepCountBySource.source_name,</span>
-<a id=__codelineno-0-230 name=__codelineno-0-230></a><span class=sd>        ).group_by(StepCountBySource.source_name)</span>
-<a id=__codelineno-0-231 name=__codelineno-0-231></a><span class=sd>    ```</span>
-<a id=__codelineno-0-232 name=__codelineno-0-232></a>
-<a id=__codelineno-0-233 name=__codelineno-0-233></a><span class=sd>    &quot;&quot;&quot;</span>
-<a id=__codelineno-0-234 name=__codelineno-0-234></a>
-<a id=__codelineno-0-235 name=__codelineno-0-235></a>    <span class=k>def</span> <span class=nf>decorator</span><span class=p>(</span><span class=n>question_func</span><span class=p>:</span> <span class=n>QuestionFunc</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Question</span><span class=p>:</span>
-<a id=__codelineno-0-236 name=__codelineno-0-236></a>        <span class=n>q</span> <span class=o>=</span> <span class=n>Question</span><span class=p>(</span><span class=n>question_func</span><span class=p>,</span> <span class=n>view_config</span><span class=o>=</span><span class=n>view_config</span><span class=p>)</span>
-<a id=__codelineno-0-237 name=__codelineno-0-237></a>        <span class=n>QUESTIONS</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>q</span><span class=p>)</span>
-<a id=__codelineno-0-238 name=__codelineno-0-238></a>
-<a id=__codelineno-0-239 name=__codelineno-0-239></a>        <span class=k>return</span> <span class=n>q</span>
-<a id=__codelineno-0-240 name=__codelineno-0-240></a>
-<a id=__codelineno-0-241 name=__codelineno-0-241></a>    <span class=k>return</span> <span class=n>decorator</span>
+<a id=__codelineno-0-225 name=__codelineno-0-225></a>
+<a id=__codelineno-0-226 name=__codelineno-0-226></a><span class=sd>    @question(view_config=PieChart(values=&quot;total&quot;, names=&quot;source_name&quot;))</span>
+<a id=__codelineno-0-227 name=__codelineno-0-227></a><span class=sd>    def what_is_the_total_step_count_to_date():</span>
+<a id=__codelineno-0-228 name=__codelineno-0-228></a><span class=sd>        return select(</span>
+<a id=__codelineno-0-229 name=__codelineno-0-229></a><span class=sd>            func.sum(StepCountBySource.value_sum).label(&quot;total&quot;),</span>
+<a id=__codelineno-0-230 name=__codelineno-0-230></a><span class=sd>            StepCountBySource.source_name,</span>
+<a id=__codelineno-0-231 name=__codelineno-0-231></a><span class=sd>        ).group_by(StepCountBySource.source_name)</span>
+<a id=__codelineno-0-232 name=__codelineno-0-232></a><span class=sd>    ```</span>
+<a id=__codelineno-0-233 name=__codelineno-0-233></a>
+<a id=__codelineno-0-234 name=__codelineno-0-234></a><span class=sd>    &quot;&quot;&quot;</span>
+<a id=__codelineno-0-235 name=__codelineno-0-235></a>
+<a id=__codelineno-0-236 name=__codelineno-0-236></a>    <span class=k>def</span> <span class=nf>decorator</span><span class=p>(</span><span class=n>question_func</span><span class=p>:</span> <span class=n>QuestionFunc</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Question</span><span class=p>:</span>
+<a id=__codelineno-0-237 name=__codelineno-0-237></a>        <span class=n>q</span> <span class=o>=</span> <span class=n>Question</span><span class=p>(</span><span class=n>question_func</span><span class=p>,</span> <span class=n>view_config</span><span class=o>=</span><span class=n>view_config</span><span class=p>)</span>
+<a id=__codelineno-0-238 name=__codelineno-0-238></a>        <span class=n>QUESTIONS</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>q</span><span class=p>)</span>
+<a id=__codelineno-0-239 name=__codelineno-0-239></a>
+<a id=__codelineno-0-240 name=__codelineno-0-240></a>        <span class=k>return</span> <span class=n>q</span>
+<a id=__codelineno-0-241 name=__codelineno-0-241></a>
+<a id=__codelineno-0-242 name=__codelineno-0-242></a>    <span class=k>return</span> <span class=n>decorator</span>
 </code></pre></div></td></tr></table></div> </details> </div> </div> <hr> <div class=md-source-file> <small> Last update: 2022-08-09 </small> </div> </article> </div> </div> </main> <footer class=md-footer> <nav class="md-footer__inner md-grid" aria-label=Footer> <a href=../../feature-store/feature-view-protocol/ class="md-footer__link md-footer__link--prev" aria-label="Previous: Feature View Protocol" rel=prev> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg> </div> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Previous </span> Feature View Protocol </div> </div> </a> <a href=../data-visualization/ class="md-footer__link md-footer__link--next" aria-label="Next: Data Visualization" rel=next> <div class=md-footer__title> <div class=md-ellipsis> <span class=md-footer__direction> Next </span> Data Visualization </div> </div> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg> </div> </a> </nav> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-copyright> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script> <script src=../../assets/javascripts/bundle.a6c66575.min.js></script> </body> </html>
