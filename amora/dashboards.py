@@ -142,7 +142,7 @@ def list_dashboards(
         try:
             dashboard = dashboard_for_path(file_path)
         except ValueError:
-            logger.exception(f"Unable to load dashboard")
+            logger.exception("Unable to load dashboard")
         else:
             DASHBOARDS[dashboard.uid] = dashboard
 

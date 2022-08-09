@@ -110,7 +110,7 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
         y: int = Field(primary_key=True)
         created_at: datetime = Field(primary_key=True)
 
-    result = materialize(sql="SELECT 1", model=TableModel)
+    materialize(sql="SELECT 1", model=TableModel)
 
     client = Client.return_value
 
@@ -157,7 +157,7 @@ def test_materialize_as_table_without_clustering_configuration(
         y: int = Field(primary_key=True)
         created_at: datetime = Field(primary_key=True)
 
-    result = materialize(sql="SELECT 1", model=TableModel)
+    materialize(sql="SELECT 1", model=TableModel)
 
     client = Client.return_value
 
@@ -185,7 +185,6 @@ def test_materialize_as_table_without_clustering_configuration(
 @patch("amora.materialization.Client", spec=Client)
 def test_materialize_as_ephemeral(Client: MagicMock):
     table_name = uuid4().hex
-    table_id = f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}.{table_name}"
 
     class EphemeralModel(AmoraModel, table=True):
         __tablename__ = table_name

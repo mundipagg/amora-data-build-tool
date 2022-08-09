@@ -333,16 +333,16 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
                 total_bytes=query_job.total_bytes_processed,
                 user_email=query_job.user_email,
             )
-        else:
-            return DryRunResult(
-                job_id=None,
-                model=model,
-                query=None,
-                referenced_tables=[str(table.reference)],
-                schema=table.schema,
-                total_bytes=table.num_bytes,
-                user_email=None,
-            )
+
+        return DryRunResult(
+            job_id=None,
+            model=model,
+            query=None,
+            referenced_tables=[str(table.reference)],
+            schema=table.schema,
+            total_bytes=table.num_bytes,
+            user_email=None,
+        )
 
     query = compile_statement(source)
 
@@ -434,8 +434,8 @@ def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
 
     if len(selects) == 1:
         return selects[0].cte()
-    else:
-        return selects[0].union_all(*(selects[1:])).cte()
+
+    return selects[0].union_all(*(selects[1:])).cte()
 
 
 def estimated_query_cost_in_usd(total_bytes: int) -> float:
@@ -557,8 +557,8 @@ class struct(expression.ClauseList, expression.ColumnElement):  # type: ignore
     def self_group(self, against=None):
         if against in (operators.any_op, operators.all_op, operators.getitem):
             return expression.Grouping(self)
-        else:
-            return self
+
+        return self
 
 
 class array(expression.ClauseList, expression.ColumnElement):  # type: ignore
@@ -639,19 +639,18 @@ class array(expression.ClauseList, expression.ColumnElement):  # type: ignore
                 unique=True,
             )
 
-        else:
-            return array(
-                [
-                    self._bind_param(operator, o, _assume_scalar=True, type_=type_)
-                    for o in obj
-                ]
-            )
+        return array(
+            [
+                self._bind_param(operator, o, _assume_scalar=True, type_=type_)
+                for o in obj
+            ]
+        )
 
     def self_group(self, against=None):
         if against in (operators.any_op, operators.all_op, operators.getitem):
             return expression.Grouping(self)
-        else:
-            return self
+
+        return self
 
 
 def zip_arrays(

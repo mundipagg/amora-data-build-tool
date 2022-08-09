@@ -127,11 +127,12 @@ class Question:
         '''
         if self.question_func.__doc__:
             return self.question_func.__doc__.strip()
-        elif self.question_func.__name__ == "<lambda>":
+
+        if self.question_func.__name__ == "<lambda>":
             raise NotImplementedError
-        else:
-            question = self.question_func.__name__.replace("_", " ")
-            return question.capitalize() + "?"
+
+        question = self.question_func.__name__.replace("_", " ")
+        return question.capitalize() + "?"
 
     @property
     def sql(self) -> str:
@@ -175,13 +176,13 @@ class Question:
     def to_markdown(self) -> str:
         return f"""
             ## {self.name}
-            
+
             ```sql
             {self.sql}
             ```
-            
+
             ### Answer
-            
+
             {self.answer_df().to_markdown()}
         """
 

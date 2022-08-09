@@ -16,7 +16,7 @@ def pytest_sessionstart():
     print(
         """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A amora adoça mais na boca de quem namora. 
+A amora adoça mais na boca de quem namora.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Mantido com <3 por `RexData@Stone`
 """

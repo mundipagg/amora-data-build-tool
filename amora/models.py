@@ -5,6 +5,7 @@ from enum import Enum, auto
 from importlib.util import module_from_spec, spec_from_file_location
 from inspect import getfile
 from pathlib import Path
+from types import ModuleType
 from typing import (
     Any,
     Dict,
@@ -66,8 +67,8 @@ class Label(NamedTuple):
     def __eq__(self, other):
         if not isinstance(other, str):
             return self.key == other.key and self.value == other.value
-        else:
-            return self == Label.from_str(other)
+
+        return self == Label.from_str(other)
 
     @classmethod
     def from_str(cls, label: str):
@@ -205,6 +206,15 @@ class AmoraModel(SQLModel):
         return str(cls.__table__)
 
 
+def _is_amora_model(candidate: ModuleType) -> bool:
+    return (
+        isinstance(candidate, CompilableProtocol)
+        and inspect.isclass(candidate)
+        and issubclass(candidate, AmoraModel)
+        and hasattr(candidate, "__table__")
+    )
+
+
 def amora_model_for_path(path: Path) -> Model:
     spec = spec_from_file_location(".".join(["amoramodel", path.stem]), path)
     if spec is None:
@@ -216,20 +226,15 @@ def amora_model_for_path(path: Path) -> Model:
         raise ValueError(f"Invalid AmoraModel path `{path}`. Unable to load module.")
 
     try:
-        spec.loader.exec_module(module)  # type: ignore
+        spec.loader.exec_module(module)
     except ImportError as e:
         raise ValueError(
             f"Invalid AmoraModel path `{path}`. Unable to load module."
         ) from e
-    is_amora_model = (
-        lambda x: isinstance(x, CompilableProtocol)
-        and inspect.isclass(x)
-        and issubclass(x, AmoraModel)
-        and hasattr(x, "__table__")  # type: ignore
-    )
+
     compilables = inspect.getmembers(
         module,
-        is_amora_model,  # type: ignore
+        _is_amora_model,
     )
 
     for _name, class_ in compilables:
@@ -260,7 +265,7 @@ def model_path_for_model(model: Model) -> Path:
 
 
 def amora_model_for_name(model_name: str) -> Model:
-    for model, path in list_models():
+    for model, _path in list_models():
         if model.unique_name() == model_name:
             return model
     raise ValueError(f"{model_name} not found on models list")
