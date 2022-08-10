@@ -12,8 +12,8 @@ from amora.models import (
     ModelConfig,
     select,
 )
+from amora.protocols import Compilable
 from amora.transformations import datetime_trunc_hour
-from amora.types import Compilable
 
 from tests.models.steps import Steps
 

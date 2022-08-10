@@ -2,7 +2,7 @@ import sqlparse
 from sqlalchemy_bigquery import STRUCT, BigQueryDialect
 from sqlalchemy_bigquery.base import BigQueryCompiler
 
-from amora.types import Compilable
+from amora.protocols import Compilable
 
 
 class AmoraBigQueryCompiler(BigQueryCompiler):

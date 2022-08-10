@@ -5,9 +5,9 @@ import pandas as pd
 from sqlalchemy.sql import Selectable
 
 from amora.compilation import compile_statement
+from amora.protocols import Compilable
 from amora.providers.bigquery import run
 from amora.storage import cache
-from amora.types import Compilable
 from amora.visualization import Table, Visualization, VisualizationConfig
 
 QuestionFunc = Callable[[], Compilable]
@@ -25,9 +25,10 @@ class Question:
     Lets define a new data question:
 
     ```python
+    from examples.models.step_count_by_source import StepCountBySource
+
     from amora.models import select
     from amora.questions import question
-    from examples.models.step_count_by_source import StepCountBySource
 
 
     @question
@@ -126,11 +127,12 @@ class Question:
         '''
         if self.question_func.__doc__:
             return self.question_func.__doc__.strip()
-        elif self.question_func.__name__ == "<lambda>":
+
+        if self.question_func.__name__ == "<lambda>":
             raise NotImplementedError
-        else:
-            question = self.question_func.__name__.replace("_", " ")
-            return question.capitalize() + "?"
+
+        question = self.question_func.__name__.replace("_", " ")
+        return question.capitalize() + "?"
 
     @property
     def sql(self) -> str:
@@ -178,13 +180,13 @@ class Question:
     def to_markdown(self) -> str:
         return f"""
             ## {self.name}
-            
+
             ```sql
             {self.sql}
             ```
-            
+
             ### Answer
-            
+
             {self.answer_df().to_markdown()}
         """
 

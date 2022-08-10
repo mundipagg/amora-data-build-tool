@@ -35,7 +35,7 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
     client = Client()
 
     if materialization == MaterializationTypes.view:
-        table_name = model.unique_name
+        table_name = model.unique_name()
 
         view = Table(table_name)
         view.description = config.description
@@ -45,18 +45,19 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
         client.delete_table(table_name, not_found_ok=True)
 
         return client.create_table(view)
-    elif materialization == MaterializationTypes.table:
+
+    if materialization == MaterializationTypes.table:
         query_job = client.query(
             sql,
             job_config=QueryJobConfig(
-                destination=model.unique_name,
+                destination=model.unique_name(),
                 write_disposition="WRITE_TRUNCATE",
             ),
         )
 
-        result = query_job.result()
+        query_job.result()
 
-        table = client.get_table(model.unique_name)
+        table = client.get_table(model.unique_name())
         table.description = config.description
         table.labels = config.labels_dict
 
@@ -66,9 +67,9 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
         return client.update_table(
             table, ["description", "labels", "clustering_fields"]
         )
-    else:
-        raise ValueError(
-            f"Invalid model materialization configuration. "
-            f"Valid types are: `{', '.join((m.name for m in MaterializationTypes))}`. "
-            f"Got: `{materialization}`"
-        )
+
+    raise ValueError(
+        f"Invalid model materialization configuration. "
+        f"Valid types are: `{', '.join((m.name for m in MaterializationTypes))}`. "
+        f"Got: `{materialization}`"
+    )

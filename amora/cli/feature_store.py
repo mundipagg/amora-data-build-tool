@@ -23,7 +23,7 @@ def feature_store_plan():
     from amora.feature_store import fs
     from amora.feature_store.registry import get_repo_contents
 
-    registry_diff, infra_diff, infra = fs._plan(
+    registry_diff, infra_diff, _infra = fs._plan(
         desired_repo_contents=get_repo_contents()
     )
 

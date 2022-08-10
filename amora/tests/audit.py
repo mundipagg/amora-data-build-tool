@@ -13,8 +13,8 @@ from amora.models import (
     Session,
     select,
 )
+from amora.protocols import Compilable
 from amora.storage import local_engine, local_metadata
-from amora.types import Compilable
 from amora.version import VERSION
 
 

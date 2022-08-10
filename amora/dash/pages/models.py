@@ -20,7 +20,7 @@ dash.register_page(
 
 
 def models_selector() -> dcc.Dropdown:
-    options = [model.unique_name for (model, _path) in list_models()]
+    options = [model.unique_name() for (model, _path) in list_models()]
 
     return dcc.Dropdown(
         options=options,

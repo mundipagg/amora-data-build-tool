@@ -112,13 +112,13 @@ def models_list(
         def materialization_type(self) -> Optional[str]:
             if self.has_source:
                 return self.model.__model_config__.materialized.value
-            else:
-                return None
+
+            return None
 
     results = []
     placeholder = "-"
 
-    for model, model_file_path in list_models():
+    for model, _model_file_path in list_models():
         if with_total_bytes:
             result_item = ResultItem(model=model, dry_run_result=dry_run(model))
         else:

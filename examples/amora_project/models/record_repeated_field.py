@@ -10,8 +10,8 @@ from amora.models import (
     ModelConfig,
     select,
 )
+from amora.protocols import Compilable
 from amora.providers.bigquery import array, cte_from_rows, struct_for_model
-from amora.types import Compilable
 
 
 class Node(AmoraModel):

@@ -11,7 +11,7 @@ from amora.models import (
     ModelConfig,
     PartitionConfig,
 )
-from amora.types import Compilable
+from amora.protocols import Compilable
 from examples.amora_project.models.health import Health
 
 

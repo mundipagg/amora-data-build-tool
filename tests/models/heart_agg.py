@@ -1,7 +1,7 @@
 from sqlmodel import Field, func, select
 
 from amora.models import AmoraModel
-from amora.types import Compilable
+from amora.protocols import Compilable
 
 from tests.models.heart_rate import HeartRate
 

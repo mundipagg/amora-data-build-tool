@@ -3,8 +3,8 @@ from typing import List
 from sqlalchemy import ARRAY, Column, Integer, String
 
 from amora.models import AmoraModel, Field, MaterializationTypes, ModelConfig, select
+from amora.protocols import Compilable
 from amora.providers.bigquery import array, cte_from_rows
-from amora.types import Compilable
 
 
 class ArrayRepeatedFields(AmoraModel, table=True):

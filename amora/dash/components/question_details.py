@@ -23,7 +23,8 @@ def answer_visualization(question: Question) -> Component:
     if isinstance(view_config, BigNumber):
         big_number = view_config.value_func(df)
         return html.H4(big_number)
-    elif isinstance(view_config, LineChart):
+
+    if isinstance(view_config, LineChart):
         return dcc.Graph(
             figure=px.line(
                 df,
@@ -31,7 +32,8 @@ def answer_visualization(question: Question) -> Component:
                 y=view_config.y_func(df),
             )
         )
-    elif isinstance(view_config, BarChart):
+
+    if isinstance(view_config, BarChart):
         return dcc.Graph(
             figure=px.bar(
                 df,
@@ -39,27 +41,27 @@ def answer_visualization(question: Question) -> Component:
                 y=view_config.y_func(df),
             )
         )
-    elif isinstance(view_config, PieChart):
+
+    if isinstance(view_config, PieChart):
         return dcc.Graph(
             figure=px.pie(df, values=view_config.values, names=view_config.names)
         )
-    else:
-        return dash_table.DataTable(
-            columns=[
-                {"name": col, "id": col, "selectable": True}
-                for col in df.columns.values
-            ],
-            data=df.to_dict("records"),
-            row_selectable="multi",
-            sort_action="native",
-            style_cell={
-                "overflow": "hidden",
-                "textOverflow": "ellipsis",
-                "maxWidth": 0,
-            },
-            export_format="csv",
-            export_headers="display",
-        )
+
+    return dash_table.DataTable(
+        columns=[
+            {"name": col, "id": col, "selectable": True} for col in df.columns.values
+        ],
+        data=df.to_dict("records"),
+        row_selectable="multi",
+        sort_action="native",
+        style_cell={
+            "overflow": "hidden",
+            "textOverflow": "ellipsis",
+            "maxWidth": 0,
+        },
+        export_format="csv",
+        export_headers="display",
+    )
 
 
 def component(question: Question) -> Component:

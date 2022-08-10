@@ -1,4 +1,4 @@
-from amora.feature_store import settings
+from amora.feature_store.config import settings
 
 
 def patch_tqdm() -> None:

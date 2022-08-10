@@ -9,7 +9,7 @@ from amora.models import (
     ModelConfig,
     PartitionConfig,
 )
-from amora.types import Compilable
+from amora.protocols import Compilable
 
 from tests.models.health import Health
 

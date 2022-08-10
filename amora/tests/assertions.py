@@ -9,10 +9,10 @@ from sqlmodel.sql.expression import SelectOfScalar
 
 from amora.config import settings
 from amora.models import AmoraModel, ColumnElement, Session, select
+from amora.protocols import Compilable
 from amora.providers.bigquery import RunResult, estimated_query_cost_in_usd, run
 from amora.storage import local_engine
 from amora.tests.audit import AuditLog
-from amora.types import Compilable
 
 Test = Callable[..., SelectOfScalar]
 
@@ -45,7 +45,8 @@ def _test(statement: Compilable, raise_on_fail: bool = True) -> bool:
 
     if run_result.rows.total_rows == 0:
         return True
-    elif raise_on_fail:
+
+    if raise_on_fail:
         pytest.fail(
             f"{run_result.rows.total_rows} rows failed the test assertion."
             f"\n==========="
@@ -54,8 +55,8 @@ def _test(statement: Compilable, raise_on_fail: bool = True) -> bool:
             f"\n{run_result.query}",
             pytrace=False,
         )
-    else:
-        return False
+
+    return False
 
 
 def that(
