@@ -81,8 +81,8 @@ def display_user(pathname):
     [State(layout_id, "is_open"), State("event-listener", "event")],
 )
 def toggle_menu_on_keydown(
-    n_events: Optional[int], is_open: bool, event: Optional[dict]
+    _n_events: Optional[int], is_open: bool, event: Optional[dict]
 ) -> bool:
-    if n_events and event["metaKey"]:
+    if event and event["metaKey"]:
         return not is_open
     return is_open

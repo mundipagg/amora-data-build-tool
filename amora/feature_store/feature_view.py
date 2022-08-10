@@ -16,16 +16,12 @@ def name_for_model(model: Model) -> str:
     return model.__tablename__  # type: ignore
 
 
-def is_feature_view(model: Model) -> bool:
-    return isinstance(model, FeatureViewSourceProtocol)
-
-
 def feature_view_for_model(model: Model) -> FeatureView:
     """
     A feature view is an object that represents a logical group of time-series
     feature data as it is found in a model.
     """
-    if not is_feature_view(model):
+    if not isinstance(model, FeatureViewSourceProtocol):
         raise ValueError(
             f"Feature view models (`@feature_view`) must implement the "
             f"{FeatureViewSourceProtocol.__name__} protocol. "

@@ -15,7 +15,7 @@ from sqlalchemy import (
 )
 from sqlalchemy_bigquery import STRUCT
 
-from amora.feature_store.feature_view import is_feature_view
+from amora.feature_store.protocols import FeatureViewSourceProtocol
 from amora.models import Model, select
 from amora.providers.bigquery import run
 from amora.storage import cache
@@ -33,7 +33,7 @@ def _summarize_columns(model: Model) -> pd.DataFrame:
         is_supported = not isinstance(column.type, (ARRAY, STRUCT))
         is_numeric = isinstance(column.type, (Numeric, Integer, Float))
 
-        if is_feature_view(model):
+        if isinstance(model, FeatureViewSourceProtocol):
             is_fv_feature = column.name in (
                 c.name for c in model.feature_view_features()
             )
