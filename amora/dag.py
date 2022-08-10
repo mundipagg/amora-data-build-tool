@@ -1,12 +1,12 @@
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Tuple
 
 import networkx as nx
 from matplotlib import pyplot as plt
 
 from amora.config import settings
-from amora.feature_store.feature_view import is_feature_view
+from amora.feature_store.protocols import FeatureViewSourceProtocol
 from amora.materialization import Task
-from amora.models import MaterializationTypes, Model
+from amora.models import Column, MaterializationTypes, Model
 from amora.utils import list_target_files
 
 
@@ -61,6 +61,19 @@ class DependencyDAG(nx.DiGraph):
 
         return cls.from_tasks(tasks=model_to_task.values())
 
+    @classmethod
+    def from_columns(cls, columns: List[Tuple[Model, Column]]) -> "DependencyDAG":
+        dag = cls()
+
+        for model, column in columns:
+            dag.add_node(column)
+            for dependency in getattr(model, "__depends_on__", []):
+                dependency_columns = dependency.__table__.columns
+                if column.key in dependency_columns:
+                    dag.add_edge(dependency_columns[column.key], column)
+
+        return dag
+
     def to_cytoscape_elements(self) -> List[Dict]:
         """
 
@@ -78,7 +91,7 @@ class DependencyDAG(nx.DiGraph):
         """
 
         def border_color_for_model(model: Model) -> str:
-            if is_feature_view(model):
+            if isinstance(model, FeatureViewSourceProtocol):
                 return "green"
             return "grey"
 
@@ -93,7 +106,7 @@ class DependencyDAG(nx.DiGraph):
             *(
                 {
                     "data": {
-                        "id": model.unique_name,
+                        "id": model.unique_name(),
                         "label": model.__tablename__,
                     },
                     "style": {
@@ -105,7 +118,12 @@ class DependencyDAG(nx.DiGraph):
                 for model in self.nodes
             ),
             *(
-                {"data": {"source": source.unique_name, "target": target.unique_name}}
+                {
+                    "data": {
+                        "source": source.unique_name(),
+                        "target": target.unique_name(),
+                    }
+                }
                 for source, target in self.edges
             ),
         ]
