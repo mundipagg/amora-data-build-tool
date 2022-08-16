@@ -4,28 +4,28 @@ import networkx as nx
 from matplotlib import pyplot as plt
 
 from amora.config import settings
-from amora.feature_store.protocols import FeatureViewSourceProtocol
 from amora.materialization import Task
-from amora.models import Column, MaterializationTypes, Model
+from amora.models import Column, Model
 from amora.utils import list_target_files
+
+CytoscapeElements = List[Dict]
 
 
 class DependencyDAG(nx.DiGraph):
     def __iter__(self):
-        # todo: validar se podemos substituir por graphlib
         return nx.topological_sort(self)
 
     @classmethod
     def from_model(cls, model: Model) -> "DependencyDAG":
         """
-        Builds the DependencyDAG for a given model
+        Builds the DependencyDAG for a given data model
         """
         dag = cls()
-        dag.add_node(model)
+        dag.add_node(model.unique_name())
 
         def fetch_edges(node: Model):
             for dependency in getattr(node, "__depends_on__", []):
-                dag.add_edge(dependency, node)
+                dag.add_edge(dependency.unique_name(), node.unique_name())
                 fetch_edges(dependency)
 
         fetch_edges(model)
@@ -36,9 +36,9 @@ class DependencyDAG(nx.DiGraph):
         dag = cls()
 
         for task in tasks:
-            dag.add_node(task.model)
+            dag.add_node(task.model.unique_name())
             for dependency in getattr(task.model, "__depends_on__", []):
-                dag.add_edge(dependency, task.model)
+                dag.add_edge(dependency.unique_name(), task.model.unique_name())
 
         return dag
 
@@ -74,7 +74,7 @@ class DependencyDAG(nx.DiGraph):
 
         return dag
 
-    def to_cytoscape_elements(self) -> List[Dict]:
+    def to_cytoscape_elements(self) -> CytoscapeElements:
         """
 
         Returns itself as a cytoscape schema compatible representation. E.g:
@@ -90,40 +90,13 @@ class DependencyDAG(nx.DiGraph):
         ```
         """
 
-        def border_color_for_model(model: Model) -> str:
-            if isinstance(model, FeatureViewSourceProtocol):
-                return "green"
-            return "grey"
-
-        def background_color_for_model(model: Model) -> str:
-            return {
-                MaterializationTypes.table: "black",
-                MaterializationTypes.view: "grey",
-                MaterializationTypes.ephemeral: "white",
-            }[model.__model_config__.materialized]
-
         return [
             *(
-                {
-                    "data": {
-                        "id": model.unique_name(),
-                        "label": model.__tablename__,
-                    },
-                    "style": {
-                        "border-color": border_color_for_model(model),
-                        "border-width": 3,
-                        "background-color": background_color_for_model(model),
-                    },
-                }
-                for model in self.nodes
+                {"group": "nodes", "data": {"id": node, "label": node}}
+                for node in self.nodes
             ),
             *(
-                {
-                    "data": {
-                        "source": source.unique_name(),
-                        "target": target.unique_name(),
-                    }
-                }
+                {"group": "edges", "data": {"source": source, "target": target}}
                 for source, target in self.edges
             ),
         ]
