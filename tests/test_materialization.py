@@ -125,6 +125,9 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
     )
 
     table: Table = client.get_table.return_value
+    client.delete_table.assert_called_once_with(
+        TableModel.unique_name(), not_found_ok=True
+    )
     client.update_table.assert_called_once_with(
         table,
         ["description", "labels", "clustering_fields"],
