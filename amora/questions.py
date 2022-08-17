@@ -167,6 +167,10 @@ class Question:
         result = run(self.question_func())
         return result.rows.to_dataframe(create_bqstorage_client=False)
 
+    @property
+    def uid(self) -> str:
+        return str(hash(self))
+
     def render(self) -> Visualization:
         """
         Renders the visual representation of the question's answer
@@ -195,11 +199,11 @@ class Question:
     def __eq__(self, other):
         if not isinstance(other, Question):
             return False
-
-        return self.question_func == other.question_func
+        return hash(self) == hash(other)
 
     def __hash__(self):
-        return hash(self.question_func)
+        code = self.question_func.__code__
+        return hash(code.co_filename + code.co_name)
 
 
 QUESTIONS: Set[Question] = set()
