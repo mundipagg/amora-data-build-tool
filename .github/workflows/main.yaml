@@ -9,6 +9,7 @@ env:
   AMORA_PROJECT_PATH: "${{ github.workspace }}/tests"
   AMORA_TARGET_SCHEMA: amora
   AMORA_TARGET_PROJECT: amora-data-build-tool
+  AMORA_DASH_DEBUG: 1
 
 jobs:
   qa:
