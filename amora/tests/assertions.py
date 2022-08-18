@@ -46,7 +46,7 @@ def _test(statement: Compilable, raise_on_fail: bool = True) -> bool:
     if run_result.rows.total_rows == 0:
         return True
 
-    if raise_on_fail:
+    if raise_on_fail:  # pragma: nocover
         pytest.fail(
             f"{run_result.rows.total_rows} rows failed the test assertion."
             f"\n==========="
