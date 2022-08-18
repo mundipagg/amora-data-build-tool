@@ -4,7 +4,7 @@ from amora.models import Column
 
 
 @runtime_checkable
-class FeatureViewSourceProtocol(Protocol):
+class FeatureViewSourceProtocol(Protocol):  # pragma: nocover
     """
     The contract needed to expose the [AmoraModel](amora-model) definition as a [Feature View](feature-view.md)
 
