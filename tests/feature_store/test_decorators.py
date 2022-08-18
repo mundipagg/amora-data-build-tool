@@ -1,7 +1,9 @@
 from datetime import datetime
+from typing import List
 
 import pytest
 from feast import Feature, FeatureView, ValueType
+from sqlalchemy import ARRAY, Column, String
 
 from amora.feature_store.decorators import feature_view
 from amora.feature_store.feature_view import name_for_model
@@ -26,6 +28,7 @@ def test_feature_view_on_valid_source_model():
         driver: str = Field(primary_key=True)
         rating: float
         trips_today: int
+        a_str_arr_field: List[str] = Field(sa_column=Column(ARRAY(String)))
 
         @classmethod
         def feature_view_entities(cls):
@@ -33,7 +36,7 @@ def test_feature_view_on_valid_source_model():
 
         @classmethod
         def feature_view_features(cls):
-            return [cls.trips_today, cls.rating]
+            return [cls.trips_today, cls.rating, cls.a_str_arr_field]
 
         @classmethod
         def feature_view_event_timestamp(cls):
@@ -49,4 +52,8 @@ def test_feature_view_on_valid_source_model():
     assert fv.features == [
         Feature(name=DriverActivity.trips_today.key, dtype=ValueType.INT64),
         Feature(name=DriverActivity.rating.key, dtype=ValueType.FLOAT),
+        Feature(
+            name=DriverActivity.a_str_arr_field.key,
+            dtype=ValueType.STRING_LIST,
+        ),
     ]

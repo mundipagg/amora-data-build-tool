@@ -17,6 +17,11 @@ def test_DependencyDAG_root():
     assert dag.root() == "a"
 
 
+def test_DependencyDAG_root_with_empty_dag():
+    dag = DependencyDAG()
+    assert dag.root() is None
+
+
 def test_DependencyDAG_to_cytoscape_elements():
     dag = DependencyDAG()
     dag.add_edge("a", "b")
