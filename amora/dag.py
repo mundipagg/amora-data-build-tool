@@ -43,19 +43,13 @@ class DependencyDAG(nx.DiGraph):
         return dag
 
     @classmethod
-    def from_target(cls, models=None) -> "DependencyDAG":
+    def from_target(cls) -> "DependencyDAG":
         """
         Builds a DependencyDAG from the files compiled at `settings.AMORA_TARGET_PATH`
-
-        :param models:
-        :return:
         """
         model_to_task = {}
 
         for target_file_path in list_target_files():
-            if models and target_file_path.stem not in models:
-                continue
-
             task = Task.for_target(target_file_path)
             model_to_task[task.model.unique_name()] = task
 
