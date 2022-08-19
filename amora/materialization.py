@@ -48,6 +48,7 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
 
     if materialization == MaterializationTypes.table:
         table_name = model.unique_name()
+        client.delete_table(table_name, not_found_ok=True)
         query_job = client.query(
             sql,
             job_config=QueryJobConfig(
@@ -61,8 +62,6 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
         table = client.get_table(model.unique_name())
         table.description = config.description
         table.labels = config.labels_dict
-
-        client.delete_table(table_name, not_found_ok=True)
 
         if config.cluster_by:
             table.clustering_fields = config.cluster_by
