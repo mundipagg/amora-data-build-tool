@@ -13,7 +13,9 @@ from amora.models import (
     select,
 )
 from amora.protocols import Compilable
+from amora.questions import question
 from amora.transformations import datetime_trunc_hour
+from amora.visualization import BigNumber
 
 from tests.models.steps import Steps
 
@@ -70,3 +72,8 @@ class StepCountBySource(AmoraModel, table=True):
     @classmethod
     def feature_view_fa_icon(cls):
         return "fa-person-running"
+
+
+@question(view_config=BigNumber())
+def how_many_data_points_where_acquired():
+    return select(func.sum(StepCountBySource.value_count).label("total"))
