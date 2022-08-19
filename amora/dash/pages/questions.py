@@ -38,7 +38,8 @@ def layout() -> Component:
             ),
             dbc.Row(questions_selector()),
             dbc.Row(id="selected-questions"),
-        ]
+        ],
+        id="questions-content",
     )
 
 

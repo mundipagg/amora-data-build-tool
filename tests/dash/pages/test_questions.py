@@ -1,22 +1,20 @@
-from unittest.mock import patch
-
-import pandas as pd
-import pytest
 from dash.testing.composite import DashComposite
 
-from amora.questions import QUESTIONS
+from tests.models.step_count_by_source import how_many_data_points_where_acquired
 
 
-@pytest.mark.skip
 def test_data_questions_page(amora_dash: DashComposite):
-    # patching so we don't have to run the question on bigquery
-    with patch("amora.questions.Question.answer_df", return_value=pd.DataFrame()):
-        amora_dash.visit_and_snapshot(
-            resource_path="/questions",
-            hook_id="questions-content",
-            wait_for_callbacks=True,
-            stay_on_page=True,
-        )
+    amora_dash.visit_and_snapshot(
+        resource_path="/questions",
+        hook_id="questions-content",
+        wait_for_callbacks=True,
+        stay_on_page=True,
+    )
+    amora_dash.multiple_click("#side-bar .btn-close", clicks=1)
+    amora_dash.select_dcc_dropdown(
+        "div#questions-selector", value=how_many_data_points_where_acquired.name
+    )
 
-        question_elements = amora_dash.find_elements(".question-card")
-        assert len(question_elements) == len(QUESTIONS)
+    amora_dash.wait_for_text_to_equal(
+        selector="H5.card-title", text=how_many_data_points_where_acquired.name
+    )
