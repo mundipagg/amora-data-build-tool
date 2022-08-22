@@ -6,4 +6,5 @@ def test_environment_page(amora_dash: DashComposite):
         resource_path="/environment",
         hook_id="environment-table",
         wait_for_callbacks=True,
+        stay_on_page=True
     )
