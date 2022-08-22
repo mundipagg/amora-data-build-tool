@@ -160,3 +160,5 @@ config/*/**
 
 
 docs/
+
+.amora_cache
