@@ -63,7 +63,7 @@ jobs:
         uses: "google-github-actions/setup-gcloud@v0"
 
       - name: 🧪 pytest
-        run: poetry run py.test --headless --cov=amora --cov-report=term-missing --cov-report=xml ./tests
+        run: poetry run py.test --cov=amora --cov-report=term-missing --cov-report=xml ./tests
 
       - name: 🧪 Mypy - Static type check
         run: poetry run mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --pretty --no-color-output amora
