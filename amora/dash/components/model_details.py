@@ -10,6 +10,7 @@ from amora.dash.components import (
     model_columns,
     model_datatable,
     model_summary,
+    model_viz,
 )
 from amora.models import Model
 
@@ -56,6 +57,11 @@ def component(model: Model) -> Component:
                                 title="🏗 SQL Code",
                                 item_id="sql_code",
                             ),
+                            dbc.AccordionItem(
+                                model_viz.component(model),
+                                title="🐿️ Viz",
+                                item_id="viz",
+                            )
                         ],
                         start_collapsed=True,
                         id="model-details-accordion",
