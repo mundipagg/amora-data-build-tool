@@ -3,6 +3,7 @@ from typing import Union
 import pytest
 from _pytest.config import ExitCode
 from _pytest.main import Session
+from dash.testing.application_runners import ThreadedRunner
 from dash.testing.composite import DashComposite
 from rich.console import Console
 from rich.table import Table
@@ -48,6 +49,19 @@ def pytest_sessionfinish(session: Session, exitstatus: Union[int, ExitCode]) -> 
 
 
 @pytest.fixture
-def amora_dash(dash_duo: DashComposite) -> DashComposite:
-    dash_duo.start_server(dash_app)
-    return dash_duo
+def amora_dash(request, dash_thread_server: ThreadedRunner, tmpdir) -> DashComposite:
+    with DashComposite(
+        dash_thread_server,
+        browser=request.config.getoption("webdriver"),
+        remote=request.config.getoption("remote"),
+        remote_url=request.config.getoption("remote_url"),
+        headless=request.config.getoption("headless"),
+        options=request.config.hook.pytest_setup_options(),
+        download_path=tmpdir.mkdir("download").strpath,
+        percy_assets_root=request.config.getoption("percy_assets"),
+        percy_finalize=request.config.getoption("nopercyfinalize"),
+        pause=request.config.getoption("pause"),
+        wait_timeout=30,
+    ) as dash_duo:
+        dash_duo.start_server(dash_app)
+        yield dash_duo
