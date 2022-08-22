@@ -6,5 +6,5 @@ def test_feature_store_page(amora_dash: DashComposite):
         resource_path="/feature-store",
         hook_id="feature-store-content",
         wait_for_callbacks=True,
-        stay_on_page=True
+        stay_on_page=True,
     )
