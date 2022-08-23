@@ -7,6 +7,7 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 import pandas as pd
 import sqlalchemy
 from google.api_core.client_info import ClientInfo
+from google.api_core.exceptions import NotFound
 from google.cloud.bigquery import (
     Client,
     QueryJobConfig,
@@ -29,6 +30,7 @@ from amora import logger
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
+from amora.logger import logger, log_execution
 from amora.models import (
     AmoraModel,
     Column,
@@ -249,7 +251,7 @@ def schema_for_model_source(model: Model) -> Optional[Schema]:
     return result.schema
 
 
-@logger.log_execution()
+@log_execution()
 def run(statement: Compilable) -> RunResult:
     """
     Executes a given query and returns its results
@@ -276,7 +278,7 @@ def run(statement: Compilable) -> RunResult:
     )
 
 
-@logger.log_execution()
+@log_execution()
 def dry_run(model: Model) -> Optional[DryRunResult]:
     """
     You can use the estimate returned by the dry run to calculate query
@@ -345,23 +347,30 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
         )
 
     query = compile_statement(source)
-
-    query_job = client.query(
-        query=query,
-        job_config=QueryJobConfig(dry_run=True, use_query_cache=False),
-    )
-    return DryRunResult(
-        job_id=query_job.job_id,
-        total_bytes=query_job.total_bytes_processed,
-        referenced_tables=[
-            ".".join(table.to_api_repr().values())
-            for table in query_job.referenced_tables
-        ],
-        query=query,
-        model=model,
-        schema=query_job.schema,
-        user_email=query_job.user_email,
-    )
+    try:
+        query_job = client.query(
+            query=query,
+            job_config=QueryJobConfig(dry_run=True, use_query_cache=False),
+        )
+    except NotFound:
+        logger.exception(
+            "The query may contain model references that are not materialized.",
+            extra={"sql": query},
+        )
+        return None
+    else:
+        return DryRunResult(
+            job_id=query_job.job_id,
+            total_bytes=query_job.total_bytes_processed,
+            referenced_tables=[
+                ".".join(table.to_api_repr().values())
+                for table in query_job.referenced_tables
+            ],
+            query=query,
+            model=model,
+            schema=query_job.schema,
+            user_email=query_job.user_email,
+        )
 
 
 class fixed_unnest(sqlalchemy.sql.roles.InElementRole, unnest):
