@@ -30,7 +30,7 @@ from amora import logger
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
-from amora.logger import logger, log_execution
+from amora.logger import log_execution, logger
 from amora.models import (
     AmoraModel,
     Column,
