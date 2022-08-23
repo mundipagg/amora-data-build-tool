@@ -63,7 +63,7 @@ def amora_dash(
         percy_assets_root=request.config.getoption("percy_assets"),
         percy_finalize=request.config.getoption("nopercyfinalize"),
         pause=request.config.getoption("pause"),
-        wait_timeout=30,
+        wait_timeout=60,
     ) as dash_duo:
         dash_duo.start_server(amora.dash.app.__name__, application_name="dash_app")
         yield dash_duo
