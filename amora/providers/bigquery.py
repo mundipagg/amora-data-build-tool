@@ -26,7 +26,6 @@ from sqlalchemy_bigquery.base import BQArray, BQBinary, unnest
 from sqlmodel.main import get_sqlachemy_type
 from sqlmodel.sql import sqltypes as sqlmodel_types
 
-from amora import logger
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
