@@ -36,9 +36,12 @@ def sql_component(model: Model) -> Component:
             )
         )
 
-    source_code = model.target_path(
-        model_file_path=model_path_for_model(model)
-    ).read_text()
+    try:
+        source_code = model.target_path(
+            model_file_path=model_path_for_model(model)
+        ).read_text()
+    except FileNotFoundError:
+        source_code = "SQL code not available"
 
     return html.Div(
         [
