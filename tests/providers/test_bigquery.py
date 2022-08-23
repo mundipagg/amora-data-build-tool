@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from google.api_core.exceptions import NotFound
 from google.cloud.bigquery.schema import SchemaField
-from sqlalchemy import ARRAY, TIMESTAMP, Column, Integer, String
+from sqlalchemy import ARRAY, TIMESTAMP, Column, Integer, String, select, literal
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery import ARRAY, STRUCT
@@ -14,7 +14,7 @@ from sqlalchemy_bigquery.base import BQArray
 
 from amora.compilation import compile_statement
 from amora.config import settings
-from amora.models import AmoraModel, Field
+from amora.models import AmoraModel, Field, ModelConfig, MaterializationTypes
 from amora.protocols import Compilable
 from amora.providers.bigquery import (
     DryRunResult,
@@ -185,6 +185,25 @@ def test_dry_run_on_invalid_model():
 
     with pytest.raises(NotFound):
         dry_run(Model)
+
+
+def test_dry_run_on_unmaterialized_model():
+    class ModelA(AmoraModel, table=True):
+        __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
+
+        id: int = Field(primary_key=True)
+
+    class ModelB(AmoraModel, table=True):
+        __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
+
+        id: int = Field(primary_key=True)
+
+        @classmethod
+        def source(cls):
+            return select(ModelA.id)
+
+    assert dry_run(ModelB) is None
+
 
 
 def test_dry_run_on_model_with_source():
