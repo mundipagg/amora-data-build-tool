@@ -1,15 +1,15 @@
-from typing import Union
+from typing import Generator, Union
 
 import pytest
 from _pytest.config import ExitCode
 from _pytest.main import Session
-from dash.testing.application_runners import ThreadedRunner
+from dash.testing.application_runners import ProcessRunner
 from dash.testing.composite import DashComposite
 from rich.console import Console
 from rich.table import Table
 
+import amora.dash.app
 from amora.config import settings
-from amora.dash.app import dash_app
 from amora.tests.audit import AuditLog
 
 
@@ -49,9 +49,11 @@ def pytest_sessionfinish(session: Session, exitstatus: Union[int, ExitCode]) -> 
 
 
 @pytest.fixture
-def amora_dash(request, dash_thread_server: ThreadedRunner, tmpdir) -> DashComposite:
+def amora_dash(
+    request, dash_process_server: ProcessRunner, tmpdir
+) -> Generator[DashComposite, None, None]:
     with DashComposite(
-        dash_thread_server,
+        dash_process_server,
         browser=request.config.getoption("webdriver"),
         remote=request.config.getoption("remote"),
         remote_url=request.config.getoption("remote_url"),
@@ -63,5 +65,5 @@ def amora_dash(request, dash_thread_server: ThreadedRunner, tmpdir) -> DashCompo
         pause=request.config.getoption("pause"),
         wait_timeout=30,
     ) as dash_duo:
-        dash_duo.start_server(dash_app)
+        dash_duo.start_server(amora.dash.app.__name__, application_name="dash_app")
         yield dash_duo
