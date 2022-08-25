@@ -1,72 +1,107 @@
-from typing import List, Any
+from typing import Callable, List, Any, Optional
 
-import numpy as np
 import pandas as pd
 
+from numerize.numerize import numerize
+
+from pandas.api.types import (
+    is_string_dtype,
+    is_numeric_dtype,
+    is_datetime64_any_dtype,
+    is_bool_dtype,
+)
+
+import plotly.express as px
+from plotly.graph_objects import Figure
 
 from dash import html, dcc
 from dash.development.base_component import Component
-
-import plotly.express as px
-import plotly.graph_objects as go
+import dash_bootstrap_components as dbc
 
 from amora.models import Model
 from amora.providers.bigquery import sample
 
 
-def create_component_with_stacked_bar_for_two_unique_values(
-    df_value_counts: pd.DataFrame, column: str
-) -> Component:
-    """
-    Create component for boolean values.
-    Returns a stacked bar plot.
-    """
-
-    index_values = df_value_counts[column].values
-    values = df_value_counts["count"].values
-
-    stacked_bar_plot = go.Figure(
-        data=[
-            go.Bar(name=index_values[0], x=[column], y=[values[0]]),
-            go.Bar(name=index_values[1], x=[column], y=[values[1]]),
-        ]
+def apply_default_layout(figure: Figure) -> Figure:
+    figure.update_layout(
+        showlegend=False,
+        bargap=0,
+        margin=dict(l=0, r=0, b=0, t=0),
+        yaxis_title=None,
+        xaxis_title=None,
+        width=400,
+        height=400,
     )
-    stacked_bar_plot.update_layout(barmode="stack")
 
-    return stacked_bar_plot
+    figure.update_yaxes(visible=False, showticklabels=False)
 
-
-def create_component_with_text_for_unique_values(value: Any, column: str) -> Component:
-    """
-    Return component for columns with unique values of any type.
-    The component is a html.H1 element with the text "100% of values: {value}".
-    """
-    return html.P(f"{column} has 100% of values: {value}", style={"color": "red"})
+    return figure
 
 
-def create_component_with_most_frequent_values(
-    df: pd.DataFrame, column_name: str
-) -> Component:
-    """
-    Create a component for a column with multiple values with string type.
-    The component will be a html.P with the format:
-        {value}        X%
-        {value2}       Y%
-        other          (100 - (X + Y))%
-    """
+def get_df_value_counts(series: pd.Series, normalize: bool = False) -> pd.DataFrame:
+    series_value_counts = series.value_counts(normalize=normalize)
+    df_value_counts = series_value_counts.to_frame().reset_index()
+    df_value_counts.set_axis(["x", "count"], axis=1, inplace=True)
+    return df_value_counts
 
-    value_counts_normalized = df[column_name].value_counts(normalize=True)
-    df_value_counts_normalized = (
-        value_counts_normalized.to_frame()
-        .reset_index()
-        .rename(columns={column_name: "count", "index": column_name})
-    )
+
+def bin_series(cut: list) -> pd.DataFrame:
+
+    frequencies = pd.value_counts(cut, sort=False)
+
+    df_frequencies = frequencies.to_frame().reset_index()
+
+    df_frequencies.set_axis(["x", "count"], axis=1, inplace=True)
+
+    df_frequencies["x"] = df_frequencies["x"].astype(str)
+
+    return df_frequencies
+
+
+def cut_formatter(cut: pd.Series, formatter_function: Callable) -> list[str]:
+
+    humanized_cut = []
+    for _, interval in cut.iteritems():
+        humanized_cut.append(
+            f"{formatter_function(interval.left)}-{formatter_function(interval.right)}"
+        )
+
+    return humanized_cut
+
+
+def datetime_formatter(value) -> str:
+
+    return value.date().strftime("%d%b%y")
+
+
+def get_binned_dataframe(
+    series: pd.Series,
+    formatter_function: Optional[Callable] = None,
+) -> pd.DataFrame:
+    nunique = series.nunique()
+    bins = nunique if nunique <= 10 else 10
+    cut = pd.cut(x=series, bins=bins, include_lowest=True, precision=0)
+
+    if formatter_function:
+        cut = cut_formatter(cut, formatter_function)
+
+    return bin_series(cut)
+
+
+def create_component_for_one_unique_value(series: pd.Series) -> html.P:
+
+    return html.P(f"One unique value: {series[0]}", style={"color": "red"})
+
+
+def get_most_common_values(
+    df_value_counts_normalized: pd.DataFrame,
+) -> List[html.P]:
 
     elements = []
 
     for _, row in df_value_counts_normalized.head(2).iterrows():
         elements.append(
-            html.P(f"{row[column_name]}        {round((row['count']*100), 2)}%")
+            html.P(f"{row['x']}        {round((row['count']*100), 2)}%")
         )
 
     if df_value_counts_normalized.shape[0] > 2:
@@ -82,95 +117,125 @@ def create_component_with_most_frequent_values(
             2,
         )
         elements.append(html.P(f"other        {other}%"))
-    return html.Div(elements)
+
+    return elements
 
 
-def bin_series(
-    column_series: pd.Series, column: str, number_of_unique_values: int
-) -> pd.DataFrame:
-    """
-    Creates interval of the series and return a dataframe with the columns:
-        `count`: frequency
-        `index`: interval`
-    """
-    k = number_of_unique_values if number_of_unique_values <= 10 else 10
-    frequencies = pd.value_counts(
-        pd.cut(x=column_series, bins=k, include_lowest=True), sort=False
+def create_bar_plot_component(
+    df_value_counts: pd.DataFrame,
+    **bar_kwargs: Any,
+) -> dcc.Graph:
+
+    figure = apply_default_layout(
+        px.bar(
+            df_value_counts,
+            x="x",
+            y="count",
+            **bar_kwargs,
+        )
     )
-    df_frequencies = (
-        frequencies.to_frame()
-        .reset_index()
-        .rename(columns={column: "count", "index": column})
+
+    return dcc.Graph(figure=figure)
+
+
+
+def datetime_column_series_aggregation(series: pd.Series) -> pd.Series:
+    days_diff = (series.max() - series.min()).days
+
+    if days_diff > 365:
+        agg_type = "Y"
+    elif days_diff > 31:
+        agg_type = "M"
+    else:
+        agg_type = "D"
+
+    return series.dt.to_period(agg_type).astype(str)
+
+def create_component_bool_type(series: pd.Series) -> dcc.Graph:
+    df_value_counts = get_df_value_counts(series)
+    return create_bar_plot_component(
+        df_value_counts,
+        color="x",
+        barmode="stack",
     )
-    df_frequencies[column] = df_frequencies[column].astype(str)
-    return df_frequencies
 
 
-def create_component_with_bar_chart(df: pd.DataFrame, column: str) -> Component:
-    """
-    Create component with bar plot with its frequencies.
-    """
-    return dcc.Graph(figure=px.bar(df, x=column, y="count"))
+def create_component_numeric_type(series: pd.Series) -> dcc.Graph:
+    df_bin = get_binned_dataframe(series, numerize)
+    return create_bar_plot_component(
+        df_bin,
+    )
 
 
-def create_component_without_chart(column_name: str) -> Component:
-    """
-    Returns a component indication error for that column
-    """
-    return html.P(f"Column {column_name} dont have viz yet. 😔")
+def create_component_datetime_type(series: pd.Series) -> dcc.Graph:
+    column_series_agg = datetime_column_series_aggregation(series)
+    df_value_counts = get_df_value_counts(column_series_agg)
+    return create_bar_plot_component(
+        df_value_counts,
+    )
+
+def create_component_string_type(series: pd.Series) -> dcc.Graph:
+    df_value_counts_normalized = get_df_value_counts(
+        series, normalize=True
+    )
+    return get_most_common_values(
+        df_value_counts_normalized
+    )
 
 
-def create_component_list(df: pd.DataFrame) -> List[Component]:
-    """
-    Given a dataframe, create a html component (viz) for each column.
-    # TODO: return a dict instead of a list (list can cause column order)
-    """
-
-    summary_plots = []
+def create_df_visualizations(df: pd.DataFrame) -> Component:
+    col_list: list = []
 
     for column_name in df:
         column_name = str(column_name)
-        column_type = df[column_name].dtypes
-        value_counts = df[column_name].value_counts()
+        column_series: pd.Series = df[column_name]
 
-        unique_values = len(value_counts)
-
-        if unique_values == 1:
-            column_component = create_component_with_text_for_unique_values(
-                df[column_name][0], column_name
-            )
+        if column_series.nunique() == 1:
+            component_title = column_name
+            component_viz = create_component_for_one_unique_value(column_series)
         else:
-            if column_type in [float, int]:
-                df_bin = bin_series(df[column_name], column_name, unique_values)
-                column_component = create_component_with_bar_chart(df_bin, column_name)
-            elif column_type == str:
-                column_component = create_component_with_most_frequent_values(
-                    df, column_name
-                )
-            elif column_type == bool:
-                df_value_counts = (
-                    value_counts.to_frame()
-                    .reset_index()
-                    .rename(columns={column_name: "count", "index": column_name})
-                )
-                column_component = create_component_with_stacked_bar_for_two_unique_values(
-                    df_value_counts, column_name
-                )
+            if is_bool_dtype(column_series):
+                component_title = f"✔️ {column_name}"
+                component_viz = create_component_bool_type(column_series)
+
+            elif is_numeric_dtype(column_series):
+                component_title = f"🔢 {column_name}"
+                component_viz = create_component_numeric_type(column_series)
+
+            elif is_datetime64_any_dtype(column_series):
+                component_title = f"📅 {column_name}"
+                component_viz = create_component_datetime_type(column_series)
+
+            elif is_string_dtype(column_series):
+                component_title = f"🔤 {column_name}"
+                component_viz = create_component_string_type(column_series)
+
             else:
-                column_component = create_component_without_chart(column_name)
+                component_title = f"❓ {column_name}"
+                component_viz = html.P("No viz implemented for this type of column 😔")
 
-        summary_plots.append(column_component)
+        col_list.append(
+            dbc.Col(
+                [
+                    html.Div(
+                        [
+                            html.B(component_title),
+                            html.Div(component_viz),
+                        ]
+                    )
+                ]
+            )
+        )
 
-    return summary_plots
+    return dbc.Row(col_list)
 
 
-def component(model: Model) -> List[Component]:
-    """
-    Get a sample of the model and create basic viz.
-    """
+def component(model: Model) -> Component:
     try:
         df = sample(model, percentage=1)
     except ValueError:
-        return html.Div(f"Kaggle needs sample! {model.unique_name}")
+        return html.Div(
+            f"This component depends Sample and it is not implemented for model {model.unique_name}"
+        )
     else:
-        return create_component_list(df)
+        return create_df_visualizations(df)

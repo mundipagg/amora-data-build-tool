@@ -38,6 +38,11 @@ def component(model: Model) -> Component:
                                 item_id="summary",
                             ),
                             dbc.AccordionItem(
+                                model_viz.component(model),
+                                title="🐿️ Summary Visualization",
+                                item_id="summary-visualization",
+                            ),
+                            dbc.AccordionItem(
                                 model_columns.component(model),
                                 title="📝 Docs",
                                 item_id="docs",
@@ -57,11 +62,6 @@ def component(model: Model) -> Component:
                                 title="🏗 SQL Code",
                                 item_id="sql_code",
                             ),
-                            dbc.AccordionItem(
-                                model_viz.component(model),
-                                title="🐿️ Viz",
-                                item_id="viz",
-                            )
                         ],
                         start_collapsed=True,
                         id="model-details-accordion",
