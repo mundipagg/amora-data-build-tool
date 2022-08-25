@@ -63,8 +63,7 @@ def get_binned_dataframe(
     series: pd.Series,
     formatter_function: Optional[Callable] = None,
 ) -> pd.DataFrame:
-    nunique = series.nunique()
-    bins = nunique if nunique <= 10 else 10
+    bins = min(series.nunique(), 10)
     cut = pd.cut(x=series, bins=bins, include_lowest=True, precision=0)
 
     if formatter_function:
