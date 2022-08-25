@@ -86,6 +86,7 @@ def layout() -> Component:
     }
 
     if registry_fvs:
+        id_ = "feature-store-content"
         feature_views = html.Div(
             [
                 card_item(model=model, fv=registry_fvs.get(fv.name))
@@ -93,12 +94,11 @@ def layout() -> Component:
             ]
         )
     else:
-        feature_views = html.Div(
-            [html.H1("Error loading feature view...")]
-        )
+        id_ = "feature-views-loading-error"
+        feature_views = html.Div([html.H1("Error loading feature view...")])
 
     return html.Div(
-        id="feature-store-content",
+        id=id_,
         children=[
             html.H1("Feature Store"),
             html.Hr(),
