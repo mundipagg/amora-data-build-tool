@@ -49,17 +49,19 @@ def pytest_sessionfinish(session: Session, exitstatus: Union[int, ExitCode]) -> 
 
 
 @pytest.fixture(scope="session")
-def dash_thread_server():
+def amora_dash(request) -> Generator[DashComposite, None, None]:
     with ThreadedRunner() as dash_thread_server:
-        yield dash_thread_server
-
-
-@pytest.fixture(scope="session")
-def amora_dash(dash_thread_server) -> Generator[DashComposite, None, None]:
-    with DashComposite(
-        dash_thread_server,
-        browser="Chrome",
-        wait_timeout=60,
-    ) as dash_duo:
-        dash_duo.start_server(dash_app)
-        yield dash_duo
+        with DashComposite(
+            dash_thread_server,
+            browser=request.config.getoption("webdriver"),
+            remote=request.config.getoption("remote"),
+            remote_url=request.config.getoption("remote_url"),
+            headless=request.config.getoption("headless"),
+            options=request.config.hook.pytest_setup_options(),
+            percy_assets_root=request.config.getoption("percy_assets"),
+            percy_finalize=request.config.getoption("nopercyfinalize"),
+            pause=request.config.getoption("pause"),
+            wait_timeout=60,
+        ) as dash_duo:
+            dash_duo.start_server(dash_app)
+            yield dash_duo
