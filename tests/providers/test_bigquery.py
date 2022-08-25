@@ -219,7 +219,7 @@ def test_schema_for_model():
         id: int
         label: str
 
-    class ModelB(AmoraModel, table=True):
+    class Foo(AmoraModel, table=True):
         a_boolean: bool
         a_date: date
         a_datetime: datetime
@@ -235,7 +235,7 @@ def test_schema_for_model():
         )
         a_struct: Node = Field(sa_column=Column(struct_for_model(Node)))
 
-    schema = schema_for_model(ModelB)
+    schema = schema_for_model(Foo)
 
     assert schema == [
         SchemaField(name="a_timestamp", field_type="TIMESTAMP", mode="NULLABLE"),
