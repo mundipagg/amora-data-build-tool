@@ -80,6 +80,16 @@ jobs:
       - name: 🧪 pytest
         run: poetry run py.test --cov=amora --cov-report=term-missing --cov-report=xml ./tests
 
+      - name: 🧪 Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: ./coverage.xml
+          directory: ./mypy_coverage
+          flags: ${{ matrix.python }}
+          verbose: true
+
       - name: 📤 Uploading coverage reports as an artifact
         uses: actions/upload-artifact@v3
         with:
