@@ -78,7 +78,7 @@ jobs:
         uses: "google-github-actions/setup-gcloud@v0"
 
       - name: 🧪 pytest
-        run: poetry run py.test --log-cli-level DEBUG --cov=amora --cov-report=term-missing --cov-report=xml ./tests
+        run: poetry run py.test --cov=amora --cov-report=term-missing --cov-report=xml ./tests
 
       - name: 📤 Uploading coverage reports as an artifact
         uses: actions/upload-artifact@v3
