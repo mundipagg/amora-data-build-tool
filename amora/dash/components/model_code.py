@@ -41,20 +41,23 @@ def sql_component(model: Model) -> Component:
             model_file_path=model_path_for_model(model)
         ).read_text()
     except FileNotFoundError:
-        source_code = "SQL code not available"
-
-    return html.Div(
-        [
-            dash_ace.DashAceEditor(
-                id="input",
-                value=source_code,
-                theme="github",
-                mode="SQL",
-                tabSize=2,
-                enableBasicAutocompletion=True,
-                enableLiveAutocompletion=True,
-                autocompleter="/autocompleter?prefix=",
-                placeholder="SQL code ...",
-            )
-        ]
-    )
+        return dbc.Alert(
+            "⚠️ SQL code unavailable. Run `amora compile` to generate SQL files",
+            color="warning",
+        )
+    else:
+        return html.Div(
+            [
+                dash_ace.DashAceEditor(
+                    id="input",
+                    value=source_code,
+                    theme="github",
+                    mode="SQL",
+                    tabSize=2,
+                    enableBasicAutocompletion=True,
+                    enableLiveAutocompletion=True,
+                    autocompleter="/autocompleter?prefix=",
+                    placeholder="SQL code ...",
+                )
+            ]
+        )
