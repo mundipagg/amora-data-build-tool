@@ -42,6 +42,7 @@ fsspec = "^2022.5.0"
 gcsfs = "^2022.5.0"
 shed = ">=0.9.5,<0.11.0"
 humanize = "^4.2.3"
+numerize = "^0.12"
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "^3.0.0"
