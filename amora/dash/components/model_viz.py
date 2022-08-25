@@ -22,15 +22,15 @@ from amora.models import Model
 from amora.providers.bigquery import sample
 
 
-def apply_default_layout(figure: Figure) -> Figure:
+def figure_apply_default_layout(figure: Figure) -> Figure:
     figure.update_layout(
         showlegend=False,
         bargap=0,
         margin=dict(l=0, r=0, b=0, t=0),
         yaxis_title=None,
         xaxis_title=None,
-        width=400,
-        height=400,
+        width=200,
+        height=200,
     )
 
     figure.update_yaxes(visible=False, showticklabels=False)
@@ -38,28 +38,18 @@ def apply_default_layout(figure: Figure) -> Figure:
     return figure
 
 
-def get_df_value_counts(series: pd.Series, normalize: bool = False) -> pd.DataFrame:
-    series_value_counts = series.value_counts(normalize=normalize)
-    df_value_counts = series_value_counts.to_frame().reset_index()
+def value_counts_series_to_dataframe(series: pd.Series) -> pd.DataFrame:
+    df_value_counts = series.to_frame().reset_index()
     df_value_counts.set_axis(["x", "count"], axis=1, inplace=True)
     return df_value_counts
 
 
-def bin_series(cut: list) -> pd.DataFrame:
-
-    frequencies = pd.value_counts(cut, sort=False)
-
-    df_frequencies = frequencies.to_frame().reset_index()
-
-    df_frequencies.set_axis(["x", "count"], axis=1, inplace=True)
-
-    df_frequencies["x"] = df_frequencies["x"].astype(str)
-
-    return df_frequencies
-
-
 def cut_formatter(cut: pd.Series, formatter_function: Callable) -> list[str]:
-
+    """
+    Apply a formatter function in both `left` and `right` Interval.
+    Sometimes the pd.cuts generates long Interval strings, and we may
+    want to format each part of it. 
+    """
     humanized_cut = []
     for _, interval in cut.iteritems():
         humanized_cut.append(
@@ -67,11 +57,6 @@ def cut_formatter(cut: pd.Series, formatter_function: Callable) -> list[str]:
         )
 
     return humanized_cut
-
-
-def datetime_formatter(value) -> str:
-
-    return value.date().strftime("%d%b%y")
 
 
 def get_binned_dataframe(
@@ -85,7 +70,28 @@ def get_binned_dataframe(
     if formatter_function:
         cut = cut_formatter(cut, formatter_function)
 
-    return bin_series(cut)
+    frequencies = pd.value_counts(cut, sort=False)
+
+    df_frequencies = frequencies.to_frame().reset_index()
+
+    df_frequencies.set_axis(["x", "count"], axis=1, inplace=True)
+
+    df_frequencies["x"] = df_frequencies["x"].astype(str)
+
+    return df_frequencies
+
+
+def datetime_series_aggregation(series: pd.Series) -> pd.Series:
+    days_diff = (series.max() - series.min()).days
+
+    if days_diff > 365:
+        agg_type = "Y"
+    elif days_diff > 31:
+        agg_type = "M"
+    else:
+        agg_type = "D"
+
+    return series.dt.to_period(agg_type).astype(str)
 
 
 def create_component_for_one_unique_value(series: pd.Series) -> html.P:
@@ -100,9 +106,7 @@ def get_most_common_values(
     elements = []
 
     for _, row in df_value_counts_normalized.head(2).iterrows():
-        elements.append(
-            html.P(f"{row['x']}        {round((row['count']*100), 2)}%")
-        )
+        elements.append(html.P(f"{row['x']}        {round((row['count']*100), 2)}%"))
 
     if df_value_counts_normalized.shape[0] > 2:
         other = round(
@@ -121,12 +125,12 @@ def get_most_common_values(
     return elements
 
 
-def create_bar_plot_component(
+def create_bar_plot(
     df_value_counts: pd.DataFrame,
     **bar_kwargs: Any,
 ) -> dcc.Graph:
 
-    figure = apply_default_layout(
+    figure = figure_apply_default_layout(
         px.bar(
             df_value_counts,
             x="x",
@@ -138,22 +142,10 @@ def create_bar_plot_component(
     return dcc.Graph(figure=figure)
 
 
-
-def datetime_column_series_aggregation(series: pd.Series) -> pd.Series:
-    days_diff = (series.max() - series.min()).days
-
-    if days_diff > 365:
-        agg_type = "Y"
-    elif days_diff > 31:
-        agg_type = "M"
-    else:
-        agg_type = "D"
-
-    return series.dt.to_period(agg_type).astype(str)
-
 def create_component_bool_type(series: pd.Series) -> dcc.Graph:
-    df_value_counts = get_df_value_counts(series)
-    return create_bar_plot_component(
+    series_value_counts = series.value_counts()
+    df_value_counts = value_counts_series_to_dataframe(series_value_counts)
+    return create_bar_plot(
         df_value_counts,
         color="x",
         barmode="stack",
@@ -162,25 +154,26 @@ def create_component_bool_type(series: pd.Series) -> dcc.Graph:
 
 def create_component_numeric_type(series: pd.Series) -> dcc.Graph:
     df_bin = get_binned_dataframe(series, numerize)
-    return create_bar_plot_component(
+    return create_bar_plot(
         df_bin,
     )
 
 
 def create_component_datetime_type(series: pd.Series) -> dcc.Graph:
-    column_series_agg = datetime_column_series_aggregation(series)
-    df_value_counts = get_df_value_counts(column_series_agg)
-    return create_bar_plot_component(
+    datetime_series_agg = datetime_series_aggregation(series)
+    series_value_counts = datetime_series_agg.value_counts()
+    df_value_counts = value_counts_series_to_dataframe(series_value_counts)
+    return create_bar_plot(
         df_value_counts,
     )
 
+
 def create_component_string_type(series: pd.Series) -> dcc.Graph:
-    df_value_counts_normalized = get_df_value_counts(
-        series, normalize=True
+    series_value_counts = series.value_counts(normalize=True)
+    df_value_counts_normalized = value_counts_series_to_dataframe(
+        series_value_counts,
     )
-    return get_most_common_values(
-        df_value_counts_normalized
-    )
+    return get_most_common_values(df_value_counts_normalized)
 
 
 def create_df_visualizations(df: pd.DataFrame) -> Component:
