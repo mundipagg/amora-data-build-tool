@@ -3,13 +3,13 @@ from typing import Generator, Union
 import pytest
 from _pytest.config import ExitCode
 from _pytest.main import Session
-from dash.testing.application_runners import ProcessRunner
+from dash.testing.application_runners import ThreadedRunner
 from dash.testing.composite import DashComposite
 from rich.console import Console
 from rich.table import Table
 
-import amora.dash.app
 from amora.config import settings
+from amora.dash.app import dash_app
 from amora.tests.audit import AuditLog
 
 
@@ -48,22 +48,18 @@ def pytest_sessionfinish(session: Session, exitstatus: Union[int, ExitCode]) -> 
     console.print(table, new_line_start=True)
 
 
-@pytest.fixture
-def amora_dash(
-    request, dash_process_server: ProcessRunner, tmpdir
-) -> Generator[DashComposite, None, None]:
+@pytest.fixture(scope="session")
+def dash_thread_server():
+    with ThreadedRunner() as dash_thread_server:
+        yield dash_thread_server
+
+
+@pytest.fixture(scope="session")
+def amora_dash(dash_thread_server) -> Generator[DashComposite, None, None]:
     with DashComposite(
-        dash_process_server,
-        browser=request.config.getoption("webdriver"),
-        remote=request.config.getoption("remote"),
-        remote_url=request.config.getoption("remote_url"),
-        headless=request.config.getoption("headless"),
-        options=request.config.hook.pytest_setup_options(),
-        download_path=tmpdir.mkdir("download").strpath,
-        percy_assets_root=request.config.getoption("percy_assets"),
-        percy_finalize=request.config.getoption("nopercyfinalize"),
-        pause=request.config.getoption("pause"),
+        dash_thread_server,
+        browser="Chrome",
         wait_timeout=60,
     ) as dash_duo:
-        dash_duo.start_server(amora.dash.app.__name__, application_name="dash_app")
+        dash_duo.start_server(dash_app)
         yield dash_duo
