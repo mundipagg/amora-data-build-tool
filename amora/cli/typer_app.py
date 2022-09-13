@@ -7,10 +7,11 @@ from amora import materialization
 from amora.cli import dash, feature_store, models
 from amora.cli.shared_options import models_option, target_option
 from amora.cli.type_specs import Models
-from amora.compilation import compile_statement
+from amora.compilation import compile_statement, get_models_to_compile
 from amora.dag import DependencyDAG
+from amora.manifest import generate_manifest, load_manifest, save_manifest
 from amora.models import list_models
-from amora.utils import list_target_files
+from amora.utils import clean_compiled_files, list_target_files
 
 app = typer.Typer(
     help="Amora Data Build Tool enables engineers to transform data in their warehouses "
@@ -23,11 +24,21 @@ app = typer.Typer(
 def compile(
     models: Optional[Models] = models_option,
     target: Optional[str] = target_option,
+    force: Optional[bool] = False,
 ) -> None:
     """
     Generates executable SQL from model files. Compiled SQL files are written to the `./target` directory.
     """
-    for model, model_file_path in list_models():
+    current_manifest = generate_manifest()
+    previous_manifest = load_manifest()
+    
+    if force or not previous_manifest:
+        clean_compiled_files()
+        models_to_compile = tuple(list_models())
+    else:
+        models_to_compile = get_models_to_compile(previous_manifest, current_manifest)
+
+    for model, model_file_path in models_to_compile:
         if models and model_file_path.stem not in models:
             continue
 
@@ -42,6 +53,8 @@ def compile(
         content = compile_statement(source_sql_statement)
         target_file_path.parent.mkdir(parents=True, exist_ok=True)
         target_file_path.write_text(content)
+
+    save_manifest(current_manifest)
 
 
 @app.command()
