@@ -1,14 +1,10 @@
 import hashlib
 import json
-import os
-import os.path
 from collections import defaultdict
-from os.path import exists
-from pathlib import Path
-from typing import Iterable, Optional, Union
-from amora.models import list_files, list_models # use list_models instead of list_files!
-from amora.utils import get_model_key_from_file
+
 from amora.config import settings
+from amora.dag import DependencyDAG
+from amora.models import list_models
 
 BUF_SIZE = 65536
 
@@ -36,7 +32,7 @@ def generate_manifest() -> dict:
             "size": file_stats.st_size,
             "hash": hash_file(model_file_path).hexdigest(),
             "path": str(model_file_path),
-            "deps": [dep.unique_name() for dep in model.dependencies()]
+            "deps": [dep for dep in DependencyDAG.from_model(model)],
         }
 
         all_sources.append(str(model_file_path))
@@ -47,7 +43,7 @@ def generate_manifest() -> dict:
 
 
 def save_manifest(manifest: dict):
-    #TODO -> save content from manifest before save, in cases where the save fails
+    # TODO -> save content from manifest before save, in cases where the save fails
     with open(settings.manifest_path, "w+") as f:
         json.dump(manifest, f)
 
