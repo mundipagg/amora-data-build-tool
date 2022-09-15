@@ -31,7 +31,7 @@ def compile(
     """
     current_manifest = generate_manifest()
     previous_manifest = load_manifest()
-    
+
     if force or not previous_manifest:
         clean_compiled_files()
         models_to_compile = tuple(list_models())

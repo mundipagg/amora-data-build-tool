@@ -72,7 +72,9 @@ class Settings(BaseSettings):
         if values["MANIFEST_PATH"] is not None:
             return values
 
-        values["MANIFEST_PATH"] = Path(os.path.join(values["PROJECT_PATH"], "manifest.json"))
+        values["MANIFEST_PATH"] = Path(
+            os.path.join(values["PROJECT_PATH"], "manifest.json")
+        )
         return values
 
     @root_validator

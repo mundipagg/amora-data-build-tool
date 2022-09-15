@@ -37,6 +37,7 @@ def list_target_files() -> Iterable[Path]:
 def get_model_key_from_file(model_file: Path) -> str:
     return os.path.basename(model_file).split(".")[0]
 
+
 def get_target_path_from_model_file(
     model_file,
 ) -> Path:  # Duplicated -> already in AmoraModel
