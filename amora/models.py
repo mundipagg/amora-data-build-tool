@@ -270,6 +270,16 @@ def amora_model_for_name(model_name: str) -> Model:
     raise ValueError(f"{model_name} not found on models list")
 
 
+def amora_model_from_name_list(
+    model_name_list: Union[list[str], set[str]]
+) -> List[Tuple[Model, Path]]:
+    models: List[Tuple[Model, Path]] = []
+    for model, _path in list_models():
+        if model.unique_name() in model_name_list:
+            models.append((model, _path))
+    return models
+
+
 def list_models(
     path: Path = settings.models_path,
 ) -> Iterable[Tuple[Model, Path]]:

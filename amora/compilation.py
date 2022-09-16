@@ -1,13 +1,13 @@
 import os
 from os.path import exists
 from pathlib import Path
-from typing import Tuple
+from typing import Any, Set, Tuple
 
 import sqlparse
 from sqlalchemy_bigquery import STRUCT, BigQueryDialect
 from sqlalchemy_bigquery.base import BigQueryCompiler
 
-from amora.models import Model, list_models
+from amora.models import Model, amora_model_from_name_list, list_models
 from amora.protocols import Compilable
 from amora.utils import get_model_key_from_file, get_target_path_from_model_file
 
@@ -69,10 +69,26 @@ def delete_removed_models_from_target(
         os.remove(get_target_path_from_model_file(model_file))
 
 
+def split_list_by_element(list_: list, element: Any) -> list:
+    return [] if element not in list_ else list_[list_.index(element) + 1 :]
+
+
+def get_deps_names(current_manifest: dict, model_id_to_compile: str) -> set:
+    model_deps_to_compile: list = []
+
+    for _, model_manifest in current_manifest["models"].items():
+        model_deps_to_compile.extend(
+            split_list_by_element(model_manifest["deps"], model_id_to_compile)
+        )
+
+    return set(model_deps_to_compile)
+
+
 def get_models_to_compile(
     previous_manifest: dict, current_manifest: dict
-) -> Tuple[Model, Path]:
-    models_to_compile: Tuple = []
+) -> Set[Tuple[Model, Path]]:
+    models_to_compile: Set[Tuple] = set()
+    deps_names_to_compile: set = set()
 
     delete_removed_models_from_target(
         previous_manifest["all_sources"], current_manifest["all_sources"]
@@ -80,21 +96,32 @@ def get_models_to_compile(
 
     for model, model_file_path in list_models():
         model_unique_name = model.unique_name()
-
-        if model_unique_name not in previous_manifest["models"]:
-            models_to_compile.append((model, model_file_path))
-            continue
+        compile_model = False
 
         model_current_manifest = current_manifest["models"][model_unique_name]
-        model_previous_manifest = previous_manifest["models"][model_unique_name]
+        model_previous_manifest = previous_manifest["models"].get(
+            model_unique_name
+        )  # model could not exist in previous
 
-        if model_current_manifest["size"] != model_previous_manifest["size"] or (
-            model_current_manifest["stat"] > model_previous_manifest["stat"]
-            and (
-                not exists(model.target_path())
-                or model_current_manifest["hash"] != model_previous_manifest["hash"]
+        compile_model = not model_previous_manifest or (
+            model_current_manifest["size"] != model_previous_manifest["size"]
+            or model_current_manifest["deps"] != model_previous_manifest["deps"]
+            or (
+                model_current_manifest["stat"] > model_previous_manifest["stat"]
+                and (
+                    not exists(model.target_path(model_file_path))
+                    or model_current_manifest["hash"] != model_previous_manifest["hash"]
+                )
             )
-        ):
-            models_to_compile.append((model, model_file_path))
+        )
+
+        if compile_model:
+            models_to_compile.add((model, model_file_path))
+            deps_names_to_compile = deps_names_to_compile.union(
+                get_deps_names(current_manifest, model_unique_name)
+            )
+
+    deps_to_compile = amora_model_from_name_list(deps_names_to_compile)
+    models_to_compile = models_to_compile.union(deps_to_compile)
 
     return models_to_compile
