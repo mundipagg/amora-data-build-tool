@@ -34,7 +34,7 @@ def compile(
 
     if force or not previous_manifest:
         clean_compiled_files()
-        models_to_compile = tuple(list_models())
+        models_to_compile = set(list_models())
     else:
         models_to_compile = get_models_to_compile(previous_manifest, current_manifest)
 
