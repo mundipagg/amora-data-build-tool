@@ -1,6 +1,7 @@
+import asyncio
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from google.cloud.bigquery import Client, QueryJobConfig, Table
 
@@ -25,7 +26,7 @@ class Task:
         return f"{self.model.__name__} -> {self.sql_stmt}"
 
 
-def materialize(sql: str, model: Model) -> Optional[Table]:
+async def materialize(sql: str, model: Model) -> Optional[Table]:
     config = model.__model_config__
     materialization = config.materialized
 
@@ -42,36 +43,43 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
         view.labels = config.labels_dict
         view.view_query = sql
 
-        client.delete_table(table_name, not_found_ok=True)
+        await asyncio.to_thread(client.delete_table, table_name, not_found_ok=True)
 
         return client.create_table(view)
 
     if materialization == MaterializationTypes.table:
         table_name = model.unique_name()
-        client.delete_table(table_name, not_found_ok=True)
-        query_job = client.query(
+        await asyncio.to_thread(client.delete_table, table_name, not_found_ok=True)
+        query_job = await asyncio.to_thread(
+            client.query,
             sql,
             job_config=QueryJobConfig(
-                destination=model.unique_name(),
+                destination=table_name,
                 write_disposition="WRITE_TRUNCATE",
             ),
         )
 
-        query_job.result()
+        await asyncio.to_thread(query_job.result)
 
-        table = client.get_table(model.unique_name())
+        table = await asyncio.to_thread(client.get_table, table_name)
         table.description = config.description
         table.labels = config.labels_dict
 
         if config.cluster_by:
             table.clustering_fields = config.cluster_by
 
-        return client.update_table(
-            table, ["description", "labels", "clustering_fields"]
+        return await asyncio.to_thread(
+            client.update_table, table, ["description", "labels", "clustering_fields"]
         )
 
     raise ValueError(
         f"Invalid model materialization configuration. "
         f"Valid types are: `{', '.join((m.name for m in MaterializationTypes))}`. "
         f"Got: `{materialization}`"
+    )
+
+
+async def task_layer_async_call(tasks: List[Task]):
+    await asyncio.gather(
+        *[materialize(sql=task.sql_stmt, model=task.model) for task in tasks]
     )

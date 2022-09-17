@@ -1,7 +1,9 @@
+import asyncio
 from typing import Optional
 
 import pytest
 import typer
+from networkx.algorithms.traversal.breadth_first_search import bfs_layers
 
 from amora import materialization
 from amora.cli import dash, feature_store, models
@@ -76,20 +78,25 @@ def materialize(
     if draw_dag:
         dag.draw()
 
-    for model in dag:
-        try:
-            task = model_to_task[model]
-        except KeyError:
-            typer.echo(f"⚠️  Skipping `{model}`")
-            continue
-        else:
-            table = materialization.materialize(sql=task.sql_stmt, model=task.model)
-            if table is None:
+    for model_layer in bfs_layers(dag, dag.root()):
+        layer_materialize = []
+        for model in model_layer:
+            try:
+                task = model_to_task[model]
+                layer_materialize.append(task)
+            except KeyError:
+                typer.echo(f"⚠️  Skipping `{model}`")
                 continue
 
-            typer.echo(f"✅  Created `{model}` as `{table.full_table_id}`")
-            typer.echo(f"    Rows: {table.num_rows}")
-            typer.echo(f"    Bytes: {table.num_bytes}")
+        table_list = asyncio.run(
+            materialization.task_layer_async_call(layer_materialize)
+        )
+
+        for table in table_list:
+            if table is not None:
+                typer.echo(f"✅  Created `{model}` as `{table.full_table_id}`")
+                typer.echo(f"    Rows: {table.num_rows}")
+                typer.echo(f"    Bytes: {table.num_bytes}")
 
 
 @app.command()
