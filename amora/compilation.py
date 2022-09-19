@@ -86,9 +86,9 @@ def get_deps_names(current_manifest: dict, model_id_to_compile: str) -> set:
 
 def get_models_to_compile(
     previous_manifest: dict, current_manifest: dict
-) -> Set[Tuple[Model, Path]]:
-    models_to_compile: Set[Tuple[Model, Path]] = set()
-    deps_names_to_compile: set = set()
+) -> set[Tuple[Model, Path]]:
+    models_to_compile = set()
+    deps_names_to_compile: Set = set()
 
     delete_removed_models_from_target(
         previous_manifest["all_sources"], current_manifest["all_sources"]
@@ -121,9 +121,7 @@ def get_models_to_compile(
                 get_deps_names(current_manifest, model_unique_name)
             )
 
-    deps_to_compile: set[Tuple[Model], Path] = set(
-        amora_model_from_name_list(deps_names_to_compile)
-    )
+    deps_to_compile = set(amora_model_from_name_list(deps_names_to_compile))
     models_to_compile = models_to_compile.union(deps_to_compile)
 
     return models_to_compile
