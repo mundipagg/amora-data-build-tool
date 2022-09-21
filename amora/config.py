@@ -55,6 +55,8 @@ class Settings(BaseSettings):
 
     TEST_RUN_ID: str = os.getenv("PYTEST_XDIST_TESTRUNUID") or f"amora-{uuid4().hex}"
 
+    MATERIALIZE_NUM_THREADS: int = 5
+
     class Config:
         env_prefix = "AMORA_"
 
