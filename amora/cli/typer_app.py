@@ -8,9 +8,8 @@ from amora.cli import dash, feature_store, models
 from amora.cli.shared_options import models_option, target_option
 from amora.cli.type_specs import Models
 from amora.compilation import compile_statement
-from amora.dag import DependencyDAG
+from amora.dag import DependencyDAG, Task
 from amora.models import list_models
-from amora.utils import list_target_files
 
 app = typer.Typer(
     help="Amora Data Build Tool enables engineers to transform data in their warehouses "
@@ -62,21 +61,14 @@ def materialize(
     if not no_compile:
         compile(models=models, target=target)
 
-    model_to_task: dict[str, materialization.Task] = {}
+    tasks: dict[str, Task] = materialization.create_materialization_tasks(models)
 
-    for target_file_path in list_target_files():
-        if models and target_file_path.stem not in models:
-            continue
-
-        task = materialization.Task.for_target(target_file_path)
-        model_to_task[task.model.unique_name()] = task
-
-    dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
+    dag = DependencyDAG.from_tasks(tasks=tasks.values())
 
     if draw_dag:
         dag.draw()
 
-    materialization.materialize_dag(dag, model_to_task, typer.echo)
+    materialization.materialize_dag(dag, tasks, typer.echo)
 
 
 @app.command()
