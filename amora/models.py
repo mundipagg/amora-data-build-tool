@@ -1,8 +1,11 @@
 import inspect
+import os
 import re
+import sys
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from importlib.util import module_from_spec, spec_from_file_location
+from functools import partial
+from importlib import import_module
 from inspect import getfile
 from pathlib import Path
 from types import ModuleType
@@ -205,45 +208,36 @@ class AmoraModel(SQLModel):
         return str(cls.__table__)
 
 
-def _is_amora_model(candidate: ModuleType) -> bool:
+def _is_amora_model(module_name: str, candidate: ModuleType) -> bool:
     return (
         isinstance(candidate, CompilableProtocol)
         and inspect.isclass(candidate)
         and issubclass(candidate, AmoraModel)
         and hasattr(candidate, "__table__")
+        and candidate.__module__ == module_name
     )
 
 
 def amora_model_for_path(path: Path) -> Model:
-    spec = spec_from_file_location(".".join(["amoramodel", path.stem]), path)
-    if spec is None:
-        raise ValueError(f"Invalid path `{path}`. Not a valid Python file.")
+    if settings.PROJECT_PATH.as_posix() not in sys.path:
+        sys.path.insert(0, settings.PROJECT_PATH.as_posix())
+    module_name = (
+        path.relative_to(settings.PROJECT_PATH)
+        .with_suffix("")
+        .as_posix()
+        .replace(os.sep, ".")
+    )
+    module = import_module(module_name)
 
-    module = module_from_spec(spec)
-
-    if spec.loader is None:
-        raise ValueError(f"Invalid AmoraModel path `{path}`. Unable to load module.")
-
-    try:
-        spec.loader.exec_module(module)
-    except ImportError as e:
-        raise ValueError(
-            f"Invalid AmoraModel path `{path}`. Unable to load module."
-        ) from e
+    __is_amora_model = partial(_is_amora_model, module_name)
 
     compilables = inspect.getmembers(
         module,
-        _is_amora_model,
+        __is_amora_model,
     )
 
-    for _name, class_ in compilables:
-        try:
-            # fixme: Quando carregamos o código em inspect, não existe um arquivo associado,
-            #  ou seja, ao iterar sobre as classes de um arquivo, a classe que retornar um TypeError,
-            #  é uma classe definida no arquivo
-            class_.model_file_path()
-        except TypeError:
-            return class_
+    if compilables:
+        return compilables[-1][-1]
 
     raise ValueError(f"Invalid path `{path}`")
 

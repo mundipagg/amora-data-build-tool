@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
+from models.heart_rate import HeartRate
 from sqlalchemy import TIMESTAMP
 
 from amora.models import (
@@ -13,7 +14,6 @@ from amora.models import (
     select,
 )
 from amora.protocols import Compilable
-from examples.amora_project.models.heart_rate import HeartRate
 
 
 class HeartRateOver100(AmoraModel, table=True):

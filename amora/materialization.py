@@ -1,22 +1,22 @@
 from concurrent import futures
-from typing import Callable, Optional, Union
+from typing import Optional
 
-import networkx as nx
 from google.cloud.bigquery import Client, QueryJobConfig, Table
 
+from amora.compilation import compile_statement
 from amora.config import settings
-from amora.dag import DependencyDAG, Task
-from amora.models import MaterializationTypes, ModelConfig
-from amora.utils import list_target_files
+from amora.dag import MaterializationDAG
+from amora.models import MaterializationTypes, Model
 
 
-def materialize_model(
-    sql: str, model_name: str, config: ModelConfig
-) -> Optional[Table]:
+def materialize_model(model: Model) -> Optional[Table]:
+    config = model.__model_config__
     materialization = config.materialized
+    model_name = model.unique_name()
+    sql = compile_statement(model.source())
 
     if materialization == MaterializationTypes.ephemeral:
-        return f"    Skipping materialization of ephemeral model {model_name}"
+        return None
 
     client = Client()
 
@@ -73,41 +73,17 @@ def materialize_model(
 
 
 def materialize_dag(
-    dag: "DependencyDAG",  # type: ignore
-    tasks: dict[str, Task],
-    logger: Optional[Callable] = None,
+    dag: "MaterializationDAG",  # type: ignore
 ) -> None:
     with futures.ProcessPoolExecutor(
         max_workers=settings.MATERIALIZE_NUM_THREADS
     ) as executor:
-        for models in nx.topological_generations(dag):
-            sqls = [tasks[model].sql_stmt for model in models if model in tasks]
-            model_names = [model for model in models if model in tasks]
-            configs = [
-                tasks[model].model.__model_config__
-                for model in models
-                if model in tasks
-            ]
+        for models in dag:
 
             results = executor.map(
                 materialize_model,
-                sqls,
-                model_names,
-                configs,
+                models,
             )
 
             for result in results:
-                if logger:
-                    logger(result)
-
-
-def create_materialization_tasks(models: Union[list, None]) -> dict[str, Task]:
-    tasks: dict[str, Task] = {}
-
-    for target_file_path in list_target_files():
-        if models and target_file_path.stem not in models:
-            continue
-
-        task = Task.for_target(target_file_path)
-        tasks[task.model.unique_name()] = task
-    return tasks
+                print(result)

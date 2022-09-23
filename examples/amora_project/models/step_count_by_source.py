@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 import humanize
+from models.steps import Steps
 from sqlalchemy import TIMESTAMP, Column, Integer, func, literal
 
 from amora.feature_store.decorators import feature_view
@@ -17,7 +18,6 @@ from amora.protocols import Compilable
 from amora.questions import question
 from amora.transformations import datetime_trunc_hour
 from amora.visualization import BigNumber, LineChart, PieChart
-from examples.amora_project.models.steps import Steps
 
 
 @feature_view

@@ -1,3 +1,5 @@
+from models.heart_agg import HeartRateAgg
+
 from amora.tests.assertions import (
     are_unique_together,
     expression_is_true,
@@ -5,7 +7,6 @@ from amora.tests.assertions import (
     is_non_negative,
     that,
 )
-from examples.amora_project.models.heart_agg import HeartRateAgg
 
 
 def test_sum_of_values_is_greater_than_avg_of_values():

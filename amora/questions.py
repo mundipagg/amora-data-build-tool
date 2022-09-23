@@ -25,7 +25,7 @@ class Question:
     Lets define a new data question:
 
     ```python
-    from examples.models.step_count_by_source import StepCountBySource
+    frommodels.step_count_by_source import StepCountBySource
 
     from amora.models import select
     from amora.questions import question

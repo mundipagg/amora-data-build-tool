@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from models.health import Health
 from sqlalchemy import TIMESTAMP
 from sqlmodel import Field, select
 
@@ -12,7 +13,6 @@ from amora.models import (
     ModelConfig,
     PartitionConfig,
 )
-from examples.amora_project.models.health import Health
 
 
 class Steps(AmoraModel, table=True):

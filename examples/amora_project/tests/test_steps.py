@@ -1,3 +1,6 @@
+from models.health import Health
+from models.steps import Steps
+
 from amora.tests.assertions import (
     expression_is_true,
     has_accepted_values,
@@ -5,8 +8,6 @@ from amora.tests.assertions import (
     relationship,
     that,
 )
-from examples.amora_project.models.health import Health
-from examples.amora_project.models.steps import Steps
 
 
 def test_relates_to_health():

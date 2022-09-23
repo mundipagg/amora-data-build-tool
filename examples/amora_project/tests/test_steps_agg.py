@@ -1,5 +1,6 @@
+from models.steps_agg import StepsAgg
+
 from amora.tests.assertions import expression_is_true, is_non_negative, that
-from examples.amora_project.models.steps_agg import StepsAgg
 
 
 def test_sum_of_values_is_greater_than_avg_of_values():

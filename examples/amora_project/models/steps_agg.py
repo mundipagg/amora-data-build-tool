@@ -1,8 +1,8 @@
+from models.steps import Steps
 from sqlmodel import Field, func, select
 
 from amora.compilation import Compilable
 from amora.models import AmoraModel, MaterializationTypes, ModelConfig
-from examples.amora_project.models.steps import Steps
 
 
 class StepsAgg(AmoraModel, table=True):

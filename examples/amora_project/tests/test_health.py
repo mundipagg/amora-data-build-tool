@@ -1,3 +1,5 @@
+from models.health import Health
+
 from amora.tests.assertions import (
     expression_is_true,
     has_accepted_values,
@@ -6,7 +8,6 @@ from amora.tests.assertions import (
     is_unique,
     that,
 )
-from examples.amora_project.models.health import Health
 
 
 def test_value_is_not_null():

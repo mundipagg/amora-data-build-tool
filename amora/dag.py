@@ -30,6 +30,23 @@ class Task:
         return f"{self.model.__name__} -> {self.sql_stmt}"
 
 
+class MaterializationDAG(nx.DiGraph):
+    def __iter__(self):
+        return nx.topological_generations(self)
+
+    @classmethod
+    def from_models(cls, models: Iterable[Model]) -> "MaterializationDAG":
+        dag = cls()
+        for model in models:
+            if model.source() is not None:
+                dag.add_node(model)
+                for dependency in model.dependencies():
+                    if dependency.source() is not None:
+                        dag.add_edge(dependency, model)
+
+        return dag
+
+
 class DependencyDAG(nx.DiGraph):
     def __iter__(self):
         return nx.topological_sort(self)
@@ -58,6 +75,18 @@ class DependencyDAG(nx.DiGraph):
             dag.add_node(task.model.unique_name())
             for dependency in getattr(task.model, "__depends_on__", []):
                 dag.add_edge(dependency.unique_name(), task.model.unique_name())
+
+        return dag
+
+    @classmethod
+    def from_models(cls, models: Iterable[Model]) -> "DependencyDAG":
+        dag = cls()
+        for model in models:
+            if model.source() is not None:
+                dag.add_node(model)
+                for dependency in model.dependencies():
+                    if dependency.source() is not None:
+                        dag.add_edge(dependency, model)
 
         return dag
 

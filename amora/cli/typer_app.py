@@ -8,7 +8,7 @@ from amora.cli import dash, feature_store, models
 from amora.cli.shared_options import models_option, target_option
 from amora.cli.type_specs import Models
 from amora.compilation import compile_statement
-from amora.dag import DependencyDAG, Task
+from amora.dag import MaterializationDAG
 from amora.models import list_models
 
 app = typer.Typer(
@@ -61,14 +61,12 @@ def materialize(
     if not no_compile:
         compile(models=models, target=target)
 
-    tasks: dict[str, Task] = materialization.create_materialization_tasks(models)
-
-    dag = DependencyDAG.from_tasks(tasks=tasks.values())
+    dag = MaterializationDAG.from_models(models=[model for model, _ in list_models()])
 
     if draw_dag:
         dag.draw()
 
-    materialization.materialize_dag(dag, tasks, typer.echo)
+    materialization.materialize_dag(dag)
 
 
 @app.command()
