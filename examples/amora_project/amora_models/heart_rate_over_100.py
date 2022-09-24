@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from models.heart_rate import HeartRate
+from amora_models.heart_rate import HeartRate
 from sqlalchemy import TIMESTAMP
 
 from amora.models import (

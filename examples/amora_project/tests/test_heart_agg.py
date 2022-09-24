@@ -1,4 +1,4 @@
-from models.heart_agg import HeartRateAgg
+from amora_models.heart_agg import HeartRateAgg
 
 from amora.tests.assertions import (
     are_unique_together,

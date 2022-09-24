@@ -1,4 +1,4 @@
-from models.heart_rate import HeartRate
+from amora_models.heart_rate import HeartRate
 from sqlmodel import Field, func, select
 
 from amora.models import AmoraModel, MaterializationTypes, ModelConfig

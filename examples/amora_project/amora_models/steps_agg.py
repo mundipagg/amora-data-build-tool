@@ -1,4 +1,4 @@
-from models.steps import Steps
+from amora_models.steps import Steps
 from sqlmodel import Field, func, select
 
 from amora.compilation import Compilable

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 import humanize
-from models.steps import Steps
+from amora_models.steps import Steps
 from sqlalchemy import TIMESTAMP, Column, Integer, func, literal
 
 from amora.feature_store.decorators import feature_view

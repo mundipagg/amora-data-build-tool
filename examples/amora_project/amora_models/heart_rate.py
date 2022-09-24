@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from models.health import Health
+from amora_models.health import Health
 from sqlalchemy import TIMESTAMP
 from sqlmodel import Field, select
 

@@ -1,4 +1,4 @@
-from models.health import Health
+from amora_models.health import Health
 
 from amora.tests.assertions import (
     expression_is_true,

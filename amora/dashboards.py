@@ -49,7 +49,7 @@ class Dashboard(BaseModel):
     ```python
     # $AMORA_PROJECT_PATH/dashboards/steps.py
 
-    from models.step_count_by_source import (
+    from amora_models.step_count_by_source import (
         how_many_data_points_where_acquired,
         what_are_the_available_data_sources,
         what_are_the_values_observed_on_the_iphone,

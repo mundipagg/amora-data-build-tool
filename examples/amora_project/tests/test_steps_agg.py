@@ -1,4 +1,4 @@
-from models.steps_agg import StepsAgg
+from amora_models.steps_agg import StepsAgg
 
 from amora.tests.assertions import expression_is_true, is_non_negative, that
 
