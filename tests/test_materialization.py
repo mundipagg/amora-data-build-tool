@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from amora.config import settings
 from amora.dag import DependencyDAG, Task
-from amora.materialization import create_materialization_tasks, materialize_model
+from amora.materialization import materialize_model
 from amora.models import (
     AmoraModel,
     Field,
@@ -76,7 +76,7 @@ def test_materialize_as_view(Client: MagicMock):
     model_name = ViewModel.unique_name()
 
     result = materialize_model(
-        sql="SELECT 1", model_name=model_name, config=ViewModel.__model_config__
+        ViewModel
     )
 
     client = Client.return_value
@@ -115,7 +115,7 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
     model_name = TableModel.unique_name()
 
     materialize_model(
-        sql="SELECT 1", model_name=model_name, config=TableModel.__model_config__
+        TableModel
     )
 
     client = Client.return_value
@@ -125,14 +125,14 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
     client.query.assert_called_once_with(
         "SELECT 1",
         job_config=QueryJobConfig(
-            destination=TableModel.unique_name(),
+            destination=model_name,
             write_disposition="WRITE_TRUNCATE",
         ),
     )
 
     table: Table = client.get_table.return_value
     client.delete_table.assert_called_once_with(
-        TableModel.unique_name(), not_found_ok=True
+        model_name, not_found_ok=True
     )
     client.update_table.assert_called_once_with(
         table,
@@ -169,7 +169,7 @@ def test_materialize_as_table_without_clustering_configuration(
     model_name = TableModel.unique_name()
 
     materialize_model(
-        sql="SELECT 1", model_name=model_name, config=TableModel.__model_config__
+        TableModel
     )
 
     client = Client.return_value
@@ -179,7 +179,7 @@ def test_materialize_as_table_without_clustering_configuration(
     client.query.assert_called_once_with(
         "SELECT 1",
         job_config=QueryJobConfig(
-            destination=TableModel.unique_name(),
+            destination=model_name,
             write_disposition="WRITE_TRUNCATE",
         ),
     )
@@ -211,60 +211,11 @@ def test_materialize_as_ephemeral(Client: MagicMock):
 
     assert (
         materialize_model(
-            sql="SELECT 1",
-            model_name=EphemeralModel.unique_name(),
-            config=EphemeralModel.__model_config__,
+            EphemeralModel
         )
         is None
     )
     assert not Client.called
-
-
-def test_create_materialization_tasks():
-    models: list[AmoraModel] = [HeartRate, Steps]
-    for model in models:
-        target_path = model.target_path(model_file_path=model.model_file_path())
-        target_path.write_text("SELECT 1")
-
-    tasks = create_materialization_tasks([])
-
-    assert len(tasks) == len(models)
-
-    for model_name, model in zip(
-        sorted(tasks), sorted(models, key=lambda x: x.unique_name())
-    ):
-        task = tasks[model_name]
-        expected_task = Task.for_target(
-            model.target_path(model_file_path=model.model_file_path())
-        )
-
-        assert task.sql_stmt == expected_task.sql_stmt
-        assert task.target_file_path == expected_task.target_file_path
-        assert task.model.__table__ == expected_task.model.__table__
-
-
-def test_create_materialization_tasks_with_models():
-    models: list[AmoraModel] = [HeartRate, Steps]
-    models_option: list[str] = [model.model_file_path().stem for model in models]
-    for model in models:
-        target_path = model.target_path(model_file_path=model.model_file_path())
-        target_path.write_text("SELECT 1")
-
-    tasks = create_materialization_tasks(models_option)
-
-    assert len(tasks) == len(models)
-
-    for model_name, model in zip(
-        sorted(tasks), sorted(models, key=lambda x: x.unique_name())
-    ):
-        task = tasks[model_name]
-        expected_task = Task.for_target(
-            model.target_path(model_file_path=model.model_file_path())
-        )
-
-        assert task.sql_stmt == expected_task.sql_stmt
-        assert task.target_file_path == expected_task.target_file_path
-        assert task.model.__table__ == expected_task.model.__table__
 
 
 # TODO test materialize_dag
