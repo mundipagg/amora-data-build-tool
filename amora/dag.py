@@ -31,7 +31,7 @@ class Task:
 
 
 class MaterializationDAG(nx.DiGraph):
-    def __iter__(self):
+    def topological_generations(self):
         return nx.topological_generations(self)
 
     @classmethod
