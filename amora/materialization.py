@@ -78,7 +78,7 @@ def materialize_dag(
     with futures.ProcessPoolExecutor(
         max_workers=settings.MATERIALIZE_NUM_THREADS
     ) as executor:
-        for models in dag:
+        for models in dag.topological_generations():
 
             results = executor.map(
                 materialize_model,
