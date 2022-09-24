@@ -65,7 +65,7 @@ class Settings(BaseSettings):
         if values["MODELS_PATH"] is not None:
             return values
 
-        values["MODELS_PATH"] = values["PROJECT_PATH"].joinpath("models")
+        values["MODELS_PATH"] = values["PROJECT_PATH"].joinpath("amora_models")
         return values
 
     @root_validator

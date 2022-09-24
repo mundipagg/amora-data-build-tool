@@ -2,7 +2,7 @@ import inspect
 import re
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from importlib.util import module_from_spec, spec_from_file_location
+from importlib import import_module
 from inspect import getfile
 from pathlib import Path
 from types import ModuleType
@@ -214,35 +214,37 @@ def _is_amora_model(candidate: ModuleType) -> bool:
     )
 
 
+def get_module_relative_import(model_path: Path, project_path: Path = settings.PROJECT_PATH) -> str:
+    """
+    Given a path of a model, build the relative import for the model in `amora_models` module.
+    Example:
+        project_path = /home/some/path/amora_project/
+        model_path = /home/some/path/amora_project/amora_models/my_model.py
+    Output:
+        amora_models.my_model
+    """
+    # FIXME deve existir uma maneira de fazer isso sem tanta manipulação de strings
+    project_path_str = str(project_path) + "/"
+    module_path = str(model_path).replace(project_path_str, "")
+    string_module_path = module_path.replace("/", ".").replace(".py", "")
+    return string_module_path
+
+
 def amora_model_for_path(path: Path) -> Model:
-    spec = spec_from_file_location(".".join(["amoramodel", path.stem]), path)
-    if spec is None:
-        raise ValueError(f"Invalid path `{path}`. Not a valid Python file.")
+    string_module_path = get_module_relative_import(path)
 
-    module = module_from_spec(spec)
-
-    if spec.loader is None:
-        raise ValueError(f"Invalid AmoraModel path `{path}`. Unable to load module.")
-
-    try:
-        spec.loader.exec_module(module)
-    except ImportError as e:
-        raise ValueError(
-            f"Invalid AmoraModel path `{path}`. Unable to load module."
-        ) from e
+    module = import_module(string_module_path)
 
     compilables = inspect.getmembers(
         module,
         _is_amora_model,
     )
 
-    for _name, class_ in compilables:
-        try:
-            # fixme: Quando carregamos o código em inspect, não existe um arquivo associado,
-            #  ou seja, ao iterar sobre as classes de um arquivo, a classe que retornar um TypeError,
-            #  é uma classe definida no arquivo
-            class_.model_file_path()
-        except TypeError:
+    for _, class_ in compilables:
+        if inspect.getfile(class_) == str(path):
+            # todos os modelos importados estarão em compilables
+            # então precisamos filtrar pelo path dos arquivos para
+            # garantir que estamos retornando apenas o modelo declarado
             return class_
 
     raise ValueError(f"Invalid path `{path}`")
