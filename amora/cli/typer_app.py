@@ -91,6 +91,9 @@ def materialize(
                     typer.echo(f"⚠️  Skipping `{model_name}`")
                     continue
 
+            if not current_tasks:
+                continue
+
             results = executor.map(
                 materialization.materialize,
                 [current_task.sql_stmt for current_task in current_tasks],
