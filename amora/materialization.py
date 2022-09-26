@@ -17,22 +17,17 @@ class Task:
     sql_stmt: str
     model: Model
     target_file_path: Path
-    model_name: str
-    model_config: ModelConfig
 
     @classmethod
     def for_target(cls, target_file_path: Path) -> "Task":
-        model = amora_model_for_target_path(target_file_path)
         return cls(
             sql_stmt=target_file_path.read_text(),
-            model=model,
+            model=amora_model_for_target_path(target_file_path),
             target_file_path=target_file_path,
-            model_name=model.unique_name(),
-            model_config=model.__model_config__,
         )
 
     def __repr__(self):
-        return f"{self.model_name} -> {self.sql_stmt}"
+        return f"{self.model.unique_name()} -> {self.sql_stmt}"
 
 
 def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Table]:

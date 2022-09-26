@@ -71,7 +71,7 @@ def materialize(
             continue
 
         task = materialization.Task.for_target(target_file_path)
-        model_to_task[task.model_name] = task
+        model_to_task[task.model.unique_name()] = task
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
@@ -94,8 +94,8 @@ def materialize(
             results = executor.map(
                 materialization.materialize,
                 [current_task.sql_stmt for current_task in current_tasks],
-                [current_task.model_name for current_task in current_tasks],
-                [current_task.model_config for current_task in current_tasks],
+                [current_task.model.unique_name() for current_task in current_tasks],
+                [current_task.model.__model_config__ for current_task in current_tasks],
             )
 
             for result in results:
