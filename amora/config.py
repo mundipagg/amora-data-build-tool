@@ -1,11 +1,11 @@
 import logging
+import multiprocessing
 import os
 from enum import Enum
 from pathlib import Path
 from tempfile import NamedTemporaryFile, mkdtemp
 from typing import Optional, Tuple
 from uuid import uuid4
-import multiprocessing
 
 from pydantic import BaseSettings, root_validator, validator
 
