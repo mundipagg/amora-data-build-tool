@@ -73,7 +73,11 @@ def test_materialize_as_view(Client: MagicMock):
             labels={Label("freshness", "daily")},
         )
 
-    result = materialize(sql="SELECT 1", model_name=ViewModel.unique_name(), config=ViewModel.__model_config__)
+    result = materialize(
+        sql="SELECT 1",
+        model_name=ViewModel.unique_name(),
+        config=ViewModel.__model_config__,
+    )
 
     client = Client.return_value
 
@@ -110,7 +114,11 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
         y: int = Field(primary_key=True)
         created_at: datetime = Field(primary_key=True)
 
-    materialize(sql="SELECT 1", model_name=TableModel.unique_name(), config=TableModel.__model_config__)
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModel.unique_name(),
+        config=TableModel.__model_config__,
+    )
 
     client = Client.return_value
 
@@ -160,7 +168,11 @@ def test_materialize_as_table_without_clustering_configuration(
         y: int = Field(primary_key=True)
         created_at: datetime = Field(primary_key=True)
 
-    materialize(sql="SELECT 1", model_name=TableModel.unique_name(), config=TableModel.__model_config__)
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModel.unique_name(),
+        config=TableModel.__model_config__,
+    )
 
     client = Client.return_value
 
@@ -199,5 +211,12 @@ def test_materialize_as_ephemeral(Client: MagicMock):
         y: int = Field(primary_key=True)
         created_at: datetime = Field(primary_key=True)
 
-    assert materialize(sql="SELECT 1", model_name=EphemeralModel.unique_name(), config=EphemeralModel.__model_config__) is None
+    assert (
+        materialize(
+            sql="SELECT 1",
+            model_name=EphemeralModel.unique_name(),
+            config=EphemeralModel.__model_config__,
+        )
+        is None
+    )
     assert not Client.called
