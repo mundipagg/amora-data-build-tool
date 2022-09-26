@@ -39,6 +39,8 @@ class Settings(BaseSettings):
 
     GCP_BIGQUERY_DEFAULT_LIMIT_SIZE: int = 1000
 
+    MATERIALIZE_NUM_THREADS: int = 5
+
     LOCAL_ENGINE_ECHO: bool = False
     LOCAL_ENGINE_SQLITE_FILE_PATH: Path = Path(
         NamedTemporaryFile(suffix="amora-sqlite.db", delete=False).name

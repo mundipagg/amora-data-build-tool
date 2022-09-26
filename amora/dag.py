@@ -68,6 +68,9 @@ class DependencyDAG(nx.DiGraph):
 
         return dag
 
+    def topological_generations(self):
+        return nx.topological_generations(self)
+
     def to_cytoscape_elements(self) -> CytoscapeElements:
         """
 

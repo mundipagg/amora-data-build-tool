@@ -1,3 +1,4 @@
+from concurrent import futures
 from typing import Optional
 
 import pytest
@@ -8,6 +9,7 @@ from amora.cli import dash, feature_store, models
 from amora.cli.shared_options import models_option, target_option
 from amora.cli.type_specs import Models
 from amora.compilation import compile_statement
+from amora.config import settings
 from amora.dag import DependencyDAG
 from amora.models import list_models
 from amora.utils import list_target_files
@@ -62,34 +64,45 @@ def materialize(
     if not no_compile:
         compile(models=models, target=target)
 
-    model_to_task = {}
+    model_to_task: dict[str, materialization.Task] = {}
 
     for target_file_path in list_target_files():
         if models and target_file_path.stem not in models:
             continue
 
         task = materialization.Task.for_target(target_file_path)
-        model_to_task[task.model.unique_name()] = task
+        model_to_task[task.model_name] = task
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
     if draw_dag:
         dag.draw()
 
-    for model in dag:
-        try:
-            task = model_to_task[model]
-        except KeyError:
-            typer.echo(f"⚠️  Skipping `{model}`")
-            continue
-        else:
-            table = materialization.materialize(sql=task.sql_stmt, model=task.model)
-            if table is None:
-                continue
+    with futures.ProcessPoolExecutor(
+        max_workers=settings.MATERIALIZE_NUM_THREADS
+    ) as executor:
+        for models_to_materialize in dag.topological_generations():
 
-            typer.echo(f"✅  Created `{model}` as `{table.full_table_id}`")
-            typer.echo(f"    Rows: {table.num_rows}")
-            typer.echo(f"    Bytes: {table.num_bytes}")
+            current_tasks: list[materialization.Task] = []
+            for model_name in models_to_materialize:
+                try:
+                    current_tasks.append(model_to_task[model_name])
+                except KeyError:
+                    typer.echo(f"⚠️  Skipping `{model_name}`")
+                    continue
+
+            results = executor.map(
+                materialization.materialize,
+                [current_task.sql_stmt for current_task in current_tasks],
+                [current_task.model_name for current_task in current_tasks],
+                [current_task.model_config for current_task in current_tasks],
+            )
+
+            for result in results:
+                if result:
+                    typer.echo(f"✅  Created `{result.full_table_id}`")
+                    typer.echo(f"    Rows: {result.num_rows}")
+                    typer.echo(f"    Bytes: {result.num_bytes}")
 
 
 @app.command()
