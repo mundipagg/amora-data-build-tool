@@ -1,10 +1,16 @@
 from dataclasses import dataclass
 from pathlib import Path
+from tracemalloc import start
 from typing import Optional
 
-from google.cloud.bigquery import Client, QueryJobConfig, Table
+from google.cloud.bigquery import Client, QueryJobConfig, Table, TimePartitioning
 
-from amora.models import MaterializationTypes, Model, amora_model_for_target_path
+
+from amora.models import (
+    MaterializationTypes,
+    Model,
+    amora_model_for_target_path,
+)
 
 
 @dataclass
@@ -47,15 +53,27 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
         return client.create_table(view)
 
     if materialization == MaterializationTypes.table:
+
         table_name = model.unique_name()
         client.delete_table(table_name, not_found_ok=True)
-        query_job = client.query(
-            sql,
-            job_config=QueryJobConfig(
-                destination=model.unique_name(),
-                write_disposition="WRITE_TRUNCATE",
-            ),
-        )
+
+        if config.partition_by:
+            query_job = client.query(
+                sql,
+                job_config=QueryJobConfig(
+                    destination=model.unique_name(),
+                    write_disposition="WRITE_TRUNCATE",
+                    time_partitioning=TimePartitioning(field=config.partition_by.field),
+                ),
+            )
+        else:
+            query_job = client.query(
+                sql,
+                job_config=QueryJobConfig(
+                    destination=model.unique_name(),
+                    write_disposition="WRITE_TRUNCATE",
+                ),
+            )
 
         query_job.result()
 
