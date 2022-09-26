@@ -5,6 +5,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile, mkdtemp
 from typing import Optional, Tuple
 from uuid import uuid4
+import multiprocessing
 
 from pydantic import BaseSettings, root_validator, validator
 
@@ -39,7 +40,7 @@ class Settings(BaseSettings):
 
     GCP_BIGQUERY_DEFAULT_LIMIT_SIZE: int = 1000
 
-    MATERIALIZE_NUM_THREADS: int = 5
+    MATERIALIZE_NUM_THREADS: int = multiprocessing.cpu_count()
 
     LOCAL_ENGINE_ECHO: bool = False
     LOCAL_ENGINE_SQLITE_FILE_PATH: Path = Path(
