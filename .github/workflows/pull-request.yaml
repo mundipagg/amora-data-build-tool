@@ -44,10 +44,10 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.python }}-${{ hashFiles('poetry.lock') }}
 
       - name: 🐍 Install Pip and Poetry
-        run: pip install -U pip==22.2.2 poetry==1.1.14
+        run: pip install -U pip>=22.2.2 poetry>=1.2.1
 
       - name: 🐍 poetry install - Installing python dependencies
-        run: poetry install --no-interaction -E feature-store -E dash --remove-untracked
+        run: poetry install --no-root --sync --no-interaction -E feature-store -E dash
         env:
           POETRY_VIRTUALENVS_IN_PROJECT: true
 
