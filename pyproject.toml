@@ -22,7 +22,7 @@ matplotlib = "^3.4.2"
 sqlmodel = ">=0.0.4,<0.0.7"
 sqlalchemy-bigquery = "^1.2"
 networkx = { extras = ["all"], version = "^2.6.3" }
-typer = { extras = ["all"], version = "^0.4.0" }
+typer = { extras = ["all"], version = ">=0.4,<0.7" }
 pytest = ">=6.2.5,<8.0.0"
 pytest-xdist = { extras = ['psutil'], version = "^2.5.0" }
 rich = ">=10.13,<13.0"
