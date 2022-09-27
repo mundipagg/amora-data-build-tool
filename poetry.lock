@@ -3195,7 +3195,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-setuptools"
-version = "63.4.1"
+version = "65.3.0"
 description = "Typing stubs for setuptools"
 category = "dev"
 optional = false
@@ -3439,7 +3439,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.10"
-content-hash = "44a8fdfae34043e1114291bc73205acf2b22d5ebdb1e927cf96b275d4506f1b6"
+content-hash = "67a84dbfcbee407ab9d7662af77e4f2ff8d5b40b76d29bbc5d5648add332ce34"
 
 [metadata.files]
 absl-py = [
@@ -5743,8 +5743,8 @@ types-pytz = [
     {file = "types_pytz-2022.1.2-py3-none-any.whl", hash = "sha256:8aa9fd2af9dee5f5bd7221c6804c9addeafa7ebc0008f544d4ace02b066818a4"},
 ]
 types-setuptools = [
-    {file = "types-setuptools-63.4.1.tar.gz", hash = "sha256:6aad80dd16bb5ee5c78260d7b5536ddbb95470ed8cc3dab19027802a7f8dc362"},
-    {file = "types_setuptools-63.4.1-py3-none-any.whl", hash = "sha256:8781e2fe71fd2885b085f2eeaad099468cda791b383ccbc735d9aad0c44f5355"},
+    {file = "types-setuptools-65.3.0.tar.gz", hash = "sha256:c26779cbba3947823c260354adaab4e91ca8c18888aa2b740f503844b88f1813"},
+    {file = "types_setuptools-65.3.0-py3-none-any.whl", hash = "sha256:f69210049580939c70386252b776eb75ff4b6de488e7d766b9398669b7de68af"},
 ]
 types-typed-ast = [
     {file = "types-typed-ast-1.5.7.tar.gz", hash = "sha256:0fdf7432e47b1fe67330b755abaf2d95ecbd634f4ba5884a7728a7b971ae3880"},
