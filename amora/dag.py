@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, List, Tuple
+from typing import Any, Dict, Generator, Iterable, List, Tuple
 
 import networkx as nx
 from matplotlib import pyplot as plt
@@ -68,8 +68,8 @@ class DependencyDAG(nx.DiGraph):
 
         return dag
 
-    def topological_generations(self):
-        return nx.topological_generations(self)
+    def topological_generations(self) -> Generator[list[Any], None, None]:
+        yield from nx.topological_generations(self)
 
     def to_cytoscape_elements(self) -> CytoscapeElements:
         """
