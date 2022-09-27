@@ -1,5 +1,5 @@
 from concurrent import futures
-from typing import Optional
+from typing import Dict, List, Optional
 
 import pytest
 import typer
@@ -64,7 +64,7 @@ def materialize(
     if not no_compile:
         compile(models=models, target=target)
 
-    model_to_task: dict[str, materialization.Task] = {}
+    model_to_task: Dict[str, materialization.Task] = {}
 
     for target_file_path in list_target_files():
         if models and target_file_path.stem not in models:
@@ -83,7 +83,7 @@ def materialize(
     ) as executor:
         for models_to_materialize in dag.topological_generations():
 
-            current_tasks: list[materialization.Task] = []
+            current_tasks: List[materialization.Task] = []
             for model_name in models_to_materialize:
                 try:
                     current_tasks.append(model_to_task[model_name])
