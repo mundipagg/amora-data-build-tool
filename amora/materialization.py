@@ -2,7 +2,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from google.cloud.bigquery import Client, QueryJobConfig, Table, TimePartitioning
+from google.cloud.bigquery import (
+    Client,
+    QueryJobConfig,
+    Table,
+    TimePartitioning,
+    TimePartitioningType,
+)
 
 from amora.models import MaterializationTypes, Model, amora_model_for_target_path
 
@@ -29,6 +35,13 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
     config = model.__model_config__
     materialization = config.materialized
 
+    granulaty_map = {
+        "day": TimePartitioningType.DAY,
+        "hour": TimePartitioningType.HOUR,
+        "month": TimePartitioningType.MONTH,
+        "year": TimePartitioningType.YEAR,
+    }
+
     if materialization == MaterializationTypes.ephemeral:
         return None
 
@@ -51,23 +64,23 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
         table_name = model.unique_name()
         client.delete_table(table_name, not_found_ok=True)
 
+        load_job_config = QueryJobConfig(
+            destination=model.unique_name(), write_disposition="WRITE_TRUNCATE"
+        )
+
         if config.partition_by:
-            query_job = client.query(
-                sql,
-                job_config=QueryJobConfig(
-                    destination=model.unique_name(),
-                    write_disposition="WRITE_TRUNCATE",
-                    time_partitioning=TimePartitioning(field=config.partition_by.field),
-                ),
+            load_job_config.time_partitioning = TimePartitioning(
+                field=config.partition_by.field,
+                type_=granulaty_map.get(config.partition_by.granularity),
             )
-        else:
-            query_job = client.query(
-                sql,
-                job_config=QueryJobConfig(
-                    destination=model.unique_name(),
-                    write_disposition="WRITE_TRUNCATE",
-                ),
-            )
+
+        if config.cluster_by:
+            load_job_config.clustering_fields = config.cluster_by
+
+        query_job = client.query(
+            sql,
+            job_config=load_job_config,
+        )
 
         query_job.result()
 
@@ -75,12 +88,7 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
         table.description = config.description
         table.labels = config.labels_dict
 
-        if config.cluster_by:
-            table.clustering_fields = config.cluster_by
-
-        return client.update_table(
-            table, ["description", "labels", "clustering_fields"]
-        )
+        return client.update_table(table, ["description", "labels"])
 
     raise ValueError(
         f"Invalid model materialization configuration. "
