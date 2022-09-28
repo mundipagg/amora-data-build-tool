@@ -19,9 +19,7 @@ from typing import (
     Union,
 )
 
-from google.cloud.bigquery import (
-    Table,
-)
+from google.cloud.bigquery import Table
 from sqlalchemy import Column, MetaData, Table, select
 from sqlalchemy.orm import declared_attr
 from sqlalchemy.sql import ColumnElement

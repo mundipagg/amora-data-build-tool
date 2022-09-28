@@ -12,11 +12,7 @@ from google.cloud.bigquery import (
     TimePartitioningType,
 )
 
-from amora.models import (
-    MaterializationTypes,
-    Model,
-    amora_model_for_target_path,
-)
+from amora.models import MaterializationTypes, Model, amora_model_for_target_path
 
 
 @dataclass
