@@ -74,8 +74,7 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
             if config.partition_by.data_type == "int":
                 load_job_config.range_partitioning = RangePartitioning(
                     range_=bigquery.PartitionRange(
-                        config.partition_by.range["start"],
-                        config.partition_by.range["end"],
+                        config.partition_by.range,
                     ),
                     field=config.partition_by.field,
                 )
