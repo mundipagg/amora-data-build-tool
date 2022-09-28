@@ -2,6 +2,14 @@ from datetime import datetime
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
+from google.cloud.bigquery import (
+    Client,
+    QueryJobConfig,
+    Table,
+    TimePartitioning,
+    TimePartitioningType,
+)
+
 from amora.config import settings
 from amora.dag import DependencyDAG
 from amora.materialization import Task, materialize
@@ -91,8 +99,13 @@ def test_materialize_as_view(Client: MagicMock):
 
 @patch("amora.materialization.Client", spec=Client)
 @patch("amora.materialization.QueryJobConfig", spec=QueryJobConfig)
-def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
+def test_materialize_as_table_with_clustering_and_time_partitioning(
+    QueryJobConfig: MagicMock, Client: MagicMock
+):
     table_name = uuid4().hex
+
+    query_job_config = MagicMock()
+    QueryJobConfig.return_value = query_job_config
 
     class TableModel(AmoraModel, table=True):
         __tablename__ = table_name
@@ -116,13 +129,19 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
 
     client.get_table.assert_called_once_with(TableModel.unique_name())
 
-    client.query.assert_called_once_with(
-        "SELECT 1",
-        job_config=QueryJobConfig(
-            destination=TableModel.unique_name(),
-            write_disposition="WRITE_TRUNCATE",
-        ),
+    QueryJobConfig.assert_called_once_with(
+        destination=TableModel.unique_name(),
+        write_disposition="WRITE_TRUNCATE",
     )
+
+    assert query_job_config.time_partitioning == TimePartitioning(
+        field=TableModel.__model_config__.partition_by.field,
+        type_=TimePartitioningType.DAY,
+    )
+
+    assert query_job_config.clustering_fields == TableModel.__model_config__.cluster_by
+
+    client.query.assert_called_once_with("SELECT 1", job_config=query_job_config)
 
     table: Table = client.get_table.return_value
     client.delete_table.assert_called_once_with(
@@ -130,11 +149,10 @@ def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
     )
     client.update_table.assert_called_once_with(
         table,
-        ["description", "labels", "clustering_fields"],
+        ["description", "labels"],
     )
 
     assert table.description == TableModel.__model_config__.description
-    assert table.clustering_fields == TableModel.__model_config__.cluster_by
     assert table.labels == {"freshness": "daily"}
 
 
