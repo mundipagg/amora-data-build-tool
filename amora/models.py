@@ -18,17 +18,14 @@ from typing import (
     Type,
     Union,
 )
+
+from google.cloud import bigquery
 from google.cloud.bigquery import (
-    Client,
-    QueryJobConfig,
+    RangePartitioning,
     Table,
     TimePartitioning,
     TimePartitioningType,
-    RangePartitioning,
 )
-from google.cloud import bigquery
-
-
 from sqlalchemy import Column, MetaData, Table, select
 from sqlalchemy.orm import declared_attr
 from sqlalchemy.sql import ColumnElement

@@ -1,23 +1,17 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from tracemalloc import start
 from typing import Optional
-from google.cloud import bigquery
 
 from google.cloud.bigquery import (
     Client,
     QueryJobConfig,
     Table,
-    TimePartitioning,
-    TimePartitioningType,
 )
-
 
 from amora.models import (
     MaterializationTypes,
     Model,
     amora_model_for_target_path,
-    PartitionConfig,
 )
 
 
