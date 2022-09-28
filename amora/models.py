@@ -18,6 +18,16 @@ from typing import (
     Type,
     Union,
 )
+from google.cloud.bigquery import (
+    Client,
+    QueryJobConfig,
+    Table,
+    TimePartitioning,
+    TimePartitioningType,
+    RangePartitioning,
+)
+from google.cloud import bigquery
+
 
 from sqlalchemy import Column, MetaData, Table, select
 from sqlalchemy.orm import declared_attr
@@ -89,6 +99,33 @@ class PartitionConfig:
     data_type: str = "date"
     granularity: str = "day"
     range: Optional[Dict[str, Any]] = None
+
+    granulaty_map = {
+        "day": TimePartitioningType.DAY,
+        "hour": TimePartitioningType.HOUR,
+        "month": TimePartitioningType.MONTH,
+        "year": TimePartitioningType.YEAR,
+    }
+
+    def converte_partition(self, load_job_config):
+
+        if self.data_type == "int":
+            load_job_config.range_partitioning = RangePartitioning(
+                range_=bigquery.PartitionRange(self.range["start"], self.range["end"]),
+                field=self.field,
+            )
+
+            return load_job_config
+
+        elif self.data_type == "date":
+
+            load_job_config.time_partitioning = TimePartitioning(
+                field=self.field,
+                type_=self.granulaty_map.get(self.granularity),
+            )
+            return load_job_config
+
+        raise ValueError("Invalid partition type")
 
 
 class AutoName(Enum):
