@@ -1,3 +1,4 @@
+from asyncore import write
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
@@ -163,6 +164,9 @@ def test_materialize_as_table_without_clustering_configuration(
 ):
     table_name = uuid4().hex
 
+    query_job_config = MagicMock()
+    QueryJobConfig.return_value = query_job_config
+
     class TableModel(AmoraModel, table=True):
         __tablename__ = table_name
         __model_config__ = ModelConfig(
@@ -184,12 +188,14 @@ def test_materialize_as_table_without_clustering_configuration(
 
     client.get_table.assert_called_once_with(TableModel.unique_name())
 
-    client.query.assert_called_once_with(
-        "SELECT 1",
-        job_config=QueryJobConfig(
-            destination=TableModel.unique_name(),
-            write_disposition="WRITE_TRUNCATE",
-        ),
+    QueryJobConfig.assert_called_once_with(
+        destination=TableModel.unique_name(),
+        write_disposition="WRITE_TRUNCATE",
+    )
+
+    assert query_job_config.time_partitioning == TimePartitioning(
+        field=TableModel.__model_config__.partition_by.field,
+        type_=TimePartitioningType.DAY,
     )
 
     table: Table = client.get_table.return_value
