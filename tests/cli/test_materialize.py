@@ -1,5 +1,5 @@
 import inspect
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 from typer.testing import CliRunner
 
@@ -7,6 +7,7 @@ from amora.cli import app
 from amora.utils import clean_compiled_files
 
 from tests.models.heart_rate import HeartRate
+from tests.models.step_count_by_source import StepCountBySource
 from tests.models.steps import Steps
 
 runner = CliRunner()
@@ -30,7 +31,7 @@ def test_materialize_without_arguments_and_options(
     executor_mock.map = MagicMock()
     pool_mock.return_value.__enter__.return_value = executor_mock
 
-    models = [Steps, HeartRate]
+    models = [HeartRate, Steps, StepCountBySource]
 
     for model in models:
         target_path = model.target_path(model_file_path=inspect.getfile(model))
@@ -42,13 +43,25 @@ def test_materialize_without_arguments_and_options(
     )
 
     assert result.exit_code == 0
-    executor_mock.map.assert_called_once_with(
-        materialize,
-        ["SELECT 1"] * len(models),
-        [model.unique_name() for model in models],
-        [model.__model_config__ for model in models],
-    )
+
     compile.assert_called_once_with(target=None, models=[])
+
+    assert executor_mock.map.call_count == 2
+
+    assert executor_mock.map.call_args_list == [
+        call(
+            materialize,
+            ["SELECT 1"] * 2,
+            [model.unique_name() for model in [HeartRate, Steps]],
+            [model.__model_config__ for model in [HeartRate, Steps]],
+        ),
+        call(
+            materialize,
+            ["SELECT 1"],
+            [StepCountBySource.unique_name()],
+            [StepCountBySource.__model_config__],
+        ),
+    ]
 
 
 @patch("concurrent.futures.ProcessPoolExecutor")
