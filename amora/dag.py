@@ -69,7 +69,8 @@ class DependencyDAG(nx.DiGraph):
         return dag
 
     def topological_generations(self) -> Generator[List[Any], None, None]:
-        yield from nx.topological_generations(self)
+        for generation in nx.topological_generations(self):
+            yield sorted(generation)
 
     def to_cytoscape_elements(self) -> CytoscapeElements:
         """
