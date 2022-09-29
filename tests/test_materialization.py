@@ -197,6 +197,8 @@ def test_materialize_as_table_without_clustering_configuration(
         type_=TimePartitioningType.DAY,
     )
 
+    assert query_job_config.clustering_fields == None
+
     table: Table = client.get_table.return_value
     client.update_table.assert_called_once_with(
         table,
@@ -205,6 +207,42 @@ def test_materialize_as_table_without_clustering_configuration(
 
     assert table.description == TableModel.__model_config__.description
     assert table.labels == {"freshness": "daily"}
+
+
+@patch("amora.materialization.Client", spec=Client)
+@patch("amora.materialization.QueryJobConfig", spec=QueryJobConfig)
+def test_materialize_as_table_without_partitioning_configuration():
+    table_name = uuid4().hex
+
+    query_job_config = MagicMock()
+    QueryJobConfig.return_value = query_job_config
+
+    class TableModel(AmoraModel, table=True):
+        __tablename__ = table_name
+        __model_config__ = ModelConfig(
+            materialized=MaterializationTypes.table,
+            labels={Label("freshness", "daily")},
+            description=uuid4().hex,
+        )
+
+        x: int = Field(primary_key=True)
+        y: int = Field(primary_key=True)
+        created_at: datetime = Field(primary_key=True)
+
+    materialize(sql="SELECT 1", model=TableModel)
+
+    client = Client.return_value
+
+    client.get_table.assert_called_once_with(TableModel.unique_name())
+
+    QueryJobConfig.assert_called_once_with(
+        destination=TableModel.unique_name(),
+        write_disposition="WRITE_TRUNCATE",
+    )
+
+    assert query_job_config.time_partitioning is None
+
+    assert query_job_config.clustering_fields == TableModel.__model_config__.cluster_by
 
 
 @patch("amora.materialization.Client", spec=Client)
