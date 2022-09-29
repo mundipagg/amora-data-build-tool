@@ -85,9 +85,9 @@ def materialize(
 
             current_tasks: List[materialization.Task] = []
             for model_name in models_to_materialize:
-                try:
+                if model_name in model_to_task:
                     current_tasks.append(model_to_task[model_name])
-                except KeyError:
+                else:
                     typer.echo(f"⚠️  Skipping `{model_name}`")
                     continue
 
