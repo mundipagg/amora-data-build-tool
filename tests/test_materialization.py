@@ -195,11 +195,10 @@ def test_materialize_as_table_without_clustering_configuration(
     table: Table = client.get_table.return_value
     client.update_table.assert_called_once_with(
         table,
-        ["description", "labels", "clustering_fields"],
+        ["description", "labels"],
     )
 
     assert table.description == TableModel.__model_config__.description
-    assert isinstance(table.clustering_fields, MagicMock)
     assert table.labels == {"freshness": "daily"}
 
 
