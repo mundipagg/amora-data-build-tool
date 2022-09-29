@@ -1,4 +1,3 @@
-from asyncore import write
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
