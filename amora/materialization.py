@@ -2,14 +2,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from google.cloud import bigquery
 from google.cloud.bigquery import (
     Client,
+    PartitionRange,
     QueryJobConfig,
     RangePartitioning,
     Table,
     TimePartitioning,
-    TimePartitioningType,
 )
 
 from amora.models import (
@@ -41,13 +40,6 @@ class Task:
 def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Table]:
     materialization = config.materialized
 
-    granularity_map = {
-        "day": TimePartitioningType.DAY,
-        "hour": TimePartitioningType.HOUR,
-        "month": TimePartitioningType.MONTH,
-        "year": TimePartitioningType.YEAR,
-    }
-
     if materialization == MaterializationTypes.ephemeral:
         return None
 
@@ -68,7 +60,7 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
         if config.partition_by:
             if config.partition_by.data_type == "int":
                 query_job_config.range_partitioning = RangePartitioning(
-                    range_=bigquery.PartitionRange(
+                    range_=PartitionRange(
                         start=config.partition_by.range.get("start"),
                         end=config.partition_by.range.get("end"),
                     ),
@@ -78,7 +70,7 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
             else:
                 query_job_config.time_partitioning = TimePartitioning(
                     field=config.partition_by.field,
-                    type_=granularity_map.get(config.partition_by.granularity),
+                    type_=config.partition_by.granularity.upper(),
                 )
 
         query_job_config.clustering_fields = config.cluster_by
