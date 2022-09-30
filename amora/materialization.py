@@ -63,11 +63,11 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
         return client.create_table(view)
 
     if materialization == MaterializationTypes.table:
-        load_job_config = QueryJobConfig(destination=model_name)
+        query_job_config = QueryJobConfig(destination=model_name)
 
         if config.partition_by:
             if config.partition_by.data_type == "int":
-                load_job_config.range_partitioning = RangePartitioning(
+                query_job_config.range_partitioning = RangePartitioning(
                     range_=bigquery.PartitionRange(
                         start=config.partition_by.range.get("start"),
                         end=config.partition_by.range.get("end"),
@@ -76,16 +76,16 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
                 )
 
             else:
-                load_job_config.time_partitioning = TimePartitioning(
+                query_job_config.time_partitioning = TimePartitioning(
                     field=config.partition_by.field,
                     type_=granularity_map.get(config.partition_by.granularity),
                 )
 
-        load_job_config.clustering_fields = config.cluster_by
+        query_job_config.clustering_fields = config.cluster_by
 
         query_job = client.query(
             sql,
-            job_config=load_job_config,
+            job_config=query_job_config,
         )
         query_job.result()
 
