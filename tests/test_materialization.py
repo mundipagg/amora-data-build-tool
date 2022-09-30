@@ -197,8 +197,6 @@ def test_materialize_as_table_without_clustering_configuration(
         type_=TimePartitioningType.DAY,
     )
 
-    assert query_job_config.clustering_fields == None
-
     table: Table = client.get_table.return_value
     client.update_table.assert_called_once_with(
         table,
@@ -239,8 +237,6 @@ def test_materialize_as_table_without_partitioning_configuration():
         destination=TableModel.unique_name(),
         write_disposition="WRITE_TRUNCATE",
     )
-
-    assert query_job_config.time_partitioning is None
 
     assert query_job_config.clustering_fields == TableModel.__model_config__.cluster_by
 
