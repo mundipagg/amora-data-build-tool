@@ -52,6 +52,7 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
         return None
 
     client = Client()
+    client.delete_table(model_name, not_found_ok=True)
 
     if materialization == MaterializationTypes.view:
         view = Table(model_name)
@@ -59,23 +60,17 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
         view.labels = config.labels_dict
         view.view_query = sql
 
-        client.delete_table(model_name, not_found_ok=True)
-
         return client.create_table(view)
 
     if materialization == MaterializationTypes.table:
-
-        client.delete_table(model_name, not_found_ok=True)
-
-        load_job_config = QueryJobConfig(
-            destination=model_name, write_disposition="WRITE_TRUNCATE"
-        )
+        load_job_config = QueryJobConfig(destination=model_name)
 
         if config.partition_by:
             if config.partition_by.data_type == "int":
                 load_job_config.range_partitioning = RangePartitioning(
                     range_=bigquery.PartitionRange(
-                        config.partition_by.range,
+                        start=config.partition_by.range.get("start"),
+                        end=config.partition_by.range.get("end"),
                     ),
                     field=config.partition_by.field,
                 )
@@ -86,8 +81,7 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
                     type_=granularity_map.get(config.partition_by.granularity),
                 )
 
-        if config.cluster_by:
-            load_job_config.clustering_fields = config.cluster_by
+        load_job_config.clustering_fields = config.cluster_by
 
         query_job = client.query(
             sql,
