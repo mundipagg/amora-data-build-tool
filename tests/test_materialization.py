@@ -209,6 +209,8 @@ def test_materialize_as_table_without_clustering_configuration(
         type_=TimePartitioningType.DAY,
     )
 
+    assert isinstance(query_job_config.clustering_fields, MagicMock)
+
     table: Table = client.get_table.return_value
     client.update_table.assert_called_once_with(
         table,
@@ -221,7 +223,9 @@ def test_materialize_as_table_without_clustering_configuration(
 
 @patch("amora.materialization.Client", spec=Client)
 @patch("amora.materialization.QueryJobConfig", spec=QueryJobConfig)
-def test_materialize_as_table_without_partitioning_configuration():
+def test_materialize_as_table_without_partitioning_configuration(
+    QueryJobConfig: MagicMock, Client: MagicMock
+):
     table_name = uuid4().hex
 
     query_job_config = MagicMock()
@@ -239,18 +243,24 @@ def test_materialize_as_table_without_partitioning_configuration():
         y: int = Field(primary_key=True)
         created_at: datetime = Field(primary_key=True)
 
-    materialize(sql="SELECT 1", model=TableModel)
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModel.unique_name(),
+        config=TableModel.__model_config__,
+    )
 
     client = Client.return_value
 
     client.get_table.assert_called_once_with(TableModel.unique_name())
 
+    assert isinstance(query_job_config.time_partitioning, MagicMock)
+
+    assert isinstance(query_job_config.clustering_fields, MagicMock)
+
     QueryJobConfig.assert_called_once_with(
         destination=TableModel.unique_name(),
         write_disposition="WRITE_TRUNCATE",
     )
-
-    assert query_job_config.clustering_fields == TableModel.__model_config__.cluster_by
 
 
 @patch("amora.materialization.Client", spec=Client)
