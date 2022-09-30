@@ -12,7 +12,12 @@ from google.cloud.bigquery import (
     TimePartitioningType,
 )
 
-from amora.models import MaterializationTypes, Model, amora_model_for_target_path
+from amora.models import (
+    MaterializationTypes,
+    Model,
+    ModelConfig,
+    amora_model_for_target_path,
+)
 
 
 @dataclass
@@ -30,14 +35,13 @@ class Task:
         )
 
     def __repr__(self):
-        return f"{self.model.__name__} -> {self.sql_stmt}"
+        return f"{self.model.unique_name()} -> {self.sql_stmt}"
 
 
-def materialize(sql: str, model: Model) -> Optional[Table]:
-    config = model.__model_config__
+def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Table]:
     materialization = config.materialized
 
-    granulaty_map = {
+    granularity_map = {
         "day": TimePartitioningType.DAY,
         "hour": TimePartitioningType.HOUR,
         "month": TimePartitioningType.MONTH,
@@ -50,24 +54,21 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
     client = Client()
 
     if materialization == MaterializationTypes.view:
-        table_name = model.unique_name()
-
-        view = Table(table_name)
+        view = Table(model_name)
         view.description = config.description
         view.labels = config.labels_dict
         view.view_query = sql
 
-        client.delete_table(table_name, not_found_ok=True)
+        client.delete_table(model_name, not_found_ok=True)
 
         return client.create_table(view)
 
     if materialization == MaterializationTypes.table:
 
-        table_name = model.unique_name()
-        client.delete_table(table_name, not_found_ok=True)
+        client.delete_table(model_name, not_found_ok=True)
 
         load_job_config = QueryJobConfig(
-            destination=model.unique_name(), write_disposition="WRITE_TRUNCATE"
+            destination=model_name, write_disposition="WRITE_TRUNCATE"
         )
 
         if config.partition_by:
@@ -82,7 +83,7 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
             else:
                 load_job_config.time_partitioning = TimePartitioning(
                     field=config.partition_by.field,
-                    type_=granulaty_map.get(config.partition_by.granularity),
+                    type_=granularity_map.get(config.partition_by.granularity),
                 )
 
         if config.cluster_by:
@@ -92,10 +93,9 @@ def materialize(sql: str, model: Model) -> Optional[Table]:
             sql,
             job_config=load_job_config,
         )
-
         query_job.result()
 
-        table = client.get_table(model.unique_name())
+        table = client.get_table(model_name)
         table.description = config.description
         table.labels = config.labels_dict
 

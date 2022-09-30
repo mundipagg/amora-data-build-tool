@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, List, Tuple
+from typing import Any, Dict, Generator, Iterable, List, Tuple
 
 import networkx as nx
 from matplotlib import pyplot as plt
@@ -67,6 +67,10 @@ class DependencyDAG(nx.DiGraph):
                     dag.add_edge(dependency_columns[column.key], column)
 
         return dag
+
+    def topological_generations(self) -> Generator[List[Any], None, None]:
+        for generation in nx.topological_generations(self):
+            yield sorted(generation)
 
     def to_cytoscape_elements(self) -> CytoscapeElements:
         """
