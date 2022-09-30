@@ -1,6 +1,9 @@
 from datetime import datetime
-from unittest.mock import MagicMock, patch
+from unittest.mock import ANY, MagicMock, call, patch
 from uuid import uuid4
+
+import pytest
+from google.cloud.bigquery import Client
 
 from amora.config import settings
 from amora.dag import DependencyDAG
@@ -13,12 +16,64 @@ from amora.models import (
     ModelConfig,
     PartitionConfig,
 )
-from amora.providers.bigquery import Client, QueryJobConfig, Table
 from amora.utils import clean_compiled_files
 
 from tests.models.heart_agg import HeartRateAgg
 from tests.models.heart_rate import HeartRate
 from tests.models.steps import Steps
+
+
+class ViewModel(AmoraModel, table=True):
+    x: int = Field(primary_key=True)
+    y: int = Field(primary_key=True)
+
+    __model_config__ = ModelConfig(
+        materialized=MaterializationTypes.view,
+        partition_by=PartitionConfig(
+            field="creationDate", data_type="TIMESTAMP", granularity="day"
+        ),
+        cluster_by=["sourceName"],
+        labels={Label("freshness", "daily")},
+    )
+
+
+class TableModelByDay(AmoraModel, table=True):
+    __tablename__ = uuid4().hex
+    __model_config__ = ModelConfig(
+        materialized=MaterializationTypes.table,
+        partition_by=PartitionConfig(
+            field="created_at", data_type="TIMESTAMP", granularity="day"
+        ),
+        cluster_by=["x", "y"],
+        labels={Label("freshness", "daily")},
+        description=uuid4().hex,
+    )
+
+    x: int = Field(primary_key=True)
+    y: int = Field(primary_key=True)
+    created_at: datetime = Field(primary_key=True)
+
+
+class TableModelByrange(AmoraModel, table=True):
+    __tablename__ = uuid4().hex
+    __model_config__ = ModelConfig(
+        materialized=MaterializationTypes.table,
+        partition_by=PartitionConfig(
+            field="x",
+            data_type="int",
+            range={
+                "start": 1,
+                "end": 10,
+            },
+        ),
+        cluster_by=["x", "y"],
+        labels={Label("freshness", "daily")},
+        description=uuid4().hex,
+    )
+
+    x: int = Field(primary_key=True)
+    y: int = Field(primary_key=True)
+    created_at: datetime = Field(primary_key=True)
 
 
 def setup_function(module):
@@ -59,142 +114,153 @@ def test_dependency_dags_is_iterable_and_topologicaly_sorted():
 
 
 @patch("amora.materialization.Client", spec=Client)
-def test_materialize_as_view(Client: MagicMock):
-    class ViewModel(AmoraModel, table=True):
-        x: int = Field(primary_key=True)
-        y: int = Field(primary_key=True)
+def test_materialize_deletes_table(Client: MagicMock):
+    client = Client.return_value
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByDay.unique_name(),
+        config=TableModelByDay.__model_config__,
+    )
 
-        __model_config__ = ModelConfig(
-            materialized=MaterializationTypes.view,
-            partition_by=PartitionConfig(
-                field="creationDate", data_type="TIMESTAMP", granularity="day"
-            ),
-            cluster_by=["sourceName"],
-            labels={Label("freshness", "daily")},
-        )
+    assert client.delete_table.call_count == 1
+    assert client.delete_table.call_args_list == [
+        call(TableModelByDay.unique_name(), not_found_ok=True)
+    ]
 
-    result = materialize(
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_deletes_view(Client: MagicMock):
+    client = Client.return_value
+    materialize(
         sql="SELECT 1",
         model_name=ViewModel.unique_name(),
         config=ViewModel.__model_config__,
     )
 
+    assert client.delete_table.call_count == 1
+    assert client.delete_table.call_args_list == [
+        call(ViewModel.unique_name(), not_found_ok=True)
+    ]
+
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_creates_view(Client: MagicMock):
     client = Client.return_value
 
-    client.delete_table.assert_called_once_with(
-        ViewModel.unique_name(), not_found_ok=True
+    materialize(
+        sql="SELECT 1",
+        model_name=ViewModel.unique_name(),
+        config=ViewModel.__model_config__,
     )
-
     assert client.create_table.call_count == 1
-    assert client.create_table.return_value == result
 
-    view: Table = client.create_table.call_args_list[0][0][0]
+    view = client.create_table.call_args.args[0]
+    assert view.view_query == "SELECT 1"
     assert view.description == ViewModel.__model_config__.description
     assert view.labels == {"freshness": "daily"}
 
 
 @patch("amora.materialization.Client", spec=Client)
-@patch("amora.materialization.QueryJobConfig", spec=QueryJobConfig)
-def test_materialize_as_table(QueryJobConfig: MagicMock, Client: MagicMock):
-    table_name = uuid4().hex
-
-    class TableModel(AmoraModel, table=True):
-        __tablename__ = table_name
-        __model_config__ = ModelConfig(
-            materialized=MaterializationTypes.table,
-            partition_by=PartitionConfig(
-                field="created_at", data_type="TIMESTAMP", granularity="day"
-            ),
-            cluster_by=["x", "y"],
-            labels={Label("freshness", "daily")},
-            description=uuid4().hex,
-        )
-
-        x: int = Field(primary_key=True)
-        y: int = Field(primary_key=True)
-        created_at: datetime = Field(primary_key=True)
+def test_materialize_creates_table(Client: MagicMock):
+    client = Client.return_value
 
     materialize(
         sql="SELECT 1",
-        model_name=TableModel.unique_name(),
-        config=TableModel.__model_config__,
+        model_name=TableModelByDay.unique_name(),
+        config=TableModelByDay.__model_config__,
     )
 
-    client = Client.return_value
-
-    client.get_table.assert_called_once_with(TableModel.unique_name())
-
-    client.query.assert_called_once_with(
-        "SELECT 1",
-        job_config=QueryJobConfig(
-            destination=TableModel.unique_name(),
-            write_disposition="WRITE_TRUNCATE",
-        ),
-    )
-
-    table: Table = client.get_table.return_value
-    client.delete_table.assert_called_once_with(
-        TableModel.unique_name(), not_found_ok=True
-    )
-    client.update_table.assert_called_once_with(
-        table,
-        ["description", "labels", "clustering_fields"],
-    )
-
-    assert table.description == TableModel.__model_config__.description
-    assert table.clustering_fields == TableModel.__model_config__.cluster_by
-    assert table.labels == {"freshness": "daily"}
+    assert client.query.call_count == 1
+    assert client.query.call_args_list == [call("SELECT 1", job_config=ANY)]
 
 
 @patch("amora.materialization.Client", spec=Client)
-@patch("amora.materialization.QueryJobConfig", spec=QueryJobConfig)
-def test_materialize_as_table_without_clustering_configuration(
-    QueryJobConfig: MagicMock, Client: MagicMock
-):
-    table_name = uuid4().hex
-
-    class TableModel(AmoraModel, table=True):
-        __tablename__ = table_name
-        __model_config__ = ModelConfig(
-            materialized=MaterializationTypes.table,
-            partition_by=PartitionConfig(
-                field="created_at", data_type="TIMESTAMP", granularity="day"
-            ),
-            labels={Label("freshness", "daily")},
-            description=uuid4().hex,
-        )
-
-        x: int = Field(primary_key=True)
-        y: int = Field(primary_key=True)
-        created_at: datetime = Field(primary_key=True)
+def test_materialize_partition_table_by_range(Client: MagicMock):
+    client = Client.return_value
 
     materialize(
         sql="SELECT 1",
-        model_name=TableModel.unique_name(),
-        config=TableModel.__model_config__,
+        model_name=TableModelByrange.unique_name(),
+        config=TableModelByrange.__model_config__,
     )
 
+    job_config = client.query.call_args.kwargs["job_config"]
+    partition_config = job_config.range_partitioning
+
+    assert partition_config.field == "x"
+    assert partition_config.range_.start == 1
+    assert partition_config.range_.end == 10
+
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_partition_table_by_time(Client: MagicMock):
     client = Client.return_value
 
-    client.get_table.assert_called_once_with(TableModel.unique_name())
-
-    client.query.assert_called_once_with(
-        "SELECT 1",
-        job_config=QueryJobConfig(
-            destination=TableModel.unique_name(),
-            write_disposition="WRITE_TRUNCATE",
-        ),
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByDay.unique_name(),
+        config=TableModelByDay.__model_config__,
     )
 
-    table: Table = client.get_table.return_value
-    client.update_table.assert_called_once_with(
-        table,
-        ["description", "labels", "clustering_fields"],
+    job_config = client.query.call_args.kwargs["job_config"]
+    partition_config = job_config.time_partitioning
+
+    assert partition_config.field == "created_at"
+    assert partition_config.type_ == "DAY"
+
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_cluster_table(Client: MagicMock):
+    client = Client.return_value
+
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByDay.unique_name(),
+        config=TableModelByDay.__model_config__,
     )
 
-    assert table.description == TableModel.__model_config__.description
-    assert isinstance(table.clustering_fields, MagicMock)
-    assert table.labels == {"freshness": "daily"}
+    job_config = client.query.call_args.kwargs["job_config"]
+    clustering_fields = job_config.clustering_fields
+
+    assert clustering_fields == ["x", "y"]
+
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_update_table_metadata(Client: MagicMock):
+    client = Client.return_value
+
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByDay.unique_name(),
+        config=TableModelByDay.__model_config__,
+    )
+
+    assert client.get_table.call_count == 1
+    assert client.get_table.call_args_list == [call(TableModelByDay.unique_name())]
+
+    table = client.get_table.return_value
+
+    assert client.update_table.call_count == 1
+    assert client.update_table.call_args_list == [
+        call(table, ["description", "labels"])
+    ]
+    assert table.description == TableModelByDay.__model_config__.description
+    assert table.labels == TableModelByDay.__model_config__.labels_dict
+
+
+def test_materialize_invalid_materialization():
+    class InvalidModel(AmoraModel, table=True):
+        x: int = Field(primary_key=True)
+        y: int = Field(primary_key=True)
+
+        __model_config__ = ModelConfig(materialized="invalid")  # type:ignore
+
+    with pytest.raises(ValueError):
+        materialize(
+            sql="SELECT 1",
+            model_name=InvalidModel.unique_name(),
+            config=InvalidModel.__model_config__,
+        )
 
 
 @patch("amora.materialization.Client", spec=Client)
