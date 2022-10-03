@@ -462,14 +462,14 @@ dash = "*"
 
 [[package]]
 name = "dash-extensions"
-version = "0.1.5"
+version = "0.1.6"
 description = "Extensions for Plotly Dash."
 category = "main"
 optional = true
 python-versions = ">=3.7,<4"
 
 [package.dependencies]
-dash = ">=2.5.0"
+dash = ">=2.6.1"
 Flask-Caching = "2.0.0"
 jsbeautifier = ">=1.14.3,<2.0.0"
 more-itertools = ">=8.12.0,<9.0.0"
@@ -3896,8 +3896,8 @@ dash-cytoscape = [
     {file = "dash_cytoscape-0.3.0.tar.gz", hash = "sha256:a71ad4fe095570b71d4ad7c0d29199e9780c2e6796173d3b25fccc2cc58c855f"},
 ]
 dash-extensions = [
-    {file = "dash-extensions-0.1.5.tar.gz", hash = "sha256:8b5cdfe4471305d22b79f04e95dd366da20f9fcc129f5c9ac6c5f0dfd3c889fe"},
-    {file = "dash_extensions-0.1.5-py3-none-any.whl", hash = "sha256:fd597e43986dba48e0e5dd1028f12a954a992afcc86fdada6865a2dae803ec42"},
+    {file = "dash-extensions-0.1.6.tar.gz", hash = "sha256:6dbbe95c719b30474ea60fdc10086c74ea7d01ef3685178594eb4c43845edb71"},
+    {file = "dash_extensions-0.1.6-py3-none-any.whl", hash = "sha256:239c9f1947d679208ee871dbac593028e86375d3187e2d7341e356361d773d84"},
 ]
 dash-html-components = [
     {file = "dash_html_components-2.0.0-py3-none-any.whl", hash = "sha256:b42cc903713c9706af03b3f2548bda4be7307a7cf89b7d6eae3da872717d1b63"},
