@@ -20,6 +20,7 @@ repo_config = RepoConfig(
         **settings.OFFLINE_STORE_CONFIG,
     },
     repo_path=settings.REPO_PATH,
+    entity_key_serialization_version=2,
 )
 
 fs = FeatureStore(config=repo_config)
