@@ -3180,7 +3180,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-protobuf"
-version = "3.19.22"
+version = "3.20.4"
 description = "Typing stubs for protobuf"
 category = "dev"
 optional = false
@@ -3440,7 +3440,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.10"
-content-hash = "0c213d82ce9d8dcc7fc3661ae849fff71dd602bbdcd24fe613114930e49772fb"
+content-hash = "6936393c9ef82c298bb6da8f8942172b68ff9f4c580d67fa6a1e2e163399f34e"
 
 [metadata.files]
 absl-py = [
@@ -5737,8 +5737,8 @@ types-markdown = [
     {file = "types_Markdown-3.4.0-py3-none-any.whl", hash = "sha256:4cd569a77535f05dc4e533645e16062ea3642877a28edfd2c33195b10de5f6d9"},
 ]
 types-protobuf = [
-    {file = "types-protobuf-3.19.22.tar.gz", hash = "sha256:d2b26861b0cb46a3c8669b0df507b7ef72e487da66d61f9f3576aa76ce028a83"},
-    {file = "types_protobuf-3.19.22-py3-none-any.whl", hash = "sha256:d291388678af91bb045fafa864f142dc4ac22f5d4cdca097c7d8d8a32fa9b3ab"},
+    {file = "types-protobuf-3.20.4.tar.gz", hash = "sha256:0dad3a5009895c985a56e2837f61902bad9594151265ac0ee907bb16d0b01eb7"},
+    {file = "types_protobuf-3.20.4-py3-none-any.whl", hash = "sha256:5082437afe64ce3b31c8db109eae86e02fda11e4d5f9ac59cb8578a8a138aa70"},
 ]
 types-pytz = [
     {file = "types-pytz-2022.1.2.tar.gz", hash = "sha256:1a8b25c225c5e6bd8468aa9eb45ddd3b337f6716d4072ad0aa4ef1e41478eebc"},
