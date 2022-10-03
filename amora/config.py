@@ -4,7 +4,7 @@ import os
 from enum import Enum
 from pathlib import Path
 from tempfile import NamedTemporaryFile, mkdtemp
-from typing import Optional, Tuple
+from typing import Literal, Optional, Tuple
 from uuid import uuid4
 
 from pydantic import BaseSettings, root_validator, validator
@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     STORAGE_CACHE_PROVIDER: StorageCacheProviders = StorageCacheProviders.local
     STORAGE_GCS_BUCKET_NAME: str = "amora-storage"
     STORAGE_LOCAL_CACHE_PATH: Path = Path(mkdtemp())
-    STORAGE_PARQUET_ENGINE: str = "pyarrow"
+    STORAGE_PARQUET_ENGINE: Literal["auto", "pyarrow", "fastparquet"] = "pyarrow"
 
     LOGGER_LOG_LEVEL: int = logging.DEBUG
 
