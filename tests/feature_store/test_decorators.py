@@ -2,7 +2,8 @@ from datetime import datetime
 from typing import List
 
 import pytest
-from feast import Feature, FeatureView, ValueType
+from feast import FeatureView, Field as FeastField, ValueType
+from feast.types import from_value_type
 from sqlalchemy import ARRAY, Column, String
 
 from amora.feature_store.decorators import feature_view
@@ -47,13 +48,17 @@ def test_feature_view_on_valid_source_model():
 
     assert isinstance(fv, FeatureView)
     assert fv.name == feature_view_name
-    assert fv.input.event_timestamp_column == DriverActivity.datetime_trunc_day.key
+    assert fv.batch_source.timestamp_field == DriverActivity.datetime_trunc_day.key
     assert fv.entities == ["driver"]
     assert fv.features == [
-        Feature(name=DriverActivity.trips_today.key, dtype=ValueType.INT64),
-        Feature(name=DriverActivity.rating.key, dtype=ValueType.FLOAT),
-        Feature(
+        FeastField(
+            name=DriverActivity.trips_today.key, dtype=from_value_type(ValueType.INT64)
+        ),
+        FeastField(
+            name=DriverActivity.rating.key, dtype=from_value_type(ValueType.FLOAT)
+        ),
+        FeastField(
             name=DriverActivity.a_str_arr_field.key,
-            dtype=ValueType.STRING_LIST,
+            dtype=from_value_type(ValueType.STRING_LIST),
         ),
     ]

@@ -9,7 +9,7 @@ runner = CliRunner()
 
 @patch("feast.repo_operations.apply_total_with_repo_instance")
 @patch(
-    "amora.feature_store.fs._plan",
+    "amora.feature_store.fs.plan",
     return_value=(
         MagicMock(to_string=lambda: "registry diff"),
         MagicMock(to_string=lambda: "infra diff"),
