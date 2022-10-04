@@ -10,6 +10,7 @@ env:
   AMORA_TARGET_SCHEMA: amora
   AMORA_TARGET_PROJECT: amora-data-build-tool
   AMORA_DASH_DEBUG: 1
+  PYTHONPATH: "."
 
 jobs:
   qa:
