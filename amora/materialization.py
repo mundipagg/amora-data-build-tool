@@ -2,9 +2,21 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from google.cloud.bigquery import Client, QueryJobConfig, Table
+from google.cloud.bigquery import (
+    Client,
+    PartitionRange,
+    QueryJobConfig,
+    RangePartitioning,
+    Table,
+    TimePartitioning,
+)
 
-from amora.models import MaterializationTypes, Model, amora_model_for_target_path
+from amora.models import (
+    MaterializationTypes,
+    Model,
+    ModelConfig,
+    amora_model_for_target_path,
+)
 
 
 @dataclass
@@ -22,53 +34,58 @@ class Task:
         )
 
     def __repr__(self):
-        return f"{self.model.__name__} -> {self.sql_stmt}"
+        return f"{self.model.unique_name()} -> {self.sql_stmt}"
 
 
-def materialize(sql: str, model: Model) -> Optional[Table]:
-    config = model.__model_config__
+def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Table]:
     materialization = config.materialized
 
     if materialization == MaterializationTypes.ephemeral:
         return None
 
     client = Client()
+    client.delete_table(model_name, not_found_ok=True)
 
     if materialization == MaterializationTypes.view:
-        table_name = model.unique_name()
-
-        view = Table(table_name)
+        view = Table(model_name)
         view.description = config.description
         view.labels = config.labels_dict
         view.view_query = sql
 
-        client.delete_table(table_name, not_found_ok=True)
-
         return client.create_table(view)
 
     if materialization == MaterializationTypes.table:
-        table_name = model.unique_name()
-        client.delete_table(table_name, not_found_ok=True)
+        query_job_config = QueryJobConfig(destination=model_name)
+
+        if config.partition_by:
+            if config.partition_by.data_type == "int":
+                query_job_config.range_partitioning = RangePartitioning(
+                    range_=PartitionRange(
+                        start=config.partition_by.range.get("start"),
+                        end=config.partition_by.range.get("end"),
+                    ),
+                    field=config.partition_by.field,
+                )
+
+            else:
+                query_job_config.time_partitioning = TimePartitioning(
+                    field=config.partition_by.field,
+                    type_=config.partition_by.granularity.upper(),
+                )
+
+        query_job_config.clustering_fields = config.cluster_by
+
         query_job = client.query(
             sql,
-            job_config=QueryJobConfig(
-                destination=model.unique_name(),
-                write_disposition="WRITE_TRUNCATE",
-            ),
+            job_config=query_job_config,
         )
-
         query_job.result()
 
-        table = client.get_table(model.unique_name())
+        table = client.get_table(model_name)
         table.description = config.description
         table.labels = config.labels_dict
 
-        if config.cluster_by:
-            table.clustering_fields = config.cluster_by
-
-        return client.update_table(
-            table, ["description", "labels", "clustering_fields"]
-        )
+        return client.update_table(table, ["description", "labels"])
 
     raise ValueError(
         f"Invalid model materialization configuration. "
