@@ -1,15 +1,18 @@
 import hashlib
 import json
 from collections import defaultdict
+from pathlib import Path
 
 from amora.config import settings
 from amora.dag import DependencyDAG
 from amora.models import list_models
 
+from _hashlib import HASH
+
 BUF_SIZE = 65536
 
 
-def hash_file(file_path):  # should be _Hash, but fails due to import error
+def hash_file(file_path: Path) -> HASH:
     hash = hashlib.md5()
     with open(file_path, "rb") as f:
         while True:
