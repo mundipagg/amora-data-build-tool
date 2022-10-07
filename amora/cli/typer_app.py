@@ -8,7 +8,7 @@ from amora import materialization
 from amora.cli import dash, feature_store, models
 from amora.cli.shared_options import models_option, target_option
 from amora.cli.type_specs import Models
-from amora.compilation import compile_statement, get_models_to_compile
+from amora.compilation import compile_statement, get_models_to_compile, clean_compiled_files_of_removed_models
 from amora.config import settings
 from amora.dag import DependencyDAG
 from amora.manifest import generate_manifest, load_manifest, save_manifest
@@ -38,6 +38,9 @@ def compile(
         clean_compiled_files()
         models_to_compile = set(list_models())
     else:
+        clean_compiled_files_of_removed_models(
+        previous_manifest["models"].keys(), current_manifest["models"].keys()
+    )
         models_to_compile = get_models_to_compile(previous_manifest, current_manifest)
 
     for model, model_file_path in models_to_compile:

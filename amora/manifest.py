@@ -21,9 +21,7 @@ def hash_file(file_path):  # should be _Hash, but fails due to import error
 
 
 def generate_manifest() -> dict:
-    manifest: dict = defaultdict(models={}, all_sources={})
-
-    all_sources = []
+    manifest: dict = defaultdict(models={})
 
     for model, model_file_path in list_models():
         file_stats = model_file_path.stat()
@@ -35,15 +33,10 @@ def generate_manifest() -> dict:
             "deps": [dep for dep in DependencyDAG.from_model(model)],
         }
 
-        all_sources.append(str(model_file_path))
-
-    manifest["all_sources"] = all_sources
-
     return manifest
 
 
 def save_manifest(manifest: dict):
-    # TODO -> save content from manifest before save, in cases where the save fails
     with open(settings.manifest_path, "w+") as f:
         json.dump(manifest, f)
 

@@ -36,15 +36,3 @@ def list_target_files() -> Iterable[Path]:
 
 def get_model_key_from_file(model_file: Path) -> str:
     return os.path.basename(model_file).split(".")[0]
-
-
-def get_target_path_from_model_file(
-    model_file,
-) -> Path:  # Duplicated -> already in AmoraModel
-    strip_path = Path(settings.models_path).as_posix()
-    relative_model_path = str(model_file).split(strip_path)[1][1:]
-    target_file_path = Path(settings.target_path).joinpath(
-        relative_model_path.replace(".py", ".sql")
-    )
-
-    return target_file_path

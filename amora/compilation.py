@@ -7,9 +7,9 @@ import sqlparse
 from sqlalchemy_bigquery import STRUCT, BigQueryDialect
 from sqlalchemy_bigquery.base import BigQueryCompiler
 
-from amora.models import Model, amora_model_from_name_list, list_models
+from amora.models import Model, amora_model_from_name_list, list_models, AmoraModel
 from amora.protocols import Compilable
-from amora.utils import get_model_key_from_file, get_target_path_from_model_file
+from amora.utils import get_model_key_from_file
 
 
 class AmoraBigQueryCompiler(BigQueryCompiler):
@@ -58,15 +58,12 @@ def compile_statement(statement: Compilable) -> str:
     return formatted_sql
 
 
-def delete_removed_models_from_target(
-    previous_sources: list, all_sources: list
+def clean_compiled_files_of_removed_models(
+    previous_models: list, current_models: list
 ) -> None:
-    removed_sources = set(previous_sources) - set(all_sources)
-    for model_file in removed_sources:
-        print(
-            f"Removing non existent model: {get_model_key_from_file(model_file)} from target: {model_file}"
-        )
-        os.remove(get_target_path_from_model_file(model_file))
+    removed_models_files = set(previous_models) - set(current_models)
+    for model_file in removed_models_files:
+        os.remove(AmoraModel.target_path(model_file))
 
 
 def split_list_by_element(list_: list, element: Any) -> list:
@@ -89,10 +86,6 @@ def get_models_to_compile(
 ) -> set[Tuple[Model, Path]]:
     models_to_compile = set()
     deps_names_to_compile: Set = set()
-
-    delete_removed_models_from_target(
-        previous_manifest["all_sources"], current_manifest["all_sources"]
-    )
 
     for model, model_file_path in list_models():
         model_unique_name = model.unique_name()
