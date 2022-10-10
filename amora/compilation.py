@@ -7,9 +7,8 @@ import sqlparse
 from sqlalchemy_bigquery import STRUCT, BigQueryDialect
 from sqlalchemy_bigquery.base import BigQueryCompiler
 
-from amora.models import Model, amora_model_from_name_list, list_models, AmoraModel
+from amora.models import AmoraModel, Model, amora_model_from_name_list, list_models
 from amora.protocols import Compilable
-from amora.utils import get_model_key_from_file
 
 
 class AmoraBigQueryCompiler(BigQueryCompiler):

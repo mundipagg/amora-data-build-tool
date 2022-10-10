@@ -3,11 +3,11 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
+from _hashlib import HASH
+
 from amora.config import settings
 from amora.dag import DependencyDAG
 from amora.models import list_models
-
-from _hashlib import HASH
 
 BUF_SIZE = 65536
 

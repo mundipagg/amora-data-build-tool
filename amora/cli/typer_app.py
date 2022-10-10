@@ -4,16 +4,13 @@ from typing import Dict, List, Optional
 import pytest
 import typer
 
-from amora import materialization
+from amora import compilation, manifest, materialization, utils
 from amora.cli import dash, feature_store, models
-from amora.cli.shared_options import models_option, target_option
+from amora.cli.shared_options import force_option, models_option, target_option
 from amora.cli.type_specs import Models
-from amora.compilation import compile_statement, get_models_to_compile, clean_compiled_files_of_removed_models
 from amora.config import settings
 from amora.dag import DependencyDAG
-from amora.manifest import generate_manifest, load_manifest, save_manifest
 from amora.models import list_models
-from amora.utils import clean_compiled_files, list_target_files
 
 app = typer.Typer(
     help="Amora Data Build Tool enables engineers to transform data in their warehouses "
@@ -26,22 +23,24 @@ app = typer.Typer(
 def compile(
     models: Optional[Models] = models_option,
     target: Optional[str] = target_option,
-    force: Optional[bool] = False,
+    force: Optional[bool] = force_option,
 ) -> None:
     """
     Generates executable SQL from model files. Compiled SQL files are written to the `./target` directory.
     """
-    current_manifest = generate_manifest()
-    previous_manifest = load_manifest()
+    current_manifest = manifest.generate_manifest()
+    previous_manifest = manifest.load_manifest()
 
     if force or not previous_manifest:
-        clean_compiled_files()
+        utils.clean_compiled_files()
         models_to_compile = set(list_models())
     else:
-        clean_compiled_files_of_removed_models(
-        previous_manifest["models"].keys(), current_manifest["models"].keys()
-    )
-        models_to_compile = get_models_to_compile(previous_manifest, current_manifest)
+        compilation.clean_compiled_files_of_removed_models(
+            previous_manifest["models"].keys(), current_manifest["models"].keys()
+        )
+        models_to_compile = compilation.get_models_to_compile(
+            previous_manifest, current_manifest
+        )
 
     for model, model_file_path in models_to_compile:
         if models and model_file_path.stem not in models:
@@ -55,11 +54,11 @@ def compile(
         target_file_path = model.target_path(model_file_path)
         typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
 
-        content = compile_statement(source_sql_statement)
+        content = compilation.compile_statement(source_sql_statement)
         target_file_path.parent.mkdir(parents=True, exist_ok=True)
         target_file_path.write_text(content)
 
-    save_manifest(current_manifest)
+    manifest.save_manifest(current_manifest)
 
 
 @app.command()
@@ -82,7 +81,7 @@ def materialize(
 
     model_to_task: Dict[str, materialization.Task] = {}
 
-    for target_file_path in list_target_files():
+    for target_file_path in utils.list_target_files():
         if models and target_file_path.stem not in models:
             continue
 

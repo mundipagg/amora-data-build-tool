@@ -32,7 +32,3 @@ def clean_compiled_files() -> None:
 
 def list_target_files() -> Iterable[Path]:
     return list_files(settings.target_path, suffix=".sql")
-
-
-def get_model_key_from_file(model_file: Path) -> str:
-    return os.path.basename(model_file).split(".")[0]

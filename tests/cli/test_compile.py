@@ -1,10 +1,12 @@
 import itertools
+import os
 from typing import List
 
 import pytest
 from typer.testing import CliRunner
 
 from amora.cli import app
+from amora.config import settings
 from amora.utils import clean_compiled_files, list_target_files
 
 runner = CliRunner(mix_stderr=False)
@@ -12,10 +14,79 @@ runner = CliRunner(mix_stderr=False)
 
 def setup_function(_module):
     clean_compiled_files()
+    if os.path.exists(settings.manifest_path):
+        os.remove(settings.manifest_path)
 
 
 def teardown_function(_module):
     clean_compiled_files()
+    if os.path.exists(settings.manifest_path):
+        os.remove(settings.manifest_path)
+
+
+from unittest import mock
+
+
+@mock.patch("amora.utils.clean_compiled_files")
+def test_compile_with_force_clean_compiled_files(clean_compiled_files: mock.MagicMock):
+    result = runner.invoke(
+        app,
+        ["compile", "--force"],
+    )
+
+    clean_compiled_files.assert_called_once()
+
+
+@mock.patch("amora.manifest.load_manifest")
+@mock.patch("amora.utils.clean_compiled_files")
+def test_compile_call_clean_compiled_files_when_manifest_doesnt_exists(
+    clean_compiled_files: mock.MagicMock, load_manifest: mock.MagicMock
+):
+    load_manifest.return_value = {}
+
+    result = runner.invoke(
+        app,
+        ["compile"],
+    )
+
+    clean_compiled_files.assert_called_once()
+
+
+@mock.patch("amora.manifest.save_manifest")
+def test_compile_call_save_manifest(save_manifest: mock.MagicMock):
+    result = runner.invoke(
+        app,
+        ["compile"],
+    )
+
+    save_manifest.assert_called_once()
+
+
+@mock.patch("amora.manifest.load_manifest")
+@mock.patch("amora.manifest.generate_manifest")
+@mock.patch("amora.compilation.get_models_to_compile")
+@mock.patch("amora.compilation.clean_compiled_files_of_removed_models")
+def test_compile_call_clean_compiled_files_of_removed_models(
+    clean_compiled_files_of_removed_models: mock.MagicMock,
+    get_models_to_compile: mock.MagicMock,
+    generate_manifest: mock.MagicMock,
+    load_manifest: mock.MagicMock,
+):
+    current_manifest: dict = {"models": {}}
+    previous_manifest: dict = {"models": {"1": "1"}}
+
+    generate_manifest.return_value = current_manifest
+    load_manifest.return_value = previous_manifest
+
+    result = runner.invoke(
+        app,
+        ["compile"],
+    )
+
+    clean_compiled_files_of_removed_models.assert_called_once_with(
+        previous_manifest["models"].keys(), current_manifest["models"].keys()
+    )
+    get_models_to_compile.assert_called_once_with(previous_manifest, current_manifest)
 
 
 @pytest.mark.parametrize(
@@ -29,8 +100,6 @@ def teardown_function(_module):
 def test_compile_with_models_options(
     models: List[str], expected_exit_code: int, expected_target_files: List[str]
 ):
-    # todo: implementar função clean_target
-    # todo: clean_target()
     models_args = [("--model", model) for model in models]
     result = runner.invoke(
         app, ["compile", *itertools.chain.from_iterable(models_args)]
