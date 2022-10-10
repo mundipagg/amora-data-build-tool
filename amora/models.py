@@ -271,7 +271,7 @@ def amora_model_for_name(model_name: str) -> Model:
 
 
 def amora_model_from_name_list(
-    model_name_list: Union[list[str], set[str]]
+    model_name_list: Union[List[str], Set[str]]
 ) -> List[Tuple[Model, Path]]:
     models: List[Tuple[Model, Path]] = []
     for model, _path in list_models():

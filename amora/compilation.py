@@ -82,7 +82,7 @@ def get_deps_names(current_manifest: dict, model_id_to_compile: str) -> set:
 
 def get_models_to_compile(
     previous_manifest: dict, current_manifest: dict
-) -> set[Tuple[Model, Path]]:
+) -> Set[Tuple[Model, Path]]:
     models_to_compile = set()
     deps_names_to_compile: Set = set()
 
