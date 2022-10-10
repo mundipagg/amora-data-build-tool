@@ -1,6 +1,7 @@
 import itertools
 import os
 from typing import List
+from unittest import mock
 
 import pytest
 from typer.testing import CliRunner
@@ -22,9 +23,6 @@ def teardown_function(_module):
     clean_compiled_files()
     if os.path.exists(settings.manifest_path):
         os.remove(settings.manifest_path)
-
-
-from unittest import mock
 
 
 @mock.patch("amora.utils.clean_compiled_files")
