@@ -12,7 +12,7 @@ from amora.compilation import compile_statement
 from amora.config import settings
 from amora.dag import DependencyDAG
 from amora.models import list_models
-from amora.utils import list_target_files
+from amora.utils import list_target_files, clean_compiled_files
 
 app = typer.Typer(
     help="Amora Data Build Tool enables engineers to transform data in their warehouses "
@@ -29,6 +29,8 @@ def compile(
     """
     Generates executable SQL from model files. Compiled SQL files are written to the `./target` directory.
     """
+    clean_compiled_files()
+
     for model, model_file_path in list_models():
         if models and model_file_path.stem not in models:
             continue
