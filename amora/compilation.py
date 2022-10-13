@@ -88,7 +88,6 @@ def get_models_to_compile(
 
     for model, model_file_path in list_models():
         model_unique_name = model.unique_name()
-        compile_model = False
 
         model_current_manifest = current_manifest["models"][model_unique_name]
         model_previous_manifest = previous_manifest["models"].get(
