@@ -1,8 +1,13 @@
 from amora.dag import DependencyDAG
 from amora.utils import clean_compiled_files
 
+from tests.models.array_repeated_fields import ArrayRepeatedFields
 from tests.models.health import Health
+from tests.models.heart_agg import HeartRateAgg
 from tests.models.heart_rate import HeartRate
+from tests.models.heart_rate_over_100 import HeartRateOver100
+from tests.models.step_count_by_source import StepCountBySource
+from tests.models.steps import Steps
 
 
 def setup_function(module):
@@ -62,3 +67,29 @@ def test_DependencyDAG_from_model():
             HeartRate.unique_name(),
         )
     ]
+
+
+def test_DependencyDAG_from_project():
+    dag = DependencyDAG.from_project()
+
+    assert sorted(list(dag.nodes)) == sorted(
+        [
+            Health.unique_name(),
+            HeartRate.unique_name(),
+            ArrayRepeatedFields.unique_name(),
+            HeartRateAgg.unique_name(),
+            Steps.unique_name(),
+            StepCountBySource.unique_name(),
+            HeartRateOver100.unique_name(),
+        ]
+    )
+
+    assert sorted(list(dag.edges)) == sorted(
+        [
+            (Steps.unique_name(), StepCountBySource.unique_name()),
+            (Health.unique_name(), Steps.unique_name()),
+            (Health.unique_name(), HeartRate.unique_name()),
+            (HeartRate.unique_name(), HeartRateAgg.unique_name()),
+            (HeartRate.unique_name(), HeartRateOver100.unique_name()),
+        ]
+    )
