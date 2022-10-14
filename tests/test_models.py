@@ -51,7 +51,10 @@ def test_amora_model_from_name_list():
     models = amora_model_from_name_list(expected_models_name_list)
 
     assert len(expected_models) == len(models)
-    for (model, _), expected_model in zip(models, expected_models):
+    for (model, _), expected_model in zip(
+        sorted(models, key=lambda x: x[0].unique_name()),
+        sorted(expected_models, key=lambda x: x.unique_name()),
+    ):
         assert issubclass(model, AmoraModel)
         assert expected_model.__table__ == model.__table__
 
