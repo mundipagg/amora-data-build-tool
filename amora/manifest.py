@@ -26,14 +26,17 @@ def hash_file(file_path: Path) -> HASH:
 def generate_manifest() -> dict:
     manifest: dict = defaultdict(models={})
 
+    dag = DependencyDAG.from_project()
+
     for model, model_file_path in list_models():
         file_stats = model_file_path.stat()
-        manifest["models"][model.unique_name()] = {
+        model_unique_name = model.unique_name()
+        manifest["models"][model_unique_name] = {
             "stat": file_stats.st_mtime,
             "size": file_stats.st_size,
             "hash": hash_file(model_file_path).hexdigest(),
             "path": str(model_file_path),
-            "deps": [dep for dep in DependencyDAG.from_model(model)],
+            "deps": [dep for dep in dag.get_all_dependencies(source=model_unique_name)],
         }
 
     return manifest

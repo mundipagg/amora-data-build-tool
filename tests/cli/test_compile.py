@@ -1,5 +1,4 @@
 import itertools
-import os
 from typing import List
 from unittest import mock
 
@@ -15,14 +14,12 @@ runner = CliRunner(mix_stderr=False)
 
 def setup_function(_module):
     clean_compiled_files()
-    if os.path.exists(settings.manifest_path):
-        os.remove(settings.manifest_path)
+    settings.manifest_path.unlink(missing_ok=True)
 
 
 def teardown_function(_module):
     clean_compiled_files()
-    if os.path.exists(settings.manifest_path):
-        os.remove(settings.manifest_path)
+    settings.manifest_path.unlink(missing_ok=True)
 
 
 @mock.patch("amora.utils.clean_compiled_files")

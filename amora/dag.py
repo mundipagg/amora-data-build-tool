@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 from amora.config import settings
 from amora.materialization import Task
-from amora.models import Column, Model
+from amora.models import Column, Model, list_models
 from amora.utils import list_target_files
 
 CytoscapeElements = List[Dict]
@@ -29,6 +29,24 @@ class DependencyDAG(nx.DiGraph):
                 fetch_edges(dependency)
 
         fetch_edges(model)
+        return dag
+
+    @classmethod
+    def from_project(cls) -> "DependencyDAG":
+        """
+        Builds the DependencyDAG for all models.
+        """
+        dag = cls()
+
+        def fetch_edges(node: Model):
+            for dependency in getattr(node, "__depends_on__", []):
+                dag.add_edge(dependency.unique_name(), node.unique_name())
+                fetch_edges(dependency)
+
+        for model, _ in list_models():
+            dag.add_node(model.unique_name())
+            fetch_edges(model)
+
         return dag
 
     @classmethod
@@ -71,6 +89,11 @@ class DependencyDAG(nx.DiGraph):
     def topological_generations(self) -> Generator[List[Any], None, None]:
         for generation in nx.topological_generations(self):
             yield sorted(generation)
+
+    def get_all_dependencies(self, source: Any) -> Generator[Any, None, None]:
+        for dep in nx.predecessor(self, source=source):
+            if dep != source:
+                yield dep
 
     def to_cytoscape_elements(self) -> CytoscapeElements:
         """

@@ -7,12 +7,7 @@ import pytest
 from sqlalchemy import Integer, String, func
 from sqlalchemy_bigquery.base import BQArray
 
-from amora.compilation import (
-    compile_statement,
-    get_deps_names,
-    get_models_to_compile,
-    split_list_by_element,
-)
+from amora.compilation import compile_statement, get_models_to_compile
 from amora.models import AmoraModel, amora_model_for_path, select
 from amora.providers.bigquery import fixed_unnest
 
@@ -92,28 +87,6 @@ def test_AmoraBigQueryCompiler_visit_function_without_offset():
     assert compiled == "unnest(`array_repeated_fields`.`int_arr`)"
 
 
-def test_split_list_by_element():
-    assert split_list_by_element([1, 2, 3, 4, 5, 6], 4) == [5, 6]
-
-
-def test_get_deps_names():
-    current_manifest = {
-        "models": {
-            "health": {"deps": ["health"]},
-            "steps": {"deps": ["health", "steps"]},
-            "step_count_by_source": {
-                "deps": ["health", "steps", "step_count_by_source"]
-            },
-        }
-    }
-
-    model_name = "health"
-
-    assert sorted(get_deps_names(current_manifest, model_name)) == sorted(
-        {"steps", "step_count_by_source"}
-    )
-
-
 @pytest.fixture()
 def sample_manifest():
     return {
@@ -123,17 +96,14 @@ def sample_manifest():
                 "size": 1181,
                 "hash": "1a3de26089812ca0b731588a7dd2f3f2",
                 "path": "/home/beto/code/work/amora-data-build-tool/examples/amora_project/models/health.py",
-                "deps": ["amora-data-build-tool.amora.health"],
+                "deps": [],
             },
             "amora-data-build-tool.amora.steps": {
                 "stat": 1665147859.6682658,
                 "size": 1937,
                 "hash": "c8981d729c89dd8f6afcbe6671fa8c62",
                 "path": "/home/beto/code/work/amora-data-build-tool/examples/amora_project/models/steps.py",
-                "deps": [
-                    "amora-data-build-tool.amora.health",
-                    "amora-data-build-tool.amora.steps",
-                ],
+                "deps": [],
             },
         }
     }
@@ -182,11 +152,7 @@ def test_get_models_to_compile_when_has_new_model(
         "stat": 1664199318.9035711,
         "size": 4714,
         "hash": "3df3f2761805fb1ece39581f21fbaf0a",
-        "deps": [
-            "amora-data-build-tool.amora.health",
-            "amora-data-build-tool.amora.steps",
-            "amora-data-build-tool.amora.step_count_by_source",
-        ],
+        "deps": [],
     }
 
     models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
@@ -333,15 +299,18 @@ def test_get_models_to_compile_return_all_dependencies_from_a_changed_model(
 
     list_models.return_value = expected_models_to_compile
 
+    sample_manifest["models"]["amora-data-build-tool.amora.health"]["deps"] = [
+        "amora-data-build-tool.amora.steps",
+        "amora-data-build-tool.amora.step_count_by_source",
+    ]
+    sample_manifest["models"]["amora-data-build-tool.amora.steps"]["deps"] = [
+        "amora-data-build-tool.amora.step_count_by_source"
+    ]
     sample_manifest["models"][StepCountBySource.unique_name()] = {
         "stat": 1664199318.9035711,
         "size": 4714,
         "hash": "3df3f2761805fb1ece39581f21fbaf0a",
-        "deps": [
-            "amora-data-build-tool.amora.health",
-            "amora-data-build-tool.amora.steps",
-            "amora-data-build-tool.amora.step_count_by_source",
-        ],
+        "deps": [],
     }
     new_manifest = deepcopy(sample_manifest)
     new_manifest["models"]["amora-data-build-tool.amora.health"]["size"] = 1920

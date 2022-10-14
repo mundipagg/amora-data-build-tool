@@ -1,7 +1,7 @@
 import os
 from os.path import exists
 from pathlib import Path
-from typing import Any, Set, Tuple
+from typing import Set, Tuple
 
 import sqlparse
 from sqlalchemy_bigquery import STRUCT, BigQueryDialect
@@ -65,21 +65,6 @@ def clean_compiled_files_of_removed_models(
         os.remove(AmoraModel.target_path(model_file))
 
 
-def split_list_by_element(list_: list, element: Any) -> list:
-    return [] if element not in list_ else list_[list_.index(element) + 1 :]
-
-
-def get_deps_names(current_manifest: dict, model_id_to_compile: str) -> set:
-    model_deps_to_compile: list = []
-
-    for _, model_manifest in current_manifest["models"].items():
-        model_deps_to_compile.extend(
-            split_list_by_element(model_manifest["deps"], model_id_to_compile)
-        )
-
-    return set(model_deps_to_compile)
-
-
 def get_models_to_compile(
     previous_manifest: dict, current_manifest: dict
 ) -> Set[Tuple[Model, Path]]:
@@ -109,7 +94,7 @@ def get_models_to_compile(
         if compile_model:
             models_to_compile.add((model, model_file_path))
             deps_names_to_compile = deps_names_to_compile.union(
-                get_deps_names(current_manifest, model_unique_name)
+                model_current_manifest["deps"]
             )
 
     deps_to_compile = set(amora_model_from_name_list(deps_names_to_compile))
