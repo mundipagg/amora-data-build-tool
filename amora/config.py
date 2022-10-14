@@ -71,16 +71,6 @@ class Settings(BaseSettings):
         return values
 
     @root_validator
-    def compute_MANIFEST_PATH(cls, values: dict) -> dict:
-        if values["MANIFEST_PATH"] is not None:
-            return values
-
-        values["MANIFEST_PATH"] = Path(
-            os.path.join(values["TARGET_PATH"], "manifest.json")
-        )
-        return values
-
-    @root_validator
     def compute_DASHBOARDS_PATH(cls, values: dict) -> dict:
         if values["DASHBOARDS_PATH"] is not None:
             return values
@@ -99,6 +89,16 @@ class Settings(BaseSettings):
 
         values["TARGET_PATH"] = target_path
 
+        return values
+
+    @root_validator
+    def compute_MANIFEST_PATH(cls, values: dict) -> dict:
+        if values["MANIFEST_PATH"] is not None:
+            return values
+
+        values["MANIFEST_PATH"] = Path(
+            os.path.join(values["TARGET_PATH"], "manifest.json")
+        )
         return values
 
     @validator("PROJECT_PATH")
