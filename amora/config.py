@@ -76,7 +76,7 @@ class Settings(BaseSettings):
             return values
 
         values["MANIFEST_PATH"] = Path(
-            os.path.join(values["PROJECT_PATH"], "manifest.json")
+            os.path.join(values["TARGET_PATH"], "manifest.json")
         )
         return values
 
