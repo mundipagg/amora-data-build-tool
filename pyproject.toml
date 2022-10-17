@@ -47,7 +47,7 @@ dash-mantine-components = { version = "^0.10.2", optional = true }
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "^3.0.0"
-black = "^22.1"
+black = "^22.10"
 jupyter = "^1.0.0"
 mypy = "^0.981"
 lxml = "^4.6.3"
