@@ -1,12 +1,4 @@
 [[package]]
-name = "absl-py"
-version = "1.2.0"
-description = "Abseil Python Common Libraries, see https://github.com/abseil/abseil-py."
-category = "main"
-optional = true
-python-versions = ">=3.6"
-
-[[package]]
 name = "aiohttp"
 version = "3.8.1"
 description = "Async http client/server framework (asyncio)"
@@ -684,7 +676,7 @@ devel = ["colorama", "json-spec", "jsonschema", "pylint", "pytest", "pytest-benc
 
 [[package]]
 name = "feast"
-version = "0.25.1"
+version = "0.26.0"
 description = "Python SDK for Feast"
 category = "main"
 optional = true
@@ -701,6 +693,7 @@ fastavro = ">=1.1.0,<2"
 google-api-core = ">=1.23.0,<3"
 google-cloud-bigquery = {version = ">=2,<4", extras = ["pandas"], optional = true, markers = "extra == \"gcp\""}
 google-cloud-bigquery-storage = {version = ">=2.0.0,<3", optional = true, markers = "extra == \"gcp\""}
+google-cloud-bigtable = {version = ">=2.11,<3", optional = true, markers = "extra == \"gcp\""}
 google-cloud-datastore = {version = ">=2.1,<3", optional = true, markers = "extra == \"gcp\""}
 google-cloud-storage = {version = ">=1.34,<3", optional = true, markers = "extra == \"gcp\""}
 googleapis-common-protos = ">=1.52,<2"
@@ -723,7 +716,6 @@ redis = {version = "4.2.2", optional = true, markers = "extra == \"redis\""}
 SQLAlchemy = {version = ">1,<2", extras = ["mypy"]}
 tabulate = ">=0.8.0,<1"
 tenacity = ">=7,<9"
-tensorflow-metadata = ">=1.0.0,<2.0.0"
 toml = ">=0.10.0,<1"
 tqdm = ">=4,<5"
 typeguard = "*"
@@ -734,17 +726,17 @@ aws = ["boto3 (>=1.17.0,<=1.20.23)", "docker (>=5.0.2)", "s3fs (>=0.4.0,<=2022.0
 azure = ["SQLAlchemy (>=1.4.19)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "pymssql", "pyodbc (>=4.0.30)"]
 bytewax = ["bytewax (==0.10.0)", "docker (>=5.0.2)", "kubernetes (<=20.13.0)"]
 cassandra = ["cassandra-driver (>=3.24.0,<4)"]
-ci = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.10.0)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "mysqlclient", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pybindgen", "pymssql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
-dev = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.10.0)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.0.0,<2.0.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "mysqlclient", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pybindgen", "pymssql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
-docs = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.10.0)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pybindgen", "pymssql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
-gcp = ["google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)"]
+ci = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.10.0)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-bigtable (>=2.11,<3)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto (<4)", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "mysqlclient", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pyOpenSSL (<22.1.0)", "pybindgen", "pymssql", "pymysql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyMySQL", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
+dev = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.10.0)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-bigtable (>=2.11,<3)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.0.0,<2.0.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto (<4)", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "mysqlclient", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pyOpenSSL (<22.1.0)", "pybindgen", "pymssql", "pymysql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyMySQL", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
+docs = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.10.0)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-bigtable (>=2.11,<3)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto (<4)", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pyOpenSSL (<22.1.0)", "pybindgen", "pymssql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
+gcp = ["google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-bigtable (>=2.11,<3)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)"]
 ge = ["great-expectations (>=0.14.0,<0.15.0)"]
 go = ["cffi (>=1.15.0,<1.16.0)"]
 hbase = ["happybase (>=1.2.0,<3)"]
-mysql = ["mysqlclient"]
+mysql = ["mysqlclient", "pymysql", "types-PyMySQL"]
 postgres = ["psycopg2-binary (>=2.8.3,<3)"]
 redis = ["hiredis (>=2.0.0,<3)", "redis (==4.2.2)"]
-snowflake = ["snowflake-connector-python[pandas] (>=2.7.3,<3)"]
+snowflake = ["pyOpenSSL (<22.1.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)"]
 spark = ["pyspark (>=3.0.0,<4)"]
 trino = ["trino (>=0.305.0,<0.400.0)"]
 
@@ -1058,6 +1050,24 @@ pyarrow = ["pyarrow (>=0.15.0)"]
 tests = ["freezegun"]
 
 [[package]]
+name = "google-cloud-bigtable"
+version = "2.13.1"
+description = "Google Cloud Bigtable API client library"
+category = "main"
+optional = true
+python-versions = ">=3.7"
+
+[package.dependencies]
+google-api-core = {version = ">=1.32.0,<2.0.0 || >=2.8.0,<3.0.0dev", extras = ["grpc"]}
+google-cloud-core = ">=1.4.1,<3.0.0dev"
+grpc-google-iam-v1 = ">=0.12.4,<1.0.0dev"
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[package.extras]
+libcst = ["libcst (>=0.2.5)"]
+
+[[package]]
 name = "google-cloud-core"
 version = "1.7.3"
 description = "Google Cloud API client core library"
@@ -1133,17 +1143,18 @@ requests = ["requests (>=2.18.0,<3.0.0dev)"]
 
 [[package]]
 name = "googleapis-common-protos"
-version = "1.52.0"
+version = "1.56.4"
 description = "Common protobufs used in Google APIs"
 category = "main"
 optional = false
-python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
+python-versions = ">=3.7"
 
 [package.dependencies]
-protobuf = ">=3.6.0"
+grpcio = {version = ">=1.0.0,<2.0.0dev", optional = true, markers = "extra == \"grpc\""}
+protobuf = ">=3.15.0,<5.0.0dev"
 
 [package.extras]
-grpc = ["grpcio (>=1.0.0)"]
+grpc = ["grpcio (>=1.0.0,<2.0.0dev)"]
 
 [[package]]
 name = "greenlet"
@@ -1166,6 +1177,18 @@ python-versions = ">=3.7"
 
 [package.extras]
 async = ["aiofiles (>=0.7,<1.0)"]
+
+[[package]]
+name = "grpc-google-iam-v1"
+version = "0.12.4"
+description = "IAM API client library"
+category = "main"
+optional = true
+python-versions = ">=3.6"
+
+[package.dependencies]
+googleapis-common-protos = {version = ">=1.56.0,<2.0.0dev", extras = ["grpc"]}
+grpcio = ">=1.0.0,<2.0.0dev"
 
 [[package]]
 name = "grpcio"
@@ -3138,19 +3161,6 @@ python-versions = ">=3.6"
 doc = ["reno", "sphinx", "tornado (>=4.5)"]
 
 [[package]]
-name = "tensorflow-metadata"
-version = "1.9.0"
-description = "Library and standards for schema and statistics."
-category = "main"
-optional = true
-python-versions = ">=3.7,<4"
-
-[package.dependencies]
-absl-py = ">=0.9,<2.0.0"
-googleapis-common-protos = ">=1.52.0,<2"
-protobuf = ">=3.13,<4"
-
-[[package]]
 name = "terminado"
 version = "0.15.0"
 description = "Tornado websocket backend for the Xterm.js Javascript terminal emulator library."
@@ -3592,13 +3602,9 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.10"
-content-hash = "5ba1bd1dad59ff7388bbd1713f4686ff63379e2aadd5a157dc89e2ce7d296dd3"
+content-hash = "5988f9c9fc40c3e0df46761606f0dfa33507df3cc50091eb8c07db44b44e5f0d"
 
 [metadata.files]
-absl-py = [
-    {file = "absl-py-1.2.0.tar.gz", hash = "sha256:f568809938c49abbda89826223c992b630afd23c638160ad7840cfe347710d97"},
-    {file = "absl_py-1.2.0-py3-none-any.whl", hash = "sha256:5d15f85b8cc859c6245bc9886ba664460ed96a6fee895416caa37d669ee74a9a"},
-]
 aiohttp = [
     {file = "aiohttp-3.8.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:1ed0b6477896559f17b9eaeb6d38e07f7f9ffe40b9f0f9627ae8b9926ae260a8"},
     {file = "aiohttp-3.8.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:7dadf3c307b31e0e61689cbf9e06be7a867c563d5a63ce9dca578f956609abf8"},
@@ -4158,13 +4164,13 @@ fastjsonschema = [
     {file = "fastjsonschema-2.16.1.tar.gz", hash = "sha256:d6fa3ffbe719768d70e298b9fb847484e2bdfdb7241ed052b8d57a9294a8c334"},
 ]
 feast = [
-    {file = "feast-0.25.1-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:6cfa3fae35300ab89e6b9c67edb7a618c744b9cbd37d6a03c7c278726670dc85"},
-    {file = "feast-0.25.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e469da2c2c36c19149cfb5affa9bb7f478422b4234ab9b17124e1737e05b6965"},
-    {file = "feast-0.25.1-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:b80d8f54a52f6cbb09a7085f877c80e5ffb322e39ca576a7a051a2b5005c695e"},
-    {file = "feast-0.25.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:18585dd399d12a3d5c9fb990211387ade5f3b1d547f9000b6de42ea6323ed168"},
-    {file = "feast-0.25.1-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:141579c6d3c002a799286a13b6d60ac0132786618dac382b78727a24542b28e1"},
-    {file = "feast-0.25.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:247e017f85c88a78a0aa90edc5fe1114ddc3e13717c7c579f3f3909c7ec3e13b"},
-    {file = "feast-0.25.1.tar.gz", hash = "sha256:7509b0e6b9dd77ea04806b14bbc5ce05f53db7bcb7e075a930c6488af4f8044d"},
+    {file = "feast-0.26.0-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:d56cfe0337fc874ed2e714dee8943042903d10160d9c0904ab2fad8d1c4294fa"},
+    {file = "feast-0.26.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1a39cffd4c4402dfe13504845e1756de44bb1b1522f704734e4ee116a7e88312"},
+    {file = "feast-0.26.0-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:8c4529f205ae23025d0977b5ea955d008e198f7b69dfa4b0ce555fe524c859b3"},
+    {file = "feast-0.26.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:634d6617fd60618892e6595b861fc6a5e0c226511d491291cbd3bc48e2c866b9"},
+    {file = "feast-0.26.0-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:0b71054927c82dc302e1eae3b0735d06b19b2b8acc24c38b3bed7aa827e1b290"},
+    {file = "feast-0.26.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7958ec511441d314813073729046f671921ccf6dfdad8032b85d860243462a6a"},
+    {file = "feast-0.26.0.tar.gz", hash = "sha256:6221886498559e072058206152aa01c7fb205b2bd5c521a1e853b82f49309566"},
 ]
 filelock = [
     {file = "filelock-3.8.0-py3-none-any.whl", hash = "sha256:617eb4e5eedc82fc5f47b6d61e4d11cb837c56cb4544e39081099fa17ad109d4"},
@@ -4298,6 +4304,10 @@ google-cloud-bigquery-storage = [
     {file = "google-cloud-bigquery-storage-2.14.1.tar.gz", hash = "sha256:9cec07689c455448b4db789aa60e759664d757eb066af2a35d414e5e00cf6fb8"},
     {file = "google_cloud_bigquery_storage-2.14.1-py2.py3-none-any.whl", hash = "sha256:3ada498d288582eb706f0d660734c197ead85798caec3bb4fc435505890dceac"},
 ]
+google-cloud-bigtable = [
+    {file = "google-cloud-bigtable-2.13.1.tar.gz", hash = "sha256:9e4d402282a824d4639e44201bc0b350be3d1918b8fee703ce124582976f9d05"},
+    {file = "google_cloud_bigtable-2.13.1-py2.py3-none-any.whl", hash = "sha256:579ef8480f257db7804371e09752f27fffb5285fb96ff189577e3909d571fea4"},
+]
 google-cloud-core = [
     {file = "google-cloud-core-1.7.3.tar.gz", hash = "sha256:dfa40e9d75a825632103326cc52617e3652658c17c6f7360448388d6c9d009fe"},
     {file = "google_cloud_core-1.7.3-py2.py3-none-any.whl", hash = "sha256:d5af737c60a73b9588a0511332ac0cdc6294ad8e477c7b82be03a1afc7c3f7b6"},
@@ -4360,8 +4370,8 @@ google-resumable-media = [
     {file = "google_resumable_media-1.3.3-py2.py3-none-any.whl", hash = "sha256:092f39153cd67a4e409924edf08129f43cc72e630a1eb22abec93e80155df4ba"},
 ]
 googleapis-common-protos = [
-    {file = "googleapis-common-protos-1.52.0.tar.gz", hash = "sha256:560716c807117394da12cecb0a54da5a451b5cf9866f1d37e9a5e2329a665351"},
-    {file = "googleapis_common_protos-1.52.0-py2.py3-none-any.whl", hash = "sha256:c8961760f5aad9a711d37b675be103e0cc4e9a39327e0d6d857872f698403e24"},
+    {file = "googleapis-common-protos-1.56.4.tar.gz", hash = "sha256:c25873c47279387cfdcbdafa36149887901d36202cb645a0e4f29686bf6e4417"},
+    {file = "googleapis_common_protos-1.56.4-py2.py3-none-any.whl", hash = "sha256:8eb2cbc91b69feaf23e32452a7ae60e791e09967d81d4fcc7fc388182d1bd394"},
 ]
 greenlet = [
     {file = "greenlet-1.1.2-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:58df5c2a0e293bf665a51f8a100d3e9956febfbf1d9aaf8c0677cf70218910c6"},
@@ -4423,6 +4433,10 @@ greenlet = [
 griffe = [
     {file = "griffe-0.22.2-py3-none-any.whl", hash = "sha256:cea5415ac6a92f4a22638e3f1f2e661402bac09fb8e8266936d67185a7e0d0fb"},
     {file = "griffe-0.22.2.tar.gz", hash = "sha256:1408e336a4155392bbd81eed9f2f44bf144e71b9c664e905630affe83bbc088e"},
+]
+grpc-google-iam-v1 = [
+    {file = "grpc-google-iam-v1-0.12.4.tar.gz", hash = "sha256:3f0ac2c940b9a855d7ce7e31fde28bddb0d9ac362d32d07c67148306931a0e30"},
+    {file = "grpc_google_iam_v1-0.12.4-py2.py3-none-any.whl", hash = "sha256:312801ae848aeb8408c099ea372b96d253077e7851aae1a9e745df984f81f20c"},
 ]
 grpcio = [
     {file = "grpcio-1.48.0-cp310-cp310-linux_armv7l.whl", hash = "sha256:4a049a032144641ed5d073535c0dc69eb6029187cc729a66946c86dcc8eec3a1"},
@@ -5882,9 +5896,6 @@ tabulate = [
 tenacity = [
     {file = "tenacity-8.0.1-py3-none-any.whl", hash = "sha256:f78f4ea81b0fabc06728c11dc2a8c01277bfc5181b321a4770471902e3eb844a"},
     {file = "tenacity-8.0.1.tar.gz", hash = "sha256:43242a20e3e73291a28bcbcacfd6e000b02d3857a9a9fff56b297a27afdc932f"},
-]
-tensorflow-metadata = [
-    {file = "tensorflow_metadata-1.9.0-py3-none-any.whl", hash = "sha256:a147801b1d91debdea81940a78221af10940f0174529d48075c774a9b46f86d5"},
 ]
 terminado = [
     {file = "terminado-0.15.0-py3-none-any.whl", hash = "sha256:0d5f126fbfdb5887b25ae7d9d07b0d716b1cc0ccaacc71c1f3c14d228e065197"},
