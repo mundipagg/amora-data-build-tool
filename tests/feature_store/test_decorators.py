@@ -9,7 +9,7 @@ from sqlalchemy import ARRAY, Column, String
 from amora.feature_store.decorators import feature_view
 from amora.feature_store.feature_view import name_for_model
 from amora.feature_store.registry import FEATURE_REGISTRY
-from amora.models import AmoraModel, Field
+from amora.models import AmoraModel, Field, ModelConfig
 
 
 def test_feature_view_raises_ValueError_if_model_isnt_a_valid_feature_view_source():
@@ -25,6 +25,7 @@ def test_feature_view_raises_ValueError_if_model_isnt_a_valid_feature_view_sourc
 def test_feature_view_on_valid_source_model():
     @feature_view
     class DriverActivity(AmoraModel, table=True):
+        __model_config__ = ModelConfig(owner="John Doe <john@example.com>")
         datetime_trunc_day: datetime = Field(primary_key=True)
         driver: str = Field(primary_key=True)
         rating: float
@@ -62,3 +63,4 @@ def test_feature_view_on_valid_source_model():
             dtype=from_value_type(ValueType.STRING_LIST),
         ),
     ]
+    assert fv.owner == "John Doe <john@example.com>"

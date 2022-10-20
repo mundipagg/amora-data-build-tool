@@ -19,6 +19,7 @@ from typing import (
     Union,
 )
 
+from pydantic import NameEmail
 from sqlalchemy import Column, MetaData, Table, select
 from sqlalchemy.orm import declared_attr
 from sqlalchemy.sql import ColumnElement
@@ -120,6 +121,7 @@ class ModelConfig:
     partition_by: Optional[PartitionConfig] = None
     cluster_by: Optional[List[str]] = None
     labels: Labels = dataclasses.field(default_factory=set)
+    owner: Optional[NameEmail] = None
 
     @property
     def labels_dict(self) -> Dict[str, str]:
@@ -203,6 +205,13 @@ class AmoraModel(SQLModel):
     @classmethod
     def unique_name(cls) -> str:
         return str(cls.__table__)
+
+    @classmethod
+    def owner(cls) -> str:
+        if model_owner := cls.__model_config__.owner:
+            return str(model_owner)
+
+        return ""
 
 
 def _is_amora_model(candidate: ModuleType) -> bool:
