@@ -40,14 +40,12 @@ def test_models_import_with_invalid_table_reference(get_schema: MagicMock):
 
 
 mock_schema = [
-    SchemaField(name="BOOL_COLUMN", field_type="BOOL"),
     SchemaField(name="BOOLEAN_COLUMN", field_type="BOOLEAN"),
-    SchemaField(name="BYTES_COLUMN", field_type="BYTES"),
+    SchemaField(name="BOOL_COLUMN", field_type="BOOL"),
+    SchemaField(name="BYNARY_COLUMN", field_type="BYNARY"),
     SchemaField(name="DATE_COLUMN", field_type="DATE"),
     SchemaField(name="DATETIME_COLUMN", field_type="DATETIME"),
-    SchemaField(name="FLOAT64_COLUMN", field_type="FLOAT64"),
     SchemaField(name="FLOAT_COLUMN", field_type="FLOAT"),
-    SchemaField(name="INT64_COLUMN", field_type="INT64"),
     SchemaField(name="INTEGER_COLUMN", field_type="INTEGER"),
     SchemaField(name="JSON_COLUMN", field_type="JSON"),
     SchemaField(name="STRING_COLUMN", field_type="STRING"),
@@ -61,18 +59,18 @@ mock_schema = [
         field_type="RECORD",
         mode="REPEATED",
         fields=(
-            SchemaField("id", "STRING", "NULLABLE", None, (), None),
-            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
-            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField(name="id", field_type="STRING", mode="NULLABLE"),
+            SchemaField(name="x", field_type="INTEGER", mode="NULLABLE"),
+            SchemaField(name="y", field_type="INTEGER", mode="NULLABLE"),
         ),
     ),
     SchemaField(
         name="STRUCT_COLUMN",
         field_type="RECORD",
         fields=(
-            SchemaField("id", "STRING", "NULLABLE", None, (), None),
-            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
-            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField(name="id", field_type="STRING", mode="NULLABLE"),
+            SchemaField(name="x", field_type="INTEGER", mode="NULLABLE"),
+            SchemaField(name="y", field_type="INTEGER", mode="NULLABLE"),
         ),
     ),
 ]
@@ -122,6 +120,7 @@ def test_models_import_with_valid_table_reference_and_existing_destination_file_
                 table_reference,
                 output.as_posix(),
             ],
+            catch_exceptions=False,
         )
 
         assert result.exit_code == 0, result.stderr

@@ -3,9 +3,8 @@ from unittest.mock import patch
 import markdown
 import pandas
 import pytest
-from sqlalchemy import literal
+from sqlalchemy import literal, select
 
-from amora.models import select
 from amora.protocols import Compilable
 from amora.questions import Question, question
 from amora.visualization import Visualization

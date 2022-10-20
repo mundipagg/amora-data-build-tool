@@ -5,10 +5,10 @@ from functools import wraps
 from typing import Callable, NamedTuple, Union
 
 import pandas as pd
+from sqlalchemy import MetaData, create_engine
 
 from amora import logger
 from amora.config import StorageCacheProviders, settings
-from amora.models import MetaData, create_engine
 
 local_engine = create_engine(
     f"sqlite:///{settings.LOCAL_ENGINE_SQLITE_FILE_PATH}",

@@ -1,20 +1,19 @@
-from sqlmodel import Field, func, select
+from sqlalchemy import Float, Integer, func, select
 
-from amora.models import AmoraModel, MaterializationTypes, ModelConfig
+from amora.models import AmoraModel, Field, MaterializationTypes, ModelConfig
 from amora.protocols import Compilable
 from examples.amora_project.models.heart_rate import HeartRate
 
 
-class HeartRateAgg(AmoraModel, table=True):
-    __depends_on__ = [HeartRate]
-    __tablename__ = "heart_rate_agg"
+class HeartRateAgg(AmoraModel):
+    __tablename__override__ = "heart_rate_agg"
     __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
 
-    avg: float
-    sum: float
-    count: int
-    year: int = Field(primary_key=True)
-    month: int = Field(primary_key=True)
+    avg: float = Field(Float)
+    sum: float = Field(Float)
+    count: int = Field(Float)
+    year: int = Field(Integer, primary_key=True)
+    month: int = Field(Integer, primary_key=True)
 
     @classmethod
     def source(cls) -> Compilable:

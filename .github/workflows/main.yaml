@@ -67,7 +67,7 @@ jobs:
         run: poetry run py.test --cov=amora --cov-report=term-missing --cov-report=xml ./tests
 
       - name: 🧪 Mypy - Static type check
-        run: poetry run mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --pretty --no-color-output amora
+        run: poetry run mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --pretty --no-color-output amora tests examples
 
       - uses: codecov/codecov-action@v3
         with:

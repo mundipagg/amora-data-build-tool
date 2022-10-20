@@ -4,6 +4,7 @@ from uuid import uuid4
 
 import pytest
 from google.cloud.bigquery import Client
+from sqlalchemy import TIMESTAMP, Integer
 
 from amora.config import settings
 from amora.dag import DependencyDAG
@@ -23,7 +24,7 @@ from tests.models.heart_rate import HeartRate
 from tests.models.steps import Steps
 
 
-class ViewModel(AmoraModel, table=True):
+class ViewModel(AmoraModel):
     x: int = Field(primary_key=True)
     y: int = Field(primary_key=True)
 
@@ -37,8 +38,8 @@ class ViewModel(AmoraModel, table=True):
     )
 
 
-class TableModelByDay(AmoraModel, table=True):
-    __tablename__ = uuid4().hex
+class TableModelByDay(AmoraModel):
+    __tablename__override__ = uuid4().hex
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.table,
         partition_by=PartitionConfig(
@@ -54,8 +55,8 @@ class TableModelByDay(AmoraModel, table=True):
     created_at: datetime = Field(primary_key=True)
 
 
-class TableModelByrange(AmoraModel, table=True):
-    __tablename__ = uuid4().hex
+class TableModelByrange(AmoraModel):
+    __tablename__override__ = uuid4().hex
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.table,
         partition_by=PartitionConfig(
@@ -249,7 +250,7 @@ def test_materialize_update_table_metadata(Client: MagicMock):
 
 
 def test_materialize_invalid_materialization():
-    class InvalidModel(AmoraModel, table=True):
+    class InvalidModel(AmoraModel):
         x: int = Field(primary_key=True)
         y: int = Field(primary_key=True)
 
@@ -265,17 +266,14 @@ def test_materialize_invalid_materialization():
 
 @patch("amora.materialization.Client", spec=Client)
 def test_materialize_as_ephemeral(Client: MagicMock):
-    table_name = uuid4().hex
-
-    class EphemeralModel(AmoraModel, table=True):
-        __tablename__ = table_name
+    class EphemeralModel(AmoraModel):
         __model_config__ = ModelConfig(
             materialized=MaterializationTypes.ephemeral,
         )
 
-        x: int = Field(primary_key=True)
-        y: int = Field(primary_key=True)
-        created_at: datetime = Field(primary_key=True)
+        x: int = Field(Integer, primary_key=True)
+        y: int = Field(Integer, primary_key=True)
+        created_at: datetime = Field(TIMESTAMP, primary_key=True)
 
     assert (
         materialize(

@@ -4,7 +4,7 @@ from typing import List
 import pytest
 from feast import FeatureView, Field as FeastField, ValueType
 from feast.types import from_value_type
-from sqlalchemy import ARRAY, Column, String
+from sqlalchemy import ARRAY, DateTime, Float, Integer, String
 
 from amora.feature_store.decorators import feature_view
 from amora.feature_store.feature_view import name_for_model
@@ -13,10 +13,10 @@ from amora.models import AmoraModel, Field, ModelConfig
 
 
 def test_feature_view_raises_ValueError_if_model_isnt_a_valid_feature_view_source():
-    class Model(AmoraModel, table=True):
-        x: int
-        y: int
-        id: int = Field(primary_key=True)
+    class Model(AmoraModel):
+        x: int = Field(Integer)
+        y: int = Field(Integer)
+        id: int = Field(Integer, primary_key=True)
 
     with pytest.raises(ValueError):
         feature_view(Model)
@@ -24,13 +24,13 @@ def test_feature_view_raises_ValueError_if_model_isnt_a_valid_feature_view_sourc
 
 def test_feature_view_on_valid_source_model():
     @feature_view
-    class DriverActivity(AmoraModel, table=True):
+    class DriverActivity(AmoraModel):
         __model_config__ = ModelConfig(owner="John Doe <john@example.com>")
-        datetime_trunc_day: datetime = Field(primary_key=True)
-        driver: str = Field(primary_key=True)
-        rating: float
-        trips_today: int
-        a_str_arr_field: List[str] = Field(sa_column=Column(ARRAY(String)))
+        datetime_trunc_day: datetime = Field(DateTime, primary_key=True)
+        driver: str = Field(String, primary_key=True)
+        rating: float = Field(Float)
+        trips_today: int = Field(Integer)
+        a_str_arr_field: List[str] = Field(ARRAY(String))
 
         @classmethod
         def feature_view_entities(cls):

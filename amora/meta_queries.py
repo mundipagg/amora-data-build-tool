@@ -11,12 +11,13 @@ from sqlalchemy import (
     cast,
     func,
     literal,
+    select,
     union_all,
 )
 from sqlalchemy_bigquery import STRUCT
 
 from amora.feature_store.protocols import FeatureViewSourceProtocol
-from amora.models import Model, select
+from amora.models import Model
 from amora.providers.bigquery import run
 from amora.storage import cache
 

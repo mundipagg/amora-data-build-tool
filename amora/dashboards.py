@@ -99,7 +99,7 @@ class Dashboard(BaseModel):
         arbitrary_types_allowed = True
 
 
-DASHBOARDS: Dict[DashboardUid, Dashboard] = dict()
+DASHBOARDS: Dict[DashboardUid, Dashboard] = {}
 
 
 def dashboard_for_path(path: Path) -> Dashboard:

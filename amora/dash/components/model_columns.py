@@ -10,7 +10,7 @@ def component(model: Model) -> Component:
         [
             {
                 "column": col.key,
-                "description": col.comment if col.comment else "Undocumented",
+                "description": col.doc if col.doc else "Undocumented",
             }
             for col in model.__table__.columns
         ]

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 
 import dash_bootstrap_components as dbc
 import humanize
@@ -7,7 +7,7 @@ from dash import html
 from dash.development.base_component import Component
 
 
-def component(updated_at: Union[datetime, None]) -> Optional[Component]:
+def component(updated_at: Optional[datetime]) -> Optional[Component]:
     if updated_at:
         delta = datetime.now() - updated_at
         label = humanize.naturaltime(delta)

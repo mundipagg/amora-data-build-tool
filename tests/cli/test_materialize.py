@@ -84,6 +84,7 @@ def test_materialize_with_model_options(
     )
 
     assert result.exit_code == 0
+
     executor_mock.map.assert_called_once_with(
         materialize, ["SELECT 1"], [Steps.unique_name()], [Steps.__model_config__]
     )

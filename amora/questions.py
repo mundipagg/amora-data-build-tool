@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Callable, Set
+from typing import Callable, Optional, Set
 
 import pandas as pd
 from sqlalchemy.sql import Selectable
@@ -76,7 +76,9 @@ class Question:
     """
 
     def __init__(
-        self, question_func: QuestionFunc, view_config: VisualizationConfig = None
+        self,
+        question_func: QuestionFunc,
+        view_config: Optional[VisualizationConfig] = None,
     ):
         if isinstance(question_func, Question):
             question_func = question_func.question_func
@@ -209,7 +211,7 @@ class Question:
 QUESTIONS: Set[Question] = set()
 
 
-def question(view_config: VisualizationConfig = None):
+def question(view_config: Optional[VisualizationConfig] = None):
     """
     Wraps the function into a `amora.questions.Question`.
     The decorated function must return a `Compilable`

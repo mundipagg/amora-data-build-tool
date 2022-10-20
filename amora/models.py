@@ -20,30 +20,32 @@ from typing import (
 )
 
 from pydantic import NameEmail
-from sqlalchemy import Column, MetaData, Table, select
-from sqlalchemy.orm import declared_attr
-from sqlalchemy.sql import ColumnElement
-from sqlmodel import Field, Session, SQLModel, create_engine
+from sqlalchemy import Column, MetaData, Table
+from sqlalchemy.orm import declared_attr, registry
 
 from amora.config import settings
 from amora.logger import logger
 from amora.protocols import Compilable, CompilableProtocol
 from amora.utils import list_files, model_path_for_target_path
 
-select = select
-Column = Column
-ColumnElement = ColumnElement
-Columns = Iterable[ColumnElement]
-Field = Field
+metadata = MetaData(schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}")
+mapper_registry = registry(metadata=metadata)
+
+
 Model = Type["AmoraModel"]
-MetaData = MetaData
 Models = Iterable[Model]
-Session = Session
-create_engine = create_engine
 
 LabelKey = str
 LabelValue = str
 LabelKeys = Iterable[LabelKey]
+
+SQLALCHEMY_METADATA_KEY = "sa"
+
+
+def Field(*args, **kwargs):
+    return dataclasses.field(
+        init=False, metadata={SQLALCHEMY_METADATA_KEY: Column(*args, **kwargs)}
+    )
 
 
 class Label(NamedTuple):
@@ -128,26 +130,30 @@ class ModelConfig:
         return {label.key: label.value for label in self.labels}
 
 
-metadata = MetaData(schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}")
-
-
-class AmoraModel(SQLModel):
+class AmoraModel:
     """
     Attributes:
         __depends_on__ (Models): A list of Amora Models that the current model depends on
         __model_config__ (ModelConfig): Model configuration metadata
         __table__ (Table): SQLAlchemy table object
         __table_args__ (Dict[str, Any]): SQLAlchemy table arguments
+        __tablename__override__ (Optional[str]): Set the desired table name. Overrides __tablename__
     """
 
+    __table__: Table
+    __tablename__override__: Optional[str] = None
     __depends_on__: Models = []
     __model_config__ = ModelConfig(materialized=MaterializationTypes.view)
-    __table__: Table
-    __table_args__: Dict[str, Any] = {"extend_existing": True}
-    metadata = metadata
 
-    @declared_attr  # type: ignore
-    def __tablename__(cls) -> str:  # type: ignore
+    __sa_dataclass_metadata_key__ = SQLALCHEMY_METADATA_KEY
+    __table_args__: Dict[str, Any] = {"extend_existing": True}
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+        mapper_registry.mapped(dataclasses.dataclass(cls))
+
+    @declared_attr
+    def __tablename__(cls: Model) -> str:  # type: ignore
         """
         By default, `__tablename__` is the `snake_case` class name.
 
@@ -159,18 +165,19 @@ class AmoraModel(SQLModel):
         assert MyModel.__tablename__ == "my_model"
         ```
         """
-        return re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__name__).lower()
+
+        return (
+            cls.__tablename__override__
+            or re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__mro__[0].__name__).lower()
+        )
 
     @classmethod
-    def dependencies(cls) -> Models:
+    def dependencies(cls) -> List[Table]:
         source = cls.source()
         if source is None:
             return []
 
-        # todo: Remover necessidade de __depends_on__ inspecionando a query e chegando ao modelo de origem
-        # tables: List[Table] = source.froms
-
-        return cls.__depends_on__
+        return [other.__table__ for other in cls.__depends_on__]
 
     @classmethod
     def source(cls) -> Optional[Compilable]:
@@ -204,7 +211,7 @@ class AmoraModel(SQLModel):
 
     @classmethod
     def unique_name(cls) -> str:
-        return str(cls.__table__)
+        return cls.__table__.fullname
 
     @classmethod
     def owner(cls) -> str:
@@ -245,6 +252,7 @@ def amora_model_for_path(path: Path) -> Model:
         _is_amora_model,
     )
 
+    candidates = []
     for _name, class_ in compilables:
         try:
             # fixme: Quando carregamos o código em inspect, não existe um arquivo associado,
@@ -252,7 +260,10 @@ def amora_model_for_path(path: Path) -> Model:
             #  é uma classe definida no arquivo
             class_.model_file_path()
         except TypeError:
-            return class_
+            candidates.append(class_)
+
+    if candidates:
+        return candidates[-1]
 
     raise ValueError(f"Invalid path `{path}`")
 
