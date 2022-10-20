@@ -3,7 +3,9 @@ import inspect
 from amora.compilation import compile_statement
 from amora.models import (
     AmoraModel,
+    Field,
     Label,
+    ModelConfig,
     amora_model_for_name,
     select_models_with_label_keys,
     select_models_with_labels,
@@ -75,3 +77,18 @@ def test_select_models_with_label_keys_without_matches():
 def test_label__eq__():
     assert Label("domain", "health") == Label("domain", "health")
     assert Label("domain", "health") == "domain:health"
+
+
+def test_owner():
+    class ModelWithOwner(AmoraModel, table=True):
+        __model_config__ = ModelConfig(owner="John Doe <john@example.com")
+        id: int = Field(primary_key=True)
+
+    assert ModelWithOwner.owner() == "John Doe <john@example.com"
+
+
+def test_without_owner():
+    class ModelWithoutOwner(AmoraModel, table=True):
+        id: int = Field(primary_key=True)
+
+    assert ModelWithoutOwner.owner() == ""

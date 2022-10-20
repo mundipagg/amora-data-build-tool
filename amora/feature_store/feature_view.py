@@ -44,4 +44,5 @@ def feature_view_for_model(model: Model) -> FeatureView:
             timestamp_field=model.feature_view_event_timestamp().key,
         ),
         ttl=timedelta(seconds=settings.DEFAULT_FEATURE_TTL_IN_SECONDS),
+        owner=model.owner(),
     )
