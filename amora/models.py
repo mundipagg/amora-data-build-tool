@@ -272,12 +272,10 @@ def amora_model_for_name(model_name: str) -> Model:
 
 def amora_model_from_name_list(
     model_name_list: Iterable[str],
-) -> List[Tuple[Model, Path]]:
-    models: List[Tuple[Model, Path]] = []
+) -> Iterable[Tuple[Model, Path]]:
     for model, _path in list_models():
         if model.unique_name() in model_name_list:
-            models.append((model, _path))
-    return models
+            yield model, _path
 
 
 def list_models(

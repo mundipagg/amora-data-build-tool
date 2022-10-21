@@ -48,7 +48,7 @@ def test_amora_model_from_name_list():
     expected_models = [Health, Steps]
     expected_models_name_list = [model.unique_name() for model in expected_models]
 
-    models = amora_model_from_name_list(expected_models_name_list)
+    models = list(amora_model_from_name_list(expected_models_name_list))
 
     assert len(expected_models) == len(models)
     for (model, _), expected_model in zip(
