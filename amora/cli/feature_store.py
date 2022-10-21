@@ -264,6 +264,7 @@ def feature_store_serve():
                 "name": fv.name,
                 "features": [f"{fv.name}:{feature.name}" for feature in fv.features],
                 "entities": [entity for entity in fv.entities],
+                "description": fv.description,
             }
             for fv in fvs
         ]
