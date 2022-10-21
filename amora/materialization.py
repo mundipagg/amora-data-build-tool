@@ -15,8 +15,10 @@ from amora.models import (
     MaterializationTypes,
     Model,
     ModelConfig,
+    amora_model_for_name,
     amora_model_for_target_path,
 )
+from amora.providers.bigquery import schema_for_model
 
 
 @dataclass
@@ -55,7 +57,14 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
         return client.create_table(view)
 
     if materialization == MaterializationTypes.table:
-        query_job_config = QueryJobConfig(destination=model_name)
+        model = amora_model_for_name(model_name)
+        table = Table(model_name, schema=schema_for_model(model))
+        table.description = config.description
+        table.labels = config.labels_dict
+
+        client.create_table(table)
+
+        query_job_config = QueryJobConfig(destination=table)
 
         if config.partition_by:
             if config.partition_by.data_type == "int":
@@ -80,12 +89,7 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
             job_config=query_job_config,
         )
         query_job.result()
-
-        table = client.get_table(model_name)
-        table.description = config.description
-        table.labels = config.labels_dict
-
-        return client.update_table(table, ["description", "labels"])
+        return table
 
     raise ValueError(
         f"Invalid model materialization configuration. "
