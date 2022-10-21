@@ -252,7 +252,6 @@ def amora_model_for_path(path: Path) -> Model:
         _is_amora_model,
     )
 
-    candidates = []
     for _name, class_ in compilables:
         try:
             # fixme: Quando carregamos o código em inspect, não existe um arquivo associado,
@@ -260,10 +259,7 @@ def amora_model_for_path(path: Path) -> Model:
             #  é uma classe definida no arquivo
             class_.model_file_path()
         except TypeError:
-            candidates.append(class_)
-
-    if candidates:
-        return candidates[-1]
+            return class_
 
     raise ValueError(f"Invalid path `{path}`")
 
