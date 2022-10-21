@@ -307,7 +307,7 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
     ```python
     DryRunResult(
         total_bytes_processed=170181834,
-        query=\"SELECT\\n  `health`.`creationDate`,\\n  `health`.`device`,\\n  `health`.`endDate`,\\n  `health`.`id`,\\n  `health`.`sourceName`,\\n  `health`.`startDate`,\\n  `health`.`unit`,\\n  `health`.`value`\\nFROM `diogo`.`health`\\nWHERE `health`.`type` = 'HeartRate'\",
+        query="SELECT\n  `health`.`creationDate`,\n  `health`.`device`,\n  `health`.`endDate`,\n  `health`.`id`,\n  `health`.`sourceName`,\n  `health`.`startDate`,\n  `health`.`unit`,\n  `health`.`value`\nFROM `diogo`.`health`\nWHERE `health`.`type` = 'HeartRate'",
         model=HeartRate,
         referenced_tables=["amora-data-build-tool.diogo.health"],
         schema=[

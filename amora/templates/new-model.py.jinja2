@@ -1,6 +1,6 @@
+from decimal import Decimal
 from google.cloud.bigquery import SchemaField
 from amora.models import AmoraModel, Field
-from dataclasses import dataclass
 from amora.providers.bigquery import column_for_schema_field
 from datetime import date, datetime, time
 from sqlalchemy import MetaData, Column
@@ -21,15 +21,14 @@ class {{ model_name -}}(AmoraModel):
 {% for schema_field in schema %}
     {% if schema_field.mode == 'NULLABLE' %}
         {% if schema_field.field_type == 'RECORD' %}
-    {{ schema_field.name }}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }} = column_for_schema_field({{- schema_field -}} {% if loop.first %}, primary_key=True{% endif %})
+    {{ schema_field.name }}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }} = column_for_schema_field({{- schema_field -}} {% if loop.first %}, primary_key=True{% endif %}, doc='''{{- schema_field.description -}}''')
 
         {% else %}
-    {{ schema_field.name }}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }} = Field({{BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema_field.field_type].__name__}} {% if loop.first %}, primary_key=True{% endif %})
+    {{ schema_field.name }}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }} = Field({{BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema_field.field_type].__name__}} {% if loop.first %}, primary_key=True{% endif %}, doc='''{{- schema_field.description -}}''')
 
         {% endif %}
     {% elif schema_field.mode == 'REPEATED' %}
-    {{ schema_field.name }}: List[{{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }}] = column_for_schema_field({{- schema_field -}}{% if loop.first %}, primary_key=True{% endif %})
+    {{ schema_field.name }}: List[{{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }}] = column_for_schema_field({{- schema_field -}}{% if loop.first %}, primary_key=True{% endif %}, doc='''{{- schema_field.description -}}''')
 
     {% endif %}
 {% endfor %}
-
