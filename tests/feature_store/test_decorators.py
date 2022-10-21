@@ -25,7 +25,9 @@ def test_feature_view_raises_ValueError_if_model_isnt_a_valid_feature_view_sourc
 def test_feature_view_on_valid_source_model():
     @feature_view
     class DriverActivity(AmoraModel):
-        __model_config__ = ModelConfig(owner="John Doe <john@example.com>")
+        __model_config__ = ModelConfig(
+            owner="John Doe <john@example.com>", description="Description"
+        )
         datetime_trunc_day: datetime = Field(DateTime, primary_key=True)
         driver: str = Field(String, primary_key=True)
         rating: float = Field(Float)
@@ -64,3 +66,4 @@ def test_feature_view_on_valid_source_model():
         ),
     ]
     assert fv.owner == "John Doe <john@example.com>"
+    assert fv.description == "Description"
