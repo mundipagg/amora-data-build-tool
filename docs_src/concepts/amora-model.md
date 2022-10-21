@@ -1,12 +1,12 @@
 # Amora Model
 
-An Amora Model is a subclass of `amora.models.AmoraModel` . A way of expressing a [data schema](#data-schema), 
-the [data materialization](#model-configuration) and an optional transformation statement. 
-`AmoraModel` is built on top of [SQLModel](https://sqlmodel.tiangolo.com/).
+An Amora Model is a subclass of `amora.models.AmoraModel` . A way of expressing a [data schema](#data-schema),
+the [data materialization](#model-configuration) and an optional transformation statement.
+`AmoraModel` is built on top of [SQLAlchemy](https://www.sqlalchemy.org/).
 
 ## Data schema
 
-```Python 
+```Python
 {% include "../../examples/amora_project/models/health.py" %}
 ```
 
@@ -29,7 +29,7 @@ A list of Amora Models that the current model depends on
 
 ## Source models
 
-Tables/views that already exist on the Data Warehouse and shouldn't be managed by Amora. 
+Tables/views that already exist on the Data Warehouse and shouldn't be managed by Amora.
 
 
 ```Python
@@ -37,8 +37,8 @@ Tables/views that already exist on the Data Warehouse and shouldn't be managed b
 ```
 
 Source models are models managed outside the scope of Amora, without a `source` implementation and
-no [dependencies](#dependencies). [Model configurations](model-configuration) such as [materialization type](materialization-types) 
-and description are optional, and used for documentation purposes only.   
+no [dependencies](#dependencies). [Model configurations](model-configuration) such as [materialization type](materialization-types)
+and description are optional, and used for documentation purposes only.
 
 
 ## Materialized models

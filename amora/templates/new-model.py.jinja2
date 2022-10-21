@@ -1,3 +1,4 @@
+from decimal import Decimal
 from google.cloud.bigquery import SchemaField
 from amora.models import AmoraModel, Field
 from amora.providers.bigquery import column_for_schema_field
@@ -8,27 +9,26 @@ from sqlalchemy_bigquery import STRUCT
 from typing import List
 
 
-class {{ model_name -}}(AmoraModel, table=True):
+class {{ model_name -}}(AmoraModel):
     """
         {{ project }}.{{ dataset }}.{{ table }}
 
         Generated with `amora models import`
     """
     metadata = MetaData(schema='{{ project }}.{{ dataset }}')
-    __tablename__ = '{{ table }}'
+    __tablename__override__ = '{{ table }}'
 
 {% for schema_field in schema %}
     {% if schema_field.mode == 'NULLABLE' %}
         {% if schema_field.field_type == 'RECORD' %}
-    {{ schema_field.name }}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }} = Field(sa_column=column_for_schema_field({{- schema_field -}} {% if loop.first %}, primary_key=True{% endif %}))
+    {{ schema_field.name }}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }} = column_for_schema_field({{- schema_field -}} {% if loop.first %}, primary_key=True{% endif %}, doc='''{{- schema_field.description -}}''')
 
         {% else %}
-    {{ schema_field.name }}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }} {% if loop.first %} = Field(primary_key=True) {% endif %}
+    {{ schema_field.name }}: {{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }} = Field({{BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema_field.field_type].__name__}} {% if loop.first %}, primary_key=True{% endif %}, doc='''{{- schema_field.description -}}''')
 
         {% endif %}
     {% elif schema_field.mode == 'REPEATED' %}
-    {{ schema_field.name }}: List[{{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }}] = Field(sa_column=column_for_schema_field({{- schema_field -}}{% if loop.first %}, primary_key=True{% endif %}))
+    {{ schema_field.name }}: List[{{ BIGQUERY_TYPES_TO_PYTHON_TYPES[schema_field.field_type].__name__ }}] = column_for_schema_field({{- schema_field -}}{% if loop.first %}, primary_key=True{% endif %}, doc='''{{- schema_field.description -}}''')
 
     {% endif %}
 {% endfor %}
-

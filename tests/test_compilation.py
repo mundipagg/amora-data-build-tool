@@ -4,12 +4,12 @@ from tempfile import NamedTemporaryFile
 from unittest import mock
 
 import pytest
-from sqlalchemy import Integer, String, func
+from sqlalchemy import Integer, String, func, select
 from sqlalchemy_bigquery.base import BQArray
 
 from amora.compilation import compile_statement, get_models_to_compile
 from amora.manifest import Manifest, ModelMetadata
-from amora.models import AmoraModel, amora_model_for_path, select
+from amora.models import AmoraModel, amora_model_for_path
 from amora.providers.bigquery import fixed_unnest
 
 from tests.models.array_repeated_fields import ArrayRepeatedFields

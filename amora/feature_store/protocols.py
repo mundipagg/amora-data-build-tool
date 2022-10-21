@@ -86,9 +86,9 @@ class FeatureViewSourceProtocol(Protocol):  # pragma: nocover
 
 
         @feature_view
-        class FeatureViewModel(AmoraModel, table=True):
+        class FeatureViewModel(AmoraModel):
             ...
-            event_timestamp: datetime = Field(sa_column=Column(TIMESTAMP))
+            event_timestamp: datetime = Field(TIMESTAMP)
         ```
 
         """

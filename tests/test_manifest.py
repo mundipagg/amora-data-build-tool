@@ -24,7 +24,7 @@ def test_Manifest_from_project():
         "amora-data-build-tool.amora.steps",
         "amora-data-build-tool.amora.heart_rate_agg",
         "amora-data-build-tool.amora.heart_rate",
-        "amora-data-build-tool.amora.heart_rate_over_100",
+        "amora-data-build-tool.amora.heart_rate_over100",
     ]
 
     assert sorted(list(manifest.models.keys())) == sorted(expected_models_keys)

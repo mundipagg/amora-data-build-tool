@@ -1,17 +1,15 @@
-import sqlmodel
 from feast import ValueType
 from feast.types import FeastType, from_value_type
+from sqlalchemy import Column
 from sqlalchemy.sql import sqltypes
-
-from amora.models import Column
 
 _SQLALCHEMY_TYPES_TO_FS_TYPES = {
     sqltypes.Float: ValueType.FLOAT,
     sqltypes.String: ValueType.STRING,
-    sqlmodel.AutoString: ValueType.STRING,
     sqltypes.Integer: ValueType.INT64,
     sqltypes.Boolean: ValueType.BOOL,
     sqltypes.TIMESTAMP: ValueType.UNIX_TIMESTAMP,
+    sqltypes.NullType: ValueType.NULL,
     (sqltypes.ARRAY, sqltypes.String): ValueType.STRING_LIST,
     (sqltypes.ARRAY, sqltypes.Integer): ValueType.INT64_LIST,
     (sqltypes.ARRAY, sqltypes.Boolean): ValueType.BOOL_LIST,
