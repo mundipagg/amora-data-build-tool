@@ -232,7 +232,11 @@ def schema_field_for_column(column: Column) -> SchemaField:
             fields = tuple(schema_for_struct(column_type))
 
     return SchemaField(
-        name=column.name, field_type=field_type, mode=mode, fields=fields or ()
+        name=column.name,
+        field_type=field_type,
+        mode=mode,
+        fields=fields or (),
+        description=column.doc,
     )
 
 
