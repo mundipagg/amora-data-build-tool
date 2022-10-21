@@ -7,6 +7,7 @@ from typer.testing import CliRunner
 
 from amora.cli import app
 from amora.config import settings
+from amora.manifest import Manifest, ModelMetadata
 from amora.utils import clean_compiled_files, list_target_files
 
 runner = CliRunner(mix_stderr=False)
@@ -32,14 +33,14 @@ def test_compile_with_force_clean_compiled_files(clean_compiled_files: mock.Magi
     clean_compiled_files.assert_called_once()
 
 
-@mock.patch("amora.manifest.load_manifest")
+@mock.patch("amora.manifest.Manifest.load")
 @mock.patch("amora.utils.clean_compiled_files")
 def test_compile_call_clean_compiled_files_when_manifest_doesnt_exists(
-    clean_compiled_files: mock.MagicMock, load_manifest: mock.MagicMock
+    clean_compiled_files: mock.MagicMock, load: mock.MagicMock
 ):
-    load_manifest.return_value = {}
+    load.return_value = None
 
-    result = runner.invoke(
+    runner.invoke(
         app,
         ["compile"],
     )
@@ -47,31 +48,44 @@ def test_compile_call_clean_compiled_files_when_manifest_doesnt_exists(
     clean_compiled_files.assert_called_once()
 
 
-@mock.patch("amora.manifest.save_manifest")
-def test_compile_call_save_manifest(save_manifest: mock.MagicMock):
+@mock.patch("amora.manifest.Manifest.save")
+def test_compile_call_save_manifest(save: mock.MagicMock):
     result = runner.invoke(
         app,
         ["compile"],
     )
 
-    save_manifest.assert_called_once()
+    save.assert_called_once()
 
 
-@mock.patch("amora.manifest.load_manifest")
-@mock.patch("amora.manifest.generate_manifest")
+@mock.patch("amora.manifest.Manifest.load")
+@mock.patch("amora.manifest.Manifest.from_project")
 @mock.patch("amora.compilation.get_models_to_compile")
 @mock.patch("amora.compilation.clean_compiled_files_of_removed_models")
 def test_compile_call_clean_compiled_files_of_removed_models(
     clean_compiled_files_of_removed_models: mock.MagicMock,
     get_models_to_compile: mock.MagicMock,
-    generate_manifest: mock.MagicMock,
-    load_manifest: mock.MagicMock,
+    from_project: mock.MagicMock,
+    load: mock.MagicMock,
 ):
-    current_manifest: dict = {"models": {}}
-    previous_manifest: dict = {"models": {"1": "1"}}
+    # current_manifest: dict = {"models": {}}
+    # previous_manifest: dict = {"models": {"1": "1"}}
 
-    generate_manifest.return_value = current_manifest
-    load_manifest.return_value = previous_manifest
+    current_manifest = Manifest(models={})
+    previous_manifest = Manifest(
+        models={
+            "a": ModelMetadata(
+                stat=1.2,
+                size=1.5,
+                hash="abc",
+                path="amora-data-build-tool/examples/some/path/a.py",
+                deps=[],
+            )
+        }
+    )
+
+    from_project.return_value = current_manifest
+    load.return_value = previous_manifest
 
     result = runner.invoke(
         app,
@@ -79,7 +93,7 @@ def test_compile_call_clean_compiled_files_of_removed_models(
     )
 
     clean_compiled_files_of_removed_models.assert_called_once_with(
-        previous_manifest["models"].keys(), current_manifest["models"].keys()
+        list(previous_manifest.models.keys()), list(current_manifest.models.keys())
     )
     get_models_to_compile.assert_called_once_with(previous_manifest, current_manifest)
 

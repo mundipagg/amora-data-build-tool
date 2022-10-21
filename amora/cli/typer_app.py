@@ -28,15 +28,16 @@ def compile(
     """
     Generates executable SQL from model files. Compiled SQL files are written to the `./target` directory.
     """
-    current_manifest = manifest.generate_manifest()
-    previous_manifest = manifest.load_manifest()
+
+    current_manifest = manifest.Manifest.from_project()
+    previous_manifest = manifest.Manifest.load()
 
     if force or not previous_manifest:
         utils.clean_compiled_files()
         models_to_compile = set(list_models())
     else:
         compilation.clean_compiled_files_of_removed_models(
-            previous_manifest["models"].keys(), current_manifest["models"].keys()
+            list(previous_manifest.models.keys()), list(current_manifest.models.keys())
         )
         models_to_compile = compilation.get_models_to_compile(
             previous_manifest, current_manifest
@@ -58,7 +59,7 @@ def compile(
         target_file_path.parent.mkdir(parents=True, exist_ok=True)
         target_file_path.write_text(content)
 
-    manifest.save_manifest(current_manifest)
+    current_manifest.save()
 
 
 @app.command()

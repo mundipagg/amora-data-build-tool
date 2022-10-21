@@ -7,6 +7,7 @@ import sqlparse
 from sqlalchemy_bigquery import STRUCT, BigQueryDialect
 from sqlalchemy_bigquery.base import BigQueryCompiler
 
+from amora import manifest
 from amora.models import AmoraModel, Model, amora_model_from_name_list, list_models
 from amora.protocols import Compilable
 
@@ -66,7 +67,7 @@ def clean_compiled_files_of_removed_models(
 
 
 def get_models_to_compile(
-    previous_manifest: dict, current_manifest: dict
+    previous_manifest: manifest.Manifest, current_manifest: manifest.Manifest
 ) -> Set[Tuple[Model, Path]]:
     models_to_compile = set()
     deps_names_to_compile: Set = set()
@@ -74,19 +75,19 @@ def get_models_to_compile(
     for model, model_file_path in list_models():
         model_unique_name = model.unique_name()
 
-        model_current_manifest = current_manifest["models"][model_unique_name]
-        model_previous_manifest = previous_manifest["models"].get(
+        model_current_manifest = current_manifest.models[model_unique_name]
+        model_previous_manifest = previous_manifest.models.get(
             model_unique_name
         )  # model could not exist in previous
 
         compile_model = not model_previous_manifest or (
-            model_current_manifest["size"] != model_previous_manifest["size"]
-            or model_current_manifest["deps"] != model_previous_manifest["deps"]
+            model_current_manifest.size != model_previous_manifest.size
+            or model_current_manifest.deps != model_previous_manifest.deps
             or (
-                model_current_manifest["stat"] > model_previous_manifest["stat"]
+                model_current_manifest.stat > model_previous_manifest.stat
                 and (
                     not exists(model.target_path(model_file_path))
-                    or model_current_manifest["hash"] != model_previous_manifest["hash"]
+                    or model_current_manifest.hash != model_previous_manifest.hash
                 )
             )
         )
@@ -94,7 +95,7 @@ def get_models_to_compile(
         if compile_model:
             models_to_compile.add((model, model_file_path))
             deps_names_to_compile = deps_names_to_compile.union(
-                model_current_manifest["deps"]
+                model_current_manifest.deps
             )
 
     deps_to_compile = set(amora_model_from_name_list(deps_names_to_compile))

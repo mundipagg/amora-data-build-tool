@@ -8,6 +8,7 @@ from sqlalchemy import Integer, String, func
 from sqlalchemy_bigquery.base import BQArray
 
 from amora.compilation import compile_statement, get_models_to_compile
+from amora.manifest import Manifest, ModelMetadata
 from amora.models import AmoraModel, amora_model_for_path, select
 from amora.providers.bigquery import fixed_unnest
 
@@ -89,29 +90,29 @@ def test_AmoraBigQueryCompiler_visit_function_without_offset():
 
 @pytest.fixture()
 def sample_manifest():
-    return {
-        "models": {
-            "amora-data-build-tool.amora.health": {
-                "stat": 1664199318.9002378,
-                "size": 1181,
-                "hash": "1a3de26089812ca0b731588a7dd2f3f2",
-                "path": "/home/beto/code/work/amora-data-build-tool/examples/amora_project/models/health.py",
-                "deps": [],
-            },
-            "amora-data-build-tool.amora.steps": {
-                "stat": 1665147859.6682658,
-                "size": 1937,
-                "hash": "c8981d729c89dd8f6afcbe6671fa8c62",
-                "path": "/home/beto/code/work/amora-data-build-tool/examples/amora_project/models/steps.py",
-                "deps": [],
-            },
-        }
-    }
+    return Manifest(
+        models={
+            "amora-data-build-tool.amora.health": ModelMetadata(
+                stat=1664199318.9002378,
+                size=1181,
+                hash="1a3de26089812ca0b731588a7dd2f3f2",
+                path="amora-data-build-tool/examples/amora_project/models/health.py",
+                deps=[],
+            ),
+            "amora-data-build-tool.amora.steps": ModelMetadata(
+                stat=1665147859.6682658,
+                size=1937,
+                hash="c8981d729c89dd8f6afcbe6671fa8c62",
+                path="amora-data-build-tool/examples/amora_project/models/steps.py",
+                deps=[],
+            ),
+        },
+    )
 
 
 @mock.patch("amora.compilation.list_models")
 def test_get_models_to_compile_when_both_manifests_are_equal(
-    list_models: mock.MagicMock, sample_manifest
+    list_models: mock.MagicMock, sample_manifest: Manifest
 ):
     """
     Case:
@@ -132,7 +133,7 @@ def test_get_models_to_compile_when_both_manifests_are_equal(
 
 @mock.patch("amora.compilation.list_models")
 def test_get_models_to_compile_when_has_new_model(
-    list_models: mock.MagicMock, sample_manifest
+    list_models: mock.MagicMock, sample_manifest: Manifest
 ):
     """
     Case:
@@ -148,12 +149,13 @@ def test_get_models_to_compile_when_has_new_model(
     ]
 
     new_manifest = deepcopy(sample_manifest)
-    new_manifest["models"][StepCountBySource.unique_name()] = {
-        "stat": 1664199318.9035711,
-        "size": 4714,
-        "hash": "3df3f2761805fb1ece39581f21fbaf0a",
-        "deps": [],
-    }
+    new_manifest.models[StepCountBySource.unique_name()] = ModelMetadata(
+        stat=1664199318.9035711,
+        size=4714,
+        hash="3df3f2761805fb1ece39581f21fbaf0a",
+        path="amora-data-build-tool/examples/amora_project/models/steps_count_by_source.py",
+        deps=[],
+    )
 
     models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
 
@@ -165,7 +167,7 @@ def test_get_models_to_compile_when_has_new_model(
 
 @mock.patch("amora.compilation.list_models")
 def test_get_models_to_compile_when_a_model_has_changed_size(
-    list_models: mock.MagicMock, sample_manifest
+    list_models: mock.MagicMock, sample_manifest: Manifest
 ):
     """
     Case:
@@ -180,7 +182,7 @@ def test_get_models_to_compile_when_a_model_has_changed_size(
     ]
 
     new_manifest = deepcopy(sample_manifest)
-    new_manifest["models"]["amora-data-build-tool.amora.steps"]["size"] = 4714
+    new_manifest.models["amora-data-build-tool.amora.steps"].size = 4714
 
     models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
 
@@ -190,7 +192,7 @@ def test_get_models_to_compile_when_a_model_has_changed_size(
 
 @mock.patch("amora.compilation.list_models")
 def test_get_models_to_compile_when_a_model_has_changed_deps(
-    list_models: mock.MagicMock, sample_manifest
+    list_models: mock.MagicMock, sample_manifest: Manifest
 ):
     """
     Case:
@@ -205,9 +207,7 @@ def test_get_models_to_compile_when_a_model_has_changed_deps(
     ]
 
     new_manifest = deepcopy(sample_manifest)
-    new_manifest["models"]["amora-data-build-tool.amora.steps"]["deps"] = [
-        "another-model"
-    ]
+    new_manifest.models["amora-data-build-tool.amora.steps"].deps = ["another-model"]
 
     models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
 
@@ -217,7 +217,7 @@ def test_get_models_to_compile_when_a_model_has_changed_deps(
 
 @mock.patch("amora.compilation.list_models")
 def test_get_models_to_compile_when_a_model_stat_was_updated_and_has_no_target_file(
-    list_models: mock.MagicMock, sample_manifest
+    list_models: mock.MagicMock, sample_manifest: Manifest
 ):
     """
     Case:
@@ -233,9 +233,7 @@ def test_get_models_to_compile_when_a_model_stat_was_updated_and_has_no_target_f
     ]
 
     new_manifest = deepcopy(sample_manifest)
-    new_manifest["models"]["amora-data-build-tool.amora.steps"][
-        "stat"
-    ] = 2665147859.6682658
+    new_manifest.models["amora-data-build-tool.amora.steps"].stat = 2665147859.6682658
 
     models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
 
@@ -245,7 +243,7 @@ def test_get_models_to_compile_when_a_model_stat_was_updated_and_has_no_target_f
 
 @mock.patch("amora.compilation.list_models")
 def test_get_models_to_compile_when_a_model_stat_was_updated_and_hashes_are_different(
-    list_models: mock.MagicMock, sample_manifest
+    list_models: mock.MagicMock, sample_manifest: Manifest
 ):
     """
     Case:
@@ -261,12 +259,10 @@ def test_get_models_to_compile_when_a_model_stat_was_updated_and_hashes_are_diff
     ]
 
     new_manifest = deepcopy(sample_manifest)
-    new_manifest["models"]["amora-data-build-tool.amora.steps"][
-        "stat"
-    ] = 2665147859.6682658
-    new_manifest["models"]["amora-data-build-tool.amora.steps"][
-        "hash"
-    ] = "some-hash-different-from-previous-one"
+    new_manifest.models["amora-data-build-tool.amora.steps"].stat = 2665147859.6682658
+    new_manifest.models[
+        "amora-data-build-tool.amora.steps"
+    ].hash = "some-hash-different-from-previous-one"
 
     target_path = Steps.target_path(model_file_path=Steps.model_file_path())
     target_path.write_text("SELECT 1")
@@ -279,7 +275,7 @@ def test_get_models_to_compile_when_a_model_stat_was_updated_and_hashes_are_diff
 
 @mock.patch("amora.compilation.list_models")
 def test_get_models_to_compile_return_all_dependencies_from_a_changed_model(
-    list_models: mock.MagicMock, sample_manifest
+    list_models: mock.MagicMock, sample_manifest: Manifest
 ):
     """
     Case:
@@ -299,21 +295,22 @@ def test_get_models_to_compile_return_all_dependencies_from_a_changed_model(
 
     list_models.return_value = expected_models_to_compile
 
-    sample_manifest["models"]["amora-data-build-tool.amora.health"]["deps"] = [
+    sample_manifest.models["amora-data-build-tool.amora.health"].deps = [
         "amora-data-build-tool.amora.steps",
         "amora-data-build-tool.amora.step_count_by_source",
     ]
-    sample_manifest["models"]["amora-data-build-tool.amora.steps"]["deps"] = [
+    sample_manifest.models["amora-data-build-tool.amora.steps"].deps = [
         "amora-data-build-tool.amora.step_count_by_source"
     ]
-    sample_manifest["models"][StepCountBySource.unique_name()] = {
-        "stat": 1664199318.9035711,
-        "size": 4714,
-        "hash": "3df3f2761805fb1ece39581f21fbaf0a",
-        "deps": [],
-    }
+    sample_manifest.models[StepCountBySource.unique_name()] = ModelMetadata(
+        stat=1664199318.9035711,
+        size=4714,
+        hash="3df3f2761805fb1ece39581f21fbaf0a",
+        path="amora-data-build-tool/examples/amora_project/models/steps_count_by_source.py",
+        deps=[],
+    )
     new_manifest = deepcopy(sample_manifest)
-    new_manifest["models"]["amora-data-build-tool.amora.health"]["size"] = 1920
+    new_manifest.models["amora-data-build-tool.amora.health"].size = 1920
 
     models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
 

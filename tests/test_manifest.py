@@ -5,7 +5,7 @@ from tempfile import NamedTemporaryFile
 from _hashlib import HASH
 
 from amora.config import settings
-from amora.manifest import generate_manifest, hash_file, load_manifest, save_manifest
+from amora.manifest import Manifest, ModelMetadata, hash_file
 
 
 def test_hash_file():
@@ -14,39 +14,56 @@ def test_hash_file():
         assert isinstance(hash, HASH)
 
 
-def test_generate_manifest():
-    manifest = generate_manifest()
-    model_manifest_keys = sorted(["stat", "size", "hash", "path", "deps"])
+def test_Manifest_from_project():
+    manifest = Manifest.from_project()
 
-    assert "models" in manifest
+    expected_models_keys = [
+        "amora-data-build-tool.amora.step_count_by_source",
+        "amora-data-build-tool.amora.health",
+        "amora-data-build-tool.amora.array_repeated_fields",
+        "amora-data-build-tool.amora.steps",
+        "amora-data-build-tool.amora.heart_rate_agg",
+        "amora-data-build-tool.amora.heart_rate",
+        "amora-data-build-tool.amora.heart_rate_over_100",
+    ]
 
-    for _, values in manifest["models"].items():
-        assert model_manifest_keys == sorted(values.keys())
+    assert sorted(list(manifest.models.keys())) == sorted(expected_models_keys)
 
 
-def test_save_manifest():
-    manifest = {"a": 1}
+def test_Manifest_save():
+    model_metadata = ModelMetadata(
+        stat=11.2, size=1.5, hash="abc", path="/some/path/a.py", deps=["a"]
+    )
+    manifest = Manifest(models={"a": model_metadata})
+
     with NamedTemporaryFile(suffix=".json") as manifest_file:
         manifest_path = Path(manifest_file.name)
         settings.MANIFEST_PATH = manifest_path
-        save_manifest(manifest)
+        manifest.save()
+
         assert json.load(manifest_file) == manifest
 
 
-def test_load_manifest():
-    manifest = {"a": 1}
+def test_Manifest_load():
+    model_metadata = ModelMetadata(
+        stat=11.2, size=1.5, hash="abc", path="/some/path/a.py", deps=["a"]
+    )
+    manifest = Manifest(models={"a": model_metadata})
+
     with NamedTemporaryFile(suffix=".json") as manifest_file:
         manifest_path = Path(manifest_file.name)
         settings.MANIFEST_PATH = manifest_path
-        save_manifest(manifest)
-        assert json.load(manifest_file) == manifest
+
+        with open(manifest_path, "w+") as f:
+            json.dump(manifest.dict(), f)
+
+        assert manifest.load() == manifest
 
 
-def test_load_manifest_not_found():
-    manifest = {"a": 1}
+def test_Manifest_load_not_found():
     invalid_manifest_path = Path("not-a-real-file-path")
     settings.MANIFEST_PATH = invalid_manifest_path
 
-    manifest = load_manifest()
+    manifest = Manifest.load()
 
-    assert manifest == {}
+    assert manifest is None
