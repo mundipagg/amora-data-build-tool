@@ -1,7 +1,6 @@
 from amora.dag import DependencyDAG
 from amora.utils import clean_compiled_files
 
-from tests.models.array_repeated_fields import ArrayRepeatedFields
 from tests.models.health import Health
 from tests.models.heart_agg import HeartRateAgg
 from tests.models.heart_rate import HeartRate
