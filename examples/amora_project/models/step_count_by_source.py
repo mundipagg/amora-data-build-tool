@@ -2,17 +2,10 @@ from datetime import datetime
 from typing import Optional
 
 import humanize
-from sqlalchemy import TIMESTAMP, Column, Integer, func, literal
+from sqlalchemy import TIMESTAMP, Float, Integer, String, func, literal, select
 
 from amora.feature_store.decorators import feature_view
-from amora.models import (
-    AmoraModel,
-    Field,
-    Label,
-    MaterializationTypes,
-    ModelConfig,
-    select,
-)
+from amora.models import AmoraModel, Field, Label, MaterializationTypes, ModelConfig
 from amora.protocols import Compilable
 from amora.questions import question
 from amora.transformations import datetime_trunc_hour
@@ -21,35 +14,25 @@ from examples.amora_project.models.steps import Steps
 
 
 @feature_view
-class StepCountBySource(AmoraModel, table=True):
-    __depends_on__ = [Steps]
+class StepCountBySource(AmoraModel):
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.table,
-        labels=[
+        labels={
             Label("quality", "golden"),
             Label("upstream", "apple_health"),
             Label("domain", "health"),
-        ],
+        },
     )
 
-    value_avg: float = Field(
-        sa_column_kwargs=dict(comment="Average step count of the hour")
-    )
-    value_sum: float = Field(
-        sa_column_kwargs=dict(comment="Sum of the step counts of the hour")
-    )
-    value_count: float = Field(
-        sa_column_kwargs=dict(comment="Count of step count samples of the hour")
-    )
+    value_avg: float = Field(Float, doc="Average step count of the hour")
+    value_sum: float = Field(Float, doc="Sum of the step counts of the hour")
+    value_count: float = Field(Float, doc="Count of step count samples of the hour")
 
-    source_name: str = Field(
-        primary_key=True, sa_column_kwargs=dict(comment="Source of the metric")
-    )
+    source_name: str = Field(String, primary_key=True, doc="Source of the metric")
     event_timestamp: datetime = Field(
+        TIMESTAMP,
+        doc="Moment if time of which those features where observed",
         primary_key=True,
-        sa_column=Column(
-            TIMESTAMP, comment="Moment if time of which those features where observed"
-        ),
     )
 
     @classmethod
@@ -57,13 +40,13 @@ class StepCountBySource(AmoraModel, table=True):
         datetime_trunc = func.timestamp(datetime_trunc_hour(Steps.creationDate))
         return select(
             [
-                func.avg(Steps.value).label(cls.value_avg.key),
-                func.sum(Steps.value).label(cls.value_sum.key),
-                func.count(Steps.value).label(cls.value_count.key),
-                Steps.sourceName.label(cls.source_name.key),
-                datetime_trunc.label(cls.event_timestamp.key),
+                func.avg(Steps.value).label(cls.__table__.columns.value_avg.key),
+                func.sum(Steps.value).label(cls.__table__.columns.value_sum.key),
+                func.count(Steps.value).label(cls.__table__.columns.value_count.key),
+                Steps.sourceName,
+                datetime_trunc.label(cls.__table__.columns.event_timestamp.key),
             ]
-        ).group_by(cls.source_name.key, cls.event_timestamp.key)
+        ).group_by(cls.source_name, cls.event_timestamp)
 
     @classmethod
     def feature_view_entities(cls):

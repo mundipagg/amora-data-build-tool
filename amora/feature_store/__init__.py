@@ -15,7 +15,10 @@ repo_config = RepoConfig(
     provider=settings.PROVIDER,
     online_store={
         "type": settings.ONLINE_STORE_TYPE,
-        **settings.ONLINE_STORE_CONFIG,
+        **{
+            key: value.get_secret_value()
+            for key, value in settings.ONLINE_STORE_CONFIG.items()
+        },
     },
     offline_store={
         "type": settings.OFFLINE_STORE_TYPE,

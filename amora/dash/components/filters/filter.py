@@ -10,3 +10,5 @@ def layout(filter: Filter) -> Component:
 
     if isinstance(filter, AcceptedValuesFilter):
         return accepted_values_filter.layout(filter)
+
+    raise NotImplementedError()

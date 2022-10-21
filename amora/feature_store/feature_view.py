@@ -41,7 +41,7 @@ def feature_view_for_model(model: Model) -> FeatureView:
         ],
         source=BigQuerySource(
             table=get_fully_qualified_id(model),
-            timestamp_field=model.feature_view_event_timestamp().key,
+            timestamp_field=model.feature_view_event_timestamp().name,
         ),
         ttl=timedelta(seconds=settings.DEFAULT_FEATURE_TTL_IN_SECONDS),
         owner=model.owner(),

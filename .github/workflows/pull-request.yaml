@@ -68,7 +68,7 @@ jobs:
         run: poetry run pre-commit run --files ${{ steps.file_changes.outputs.python_files }}
 
       - name: 🧪 Mypy - Static type check
-        run: poetry run mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --pretty --no-color-output amora
+        run: poetry run mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --pretty --no-color-output amora tests examples
 
       - name: 🚧 GCP Auth
         uses: "google-github-actions/auth@v0"

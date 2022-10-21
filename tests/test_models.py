@@ -26,7 +26,7 @@ def test_model_without_dependencies():
 
 
 def test_model_with_dependencies():
-    assert Steps.dependencies() == [Health]
+    assert Steps.dependencies() == [Health.__table__]
 
 
 def test_model_without_source():
@@ -80,7 +80,7 @@ def test_label__eq__():
 
 
 def test_owner():
-    class ModelWithOwner(AmoraModel, table=True):
+    class ModelWithOwner(AmoraModel):
         __model_config__ = ModelConfig(owner="John Doe <john@example.com")
         id: int = Field(primary_key=True)
 
@@ -88,7 +88,7 @@ def test_owner():
 
 
 def test_without_owner():
-    class ModelWithoutOwner(AmoraModel, table=True):
+    class ModelWithoutOwner(AmoraModel):
         id: int = Field(primary_key=True)
 
     assert ModelWithoutOwner.owner() == ""

@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 from feast import Entity, FeatureService, FeatureView
+from sqlalchemy import DateTime, Float, Integer, String
 
 from amora.feature_store import registry
 from amora.feature_store.decorators import feature_view
@@ -31,11 +32,11 @@ def test_get_repo_contents_with_multiple_calls():
     assert len(first_call_fvs) == len(repo_contents.feature_views)
 
     @feature_view
-    class DriverActivity(AmoraModel, table=True):
-        datetime_trunc_day: datetime = Field(primary_key=True)
-        driver: str = Field(primary_key=True)
-        rating: float
-        trips_today: int
+    class DriverActivity(AmoraModel):
+        datetime_trunc_day: datetime = Field(DateTime, primary_key=True)
+        driver: str = Field(String, primary_key=True)
+        rating: float = Field(Float)
+        trips_today: int = Field(Integer)
 
         @classmethod
         def feature_view_entities(cls):
@@ -46,7 +47,7 @@ def test_get_repo_contents_with_multiple_calls():
             return [cls.trips_today, cls.rating]
 
         @classmethod
-        def feature_view_event_timestamp(cls) -> str:
+        def feature_view_event_timestamp(cls):
             return cls.datetime_trunc_day
 
     repo_contents = registry.get_repo_contents()

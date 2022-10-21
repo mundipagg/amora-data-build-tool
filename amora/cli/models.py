@@ -13,6 +13,7 @@ from amora.config import settings
 from amora.models import Model, list_models
 from amora.providers.bigquery import (
     BIGQUERY_TYPES_TO_PYTHON_TYPES,
+    BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
     DryRunResult,
     dry_run,
     estimated_query_cost_in_usd,
@@ -78,9 +79,7 @@ def models_list(
 
         @property
         def depends_on(self) -> List[str]:
-            return sorted(
-                dependency.__name__ for dependency in self.model.dependencies()
-            )
+            return sorted(dependency.name for dependency in self.model.dependencies())
 
         @property
         def estimated_query_cost_in_usd(self) -> Optional[str]:
@@ -219,6 +218,7 @@ def models_import(
     sorted_schema = sorted(get_schema(table_reference), key=lambda field: field.name)
     model_source_code = template.render(
         BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
+        BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES=BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
         dataset=dataset,
         dataset_id=f"{project}.{dataset}",
         model_name=model_name,

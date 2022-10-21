@@ -1,11 +1,10 @@
 from datetime import datetime
 
-from sqlalchemy import TIMESTAMP
-from sqlmodel import Field, select
+from sqlalchemy import TIMESTAMP, Float, Integer, String, select
 
 from amora.models import (
     AmoraModel,
-    Column,
+    Field,
     Label,
     MaterializationTypes,
     ModelConfig,
@@ -15,9 +14,8 @@ from amora.protocols import Compilable
 from examples.amora_project.models.health import Health
 
 
-class HeartRate(AmoraModel, table=True):
-    __tablename__ = "heart_rate"
-    __depends_on__ = [Health]
+class HeartRate(AmoraModel):
+    __tablename__override__ = "heart_rate"
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.table,
         partition_by=PartitionConfig(
@@ -27,20 +25,14 @@ class HeartRate(AmoraModel, table=True):
         labels={Label("freshness", "daily")},
     )
 
-    id: int = Field(primary_key=True, description="Identificador único da medida")
-    sourceName: str = Field(description="Origem dos dados")
-    unit: str = Field(description="Unidade de medida", default="count/min")
-    value: float = Field(description="Valor observado")
-    device: str = Field(description="Dispositivo de origem dos dados")
-    creationDate: datetime = Field(
-        description="Data de inserção dos dados", sa_column=Column(TIMESTAMP)
-    )
-    startDate: datetime = Field(
-        description="Data do início da medida", sa_column=Column(TIMESTAMP)
-    )
-    endDate: datetime = Field(
-        description="Data do fim da medida", sa_column=Column(TIMESTAMP)
-    )
+    id: int = Field(Integer, primary_key=True, doc="Identificador único da medida")
+    sourceName: str = Field(String, doc="Origem dos dados")
+    unit: str = Field(String, doc="Unidade de medida", default="count/min")
+    value: float = Field(Float, doc="Valor observado")
+    device: str = Field(String, doc="Dispositivo de origem dos dados")
+    creationDate: datetime = Field(TIMESTAMP, doc="Data de inserção dos dados")
+    startDate: datetime = Field(TIMESTAMP, doc="Data do início da medida")
+    endDate: datetime = Field(TIMESTAMP, doc="Data do fim da medida")
 
     @classmethod
     def source(cls) -> Compilable:

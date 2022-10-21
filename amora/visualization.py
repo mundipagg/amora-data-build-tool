@@ -8,14 +8,14 @@ from pydantic import BaseModel
 
 @runtime_checkable
 class SeriesSelectorFunc(Protocol):
-    def __call__(self, df: pd.DataFrame) -> Series:
-        pass
+    def __call__(self, data: pd.DataFrame) -> Series:
+        ...
 
 
 @runtime_checkable
 class ValueSelectorFunc(Protocol):
-    def __call__(self, df: pd.DataFrame) -> str:
-        pass
+    def __call__(self, data: pd.DataFrame) -> str:
+        ...
 
 
 class VisualizationConfig(ABC):

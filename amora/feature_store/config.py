@@ -4,7 +4,7 @@ from tempfile import NamedTemporaryFile
 from typing import Dict, Optional
 
 from feast.usage import USAGE_ENDPOINT as FEAST_USAGE_ENDPOINT
-from pydantic import BaseSettings
+from pydantic import BaseSettings, SecretStr
 
 from amora.config import ROOT_PATH
 
@@ -35,8 +35,10 @@ class FeatureStoreSettings(BaseSettings):
     OFFLINE_STORE_CONFIG: Dict[str, str] = {}
 
     ONLINE_STORE_TYPE: str = FeatureStoreOnlineStoreTypes.sqlite.value
-    ONLINE_STORE_CONFIG: Dict[str, str] = {
-        "path": Path(ROOT_PATH).joinpath("amora-online-feature-store.db").name
+    ONLINE_STORE_CONFIG: Dict[str, SecretStr] = {
+        "path": SecretStr(
+            Path(ROOT_PATH).joinpath("amora-online-feature-store.db").name
+        )
     }
     DEFAULT_FEATURE_TTL_IN_SECONDS: int = 3600
 
