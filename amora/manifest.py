@@ -22,7 +22,7 @@ class ModelMetadata(BaseModel):
 
 
 class Manifest(BaseModel):
-    models: dict[str, ModelMetadata]
+    models: Dict[str, ModelMetadata]
 
     @classmethod
     def from_project(cls) -> "Manifest":
