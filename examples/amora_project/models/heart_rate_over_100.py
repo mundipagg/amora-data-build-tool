@@ -9,6 +9,7 @@ from examples.amora_project.models.heart_rate import HeartRate
 
 
 class HeartRateOver100(AmoraModel):
+    __depends_on__ = [HeartRate]
     __tablename__override__ = "heart_rate_over_100"
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.view,
