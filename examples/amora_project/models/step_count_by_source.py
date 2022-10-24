@@ -15,6 +15,7 @@ from examples.amora_project.models.steps import Steps
 
 @feature_view
 class StepCountBySource(AmoraModel):
+    __depends_on__ = [Steps]
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.table,
         labels={

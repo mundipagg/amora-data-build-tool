@@ -15,6 +15,7 @@ from examples.amora_project.models.health import Health
 
 
 class HeartRate(AmoraModel):
+    __depends_on__ = [Health]
     __tablename__override__ = "heart_rate"
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.table,
