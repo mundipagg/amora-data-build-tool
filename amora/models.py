@@ -22,7 +22,7 @@ from typing import (
 from pydantic import NameEmail
 from sqlalchemy import Column, MetaData, Table
 from sqlalchemy.orm import declared_attr, registry
-from sqlalchemy.sql.base import ImmutableColumnCollection
+from sqlalchemy.sql import ColumnCollection
 
 from amora.config import settings
 from amora.logger import logger
@@ -173,10 +173,13 @@ class AmoraModel:
         )
 
     @classmethod
-    def columns(cls) -> ImmutableColumnCollection:
+    def columns(cls) -> Optional[ColumnCollection]:
         if cls.__model_config__.materialized == MaterializationTypes.ephemeral:
             cte = cls.source()
-            return cte.columns
+            if cte is not None:
+                return cte.exported_columns
+            else:
+                return None
         else:
             return cls.__table__.columns
 

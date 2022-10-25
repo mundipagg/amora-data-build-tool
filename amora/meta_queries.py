@@ -29,8 +29,11 @@ def summarize(model: Model) -> pd.DataFrame:
 
 def _summarize_columns(model: Model) -> pd.DataFrame:
     stmts = []
+    columns = model.columns()
+    if columns is None:
+        raise ValueError("Unable to summarize model without columns")
 
-    for column in model.columns():
+    for column in columns:
         is_supported = not isinstance(column.type, (ARRAY, STRUCT))
         is_numeric = isinstance(column.type, (Numeric, Integer, Float))
 
