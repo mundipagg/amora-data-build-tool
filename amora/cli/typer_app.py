@@ -34,7 +34,7 @@ def compile(
 
     if force or not previous_manifest:
         utils.clean_compiled_files()
-        models_to_compile = set(list_models())
+        models_to_compile = list_models()
     else:
         compilation.clean_compiled_files_of_removed_models(
             list(previous_manifest.models.keys()), list(current_manifest.models.keys())

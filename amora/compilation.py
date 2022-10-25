@@ -98,7 +98,7 @@ def get_models_to_compile(
                 model_current_manifest.deps
             )
 
-    deps_to_compile = set(amora_model_from_name_list(deps_names_to_compile))
+    deps_to_compile = amora_model_from_name_list(deps_names_to_compile)
     models_to_compile = models_to_compile.union(deps_to_compile)
 
     return models_to_compile
