@@ -4,7 +4,7 @@ from uuid import uuid4
 
 import pandas as pd
 import pytest
-from sqlalchemy import TIMESTAMP, Float, String
+from sqlalchemy import TIMESTAMP, Float, Integer, String
 
 from amora.feature_store.decorators import feature_view
 from amora.meta_queries import summarize
@@ -42,7 +42,7 @@ def simple_model(step_count_by_source_100_rows):
 
         value_avg: float = Field(Float, doc="Average step count of the hour")
         value_sum: float = Field(Float, doc="Sum of the step counts of the hour")
-        value_count: float = Field(Float, doc="Count of step count samples of the hour")
+        value_count: int = Field(Integer, doc="Count of step count samples of the hour")
 
         source_name: str = Field(String, primary_key=True, doc="Source of the metric")
         event_timestamp: datetime = Field(
@@ -147,7 +147,7 @@ def feature_view_model(step_count_by_source_100_rows):
 
         value_avg: float = Field(Float, doc="Average step count of the hour")
         value_sum: float = Field(Float, doc="Sum of the step counts of the hour")
-        value_count: float = Field(Float, doc="Count of step count samples of the hour")
+        value_count: int = Field(Integer, doc="Count of step count samples of the hour")
 
         source_name: str = Field(String, primary_key=True, doc="Source of the metric")
         event_timestamp: datetime = Field(
