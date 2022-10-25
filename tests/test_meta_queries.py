@@ -1,230 +1,257 @@
+from datetime import datetime
+from pathlib import Path
+from uuid import uuid4
+
+import pandas as pd
 import pytest
+from sqlalchemy import TIMESTAMP, Float, String
 
+from amora.feature_store.decorators import feature_view
 from amora.meta_queries import summarize
-
-from tests.models.health import Health
-from tests.models.step_count_by_source import StepCountBySource
-
-
-@pytest.fixture(scope="module")
-def health_model_summary():
-    return [
-        {
-            "avg": None,
-            "column_name": "endDate",
-            "column_type": "TIMESTAMP",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": False,
-            "max": "2021-07-23 03:14:19+00",
-            "min": "2019-12-08 09:49:32+00",
-            "null_percentage": 0.0,
-            "stddev": None,
-            "unique_count": 878606,
-        },
-        {
-            "avg": None,
-            "column_name": "device",
-            "column_type": "VARCHAR",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": False,
-            "max": "<<HKDevice: 0x28229ff70>, name:iPhone, manufacturer:Apple Inc., "
-            "model:iPhone, hardware:iPhone12,5, software:14.4.2>",
-            "min": "<<HKDevice: 0x282200190>, name:Mi Smart Band 4, hardware:V0.25.17.5, "
-            "software:V1.0.9.66, "
-            "localIdentifier:3C779DE0-B720-D2F6-47B2-51F4DFC484BF>",
-            "null_percentage": 38.112076247579886,
-            "stddev": None,
-            "unique_count": 423,
-        },
-        {
-            "avg": None,
-            "column_name": "creationDate",
-            "column_type": "TIMESTAMP",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": False,
-            "max": "2021-07-23 03:14:19+00",
-            "min": "2019-12-09 13:47:53+00",
-            "null_percentage": 0.0,
-            "stddev": None,
-            "unique_count": 537208,
-        },
-        {
-            "avg": "82.164803980394083",
-            "column_name": "value",
-            "column_type": "FLOAT",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": False,
-            "max": "1742",
-            "min": "0",
-            "null_percentage": 0.0,
-            "stddev": 37.98340562839273,
-            "unique_count": 8101,
-        },
-        {
-            "avg": None,
-            "column_name": "sourceName",
-            "column_type": "VARCHAR",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": False,
-            "max": "iPhone",
-            "min": "Diogo iPhone",
-            "null_percentage": 0.0,
-            "stddev": None,
-            "unique_count": 4,
-        },
-        {
-            "avg": None,
-            "column_name": "type",
-            "column_type": "VARCHAR",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": False,
-            "max": "WalkingStepLength",
-            "min": "ActiveEnergyBurned",
-            "null_percentage": 0.0,
-            "stddev": None,
-            "unique_count": 15,
-        },
-        {
-            "avg": None,
-            "column_name": "unit",
-            "column_type": "VARCHAR",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": False,
-            "max": "km/hr",
-            "min": "%",
-            "null_percentage": 0.35722006413009627,
-            "stddev": None,
-            "unique_count": 10,
-        },
-        {
-            "avg": None,
-            "column_name": "startDate",
-            "column_type": "TIMESTAMP",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": False,
-            "max": "2021-07-23 03:14:19+00",
-            "min": "2019-12-08 09:48:52+00",
-            "null_percentage": 0.0,
-            "stddev": None,
-            "unique_count": 878421,
-        },
-        {
-            "avg": None,
-            "column_name": "sourceVersion",
-            "column_type": "VARCHAR",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": False,
-            "max": "202106210942",
-            "min": "12.0.1",
-            "null_percentage": 0.0,
-            "stddev": None,
-            "unique_count": 25,
-        },
-        {
-            "avg": "525025.99999996088",
-            "column_name": "id",
-            "column_type": "INTEGER",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": False,
-            "max": "1050052",
-            "min": "0",
-            "null_percentage": 0.0,
-            "stddev": 303124.3354442229,
-            "unique_count": 1050053,
-        },
-    ]
-
-
-def test_summarize(health_model_summary):
-    summary = summarize(Health)
-    assert sorted(
-        summary.to_dict(orient="records"), key=lambda column: column["column_name"]
-    ) == sorted(health_model_summary, key=lambda column: column["column_name"])
+from amora.models import AmoraModel, Field, MaterializationTypes, ModelConfig
+from amora.providers.bigquery import cte_from_dataframe
 
 
 @pytest.fixture(scope="module")
-def step_count_by_source_model_summary():
+def step_count_by_source_100_rows() -> pd.DataFrame:
+    """
+    Returns:
+        value_avg,value_sum,value_count,source_name,event_timestamp
+        2.0,2.0,1,Diogo iPhone,2021-02-04 05:00:00.000000 UTC
+        2.0,2.0,1,Diogo iPhone,2020-12-20 18:00:00.000000 UTC
+        2.0,2.0,1,Diogo iPhone,2021-04-06 16:00:00.000000 UTC
+        2.0,2.0,1,Diogo iPhone,2021-06-03 12:00:00.000000 UTC
+        2.0,2.0,1,Diogo iPhone,2020-12-18 18:00:00.000000 UTC
+        2.0,2.0,1,Diogo iPhone,2020-11-11 02:00:00.000000 UTC
+
+    """
+    csv_file_path = Path(__file__).parent.joinpath(
+        "seeds/step_count_by_source_100_rows.csv"
+    )
+    assert csv_file_path.exists()
+    return pd.read_csv(csv_file_path)
+
+
+@pytest.fixture(scope="module")
+def simple_model(step_count_by_source_100_rows):
+    class SimpleModel(AmoraModel):
+        __tablename__override__ = uuid4().hex
+        __model_config__ = ModelConfig(
+            materialized=MaterializationTypes.ephemeral,
+        )
+
+        value_avg: float = Field(Float, doc="Average step count of the hour")
+        value_sum: float = Field(Float, doc="Sum of the step counts of the hour")
+        value_count: float = Field(Float, doc="Count of step count samples of the hour")
+
+        source_name: str = Field(String, primary_key=True, doc="Source of the metric")
+        event_timestamp: datetime = Field(
+            TIMESTAMP,
+            doc="Moment if time of which those features where observed",
+            primary_key=True,
+        )
+
+        @classmethod
+        def source(cls):
+            return cte_from_dataframe(df=step_count_by_source_100_rows)
+
+    yield SimpleModel
+
+
+@pytest.fixture(scope="module")
+def simple_model_summary():
     return [
         {
-            "avg": None,
-            "column_name": "event_timestamp",
-            "column_type": "TIMESTAMP",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": True,
-            "is_fv_feature": False,
-            "max": "2021-07-23 02:00:00+00",
-            "min": "2019-12-09 13:00:00+00",
-            "null_percentage": 0.0,
-            "stddev": None,
-            "unique_count": 3775,
-        },
-        {
-            "avg": "663.75700483091839",
-            "column_name": "value_sum",
-            "column_type": "FLOAT",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": True,
-            "max": "132968",
-            "min": "1",
-            "null_percentage": 0.0,
-            "stddev": 3996.362789365462,
-            "unique_count": 1130,
-        },
-        {
-            "avg": None,
-            "column_name": "source_name",
-            "column_type": "VARCHAR",
-            "is_fv_entity": True,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": False,
-            "max": "iPhone",
-            "min": "Diogo iPhone",
-            "null_percentage": 0.0,
-            "stddev": None,
-            "unique_count": 3,
-        },
-        {
-            "avg": "4.5374396135265735",
-            "column_name": "value_count",
-            "column_type": "FLOAT",
-            "is_fv_entity": False,
-            "is_fv_event_timestamp": False,
-            "is_fv_feature": True,
-            "max": "1374",
-            "min": "1",
-            "null_percentage": 0.0,
-            "stddev": 36.39923587492331,
-            "unique_count": 70,
-        },
-        {
-            "avg": "126.42742197839384",
             "column_name": "value_avg",
             "column_type": "FLOAT",
+            "min": "2",
+            "max": "8",
+            "unique_count": 7,
+            "avg": "5.83",
+            "stddev": 2.035319447292059,
+            "null_percentage": 0.0,
+            "is_fv_feature": False,
             "is_fv_entity": False,
             "is_fv_event_timestamp": False,
-            "is_fv_feature": True,
-            "max": "1742",
-            "min": "1",
+        },
+        {
+            "column_name": "value_sum",
+            "column_type": "FLOAT",
+            "min": "2",
+            "max": "8",
+            "unique_count": 7,
+            "avg": "5.83",
+            "stddev": 2.035319447292059,
             "null_percentage": 0.0,
-            "stddev": 175.07633740644545,
-            "unique_count": 1422,
+            "is_fv_feature": False,
+            "is_fv_entity": False,
+            "is_fv_event_timestamp": False,
+        },
+        {
+            "column_name": "value_count",
+            "column_type": "INTEGER",
+            "min": "1",
+            "max": "1",
+            "unique_count": 1,
+            "avg": "1",
+            "stddev": 0.0,
+            "null_percentage": 0.0,
+            "is_fv_feature": False,
+            "is_fv_entity": False,
+            "is_fv_event_timestamp": False,
+        },
+        {
+            "column_name": "source_name",
+            "column_type": "VARCHAR",
+            "min": "Diogo iPhone",
+            "max": "iPhone",
+            "unique_count": 3,
+            "avg": None,
+            "stddev": None,
+            "null_percentage": 0.0,
+            "is_fv_feature": False,
+            "is_fv_entity": False,
+            "is_fv_event_timestamp": False,
+        },
+        {
+            "column_name": "event_timestamp",
+            "column_type": "VARCHAR",
+            "min": "2019-12-20 02:00:00.000000 UTC",
+            "max": "2021-07-21 16:00:00.000000 UTC",
+            "unique_count": 100,
+            "avg": None,
+            "stddev": None,
+            "null_percentage": 0.0,
+            "is_fv_feature": False,
+            "is_fv_entity": False,
+            "is_fv_event_timestamp": False,
         },
     ]
 
 
-def test_summarize_feature_view_model(step_count_by_source_model_summary):
-    summary = summarize(StepCountBySource).to_dict(orient="records")
+def test_summarize_simple_model(simple_model, simple_model_summary):
+    summary = summarize(simple_model).to_dict(orient="records")
     assert sorted(summary, key=lambda column: column["column_name"]) == sorted(
-        step_count_by_source_model_summary, key=lambda column: column["column_name"]
+        simple_model_summary, key=lambda column: column["column_name"]
+    )
+
+
+@pytest.fixture(scope="module")
+def feature_view_model(step_count_by_source_100_rows):
+    @feature_view
+    class FeatureViewModel(AmoraModel):
+        __tablename__override__ = uuid4().hex
+        __model_config__ = ModelConfig(
+            materialized=MaterializationTypes.ephemeral,
+        )
+
+        value_avg: float = Field(Float, doc="Average step count of the hour")
+        value_sum: float = Field(Float, doc="Sum of the step counts of the hour")
+        value_count: float = Field(Float, doc="Count of step count samples of the hour")
+
+        source_name: str = Field(String, primary_key=True, doc="Source of the metric")
+        event_timestamp: datetime = Field(
+            TIMESTAMP,
+            doc="Moment if time of which those features where observed",
+            primary_key=True,
+        )
+
+        @classmethod
+        def feature_view_entities(cls):
+            return [cls.source_name]
+
+        @classmethod
+        def feature_view_features(cls):
+            return [
+                cls.value_avg,
+                cls.value_sum,
+                cls.value_count,
+            ]
+
+        @classmethod
+        def feature_view_event_timestamp(cls):
+            return cls.event_timestamp
+
+        @classmethod
+        def source(cls):
+            return cte_from_dataframe(df=step_count_by_source_100_rows)
+
+    yield FeatureViewModel
+
+
+@pytest.fixture(scope="module")
+def feature_view_model_summary():
+    return [
+        {
+            "column_name": "value_avg",
+            "column_type": "FLOAT",
+            "min": "2",
+            "max": "8",
+            "unique_count": 7,
+            "avg": "5.83",
+            "stddev": 2.035319447292059,
+            "null_percentage": 0.0,
+            "is_fv_feature": True,
+            "is_fv_entity": False,
+            "is_fv_event_timestamp": False,
+        },
+        {
+            "column_name": "value_sum",
+            "column_type": "FLOAT",
+            "min": "2",
+            "max": "8",
+            "unique_count": 7,
+            "avg": "5.83",
+            "stddev": 2.035319447292059,
+            "null_percentage": 0.0,
+            "is_fv_feature": True,
+            "is_fv_entity": False,
+            "is_fv_event_timestamp": False,
+        },
+        {
+            "column_name": "value_count",
+            "column_type": "INTEGER",
+            "min": "1",
+            "max": "1",
+            "unique_count": 1,
+            "avg": "1",
+            "stddev": 0.0,
+            "null_percentage": 0.0,
+            "is_fv_feature": True,
+            "is_fv_entity": False,
+            "is_fv_event_timestamp": False,
+        },
+        {
+            "column_name": "source_name",
+            "column_type": "VARCHAR",
+            "min": "Diogo iPhone",
+            "max": "iPhone",
+            "unique_count": 3,
+            "avg": None,
+            "stddev": None,
+            "null_percentage": 0.0,
+            "is_fv_feature": False,
+            "is_fv_entity": True,
+            "is_fv_event_timestamp": False,
+        },
+        {
+            "column_name": "event_timestamp",
+            "column_type": "VARCHAR",
+            "min": "2019-12-20 02:00:00.000000 UTC",
+            "max": "2021-07-21 16:00:00.000000 UTC",
+            "unique_count": 100,
+            "avg": None,
+            "stddev": None,
+            "null_percentage": 0.0,
+            "is_fv_feature": False,
+            "is_fv_entity": False,
+            "is_fv_event_timestamp": True,
+        },
+    ]
+
+
+def test_summarize_feature_view_model(feature_view_model, feature_view_model_summary):
+    summary = summarize(feature_view_model).to_dict(orient="records")
+    assert sorted(summary, key=lambda column: column["column_name"]) == sorted(
+        feature_view_model_summary, key=lambda column: column["column_name"]
     )

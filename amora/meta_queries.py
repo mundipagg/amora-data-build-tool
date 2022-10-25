@@ -30,7 +30,7 @@ def summarize(model: Model) -> pd.DataFrame:
 def _summarize_columns(model: Model) -> pd.DataFrame:
     stmts = []
 
-    for column in model.__table__.columns:
+    for column in model.columns():
         is_supported = not isinstance(column.type, (ARRAY, STRUCT))
         is_numeric = isinstance(column.type, (Numeric, Integer, Float))
 
