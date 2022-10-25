@@ -4,7 +4,7 @@ from uuid import uuid4
 
 import pytest
 from google.cloud.bigquery import Client
-from sqlalchemy import TIMESTAMP, Integer
+from sqlalchemy import TIMESTAMP, DateTime, Integer
 
 from amora.config import settings
 from amora.dag import DependencyDAG
@@ -17,6 +17,7 @@ from amora.models import (
     ModelConfig,
     PartitionConfig,
 )
+from amora.providers.bigquery import schema_for_model
 from amora.utils import clean_compiled_files
 
 from tests.models.heart_agg import HeartRateAgg
@@ -25,8 +26,8 @@ from tests.models.steps import Steps
 
 
 class ViewModel(AmoraModel):
-    x: int = Field(primary_key=True)
-    y: int = Field(primary_key=True)
+    x: int = Field(Integer, primary_key=True)
+    y: int = Field(Integer, primary_key=True)
 
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.view,
@@ -50,9 +51,9 @@ class TableModelByDay(AmoraModel):
         description=uuid4().hex,
     )
 
-    x: int = Field(primary_key=True)
-    y: int = Field(primary_key=True)
-    created_at: datetime = Field(primary_key=True)
+    x: int = Field(Integer, primary_key=True)
+    y: int = Field(Integer, primary_key=True)
+    created_at: datetime = Field(DateTime, primary_key=True)
 
 
 class TableModelByrange(AmoraModel):
@@ -72,9 +73,9 @@ class TableModelByrange(AmoraModel):
         description=uuid4().hex,
     )
 
-    x: int = Field(primary_key=True)
-    y: int = Field(primary_key=True)
-    created_at: datetime = Field(primary_key=True)
+    x: int = Field(Integer, primary_key=True)
+    y: int = Field(Integer, primary_key=True)
+    created_at: datetime = Field(DateTime, primary_key=True)
 
 
 def setup_function(module):
@@ -185,8 +186,8 @@ def test_materialize_partition_table_by_range(Client: MagicMock):
         config=TableModelByrange.__model_config__,
     )
 
-    job_config = client.query.call_args.kwargs["job_config"]
-    partition_config = job_config.range_partitioning
+    table = client.create_table.call_args.args[0]
+    partition_config = table.range_partitioning
 
     assert partition_config.field == "x"
     assert partition_config.range_.start == 1
@@ -203,8 +204,8 @@ def test_materialize_partition_table_by_time(Client: MagicMock):
         config=TableModelByDay.__model_config__,
     )
 
-    job_config = client.query.call_args.kwargs["job_config"]
-    partition_config = job_config.time_partitioning
+    table = client.create_table.call_args.args[0]
+    partition_config = table.time_partitioning
 
     assert partition_config.field == "created_at"
     assert partition_config.type_ == "DAY"
@@ -220,8 +221,8 @@ def test_materialize_cluster_table(Client: MagicMock):
         config=TableModelByDay.__model_config__,
     )
 
-    job_config = client.query.call_args.kwargs["job_config"]
-    clustering_fields = job_config.clustering_fields
+    table = client.create_table.call_args.args[0]
+    clustering_fields = table.clustering_fields
 
     assert clustering_fields == ["x", "y"]
 
@@ -236,17 +237,12 @@ def test_materialize_update_table_metadata(Client: MagicMock):
         config=TableModelByDay.__model_config__,
     )
 
-    assert client.get_table.call_count == 1
-    assert client.get_table.call_args_list == [call(TableModelByDay.unique_name())]
+    assert client.create_table.call_count == 1
+    table = client.create_table.call_args.args[0]
 
-    table = client.get_table.return_value
-
-    assert client.update_table.call_count == 1
-    assert client.update_table.call_args_list == [
-        call(table, ["description", "labels"])
-    ]
     assert table.description == TableModelByDay.__model_config__.description
     assert table.labels == TableModelByDay.__model_config__.labels_dict
+    assert table.schema == schema_for_model(TableModelByDay)
 
 
 def test_materialize_invalid_materialization():
