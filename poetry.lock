@@ -3370,7 +3370,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-typed-ast"
-version = "1.5.7"
+version = "1.5.8"
 description = "Typing stubs for typed-ast"
 category = "dev"
 optional = false
@@ -3617,7 +3617,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "445d9981f3f6ae415bb229a3be6f636a68969ede22172f36bcc9fbfc5b3c5881"
+content-hash = "8a2b75fa92b2e09a1708a3f056d7c906a12a26090eebfb4a079e97141dab2e70"
 
 [metadata.files]
 aiohttp = [
@@ -6001,8 +6001,8 @@ types-setuptools = [
     {file = "types_setuptools-65.3.0-py3-none-any.whl", hash = "sha256:f69210049580939c70386252b776eb75ff4b6de488e7d766b9398669b7de68af"},
 ]
 types-typed-ast = [
-    {file = "types-typed-ast-1.5.7.tar.gz", hash = "sha256:0fdf7432e47b1fe67330b755abaf2d95ecbd634f4ba5884a7728a7b971ae3880"},
-    {file = "types_typed_ast-1.5.7-py3-none-any.whl", hash = "sha256:1596efafa72efdd75c3d9e8276bccfef26cdcc8a46861257e0873a0530148f79"},
+    {file = "types-typed-ast-1.5.8.tar.gz", hash = "sha256:156fbaca903e8571fe70bb0b562ffba92a7cbdb7bac9a713351ca27d88183ba7"},
+    {file = "types_typed_ast-1.5.8-py3-none-any.whl", hash = "sha256:386f54c807d8adc6215fcbdf2f301ddab5aedab0f9d875e85720c1af730dd64e"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.3.0-py3-none-any.whl", hash = "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02"},
