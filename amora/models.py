@@ -292,9 +292,10 @@ def model_path_for_model(model: Model) -> Path:
 
 
 def amora_model_for_name(model_name: str) -> Model:
-    for model, _path in list_models():
-        if model.unique_name() == model_name:
-            return model
+    for m in mapper_registry.mappers:
+        if m.class_.unique_name() == model_name:
+            return m.class_
+
     raise ValueError(f"{model_name} not found on models list")
 
 
