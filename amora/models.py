@@ -22,6 +22,7 @@ from typing import (
 from pydantic import NameEmail
 from sqlalchemy import Column, MetaData, Table
 from sqlalchemy.orm import declared_attr, registry
+from sqlalchemy.sql import ColumnCollection
 
 from amora.config import settings
 from amora.logger import logger
@@ -170,6 +171,17 @@ class AmoraModel:
             cls.__tablename__override__
             or re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__mro__[0].__name__).lower()
         )
+
+    @classmethod
+    def columns(cls) -> Optional[ColumnCollection]:
+        if cls.__model_config__.materialized == MaterializationTypes.ephemeral:
+            cte = cls.source()
+            if cte is not None:
+                return cte.exported_columns
+            else:
+                return None
+        else:
+            return cls.__table__.columns
 
     @classmethod
     def dependencies(cls) -> List[Table]:

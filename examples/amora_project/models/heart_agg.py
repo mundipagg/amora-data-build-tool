@@ -6,6 +6,7 @@ from examples.amora_project.models.heart_rate import HeartRate
 
 
 class HeartRateAgg(AmoraModel):
+    __depends_on__ = [HeartRate]
     __tablename__override__ = "heart_rate_agg"
     __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
 
