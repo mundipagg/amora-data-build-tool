@@ -255,3 +255,13 @@ def test_summarize_feature_view_model(feature_view_model, feature_view_model_sum
     assert sorted(summary, key=lambda column: column["column_name"]) == sorted(
         feature_view_model_summary, key=lambda column: column["column_name"]
     )
+
+
+def test_summarize_sourceless_ephemeral_model():
+    class SourcelessModel(AmoraModel):
+        __model_config__ = ModelConfig(materialized=MaterializationTypes.ephemeral)
+        foo: float = Field(Float, primary_key=True)
+        bar: float = Field(Float)
+
+    with pytest.raises(ValueError):
+        summarize(SourcelessModel)
