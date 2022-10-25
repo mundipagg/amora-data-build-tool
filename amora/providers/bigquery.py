@@ -2,7 +2,7 @@ import dataclasses
 import decimal
 from datetime import date, datetime, time
 from enum import Enum
-from typing import Any, Callable, Dict, Iterable, List, Optional, Union
+from typing import Any, Callable, Dict, Hashable, Iterable, List, Optional, Union
 
 import pandas as pd
 import sqlalchemy
@@ -402,7 +402,7 @@ class fixed_unnest(sqlalchemy.sql.roles.InElementRole, unnest):
         return new_func
 
 
-def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
+def cte_from_rows(rows: Iterable[Dict[Hashable, Any]]) -> CTE:
     """
     Returns a table like selectable (CTE) for the given hardcoded values.
 
@@ -455,6 +455,13 @@ def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
         return selects[0].cte()
 
     return union_all(*selects).cte()
+
+
+def cte_from_dataframe(df: pd.DataFrame) -> CTE:
+    """
+    Returns a table like selectable (CTE) for the given DataFrame.
+    """
+    return cte_from_rows(rows=df.to_dict("records"))
 
 
 def estimated_query_cost_in_usd(total_bytes: int) -> float:

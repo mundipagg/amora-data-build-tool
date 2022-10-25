@@ -2,6 +2,7 @@ import string
 from datetime import date, datetime, time
 from typing import List, Optional
 
+import numpy as np
 import pandas as pd
 import pytest
 from google.api_core.exceptions import NotFound
@@ -37,6 +38,7 @@ from amora.providers.bigquery import (
     DryRunResult,
     array,
     column_for_schema_field,
+    cte_from_dataframe,
     cte_from_rows,
     dry_run,
     estimated_query_cost_in_usd,
@@ -153,6 +155,15 @@ def test_cte_from_rows_with_record_repeated_fields():
             },
         ]
     )
+    assert isinstance(cte, CTE)
+    assert compile_statement(cte)
+    assert run(cte)
+
+
+def test_cte_from_dataframe():
+    df = pd.DataFrame(np.random.randint(0, 1000, size=(10, 5)), columns=list("AMORA"))
+    cte = cte_from_dataframe(df)
+
     assert isinstance(cte, CTE)
     assert compile_statement(cte)
     assert run(cte)
