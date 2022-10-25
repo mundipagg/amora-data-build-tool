@@ -6,6 +6,7 @@ from examples.amora_project.models.steps import Steps
 
 
 class StepsAgg(AmoraModel):
+    __depends_on__ = [Steps]
     __tablename__override__ = "steps_agg"
     __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
 
