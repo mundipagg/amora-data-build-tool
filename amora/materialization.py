@@ -1,7 +1,9 @@
 from dataclasses import dataclass
+from datetime import timedelta
 from pathlib import Path
 from typing import Optional
 
+import humanize
 from google.cloud.bigquery import (
     Client,
     PartitionRange,
@@ -39,7 +41,30 @@ class Task:
         return f"{self.model.unique_name()} -> {self.sql_stmt}"
 
 
-def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Table]:
+@dataclass
+class Result:
+    model_name: str
+    model_config: ModelConfig
+    destination_table: Table
+    total_bytes_billed: int = 0
+    total_bytes_processed: int = 0
+    duration: Optional[timedelta] = None
+
+    def __str__(self):
+        if self.model_config.materialized == MaterializationTypes.table:
+            rows = humanize.intcomma(self.destination_table.num_rows)
+            processed_bytes_ = humanize.naturalsize(self.total_bytes_processed)
+            duration = humanize.naturaldelta(self.duration)
+            table_bytes_ = humanize.naturalsize(self.destination_table.num_bytes)
+
+            return f"[{self.model_name}] Took {duration} to process {processed_bytes_} of data and materialize it into a `Table` with {rows} rows and {table_bytes_}."
+        elif self.model_config.materialized == MaterializationTypes.view:
+            return f"[{self.model_name}] Materialized as `View`"
+        else:
+            raise ValueError
+
+
+def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Result]:
     materialization = config.materialized
 
     if materialization == MaterializationTypes.ephemeral:
@@ -47,6 +72,7 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
 
     client = Client()
     client.delete_table(model_name, not_found_ok=True)
+    model = amora_model_for_name(model_name)
 
     if materialization == MaterializationTypes.view:
         view = Table(model_name)
@@ -54,21 +80,20 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
         view.labels = config.labels_dict
         view.view_query = sql
 
-        return client.create_table(view)
+        table = client.create_table(view)
+        return Result(
+            model_name=model_name, model_config=config, destination_table=table
+        )
 
     if materialization == MaterializationTypes.table:
-        model = amora_model_for_name(model_name)
         table = Table(model_name, schema=schema_for_model(model))
         table.description = config.description
         table.labels = config.labels_dict
-
-        client.create_table(table)
-
-        query_job_config = QueryJobConfig(destination=table)
+        table.clustering_fields = config.cluster_by
 
         if config.partition_by:
             if config.partition_by.data_type == "int":
-                query_job_config.range_partitioning = RangePartitioning(
+                table.range_partitioning = RangePartitioning(
                     range_=PartitionRange(
                         start=config.partition_by.range.get("start"),
                         end=config.partition_by.range.get("end"),
@@ -77,19 +102,27 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Tabl
                 )
 
             else:
-                query_job_config.time_partitioning = TimePartitioning(
+                table.time_partitioning = TimePartitioning(
                     field=config.partition_by.field,
                     type_=config.partition_by.granularity.upper(),
                 )
 
-        query_job_config.clustering_fields = config.cluster_by
+        client.create_table(table)
 
         query_job = client.query(
             sql,
-            job_config=query_job_config,
+            job_config=QueryJobConfig(destination=table),
         )
-        query_job.result()
-        return table
+        result = query_job.result()
+
+        return Result(
+            model_name=model_name,
+            model_config=config,
+            destination_table=client.get_table(table),
+            total_bytes_billed=query_job.total_bytes_billed,
+            total_bytes_processed=query_job.total_bytes_processed,
+            duration=query_job.ended - query_job.created,
+        )
 
     raise ValueError(
         f"Invalid model materialization configuration. "
