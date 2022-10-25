@@ -15,9 +15,10 @@ from amora.models import list_models
 from amora.utils import list_target_files
 
 app = typer.Typer(
+    pretty_exceptions_enable=False,
     help="Amora Data Build Tool enables engineers to transform data in their warehouses "
     "by defining schemas and writing select statements with SQLAlchemy. Amora handles turning these "
-    "select statements into tables and views"
+    "select statements into tables and views",
 )
 
 
@@ -103,9 +104,7 @@ def materialize(
 
             for result in results:
                 if result:
-                    typer.echo(f"✅  Created `{result.full_table_id}`")
-                    typer.echo(f"    Rows: {result.num_rows}")
-                    typer.echo(f"    Bytes: {result.num_bytes}")
+                    typer.echo(result)
 
 
 @app.command()
