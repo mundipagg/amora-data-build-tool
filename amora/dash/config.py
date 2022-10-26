@@ -23,6 +23,9 @@ class DashSettings(BaseSettings):
     AUTH0_CALLBACK_REDIRECT_PATH: str = "/"
     AUTH0_SCOPE: str = "openid profile email"
 
+    GUNICORN_WORKERS: int = 2
+    GUNICORN_WORKER_TIMEOUT: int = 30
+
     class Config:
         env_prefix = "AMORA_DASH_"
 

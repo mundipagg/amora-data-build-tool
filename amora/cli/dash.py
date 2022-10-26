@@ -31,8 +31,8 @@ def serve():
 
     options = {
         "bind": f"{settings.HTTP_HOST}:{settings.HTTP_PORT}",
-        "workers": 3,  # FIXME: Configurar via env var?
-        "timeout": 60,  # FIXME: Configurar via env var?
+        "workers": settings.GUNICORN_WORKERS,
+        "timeout": settings.GUNICORN_WORKER_TIMEOUT,
     }
     if settings.DEBUG:
         dash_app.run(
