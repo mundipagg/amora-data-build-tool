@@ -1,5 +1,3 @@
-import inspect
-
 from amora.compilation import compile_statement
 from amora.models import (
     AmoraModel,
@@ -17,7 +15,7 @@ from tests.models.steps import Steps
 
 
 def test_target_path():
-    path = Health.target_path(model_file_path=inspect.getfile(Health))
+    path = Health.target_path()
     assert path.as_posix().endswith("target/health.sql")
 
 
@@ -52,7 +50,7 @@ def test_select_models_with_labels():
     [(model, model_path)] = models
 
     assert model.unique_name() == StepCountBySource.unique_name()
-    assert model_path == StepCountBySource.model_file_path()
+    assert model_path == StepCountBySource.path()
 
 
 def test_select_models_with_labels_without_matches():
@@ -66,7 +64,7 @@ def test_select_models_with_label_keys():
     [(model, model_path)] = models
 
     assert model.unique_name() == StepCountBySource.unique_name()
-    assert model_path == StepCountBySource.model_file_path()
+    assert model_path == StepCountBySource.path()
 
 
 def test_select_models_with_label_keys_without_matches():

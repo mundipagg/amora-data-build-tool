@@ -39,7 +39,7 @@ def compile(
             typer.echo(f"⏭ Skipping compilation of model `{model_file_path}`")
             continue
 
-        target_file_path = model.target_path(model_file_path)
+        target_file_path = model.target_path()
         typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
 
         content = compile_statement(source_sql_statement)
