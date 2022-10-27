@@ -23,6 +23,8 @@ class DashSettings(BaseSettings):
     AUTH0_CALLBACK_REDIRECT_PATH: str = "/"
     AUTH0_SCOPE: str = "openid profile email"
 
+    METRICS_ENABLED: bool = True
+
     class Config:
         env_prefix = "AMORA_DASH_"
 

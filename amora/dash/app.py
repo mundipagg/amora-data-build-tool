@@ -6,11 +6,15 @@ from dash_extensions.enrich import Dash, dcc
 from amora.dash.authentication import add_auth0_login
 from amora.dash.components import side_bar
 from amora.dash.config import settings
+from amora.dash.metrics import register_metrics
 from amora.models import list_models
 
 dash_app = Dash(
     __name__, external_stylesheets=settings.external_stylesheets, use_pages=True
 )
+
+if settings.METRICS_ENABLED:
+    register_metrics(dash_app)
 
 if settings.auth0_login_enabled:
     add_auth0_login(dash_app)
