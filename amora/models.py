@@ -205,10 +205,10 @@ class AmoraModel:
         return None
 
     @classmethod
-    def target_path(cls, model_file_path: Union[str, Path]) -> Path:
+    def target_path(cls) -> Path:
         # {settings.dbt_models_path}/a_model/a_model.py -> a_model/a_model.py
         strip_path = settings.models_path.as_posix()
-        relative_model_path = str(model_file_path).split(strip_path)[1][1:]
+        relative_model_path = str(cls.path()).split(strip_path)[1][1:]
         # a_model/a_model.py -> ~/project/amora/target/a_model/a_model.sql
         target_file_path = settings.target_path.joinpath(
             relative_model_path.replace(".py", ".sql")
@@ -217,7 +217,7 @@ class AmoraModel:
         return target_file_path
 
     @classmethod
-    def model_file_path(cls) -> Path:
+    def path(cls) -> Path:
         return Path(getfile(cls))
 
     @classmethod
@@ -254,7 +254,7 @@ def amora_model_for_path(path: Path) -> Model:
     )
 
     for _name, class_ in compilables:
-        if class_.model_file_path() == path:
+        if class_.path() == path:
             return class_
 
     raise ValueError(f"Invalid path `{path}`")
@@ -263,16 +263,6 @@ def amora_model_for_path(path: Path) -> Model:
 def amora_model_for_target_path(path: Path) -> Model:
     model_path = model_path_for_target_path(path)
     return amora_model_for_path(model_path)
-
-
-def model_path_for_model(model: Model) -> Path:
-    """
-    Returns the filepath where the model is defined.
-    """
-    for m, path in list_models():
-        if m.unique_name() == model.unique_name():
-            return path
-    raise FileNotFoundError("Model file not found in the project")
 
 
 def amora_model_for_name(model_name: str) -> Model:

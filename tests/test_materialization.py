@@ -83,7 +83,7 @@ def setup_function(module):
 
 
 def test_it_creates_a_task_from_a_target_file_path():
-    target_path = HeartRate.target_path(model_file_path=HeartRate.model_file_path())
+    target_path = HeartRate.target_path()
     target_path.write_text("SELECT 1")
     task = Task.for_target(target_path)
 
@@ -97,7 +97,7 @@ def test_dependency_dags_is_iterable_and_topologicaly_sorted():
     tasks = []
 
     for model in [HeartRateAgg, Steps, HeartRate]:
-        target_path = model.target_path(model_file_path=model.model_file_path())
+        target_path = model.target_path()
         target_path.write_text("SELECT 1")
 
         tasks.append(Task.for_target(target_path))
