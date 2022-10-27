@@ -1,3 +1,7 @@
+from pathlib import Path
+
+import pytest
+
 from amora.compilation import compile_statement
 from amora.models import (
     AmoraModel,
@@ -5,6 +9,7 @@ from amora.models import (
     Label,
     ModelConfig,
     amora_model_for_name,
+    amora_model_for_path,
     select_models_with_label_keys,
     select_models_with_labels,
 )
@@ -41,6 +46,19 @@ def test_amora_model_for_name():
 
     assert issubclass(model, AmoraModel)
     assert model.__table__ == Health.__table__
+
+
+def test_amora_model_for_path():
+    model = amora_model_for_path(Health.path())
+    assert issubclass(model, AmoraModel)
+    assert model.__table__ == Health.__table__
+
+
+def test_amora_model_for_path_on_invalid_path():
+    invalid_model_path = Path(__file__)
+
+    with pytest.raises(ValueError):
+        amora_model_for_path(invalid_model_path)
 
 
 def test_select_models_with_labels():
