@@ -10,6 +10,7 @@ from amora.models import (
     ModelConfig,
     amora_model_for_name,
     amora_model_for_path,
+    amora_model_for_target_path,
     select_models_with_label_keys,
     select_models_with_labels,
 )
@@ -48,6 +49,11 @@ def test_amora_model_for_name():
     assert model.__table__ == Health.__table__
 
 
+def test_amora_model_for_name_on_invalid_name():
+    with pytest.raises(ValueError):
+        amora_model_for_name("Apolo")
+
+
 def test_amora_model_for_path():
     model = amora_model_for_path(Health.path())
     assert issubclass(model, AmoraModel)
@@ -59,6 +65,19 @@ def test_amora_model_for_path_on_invalid_path():
 
     with pytest.raises(ValueError):
         amora_model_for_path(invalid_model_path)
+
+
+def test_amora_model_for_target_path():
+    model = amora_model_for_target_path(Health.target_path())
+    assert issubclass(model, AmoraModel)
+    assert model.__table__ == Health.__table__
+
+
+def test_amora_model_for_target_path_on_invalid_path():
+    invalid_model_path = Path(__file__)
+
+    with pytest.raises(ValueError):
+        amora_model_for_target_path(invalid_model_path)
 
 
 def test_select_models_with_labels():
