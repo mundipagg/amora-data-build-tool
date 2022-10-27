@@ -1,4 +1,3 @@
-import inspect
 from unittest.mock import MagicMock, call, patch
 
 from typer.testing import CliRunner
@@ -34,7 +33,7 @@ def test_materialize_without_arguments_and_options(
     models = [HeartRate, Steps, StepCountBySource]
 
     for model in models:
-        target_path = model.target_path(model_file_path=inspect.getfile(model))
+        target_path = model.target_path()
         target_path.write_text("SELECT 1")
 
     result = runner.invoke(
@@ -75,7 +74,7 @@ def test_materialize_with_model_options(
     pool_mock.return_value.__enter__.return_value = executor_mock
 
     for model in [HeartRate, Steps]:
-        target_path = model.target_path(model_file_path=inspect.getfile(model))
+        target_path = model.target_path()
         target_path.write_text("SELECT 1")
 
     result = runner.invoke(

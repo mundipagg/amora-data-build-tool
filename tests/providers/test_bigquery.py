@@ -2,6 +2,7 @@ import string
 from datetime import date, datetime, time
 from typing import List, Optional
 
+import numpy as np
 import pandas as pd
 import pytest
 from google.api_core.exceptions import NotFound
@@ -37,6 +38,7 @@ from amora.providers.bigquery import (
     DryRunResult,
     array,
     column_for_schema_field,
+    cte_from_dataframe,
     cte_from_rows,
     dry_run,
     estimated_query_cost_in_usd,
@@ -158,6 +160,15 @@ def test_cte_from_rows_with_record_repeated_fields():
     assert run(cte)
 
 
+def test_cte_from_dataframe():
+    df = pd.DataFrame(np.random.randint(0, 1000, size=(10, 5)), columns=list("AMORA"))
+    cte = cte_from_dataframe(df)
+
+    assert isinstance(cte, CTE)
+    assert compile_statement(cte)
+    assert run(cte)
+
+
 ONE_TERABYTE = 1 * 1024**4
 ONE_GIGABYTE = 1 * 1024**3
 
@@ -261,11 +272,13 @@ def test_schema_for_model():
         label: str = Field(String)
 
     class Foo(AmoraModel):
-        a_boolean: bool = Field(Boolean, primary_key=True)
+        a_boolean: bool = Field(
+            Boolean, primary_key=True, doc="You know... ones and zeros"
+        )
         a_date: date = Field(Date)
         a_datetime: datetime = Field(DateTime)
         a_float: float = Field(Float)
-        a_string: str = Field(String)
+        a_string: str = Field(String, doc="Words and stuff")
         a_time: time = Field(Time)
         a_timestamp: datetime = Field(TIMESTAMP)
         an_int: int = Field(Integer, primary_key=True)
@@ -279,11 +292,13 @@ def test_schema_for_model():
     schema = schema_for_model(Foo)
 
     assert schema == [
-        SchemaField("a_boolean", "BOOLEAN", "NULLABLE", None, (), None),
+        SchemaField(
+            "a_boolean", "BOOLEAN", "NULLABLE", "You know... ones and zeros", (), None
+        ),
         SchemaField("a_date", "DATE", "NULLABLE", None, (), None),
         SchemaField("a_datetime", "DATETIME", "NULLABLE", None, (), None),
         SchemaField("a_float", "FLOAT", "NULLABLE", None, (), None),
-        SchemaField("a_string", "STRING", "NULLABLE", None, (), None),
+        SchemaField("a_string", "STRING", "NULLABLE", "Words and stuff", (), None),
         SchemaField("a_time", "TIME", "NULLABLE", None, (), None),
         SchemaField("a_timestamp", "TIMESTAMP", "NULLABLE", None, (), None),
         SchemaField("an_int", "INTEGER", "NULLABLE", None, (), None),

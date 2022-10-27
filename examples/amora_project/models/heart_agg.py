@@ -6,12 +6,13 @@ from examples.amora_project.models.heart_rate import HeartRate
 
 
 class HeartRateAgg(AmoraModel):
+    __depends_on__ = [HeartRate]
     __tablename__override__ = "heart_rate_agg"
     __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
 
     avg: float = Field(Float)
     sum: float = Field(Float)
-    count: int = Field(Float)
+    count: int = Field(Integer)
     year: int = Field(Integer, primary_key=True)
     month: int = Field(Integer, primary_key=True)
 

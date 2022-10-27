@@ -3,11 +3,11 @@ import dash_bootstrap_components as dbc
 from dash import html
 from dash.development.base_component import Component
 
-from amora.models import Model, model_path_for_model
+from amora.models import Model
 
 
 def python_component(model: Model) -> Component:
-    source_code = model_path_for_model(model).read_text()
+    source_code = model.path().read_text()
     return html.Div(
         [
             dash_ace.DashAceEditor(
@@ -37,9 +37,7 @@ def sql_component(model: Model) -> Component:
         )
 
     try:
-        source_code = model.target_path(
-            model_file_path=model_path_for_model(model)
-        ).read_text()
+        source_code = model.target_path().read_text()
     except FileNotFoundError:
         return dbc.Alert(
             "⚠️ SQL code unavailable. Run `amora compile` to generate SQL files",

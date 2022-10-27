@@ -15,6 +15,7 @@ from examples.amora_project.models.steps import Steps
 
 @feature_view
 class StepCountBySource(AmoraModel):
+    __depends_on__ = [Steps]
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.table,
         labels={
@@ -26,7 +27,7 @@ class StepCountBySource(AmoraModel):
 
     value_avg: float = Field(Float, doc="Average step count of the hour")
     value_sum: float = Field(Float, doc="Sum of the step counts of the hour")
-    value_count: float = Field(Float, doc="Count of step count samples of the hour")
+    value_count: int = Field(Integer, doc="Count of step count samples of the hour")
 
     source_name: str = Field(String, primary_key=True, doc="Source of the metric")
     event_timestamp: datetime = Field(
@@ -37,16 +38,19 @@ class StepCountBySource(AmoraModel):
 
     @classmethod
     def source(cls) -> Optional[Compilable]:
-        datetime_trunc = func.timestamp(datetime_trunc_hour(Steps.creationDate))
+        source_name = Steps.sourceName.label(cls.__table__.columns.source_name.key)
+        event_timestamp = func.timestamp(datetime_trunc_hour(Steps.creationDate)).label(
+            cls.__table__.columns.event_timestamp.key
+        )
         return select(
             [
                 func.avg(Steps.value).label(cls.__table__.columns.value_avg.key),
                 func.sum(Steps.value).label(cls.__table__.columns.value_sum.key),
                 func.count(Steps.value).label(cls.__table__.columns.value_count.key),
-                Steps.sourceName,
-                datetime_trunc.label(cls.__table__.columns.event_timestamp.key),
+                source_name,
+                event_timestamp,
             ]
-        ).group_by(cls.source_name, cls.event_timestamp)
+        ).group_by(source_name, event_timestamp)
 
     @classmethod
     def feature_view_entities(cls):

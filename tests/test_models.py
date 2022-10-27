@@ -1,4 +1,6 @@
-import inspect
+from pathlib import Path
+
+import pytest
 
 from amora.compilation import compile_statement
 from amora.models import (
@@ -7,6 +9,8 @@ from amora.models import (
     Label,
     ModelConfig,
     amora_model_for_name,
+    amora_model_for_path,
+    amora_model_for_target_path,
     select_models_with_label_keys,
     select_models_with_labels,
 )
@@ -17,7 +21,7 @@ from tests.models.steps import Steps
 
 
 def test_target_path():
-    path = Health.target_path(model_file_path=inspect.getfile(Health))
+    path = Health.target_path()
     assert path.as_posix().endswith("target/health.sql")
 
 
@@ -45,6 +49,37 @@ def test_amora_model_for_name():
     assert model.__table__ == Health.__table__
 
 
+def test_amora_model_for_name_on_invalid_name():
+    with pytest.raises(ValueError):
+        amora_model_for_name("Apolo")
+
+
+def test_amora_model_for_path():
+    model = amora_model_for_path(Health.path())
+    assert issubclass(model, AmoraModel)
+    assert model.__table__ == Health.__table__
+
+
+def test_amora_model_for_path_on_invalid_path():
+    invalid_model_path = Path(__file__)
+
+    with pytest.raises(ValueError):
+        amora_model_for_path(invalid_model_path)
+
+
+def test_amora_model_for_target_path():
+    model = amora_model_for_target_path(Health.target_path())
+    assert issubclass(model, AmoraModel)
+    assert model.__table__ == Health.__table__
+
+
+def test_amora_model_for_target_path_on_invalid_path():
+    invalid_model_path = Path(__file__)
+
+    with pytest.raises(ValueError):
+        amora_model_for_target_path(invalid_model_path)
+
+
 def test_select_models_with_labels():
     models = list(select_models_with_labels({Label("domain", "health")}))
 
@@ -52,7 +87,7 @@ def test_select_models_with_labels():
     [(model, model_path)] = models
 
     assert model.unique_name() == StepCountBySource.unique_name()
-    assert model_path == StepCountBySource.model_file_path()
+    assert model_path == StepCountBySource.path()
 
 
 def test_select_models_with_labels_without_matches():
@@ -66,7 +101,7 @@ def test_select_models_with_label_keys():
     [(model, model_path)] = models
 
     assert model.unique_name() == StepCountBySource.unique_name()
-    assert model_path == StepCountBySource.model_file_path()
+    assert model_path == StepCountBySource.path()
 
 
 def test_select_models_with_label_keys_without_matches():
