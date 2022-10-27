@@ -245,8 +245,8 @@ def _is_amora_model(candidate: ModuleType) -> bool:
 def amora_model_for_path(path: Path) -> Model:
     try:
         module = importlib.import_module(path.stem, settings.models_path.name)
-    except ModuleNotFoundError:
-        module = None
+    except ModuleNotFoundError as e:
+        raise ValueError(f"Invalid path `{path}`") from e
 
     compilables = inspect.getmembers(
         module,
