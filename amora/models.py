@@ -1,8 +1,8 @@
 import dataclasses
+import importlib
 import inspect
 import re
 from enum import Enum, auto
-from importlib.util import module_from_spec, spec_from_file_location
 from inspect import getfile
 from pathlib import Path
 from types import ModuleType
@@ -27,11 +27,10 @@ from sqlalchemy.sql import ColumnCollection
 from amora.config import settings
 from amora.logger import logger
 from amora.protocols import Compilable, CompilableProtocol
-from amora.utils import list_files, model_path_for_target_path
+from amora.utils import ensure_path, list_files, model_path_for_target_path
 
 metadata = MetaData(schema=f"{settings.TARGET_PROJECT}.{settings.TARGET_SCHEMA}")
 mapper_registry = registry(metadata=metadata)
-
 
 Model = Type["AmoraModel"]
 Models = Iterable[Model]
@@ -242,22 +241,12 @@ def _is_amora_model(candidate: ModuleType) -> bool:
     )
 
 
+@ensure_path
 def amora_model_for_path(path: Path) -> Model:
-    spec = spec_from_file_location(".".join(["amoramodel", path.stem]), path)
-    if spec is None:
-        raise ValueError(f"Invalid path `{path}`. Not a valid Python file.")
-
-    module = module_from_spec(spec)
-
-    if spec.loader is None:
-        raise ValueError(f"Invalid AmoraModel path `{path}`. Unable to load module.")
-
     try:
-        spec.loader.exec_module(module)
-    except ImportError as e:
-        raise ValueError(
-            f"Invalid AmoraModel path `{path}`. Unable to load module."
-        ) from e
+        module = importlib.import_module(path.stem, settings.models_path.name)
+    except ModuleNotFoundError:
+        module = None
 
     compilables = inspect.getmembers(
         module,
@@ -265,12 +254,7 @@ def amora_model_for_path(path: Path) -> Model:
     )
 
     for _name, class_ in compilables:
-        try:
-            # fixme: Quando carregamos o código em inspect, não existe um arquivo associado,
-            #  ou seja, ao iterar sobre as classes de um arquivo, a classe que retornar um TypeError,
-            #  é uma classe definida no arquivo
-            class_.model_file_path()
-        except TypeError:
+        if class_.model_file_path() == path:
             return class_
 
     raise ValueError(f"Invalid path `{path}`")
@@ -305,8 +289,10 @@ def list_models(
     for model_file_path in list_files(path, suffix=".py"):
         if model_file_path.stem.startswith("_"):
             continue
+
         try:
             yield amora_model_for_path(model_file_path), model_file_path
+
         except ValueError:
             logger.exception(
                 "Unable to load amora model for path",
