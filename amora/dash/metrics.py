@@ -1,39 +1,32 @@
 from timeit import default_timer
-from typing import Callable
 
 from dash import Dash
 from flask import Response, request
-from prometheus_client import Histogram
+from prometheus_client import REGISTRY, Histogram
+from prometheus_client.utils import INF
 from prometheus_flask_exporter import PrometheusMetrics
 
 from amora.version import VERSION
 
 
-def callback_instrumenter(callback: Callable):
-    def decorator(*args, **kwargs):
-        result = callback(*args, **kwargs)
-        return result
-
-    return decorator
-
-
 def register_metrics(dash: Dash) -> None:
     flask_app = dash.server
-    metrics = PrometheusMetrics(app=flask_app)
+    metrics = PrometheusMetrics(app=flask_app, registry=REGISTRY)
 
     metrics.info("amora_version", "Amora version", version=VERSION)
 
     pathname_request_duration_metric = Histogram(
         "amora_dash_pages_location_pathname_change",
-        "Flask HTTP request related to dash's SPA pathname change duration in seconds",
+        "HTTP request duration, in seconds, related to an UI URL pathname change.",
         ("method", "pathname", "status"),
         registry=metrics.registry,
     )
 
     component_update_request_duration_metric = Histogram(
         "amora_dash_component_update",
-        "Flask HTTP request related to dash's SPA component update duration in seconds",
+        "HTTP request duration, in seconds, related to an UI component update.",
         ("method", "status", "inputs", "output"),
+        unit="seconds",
         registry=metrics.registry,
     )
 
@@ -63,26 +56,25 @@ def register_metrics(dash: Dash) -> None:
         if request.path == "/_dash-update-component":
             payload = request.get_json()
             if "_pages_location.pathname" in payload["changedPropIds"]:
-                for input in payload["inputs"]:
-                    if (
-                        input["id"] == "_pages_location"
-                        and input["property"] == "pathname"
-                    ):
+                for i in payload["inputs"]:
+                    if i["id"] == "_pages_location" and i["property"] == "pathname":
                         pathname_request_duration_metric.labels(
                             method=request.method,
-                            pathname=input["value"],
+                            pathname=i["value"],
                             status=response.status_code,
                         ).observe(total_time)
                         return response
+
             elif "url.pathname" in payload["changedPropIds"]:
-                for input in payload["inputs"]:
-                    if input["id"] == "url" and input["property"] == "pathname":
+                for i in payload["inputs"]:
+                    if i["id"] == "url" and i["property"] == "pathname":
                         pathname_request_duration_metric.labels(
                             method=request.method,
-                            pathname=input["value"],
+                            pathname=i["value"],
                             status=response.status_code,
                         ).observe(total_time)
                         return response
+
             else:
                 inputs = ":".join(i["id"] for i in payload["inputs"])
                 metric_labels = dict(
