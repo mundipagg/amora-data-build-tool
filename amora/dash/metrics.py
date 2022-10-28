@@ -37,6 +37,24 @@ def register_metrics(dash: Dash) -> None:
         registry=metrics.registry,
     )
 
+    component_update_response_size_metric = Histogram(
+        "amora_dash_component_update_response_size",
+        "HTTP response size, in bytes, related to an UI component update.",
+        ("method", "status", "inputs", "output"),
+        buckets=[
+            1000,
+            5000,
+            10_000,
+            100_000,
+            1_000_000,
+            10_000_000,
+            100_000_000,
+            INF,
+        ],
+        unit="bytes",
+        registry=metrics.registry,
+    )
+
     def after_request(response: Response) -> Response:
         if not hasattr(request, "prom_start_time"):
             raise ValueError
@@ -67,12 +85,19 @@ def register_metrics(dash: Dash) -> None:
                         return response
             else:
                 inputs = ":".join(i["id"] for i in payload["inputs"])
-                component_update_request_duration_metric.labels(
+                metric_labels = dict(
                     method=request.method,
                     status=response.status_code,
                     inputs=inputs,
                     output=payload["output"],
+                )
+                component_update_request_duration_metric.labels(
+                    **metric_labels
                 ).observe(total_time)
+
+                component_update_response_size_metric.labels(**metric_labels).observe(
+                    response.content_length
+                )
                 return response
 
         return response
