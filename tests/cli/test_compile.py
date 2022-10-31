@@ -60,7 +60,7 @@ def test_compile_call_save_manifest(save: mock.MagicMock):
 
 @mock.patch("amora.manifest.Manifest.load")
 @mock.patch("amora.manifest.Manifest.from_project")
-@mock.patch("amora.compilation.get_models_to_compile")
+@mock.patch("amora.manifest.get_models_to_compile")
 @mock.patch("amora.compilation.clean_compiled_files_of_removed_models")
 def test_compile_call_clean_compiled_files_of_removed_models(
     clean_compiled_files_of_removed_models: mock.MagicMock,

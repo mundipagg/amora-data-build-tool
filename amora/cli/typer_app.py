@@ -13,9 +13,10 @@ from amora.dag import DependencyDAG
 from amora.models import list_models
 
 app = typer.Typer(
+    pretty_exceptions_enable=False,
     help="Amora Data Build Tool enables engineers to transform data in their warehouses "
     "by defining schemas and writing select statements with SQLAlchemy. Amora handles turning these "
-    "select statements into tables and views"
+    "select statements into tables and views",
 )
 
 
@@ -39,7 +40,7 @@ def compile(
         compilation.clean_compiled_files_of_removed_models(
             list(previous_manifest.models.keys()), list(current_manifest.models.keys())
         )
-        models_to_compile = compilation.get_models_to_compile(
+        models_to_compile = manifest.get_models_to_compile(
             previous_manifest, current_manifest
         )
 
@@ -52,7 +53,7 @@ def compile(
             typer.echo(f"⏭ Skipping compilation of model `{model_file_path}`")
             continue
 
-        target_file_path = model.target_path(model_file_path)
+        target_file_path = model.target_path()
         typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
 
         content = compilation.compile_statement(source_sql_statement)
@@ -119,9 +120,7 @@ def materialize(
 
             for result in results:
                 if result:
-                    typer.echo(f"✅  Created `{result.full_table_id}`")
-                    typer.echo(f"    Rows: {result.num_rows}")
-                    typer.echo(f"    Bytes: {result.num_bytes}")
+                    typer.echo(result)
 
 
 @app.command()

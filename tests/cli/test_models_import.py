@@ -125,4 +125,7 @@ def test_models_import_with_valid_table_reference_and_existing_destination_file_
 
         assert result.exit_code == 0, result.stderr
         assert output_path.read_text()
+        import sys
+
+        sys.path.insert(0, output_path.parent.as_posix())
         assert issubclass(amora_model_for_path(path=output_path), AmoraModel)  # type: ignore

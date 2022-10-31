@@ -1,14 +1,15 @@
 import hashlib
 import json
+from os.path import exists
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, Set, Tuple
 
 from _hashlib import HASH
 from pydantic import BaseModel
 
 from amora.config import settings
 from amora.dag import DependencyDAG
-from amora.models import list_models
+from amora.models import Model, amora_model_from_name_list, list_models
 
 BUF_SIZE = 65536
 
@@ -68,3 +69,41 @@ def hash_file(file_path: Path) -> HASH:
                 break
             hash.update(data)
     return hash
+
+
+def get_models_to_compile(
+    previous_manifest: Manifest, current_manifest: Manifest
+) -> Set[Tuple[Model, Path]]:
+    models_to_compile = set()
+    deps_names_to_compile: Set = set()
+
+    for model, model_file_path in list_models():
+        model_unique_name = model.unique_name()
+
+        model_current_manifest = current_manifest.models[model_unique_name]
+        model_previous_manifest = previous_manifest.models.get(
+            model_unique_name
+        )  # model could not exist in previous
+
+        compile_model = not model_previous_manifest or (
+            model_current_manifest.size != model_previous_manifest.size
+            or model_current_manifest.deps != model_previous_manifest.deps
+            or (
+                model_current_manifest.stat > model_previous_manifest.stat
+                and (
+                    not exists(model.target_path())
+                    or model_current_manifest.hash != model_previous_manifest.hash
+                )
+            )
+        )
+
+        if compile_model:
+            models_to_compile.add((model, model_file_path))
+            deps_names_to_compile = deps_names_to_compile.union(
+                model_current_manifest.deps
+            )
+
+    deps_to_compile = amora_model_from_name_list(deps_names_to_compile)
+    models_to_compile = models_to_compile.union(deps_to_compile)
+
+    return models_to_compile

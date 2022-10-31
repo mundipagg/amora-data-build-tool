@@ -27,7 +27,7 @@ class StepCountBySource(AmoraModel):
 
     value_avg: float = Field(Float, doc="Average step count of the hour")
     value_sum: float = Field(Float, doc="Sum of the step counts of the hour")
-    value_count: float = Field(Float, doc="Count of step count samples of the hour")
+    value_count: int = Field(Integer, doc="Count of step count samples of the hour")
 
     source_name: str = Field(String, primary_key=True, doc="Source of the metric")
     event_timestamp: datetime = Field(

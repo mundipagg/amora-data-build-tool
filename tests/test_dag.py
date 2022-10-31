@@ -44,7 +44,7 @@ def test_DependencyDAG_from_target():
     dag = DependencyDAG.from_target()
     assert list(dag.nodes) == []
 
-    target_path = HeartRate.target_path(model_file_path=HeartRate.model_file_path())
+    target_path = HeartRate.target_path()
     target_path.write_text("SELECT 1")
 
     dag = DependencyDAG.from_target()
