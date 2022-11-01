@@ -45,6 +45,7 @@ humanize = "^4.2.3"
 dash-extensions = { version = "^0.1.5", optional = true }
 dash-mantine-components = { version = "^0.10.2", optional = true }
 pydantic = { extras = ["email"], version = "^1.10.2" }
+gunicorn = "^20.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "^4.0.0"
