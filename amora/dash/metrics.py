@@ -1,9 +1,8 @@
 from timeit import default_timer
 from typing import Optional
-from uuid import uuid4
 
 from dash import Dash
-from flask import Response, request
+from flask import Response, g, request
 from prometheus_client import REGISTRY, Histogram
 from prometheus_client.utils import INF
 from prometheus_flask_exporter import PrometheusMetrics
@@ -53,13 +52,11 @@ def add_prometheus_metrics(dash: Dash) -> None:
     )
 
     def before_request():
-        request.metrics_start_time = default_timer()
-        request.uid = uuid4()
+        g.metrics_start_time = default_timer()
 
     def after_request(response: Response) -> Response:
-        start_time: Optional[float] = getattr(request, "metrics_start_time")
+        start_time: Optional[float] = g.pop("metrics_start_time", None)
         if not start_time:
-            logger.info("Ignoring request without start timestamp")
             return response
 
         total_time = max(default_timer() - start_time, 0)
@@ -104,10 +101,7 @@ def add_prometheus_metrics(dash: Dash) -> None:
             ).observe(response.content_length)
 
             return response
-
-    def teardown_request(exception=None):
-        pass
+        return response
 
     flask_app.before_request(before_request)
     flask_app.after_request(after_request)
-    flask_app.teardown_request(teardown_request)
