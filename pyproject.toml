@@ -11,6 +11,7 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: SQL",
 ]
 
@@ -23,7 +24,7 @@ sqlalchemy-bigquery = "^1.4"
 networkx = { extras = ["all"], version = "^2.6.3" }
 typer = { extras = ["all"], version = ">=0.4,<0.7" }
 pytest = ">=6.2.5,<8.0.0"
-pytest-xdist = { extras = ['psutil'], version = "^2.5.0" }
+pytest-xdist = { extras = ['psutil'], version = ">=2.5,<4.0" }
 rich = ">=10.13,<13.0"
 Jinja2 = "^3.0.3"
 sqlparse = ">=0.3.1,<0.5.0"
@@ -54,7 +55,7 @@ mypy = "^0.982"
 lxml = "^4.6.3"
 pytest-env = "^0.6.2"
 mkdocs-material = "8.5.6"
-mkdocs-minify-plugin = "^0.5.0"
+mkdocs-minify-plugin = "^0.6.1"
 mkdocs-redirects = "^1.2.0"
 mkdocs-git-revision-date-plugin = "^0.3.1"
 mkdocs-include-markdown-plugin = "^3.4.1"
