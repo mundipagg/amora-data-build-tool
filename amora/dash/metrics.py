@@ -7,6 +7,7 @@ from prometheus_client import REGISTRY, Histogram
 from prometheus_client.utils import INF
 from prometheus_flask_exporter import PrometheusMetrics
 
+from amora.dash.config import settings
 from amora.logger import logger
 from amora.version import VERSION
 
@@ -18,35 +19,26 @@ def add_prometheus_metrics(dash: Dash) -> None:
     metrics.info("amora_version", "Amora version", version=VERSION)
 
     pathname_request_duration_metric = Histogram(
-        "amora_dash_page_pathname_change_duration",
-        "HTTP request duration, in seconds, related to an UI URL pathname change.",
-        ("method", "status"),
+        name="amora_dash_page_pathname_change_duration",
+        documentation="HTTP request duration, in seconds, related to an UI URL pathname change.",
+        labelnames=("method", "status"),
         unit="seconds",
         registry=metrics.registry,
     )
 
     component_update_request_duration_metric = Histogram(
-        "amora_dash_component_update_duration",
-        "HTTP request duration, in seconds, related to an UI component update.",
-        ("method", "status"),
+        name="amora_dash_component_update_duration",
+        documentation="HTTP request duration, in seconds, related to an UI component update.",
+        labelnames=("method", "status"),
         unit="seconds",
         registry=metrics.registry,
     )
 
     component_update_response_size_metric = Histogram(
-        "amora_dash_component_update_response_size",
-        "HTTP response size, in bytes, related to an UI component update.",
-        ("method", "status"),
-        buckets=[
-            1000,
-            5000,
-            10_000,
-            100_000,
-            1_000_000,
-            10_000_000,
-            100_000_000,
-            INF,
-        ],
+        name="amora_dash_component_update_response_size",
+        documentation="HTTP response size, in bytes, related to an UI component update.",
+        labelnames=("method", "status"),
+        buckets=[*settings.METRICS_COMPONENT_UPDATE_RESPONSE_SIZE_BUCKETS, INF],
         unit="bytes",
         registry=metrics.registry,
     )
