@@ -9,6 +9,7 @@ def serve():
 
     from amora.dash.app import dash_app
     from amora.dash.config import settings
+    from amora.dash.gunicorn.config import child_exit, when_ready
 
     # https://docs.gunicorn.org/en/latest/custom.html#custom-application
     class StandaloneApplication(gunicorn.app.base.BaseApplication):
@@ -29,14 +30,22 @@ def serve():
         def load(self):
             return self.application
 
-    options = {
-        "bind": f"{settings.HTTP_HOST}:{settings.HTTP_PORT}",
-        "workers": settings.GUNICORN_WORKERS,
-        "timeout": settings.GUNICORN_WORKER_TIMEOUT,
-    }
     if settings.DEBUG:
         dash_app.run(
             debug=settings.DEBUG, host=settings.HTTP_HOST, port=settings.HTTP_PORT
         )
     else:
+        options = {
+            "bind": f"{settings.HTTP_HOST}:{settings.HTTP_PORT}",
+            "workers": settings.GUNICORN_WORKERS,
+            "timeout": settings.GUNICORN_WORKER_TIMEOUT,
+        }
+        if settings.METRICS_ENABLED:
+            options.update(
+                {
+                    "when_ready": when_ready,
+                    "child_exit": child_exit,
+                }
+            )
+
         StandaloneApplication(dash_app.server, options).run()

@@ -24,6 +24,7 @@ class DashSettings(BaseSettings):
     AUTH0_SCOPE: str = "openid profile email"
 
     METRICS_ENABLED: bool = True
+    METRICS_PORT: int = 9090
     METRICS_COMPONENT_UPDATE_RESPONSE_SIZE_BUCKETS: List[int] = [
         1000,
         5000,

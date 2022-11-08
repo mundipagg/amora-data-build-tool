@@ -3,9 +3,10 @@ from typing import Optional
 
 from dash import Dash
 from flask import Response, g, request
-from prometheus_client import REGISTRY, Histogram
+from prometheus_client import CollectorRegistry, Histogram
 from prometheus_client.utils import INF
 from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_flask_exporter.multiprocess import GunicornPrometheusMetrics
 
 from amora.dash.config import settings
 from amora.logger import logger
@@ -14,7 +15,15 @@ from amora.version import VERSION
 
 def add_prometheus_metrics(dash: Dash) -> None:
     flask_app = dash.server
-    metrics = PrometheusMetrics(app=flask_app, registry=REGISTRY, export_defaults=False)
+    registry = CollectorRegistry()
+    if settings.DEBUG:
+        metrics = PrometheusMetrics(
+            app=flask_app, registry=registry, export_defaults=False
+        )
+    else:
+        metrics = GunicornPrometheusMetrics(
+            app=flask_app, registry=registry, export_defaults=False
+        )
 
     metrics.info("amora_version", "Amora version", version=VERSION)
 
