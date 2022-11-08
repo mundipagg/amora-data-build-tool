@@ -45,6 +45,7 @@ humanize = "^4.2.3"
 dash-extensions = { version = "^0.1.5", optional = true }
 dash-mantine-components = { version = "^0.10.2", optional = true }
 pydantic = { extras = ["email"], version = "^1.10.2" }
+prometheus-flask-exporter = { version = "0.20.3", optional = true }
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "^4.0.0"
@@ -81,6 +82,7 @@ dash = [
     "dash-ace",
     "dash-extensions",
     "dash-mantine-components",
+    "prometheus-flask-exporter",
 ]
 
 [build-system]
