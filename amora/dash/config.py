@@ -24,6 +24,7 @@ class DashSettings(BaseSettings):
     AUTH0_SCOPE: str = "openid profile email"
 
     METRICS_ENABLED: bool = True
+    METRICS_PORT: int = 9090
     METRICS_COMPONENT_UPDATE_RESPONSE_SIZE_BUCKETS: List[int] = [
         1000,
         5000,
@@ -33,6 +34,9 @@ class DashSettings(BaseSettings):
         10_000_000,
         100_000_000,
     ]
+
+    GUNICORN_WORKERS: int = 2
+    GUNICORN_WORKER_TIMEOUT: int = 30
 
     class Config:
         env_prefix = "AMORA_DASH_"
