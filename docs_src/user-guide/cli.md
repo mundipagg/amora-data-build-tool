@@ -44,11 +44,11 @@ Commands:
 
 ::: amora.cli.models.models_list
 
-![amora models list](static/cli/amora-models-list.png)
+![amora models list](../static/cli/amora-models-list.png)
 
 ---
 
-![amora models list --with-total-bytes](static/cli/amora-models-list-with-total-bytes.png)
+![amora models list --with-total-bytes](../static/cli/amora-models-list-with-total-bytes.png)
 
 ---
 If a machine readable format is required, the `--format json` option can be used as followed:
