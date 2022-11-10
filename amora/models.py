@@ -2,6 +2,7 @@ import dataclasses
 import importlib
 import inspect
 import re
+from collections import defaultdict
 from enum import Enum, auto
 from inspect import getfile
 from pathlib import Path
@@ -301,6 +302,13 @@ def list_models_with_owner(owner: Union[str, Owner]) -> Iterable[Tuple[Model, Pa
     for model, file_path in list_models():
         if owner == model.__model_config__.owner:
             yield model, file_path
+
+
+def owners_to_models_dict() -> Dict[Union[Owner, None], List[Model]]:
+    owners_dict = defaultdict(list)
+    for model, _ in list_models():
+        owners_dict[model.owner()].append(model)
+    return owners_dict
 
 
 def select_models_with_labels(labels: Labels) -> Iterable[Tuple[Model, Path]]:
