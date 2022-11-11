@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from pydantic import NameEmail
 from sqlalchemy import TIMESTAMP, Float, Integer, String, select
 
 from amora.models import (
@@ -25,6 +26,9 @@ class Steps(AmoraModel):
         labels={Label("freshness", "daily")},
         description="Health automatically counts your steps, walking, and "
         "running distances. This table stores step measurement events",
+        owner=NameEmail(
+            name="Diogo Magalhães Machado", email="diogo.martins@stone.com.br"
+        ),
     )
 
     id: int = Field(Integer, primary_key=True, doc="Identificador único da medida")

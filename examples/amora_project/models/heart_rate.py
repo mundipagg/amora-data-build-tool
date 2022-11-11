@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from pydantic import NameEmail
 from sqlalchemy import TIMESTAMP, Float, Integer, String, select
 
 from amora.models import (
@@ -24,6 +25,10 @@ class HeartRate(AmoraModel):
         ),
         cluster_by=["sourceName"],
         labels={Label("freshness", "daily")},
+        owner=NameEmail(
+            name="Diogo Magalhães Machado", email="diogo.martins@stone.com.br"
+        ),
+        description="Heart Rate measurement events",
     )
 
     id: int = Field(Integer, primary_key=True, doc="Identificador único da medida")

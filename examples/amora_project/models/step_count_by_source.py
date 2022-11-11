@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 import humanize
+from pydantic import NameEmail
 from sqlalchemy import TIMESTAMP, Float, Integer, String, func, literal, select
 
 from amora.feature_store.decorators import feature_view
@@ -23,6 +24,10 @@ class StepCountBySource(AmoraModel):
             Label("upstream", "apple_health"),
             Label("domain", "health"),
         },
+        owner=NameEmail(
+            name="Diogo Magalhães Machado", email="diogo.martins@stone.com.br"
+        ),
+        description="Step count measurements aggregated by hour",
     )
 
     value_avg: float = Field(Float, doc="Average step count of the hour")

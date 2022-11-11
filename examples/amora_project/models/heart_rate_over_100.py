@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
+from pydantic import NameEmail
 from sqlalchemy import TIMESTAMP, Float, Integer, String, select
 
 from amora.models import AmoraModel, Field, Label, MaterializationTypes, ModelConfig
@@ -14,6 +15,9 @@ class HeartRateOver100(AmoraModel):
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.view,
         labels={Label("freshness", "daily")},
+        owner=NameEmail(
+            name="Diogo Magalhães Machado", email="diogo.martins@stone.com.br"
+        ),
     )
 
     unit: str = Field(String, doc="Unidade de medida")
