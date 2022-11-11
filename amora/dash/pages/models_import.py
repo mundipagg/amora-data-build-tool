@@ -121,8 +121,8 @@ def layout() -> Component:
             dbc.Row(
                 children=[
                     dbc.Col(project_dropdown(), id="project-selector"),
-                    dbc.Col(id="dataset-selector"),
-                    dbc.Col(id="table-selector"),
+                    dbc.Col(dcc.Loading(html.Span(id="dataset-selector"))),
+                    dbc.Col(dcc.Loading(html.Span(id="table-selector"))),
                 ]
             ),
             dbc.Row(id="amora-model-code"),
