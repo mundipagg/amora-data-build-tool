@@ -13,6 +13,6 @@ def layout(model: Model) -> Component:
             dcc.Link(model.owner(), href=f"/owners/{owner}"),
         ]
     else:
-        content = "Owner: Unowned"
+        content = ["Owner: Unowned"]
 
     return html.H6(children=content, id="model-data-owner")
