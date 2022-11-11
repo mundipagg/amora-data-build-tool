@@ -2,6 +2,7 @@ import dataclasses
 import importlib
 import inspect
 import re
+from collections import defaultdict
 from enum import Enum, auto
 from inspect import getfile
 from pathlib import Path
@@ -105,6 +106,9 @@ class MaterializationTypes(AutoName):
     table = auto()
 
 
+Owner = NameEmail
+
+
 @dataclasses.dataclass
 class ModelConfig:
     """
@@ -123,7 +127,7 @@ class ModelConfig:
     partition_by: Optional[PartitionConfig] = None
     cluster_by: Optional[List[str]] = None
     labels: Labels = dataclasses.field(default_factory=set)
-    owner: Optional[NameEmail] = None
+    owner: Optional[Owner] = None
 
     @property
     def labels_dict(self) -> Dict[str, str]:
@@ -289,6 +293,24 @@ def list_models(
                 extra={"model_file_path": model_file_path},
             )
             continue
+
+
+def list_models_with_owner(owner: Union[str, Owner]) -> Iterable[Tuple[Model, Path]]:
+    if isinstance(owner, str):
+        owner = Owner.validate(owner)
+
+    for model, file_path in list_models():
+        if owner == model.__model_config__.owner:
+            yield model, file_path
+
+
+def owners_to_models_dict() -> Dict[str, List[Model]]:
+    owners_dict = defaultdict(list)
+    for model, _ in list_models():
+        owner = model.owner()
+        if owner:
+            owners_dict[owner].append(model)
+    return owners_dict
 
 
 def select_models_with_labels(labels: Labels) -> Iterable[Tuple[Model, Path]]:

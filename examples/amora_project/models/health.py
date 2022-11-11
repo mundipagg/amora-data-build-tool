@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from pydantic import NameEmail
 from sqlalchemy import TIMESTAMP, Float, Integer, String
 
 from amora.models import AmoraModel, Field, MaterializationTypes, ModelConfig
@@ -9,6 +10,9 @@ class Health(AmoraModel):
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.table,
         description="Health data exported by the Apple Health App",
+        owner=NameEmail(
+            name="Diogo Magalhães Machado", email="diogo.martins@stone.com.br"
+        ),
     )
 
     id: int = Field(Integer, primary_key=True, doc="Identificador único da medida")
