@@ -304,10 +304,12 @@ def list_models_with_owner(owner: Union[str, Owner]) -> Iterable[Tuple[Model, Pa
             yield model, file_path
 
 
-def owners_to_models_dict() -> Dict[Union[Owner, None], List[Model]]:
+def owners_to_models_dict() -> Dict[str, List[Model]]:
     owners_dict = defaultdict(list)
     for model, _ in list_models():
-        owners_dict[model.owner()].append(model)
+        owner = model.owner()
+        if owner:
+            owners_dict[owner].append(model)
     return owners_dict
 
 

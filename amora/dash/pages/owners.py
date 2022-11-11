@@ -36,7 +36,7 @@ def list_models_owned_by(owner: str) -> Component:
     )
 
 
-def list_model_owners() -> Component:
+def model_owners_list() -> Component:
     return dbc.ListGroup(
         children=[
             dbc.ListGroupItem(
@@ -57,7 +57,6 @@ def list_model_owners() -> Component:
                 )
             )
             for owner, owned_models in owners_to_models_dict().items()
-            if owner
         ]
     )
 
@@ -66,11 +65,16 @@ def layout(owner: str = None) -> Component:
     if owner:
         owner = urllib.parse.unquote(owner)
         content = [
-            dbc.Row(html.H4(owner)),
-            dbc.Row(html.P("List of owned Data Models:")),
-            dbc.Row(list_models_owned_by(owner)),
+            html.H1("Data Owners"),
+            html.H4(owner),
+            html.P("List of owned Data Models:"),
+            list_models_owned_by(owner),
         ]
     else:
-        content = dbc.Row(list_model_owners())
+        content = [
+            html.H1("Data Owners"),
+            html.P("List of Data Owners and the associated Data Models:"),
+            model_owners_list(),
+        ]
 
-    return dbc.Container(children=content)
+    return dbc.Container(children=[dbc.Row(row) for row in content])
