@@ -3,15 +3,9 @@ import dash_ace
 import dash_bootstrap_components as dbc
 from dash import Input, Output, dcc, html
 from dash.development.base_component import Component
-from jinja2 import Environment, PackageLoader, select_autoescape
 from shed import shed
 
-from amora.providers.bigquery import (
-    BIGQUERY_TYPES_TO_PYTHON_TYPES,
-    BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
-    get_client,
-    get_schema,
-)
+from amora.providers import bigquery
 
 dash.register_page(
     __name__,
@@ -21,10 +15,9 @@ dash.register_page(
 
 
 def project_dropdown() -> dcc.Dropdown:
-    client = get_client()
     options = [
         {"label": project.friendly_name, "value": project.project_id}
-        for project in client.list_projects()
+        for project in bigquery.get_client().list_projects()
     ]
 
     return dcc.Dropdown(
@@ -36,13 +29,12 @@ def project_dropdown() -> dcc.Dropdown:
 
 
 def dataset_dropdown(project_id: str) -> dcc.Dropdown:
-    client = get_client()
     options = [
         {
             "label": dataset.dataset_id,
             "value": dataset.full_dataset_id,
         }
-        for dataset in client.list_datasets(project_id)
+        for dataset in bigquery.get_client().list_datasets(project_id)
     ]
 
     return dcc.Dropdown(
@@ -54,13 +46,22 @@ def dataset_dropdown(project_id: str) -> dcc.Dropdown:
 
 
 def table_dropdown(full_dataset_id: str) -> dcc.Dropdown:
-    client = get_client()
+    """
+    >>> table_dropdown("amora-data-build-tool:amora")
+
+    Args:
+        full_dataset_id: Bigquery's dataset identifier. E.g: `amora-data-build-tool.amora`
+    """
+
+    # Datasets can be represented as `project_id.dataset_id` or `project_id:dataset_id`
+    # on gcp api responses, but only the first format is accepted on requests
+    dataset = full_dataset_id.replace(":", ".")
     options = [
         {
             "label": table.table_id,
             "value": str(table.reference),
         }
-        for table in client.list_tables(dataset=full_dataset_id.replace(":", "."))
+        for table in bigquery.get_client().list_tables(dataset)
     ]
 
     return dcc.Dropdown(
@@ -72,29 +73,9 @@ def table_dropdown(full_dataset_id: str) -> dcc.Dropdown:
 
 
 def model_code(table_reference: str) -> Component:
-    env = Environment(
-        loader=PackageLoader("amora"),
-        autoescape=select_autoescape(),
-        trim_blocks=True,
-        lstrip_blocks=True,
-    )
-    template = env.get_template("new-model.py.jinja2")
-
-    project, dataset, table = table_reference.split(".")
-    model_name = "".join(part.title() for part in table.split("_"))
-
-    sorted_schema = sorted(get_schema(table_reference), key=lambda field: field.name)
-    model_source_code = template.render(
-        BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
-        BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES=BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
-        dataset=dataset,
-        dataset_id=f"{project}.{dataset}",
-        model_name=model_name,
-        project=project,
-        schema=sorted_schema,
-        table=table,
-    )
+    model_source_code = bigquery.import_model(table_reference)
     formatted_source_code = shed(model_source_code)
+
     return dbc.Row(
         dbc.Row(
             [
