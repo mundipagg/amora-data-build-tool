@@ -38,6 +38,26 @@ def layout(unique_identifier: str = None) -> Component:
         id="models-content",
         children=[
             dbc.Row(html.H1("Data Models")),
+            dbc.Row(html.H4("Create or Import:")),
+            dbc.Row(
+                dbc.ButtonGroup(
+                    children=[
+                        dbc.Button(
+                            "Create",
+                            href="/models-create",
+                            color="primary",
+                            outline=True,
+                        ),
+                        dbc.Button(
+                            "Import",
+                            href="/models-import",
+                            color="primary",
+                            outline=True,
+                        ),
+                    ]
+                )
+            ),
+            dbc.Row(html.H4("Explore:")),
             dbc.Row(models_selector()),
             dbc.Row(dependency_dag.component(dag=DependencyDAG.from_target())),
             dbc.Row(

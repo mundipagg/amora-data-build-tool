@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 import typer
-from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
@@ -11,14 +10,12 @@ from shed import shed
 
 from amora.config import settings
 from amora.models import Model, list_models
+from amora.providers import bigquery
 from amora.providers.bigquery import (
-    BIGQUERY_TYPES_TO_PYTHON_TYPES,
-    BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
     DryRunResult,
     dry_run,
     estimated_query_cost_in_usd,
     estimated_storage_cost_in_usd,
-    get_schema,
 )
 
 app = typer.Typer(help="List or import Amora Models")
@@ -192,17 +189,8 @@ def models_import(
     ```
     """
 
-    env = Environment(
-        loader=PackageLoader("amora"),
-        autoescape=select_autoescape(),
-        trim_blocks=True,
-        lstrip_blocks=True,
-    )
-    template = env.get_template("new-model.py.jinja2")
-
     project, dataset, table = table_reference.split(".")
     model_name = "".join(part.title() for part in table.split("_"))
-
     destination_file_path = settings.models_path.joinpath(
         (model_file_path or model_name.replace(".", "/")) + ".py"
     )
@@ -215,17 +203,7 @@ def models_import(
         )
         raise typer.Exit(1)
 
-    sorted_schema = sorted(get_schema(table_reference), key=lambda field: field.name)
-    model_source_code = template.render(
-        BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
-        BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES=BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
-        dataset=dataset,
-        dataset_id=f"{project}.{dataset}",
-        model_name=model_name,
-        project=project,
-        schema=sorted_schema,
-        table=table,
-    )
+    model_source_code = bigquery.import_model(table_reference)
     formatted_source_code = shed(model_source_code)
 
     destination_file_path.parent.mkdir(parents=True, exist_ok=True)

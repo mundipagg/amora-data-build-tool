@@ -10,7 +10,10 @@ from amora.dash.metrics import add_prometheus_metrics
 from amora.models import list_models
 
 dash_app = Dash(
-    __name__, external_stylesheets=settings.external_stylesheets, use_pages=True
+    __name__,
+    external_stylesheets=settings.external_stylesheets,
+    use_pages=True,
+    suppress_callback_exceptions=settings.SUPPRESS_CALLBACK_EXCEPTIONS,
 )
 
 if settings.METRICS_ENABLED:
