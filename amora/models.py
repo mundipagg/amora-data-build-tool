@@ -248,7 +248,16 @@ def _is_amora_model(candidate: ModuleType) -> bool:
 @ensure_path
 def amora_model_for_path(path: Path) -> Model:
     try:
-        module = importlib.import_module(path.stem, settings.models_path.name)
+        relative_module_name = (
+            path.relative_to(settings.models_path)
+            .as_posix()
+            .replace("/", ".")
+            .replace(".py", "")
+        )
+
+        module = importlib.import_module(
+            relative_module_name, settings.models_path.name
+        )
     except ModuleNotFoundError as e:
         raise ValueError(f"Invalid path `{path}`") from e
 
