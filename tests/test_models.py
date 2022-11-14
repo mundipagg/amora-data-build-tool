@@ -15,6 +15,7 @@ from amora.models import (
     select_models_with_labels,
 )
 
+from tests.models.deeply.nested.array_repeated_fields import ArrayRepeatedFields
 from tests.models.health import Health
 from tests.models.step_count_by_source import StepCountBySource
 from tests.models.steps import Steps
@@ -58,6 +59,12 @@ def test_amora_model_for_path():
     model = amora_model_for_path(Health.path())
     assert issubclass(model, AmoraModel)
     assert model.__table__ == Health.__table__
+
+
+def test_amora_model_for_path_with_model_on_nested_folders():
+    model = amora_model_for_path(ArrayRepeatedFields.path())
+    assert issubclass(model, AmoraModel)
+    assert model.__table__ == ArrayRepeatedFields.__table__
 
 
 def test_amora_model_for_path_on_invalid_path():
