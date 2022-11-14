@@ -1,5 +1,6 @@
 import json
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Optional
 
 import typer
@@ -203,9 +204,21 @@ def models_import(
     project, dataset, table = table_reference.split(".")
     model_name = "".join(part.title() for part in table.split("_"))
 
-    destination_file_path = settings.models_path.joinpath(
-        (model_file_path or model_name.replace(".", "/")) + ".py"
-    )
+    if model_file_path:
+        destination_file_path = Path(model_file_path)
+        if (
+            destination_file_path.is_absolute()
+            and settings.models_path not in destination_file_path.parents
+        ):
+            typer.echo(
+                "Destination path must be relative to the configured models path",
+                err=True,
+            )
+            raise typer.Exit(1)
+    else:
+        destination_file_path = settings.models_path.joinpath(
+            model_name.replace(".", "/") + ".py"
+        )
 
     if destination_file_path.exists() and not overwrite:
         typer.echo(
