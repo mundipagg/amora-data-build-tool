@@ -322,6 +322,14 @@ def owners_to_models_dict() -> Dict[str, List[Model]]:
     return owners_dict
 
 
+def labels_to_models_dict() -> Dict[Label, List[Tuple[Model, Path]]]:
+    labels_dict = defaultdict(list)
+    for model, path in list_models():
+        for label in model.__model_config__.labels:
+            labels_dict[label].append((model, path))
+    return labels_dict
+
+
 def select_models_with_labels(labels: Labels) -> Iterable[Tuple[Model, Path]]:
     def matches_labels(item: Tuple[Model, Path]) -> bool:
         model, _model_path = item
