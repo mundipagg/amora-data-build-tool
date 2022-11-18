@@ -8,20 +8,16 @@ from amora.models import Model
 
 def python_component(model: Model) -> Component:
     source_code = model.path().read_text()
-    return html.Div(
-        [
-            dash_ace.DashAceEditor(
-                id="input",
-                value=source_code,
-                theme="github",
-                mode="python",
-                tabSize=2,
-                enableBasicAutocompletion=True,
-                enableLiveAutocompletion=True,
-                autocompleter="/autocompleter?prefix=",
-                placeholder="Python code ...",
-            )
-        ]
+    return dash_ace.DashAceEditor(
+        id="input",
+        value=source_code,
+        theme="github",
+        mode="python",
+        tabSize=2,
+        enableBasicAutocompletion=True,
+        enableLiveAutocompletion=True,
+        autocompleter="/autocompleter?prefix=",
+        placeholder="Python code ...",
     )
 
 
