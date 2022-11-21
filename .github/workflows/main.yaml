@@ -61,7 +61,7 @@ jobs:
           credentials_json: ${{ env.gcp_service_account }}
 
       - name: 🚧 Set up GCP SDK
-        uses: "google-github-actions/setup-gcloud@v0"
+        uses: "google-github-actions/setup-gcloud@v1"
 
       - name: 🧪 pytest
         run: poetry run py.test --cov=amora --cov-report=term-missing --cov-report=xml ./tests
