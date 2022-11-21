@@ -3398,7 +3398,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-typed-ast"
-version = "1.5.8.1"
+version = "1.5.8.3"
 description = "Typing stubs for typed-ast"
 category = "dev"
 optional = false
@@ -6056,8 +6056,8 @@ types-setuptools = [
     {file = "types_setuptools-65.3.0-py3-none-any.whl", hash = "sha256:f69210049580939c70386252b776eb75ff4b6de488e7d766b9398669b7de68af"},
 ]
 types-typed-ast = [
-    {file = "types-typed-ast-1.5.8.1.tar.gz", hash = "sha256:f64c15ec04c0911819ac4c0fd0052795132001fbf5ea23d1d7e4fead7de49bfc"},
-    {file = "types_typed_ast-1.5.8.1-py3-none-any.whl", hash = "sha256:5178b31c345734a6fe43764a71273b22637aa8c41c62ed5aadfd09960cbb5fd3"},
+    {file = "types-typed-ast-1.5.8.3.tar.gz", hash = "sha256:3a62bc25168f8b44ce74e1114f9fbc2ee87d6e96e3880cbef39aad9522555b4e"},
+    {file = "types_typed_ast-1.5.8.3-py3-none-any.whl", hash = "sha256:d945082da658987e6f656e1b82373fe7f16acc1e5fe10bb1ebf2258e1b96a4bd"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.3.0-py3-none-any.whl", hash = "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02"},
