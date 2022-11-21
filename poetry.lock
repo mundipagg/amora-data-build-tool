@@ -1891,7 +1891,7 @@ test = ["pytest (==6.2.5)", "pytest-cov (==3.0.0)"]
 
 [[package]]
 name = "mkdocs-jupyter"
-version = "0.21.0"
+version = "0.22.0"
 description = "Use Jupyter in mkdocs websites"
 category = "dev"
 optional = false
@@ -3648,7 +3648,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "b96ccc062e7a88665f4448eb3a7722abae4ea2584276ff8a54a17c8248cdd4c0"
+content-hash = "2a65e9f66b2937a3da539665ec1f60d4f3f621c3dba54b4e07bb3453602076e1"
 
 [metadata.files]
 aiohttp = [
@@ -5059,7 +5059,7 @@ mkdocs-include-markdown-plugin = [
     {file = "mkdocs_include_markdown_plugin-3.6.1.tar.gz", hash = "sha256:5e7416f23081085a220f7534b2fc7456e74c5a65f3b401da1f29b9e9132b46e5"},
 ]
 mkdocs-jupyter = [
-    {file = "mkdocs-jupyter-0.21.0.tar.gz", hash = "sha256:c8c00ce44456e3cf50c5dc3fe0cb18fab6467fb5bafc2c0bfe1efff3e0a52470"},
+    {file = "mkdocs-jupyter-0.22.0.tar.gz", hash = "sha256:585cc69bea4cb9faf6898131978dc9a9b225091ed4b6084f5ab65652a5e12185"},
 ]
 mkdocs-material = [
     {file = "mkdocs_material-8.5.6-py3-none-any.whl", hash = "sha256:b473162c800321b9760453f301a91f7cb40a120a85a9d0464e1e484e74b76bb2"},
