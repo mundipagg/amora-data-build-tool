@@ -37,10 +37,10 @@ def _make_tree(root: Path) -> dict:
 component_id = "file-browser-tree"
 
 
-def layout() -> Component:
+def layout(root: Path = settings.models_path) -> Component:
     return antd.AntdTree(
         id=component_id,
         defaultExpandAll=True,
         showIcon=True,
-        treeData=[_make_tree(settings.models_path)],
+        treeData=[_make_tree(root)],
     )
