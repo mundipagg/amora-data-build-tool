@@ -21,7 +21,7 @@ jobs:
           python-version: 3.9
 
       - name: 🐍 Install Pip and Poetry
-        run: pip install -U pip==21.2.4 poetry==1.1.9
+        run: pip install -U pip>=22.2.2 poetry>=1.2.1
 
       - name: 🚀 Deploy to PyPI
         run: poetry publish --build --username __token__ --password ${{ secrets.PYPI_TOKEN }}

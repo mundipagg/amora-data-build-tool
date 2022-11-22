@@ -23,7 +23,7 @@ def feature_store_plan():
     from amora.feature_store import fs
     from amora.feature_store.registry import get_repo_contents
 
-    registry_diff, infra_diff, infra = fs._plan(
+    registry_diff, infra_diff, _infra = fs.plan(
         desired_repo_contents=get_repo_contents()
     )
 
@@ -263,7 +263,8 @@ def feature_store_serve():
             {
                 "name": fv.name,
                 "features": [f"{fv.name}:{feature.name}" for feature in fv.features],
-                "entities": fv.entities,
+                "entities": [entity for entity in fv.entities],
+                "description": fv.description,
             }
             for fv in fvs
         ]

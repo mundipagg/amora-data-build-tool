@@ -18,11 +18,11 @@ def test_materialized_schema_equal_local_schema():
         if MaterializationTypes.ephemeral == model.__model_config__.materialized:
             continue
 
-        materialized_schema = get_schema(model.unique_name)
+        materialized_schema = get_schema(model.unique_name())
         model_schema = schema_for_model(model)
 
         assert set(materialized_schema) == set(model_schema), (
-            f"Diff found between the materialized model `{model.unique_name}` "
+            f"Diff found between the materialized model `{model.unique_name()}` "
             f"schema and the local definition `{model_path}`"
         )
 
@@ -42,5 +42,5 @@ def test_models_schema_equal_its_source_schema():
 
         assert set(source_schema) == set(model_schema), (
             f"Diff found between the schema of `source` classmethod "
-            f"and the model schema definition on `{model.unique_name}`"
+            f"and the model schema definition on `{model.unique_name()}`"
         )

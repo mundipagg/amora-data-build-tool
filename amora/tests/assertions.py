@@ -4,37 +4,38 @@ import os
 from typing import Callable, Iterable, Optional
 
 import pytest
-from sqlalchemy import ARRAY, Integer, and_, func, literal, or_, union_all
-from sqlmodel.sql.expression import SelectOfScalar
+from sqlalchemy import ARRAY, Integer, and_, func, literal, or_, select, union_all
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import ColumnElement, Select
 
 from amora.config import settings
-from amora.models import AmoraModel, ColumnElement, Session, select
+from amora.models import AmoraModel
+from amora.protocols import Compilable
 from amora.providers.bigquery import RunResult, estimated_query_cost_in_usd, run
 from amora.storage import local_engine
 from amora.tests.audit import AuditLog
-from amora.types import Compilable
 
-Test = Callable[..., SelectOfScalar]
+Test = Callable[..., Select]
 
 
 def _log_result(run_result: RunResult) -> AuditLog:
     with Session(local_engine) as session:
-        log = AuditLog(
-            bytes_billed=run_result.total_bytes,
-            estimated_cost_in_usd=estimated_query_cost_in_usd(run_result.total_bytes),
-            execution_time_in_ms=run_result.execution_time_in_ms,
-            query=run_result.query,
-            referenced_tables=json.dumps(run_result.referenced_tables),
-            test_node_id=os.getenv("PYTEST_CURRENT_TEST"),
-            test_run_id=settings.TEST_RUN_ID,
-            user_email=run_result.user_email,
-        )
+        log = AuditLog()
+        log.bytes_billed = run_result.total_bytes
+        log.estimated_cost_in_usd = estimated_query_cost_in_usd(run_result.total_bytes)
+        log.execution_time_in_ms = run_result.execution_time_in_ms
+        log.query = run_result.query
+        log.referenced_tables = json.dumps(run_result.referenced_tables)
+        log.test_node_id = os.getenv("PYTEST_CURRENT_TEST")
+        log.test_run_id = settings.TEST_RUN_ID
+        log.user_email = run_result.user_email
+
         session.add(log)
         session.commit()
         return log
 
 
-def _test(statement: Compilable, raise_on_fail: bool = True) -> bool:
+def _test(statement: Compilable, raise_on_fail: bool = True) -> Optional[bool]:
     """
     :param statement: A str with a valid SQL compiled statement
     :param raise_on_fail: By default, the test will raise a pytest Fail exception, with a debug message. Default `True`.
@@ -45,7 +46,8 @@ def _test(statement: Compilable, raise_on_fail: bool = True) -> bool:
 
     if run_result.rows.total_rows == 0:
         return True
-    elif raise_on_fail:
+
+    if raise_on_fail:  # pragma: nocover
         pytest.fail(
             f"{run_result.rows.total_rows} rows failed the test assertion."
             f"\n==========="
@@ -54,8 +56,8 @@ def _test(statement: Compilable, raise_on_fail: bool = True) -> bool:
             f"\n{run_result.query}",
             pytrace=False,
         )
-    else:
-        return False
+
+    return False
 
 
 def that(
@@ -63,7 +65,7 @@ def that(
     test: Test,
     raise_on_fail: bool = True,
     **test_kwargs,
-) -> bool:
+) -> Optional[bool]:
     """
     Executes the test, returning `True` if the test is successful and raising a pytest fail otherwise
 
@@ -81,7 +83,7 @@ def that(
     return _test(statement=test(column, **test_kwargs), raise_on_fail=raise_on_fail)
 
 
-def is_not_null(column: ColumnElement) -> Compilable:
+def is_not_null(column: ColumnElement) -> Select:
     """
     Asserts that the `column` does not contain `null` values
 
@@ -103,7 +105,7 @@ def is_not_null(column: ColumnElement) -> Compilable:
     return select(column).where(column == None)
 
 
-def is_unique(column: ColumnElement) -> Compilable:
+def is_unique(column: ColumnElement) -> Select:
     """
     Assert that the `column` values are unique
 
@@ -129,7 +131,7 @@ def is_unique(column: ColumnElement) -> Compilable:
     return select(column).group_by(column).having(func.count(column) > 1)
 
 
-def has_accepted_values(column: ColumnElement, values: Iterable) -> Compilable:
+def has_accepted_values(column: ColumnElement, values: Iterable) -> Select:
     """
     Assert that the values from the `column` should be one of the provided `values`
 
@@ -155,7 +157,7 @@ def relationship(
     to: ColumnElement,
     from_condition=None,
     to_condition=None,
-) -> bool:
+) -> Optional[bool]:
     """
     Each value of the `from_` column exists as a value in the `to` column.
     Also known as referential integrity.
@@ -235,7 +237,7 @@ def relationship(
     return _test(statement=exceptions)
 
 
-def is_numeric(column: ColumnElement) -> Compilable:
+def is_numeric(column: ColumnElement) -> Select:
     """
     Asserts that each not null value is a number
 
@@ -259,7 +261,7 @@ def is_numeric(column: ColumnElement) -> Compilable:
     return select(column).where(func.REGEXP_CONTAINS(column, "[^0-9]"))
 
 
-def is_non_negative(column: ColumnElement) -> Compilable:
+def is_non_negative(column: ColumnElement) -> Select:
     """
     Asserts that every column value should be >= 0
 
@@ -280,7 +282,7 @@ def is_non_negative(column: ColumnElement) -> Compilable:
     return select(column).where(column < 0)
 
 
-def is_a_non_empty_string(column: ColumnElement) -> Compilable:
+def is_a_non_empty_string(column: ColumnElement) -> Select:
     """
     Asserts that the column isn't an empty string
 
@@ -304,7 +306,7 @@ def is_a_non_empty_string(column: ColumnElement) -> Compilable:
     return select(column).where(func.trim(column) == literal(""))
 
 
-def expression_is_true(expression, condition=None) -> bool:
+def expression_is_true(expression, condition=None) -> Optional[bool]:
     """
     Asserts that a expression is TRUE for all records.
     This is useful when checking integrity across columns, for example,
@@ -359,7 +361,7 @@ def equality(
     return _test(statement=diff_union)
 
 
-def has_at_least_one_not_null_value(column: ColumnElement) -> Compilable:
+def has_at_least_one_not_null_value(column: ColumnElement) -> Select:
     """
     Asserts if column has at least one value.
 
@@ -383,7 +385,7 @@ def has_at_least_one_not_null_value(column: ColumnElement) -> Compilable:
     return select(func.count(column, type_=Integer)).having(func.count(column) == 0)
 
 
-def are_unique_together(columns: Iterable[ColumnElement]) -> Compilable:
+def are_unique_together(columns: Iterable[ColumnElement]) -> Select:
     """
     This test confirms that the combination of columns is unique.
     For example, the combination of month and product is unique,
@@ -399,7 +401,7 @@ def are_unique_together(columns: Iterable[ColumnElement]) -> Compilable:
     return select(columns).group_by(*columns).having(func.count(type_=Integer) > 1)
 
 
-def has_the_same_array_length(columns: Iterable[ColumnElement[ARRAY]]) -> Compilable:
+def has_the_same_array_length(columns: Iterable[ColumnElement[ARRAY]]) -> Select:
     """
     Asserts that all array columns has the same length
 

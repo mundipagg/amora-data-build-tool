@@ -18,15 +18,14 @@
 
 ## About The Project
 
- **Amora Data Build Tool** enables analysts and engineers to transform data on the data warehouse (BigQuery) 
-by writing *Amora Models* that describe the data schema using Python's [PEP484 - Type Hints](https://www.python.org/dev/peps/pep-0484/) 
-and select statements with [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy). Amora is able to transform Python 
+ **Amora Data Build Tool** enables analysts and engineers to transform data on the data warehouse (BigQuery)
+by writing *Amora Models* that describe the data schema using Python's [PEP484 - Type Hints](https://www.python.org/dev/peps/pep-0484/)
+and select statements with [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy). Amora is able to transform Python
 code into SQL data transformation jobs that run inside the warehouse.
 
 ## Built With
 
 * [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy)
-* [SQLModel](https://github.com/tiangolo/sqlmodel)
 * [Feast](https://github.com/feast-dev/feast)
 * [pytest](https://github.com/pytest-dev/pytest)
 * [pytest-xdist](https://github.com/pytest-dev/pytest-xdist)

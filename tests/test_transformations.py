@@ -1,4 +1,5 @@
-from amora.models import select
+from sqlalchemy import select
+
 from amora.providers.bigquery import cte_from_rows, run
 from amora.tests.assertions import is_numeric, that
 from amora.transformations import (

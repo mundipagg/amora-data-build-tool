@@ -1,18 +1,15 @@
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 import dash
 import dash_bootstrap_components as dbc
-from dash import html
+import dash_mantine_components as dmc
+from authlib.oidc.core import UserInfo
+from dash import State, html
 from dash.development.base_component import Component
+from dash_extensions.enrich import Input, Output, callback
+from flask import session
 
-SIDEBAR_STYLE = {
-    "position": "fixed",
-    "top": 0,
-    "left": 0,
-    "bottom": 0,
-    "width": "24rem",
-    "padding": "2rem 1rem",
-}
+from amora.dash.components import user_avatar
 
 
 class NavItem(NamedTuple):
@@ -41,13 +38,51 @@ def nav() -> dbc.Nav:
     )
 
 
-def component() -> Component:
-    return html.Div(
+layout_id = "side-bar"
+
+
+def layout() -> Component:
+    return dbc.Offcanvas(
         [
-            html.H2("🌱 Amora", className="display-4"),
-            html.Hr(),
+            dmc.Center(html.H2("🌱", className="display-4")),
+            dmc.Center(html.H2("Amora", className="display-4")),
+            dmc.Space(h="lg"),
             nav(),
+            dmc.Space(h=60),
+            html.Hr(),
+            dmc.Center(id="user-account"),
+            dmc.Center(
+                dbc.Alert(
+                    ["Press ", dmc.Kbd("m"), " to toggle the menu"], color="light"
+                )
+            ),
         ],
-        style=SIDEBAR_STYLE,
-        id="side-bar",
+        id=layout_id,
+        is_open=True,
     )
+
+
+@callback(Output("user-account", "children"), [Input("url", "pathname")])
+def display_user(pathname):
+    user: Optional[UserInfo] = session.get("user")
+    if not user:
+        return dbc.Button(
+            children=[html.I(className=f"fa-solid fa-user"), " Login"],
+            href="/login",
+            external_link=True,
+        )
+    else:
+        return user_avatar.layout(user["userinfo"])
+
+
+@callback(
+    Output(layout_id, "is_open"),
+    Input("event-listener", "n_events"),
+    [State(layout_id, "is_open"), State("event-listener", "event")],
+)
+def toggle_menu_on_keydown(
+    _n_events: Optional[int], is_open: bool, event: Optional[dict]
+) -> bool:
+    if event and event["key"] == "m":
+        return not is_open
+    return is_open

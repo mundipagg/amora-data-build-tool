@@ -8,6 +8,7 @@ from amora.dash.components import (
     materialization_type_badge,
     model_code,
     model_columns,
+    model_data_owner,
     model_datatable,
     model_summary,
     model_viz,
@@ -20,7 +21,10 @@ def component(model: Model) -> Component:
     return dbc.Card(
         [
             dbc.CardHeader(
-                html.H4(model.unique_name, className="card-title"),
+                children=[
+                    html.H4(model.unique_name(), className="card-title"),
+                    model_data_owner.layout(model),
+                ]
             ),
             dbc.CardBody(
                 [

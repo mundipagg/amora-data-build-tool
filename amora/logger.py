@@ -52,7 +52,7 @@ def log_execution():
             f_name = f"{fn.__module__}.{fn.__qualname__}"
             delta = humanize.naturaldelta(execution_delta, minimum_unit="milliseconds")
 
-            logger.debug(f"Function call to `{f_name}` took {delta}")
+            logger.debug("Function call to `%s` took %s", f_name, delta)
 
             return result
 

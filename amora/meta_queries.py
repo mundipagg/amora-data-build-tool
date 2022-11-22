@@ -11,25 +11,29 @@ from sqlalchemy import (
     cast,
     func,
     literal,
+    select,
     union_all,
 )
 from sqlalchemy_bigquery import STRUCT
 
 from amora.feature_store.protocols import FeatureViewSourceProtocol
-from amora.models import Model, select
+from amora.models import Model
 from amora.providers.bigquery import run
 from amora.storage import cache
 
 
-@cache(suffix=lambda model: f"{model.unique_name}.{date.today()}")
+@cache(suffix=lambda model: f"{model.unique_name()}.{date.today()}")
 def summarize(model: Model) -> pd.DataFrame:
     return _summarize_columns(model)
 
 
 def _summarize_columns(model: Model) -> pd.DataFrame:
     stmts = []
+    columns = model.columns()
+    if columns is None:
+        raise ValueError("Unable to summarize model without columns")
 
-    for column in model.__table__.columns:
+    for column in columns:
         is_supported = not isinstance(column.type, (ARRAY, STRUCT))
         is_numeric = isinstance(column.type, (Numeric, Integer, Float))
 

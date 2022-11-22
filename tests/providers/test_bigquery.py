@@ -2,23 +2,43 @@ import string
 from datetime import date, datetime, time
 from typing import List, Optional
 
+import numpy as np
 import pandas as pd
 import pytest
 from google.api_core.exceptions import NotFound
 from google.cloud.bigquery.schema import SchemaField
-from sqlalchemy import ARRAY, TIMESTAMP, Column, Integer, String
+from sqlalchemy import (
+    ARRAY,
+    TIMESTAMP,
+    Boolean,
+    Date,
+    DateTime,
+    Float,
+    Integer,
+    String,
+    Time,
+    select,
+)
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.selectable import CTE
-from sqlalchemy_bigquery import ARRAY, STRUCT
+from sqlalchemy_bigquery import STRUCT
 from sqlalchemy_bigquery.base import BQArray
 
 from amora.compilation import compile_statement
 from amora.config import settings
-from amora.models import AmoraModel, Field
+from amora.models import (
+    SQLALCHEMY_METADATA_KEY,
+    AmoraModel,
+    Field,
+    MaterializationTypes,
+    ModelConfig,
+)
+from amora.protocols import Compilable
 from amora.providers.bigquery import (
     DryRunResult,
     array,
     column_for_schema_field,
+    cte_from_dataframe,
     cte_from_rows,
     dry_run,
     estimated_query_cost_in_usd,
@@ -31,7 +51,6 @@ from amora.providers.bigquery import (
     struct_for_model,
     zip_arrays,
 )
-from amora.types import Compilable
 
 from tests.models.health import Health
 from tests.models.heart_rate import HeartRate
@@ -75,11 +94,18 @@ def test_cte_from_rows_with_repeated_fields():
 
 def test_cte_from_rows_with_struct_fields():
     class Node(AmoraModel):
-        id: str
+        id: str = Field(String, primary_key=True)
 
-    cte = cte_from_rows(
-        [{"node": Node(id="a")}, {"node": Node(id="b")}, {"node": Node(id="c")}]
-    )
+    node_a = Node()
+    node_a.id = "a"
+
+    node_b = Node()
+    node_b.id = "b"
+
+    node_c = Node()
+    node_c.id = "c"
+
+    cte = cte_from_rows([{"node": node_a}, {"node": node_b}, {"node": node_c}])
 
     assert isinstance(cte, CTE)
     assert compile_statement(cte)
@@ -91,26 +117,52 @@ def test_cte_from_rows_with_struct_fields():
 )
 def test_cte_from_rows_with_record_repeated_fields():
     class Node(AmoraModel):
-        id: str
+        id: str = Field(String, primary_key=True)
 
     class Edge(AmoraModel):
-        from_node: Node
-        to_node: Node
+        from_node: Node = Field(struct_for_model(Node), primary_key=True)
+        to_node: Node = Field(struct_for_model(Node))
+
+    node_a = Node()
+    node_a.id = "a"
+
+    node_b = Node()
+    node_b.id = "b"
+
+    node_c = Node()
+    node_c.id = "c"
+
+    edge_a_to_b = Edge()
+    edge_a_to_b.from_node = node_a
+    edge_a_to_b.to_node = node_b
+
+    edge_b_to_c = Edge()
+    edge_b_to_c.from_node = node_b
+    edge_b_to_c.to_node = node_c
 
     cte = cte_from_rows(
         [
             {
                 "id": 1,
-                "nodes": array([Node(id="a"), Node(id="b"), Node(id="c")]),
+                "nodes": array([node_a, node_b, node_c]),
                 "edges": array(
                     [
-                        Edge(from_node=Node(id="a"), to_node=Node(id="b")),
-                        Edge(from_node=Node(id="b"), to_node=Node(id="c")),
+                        edge_a_to_b,
+                        edge_b_to_c,
                     ]
                 ),
+                "root_node": node_a,
             },
         ]
     )
+    assert isinstance(cte, CTE)
+    assert compile_statement(cte)
+    assert run(cte)
+
+
+def test_cte_from_dataframe():
+    df = pd.DataFrame(np.random.randint(0, 1000, size=(10, 5)), columns=list("AMORA"))
+    cte = cte_from_dataframe(df)
 
     assert isinstance(cte, CTE)
     assert compile_statement(cte)
@@ -178,13 +230,31 @@ def test_dry_run_on_sourceless_view_model():
 
 
 def test_dry_run_on_invalid_model():
-    class Model(AmoraModel, table=True):
-        x: int
-        y: int
-        id: int = Field(primary_key=True)
+    class Model(AmoraModel):
+        x: int = Field(Integer)
+        y: int = Field(Integer)
+        id: int = Field(Integer, primary_key=True)
 
     with pytest.raises(NotFound):
         dry_run(Model)
+
+
+def test_dry_run_on_unmaterialized_model():
+    class ModelA(AmoraModel):
+        __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
+
+        id: int = Field(primary_key=True)
+
+    class ModelB(AmoraModel):
+        __model_config__ = ModelConfig(materialized=MaterializationTypes.table)
+
+        id: int = Field(primary_key=True)
+
+        @classmethod
+        def source(cls):
+            return select(ModelA.id)
+
+    assert dry_run(ModelB) is None
 
 
 def test_dry_run_on_model_with_source():
@@ -198,63 +268,72 @@ def test_dry_run_on_model_with_source():
 
 def test_schema_for_model():
     class Node(AmoraModel):
-        id: int
-        label: str
+        id: int = Field(Integer, primary_key=True)
+        label: str = Field(String)
 
-    class ModelB(AmoraModel, table=True):
-        a_boolean: bool
-        a_date: date
-        a_datetime: datetime
-        a_float: float
-        a_string: str
-        a_time: time
-        a_timestamp: datetime = Field(sa_column=Column(TIMESTAMP))
-        an_int: int = Field(primary_key=True)
-        an_int_array: List[int] = Field(sa_column=Column(ARRAY(Integer)))
-        a_str_array: List[str] = Field(sa_column=Column(ARRAY(String)))
-        a_struct_array: List[dict] = Field(
-            sa_column=Column(ARRAY(STRUCT(key=Integer, value=String)))
+    class Foo(AmoraModel):
+        a_boolean: bool = Field(
+            Boolean, primary_key=True, doc="You know... ones and zeros"
         )
-        a_struct: Node = Field(sa_column=Column(struct_for_model(Node)))
+        a_date: date = Field(Date)
+        a_datetime: datetime = Field(DateTime)
+        a_float: float = Field(Float)
+        a_string: str = Field(String, doc="Words and stuff")
+        a_time: time = Field(Time)
+        a_timestamp: datetime = Field(TIMESTAMP)
+        an_int: int = Field(Integer, primary_key=True)
+        an_int_array: List[int] = Field(ARRAY(Integer))
+        a_str_array: List[str] = Field(ARRAY(String))
+        a_struct_array: List[dict] = Field(
+            ARRAY(STRUCT(*[("key", Integer), ("value", String)]))
+        )
+        a_struct: Node = Field(struct_for_model(Node))
 
-    schema = schema_for_model(ModelB)
+    schema = schema_for_model(Foo)
 
     assert schema == [
-        SchemaField(name="a_timestamp", field_type="TIMESTAMP", mode="NULLABLE"),
-        SchemaField(name="an_int_array", field_type="INTEGER", mode="REPEATED"),
-        SchemaField(name="a_str_array", field_type="STRING", mode="REPEATED"),
         SchemaField(
-            name="a_struct_array",
-            field_type="RECORD",
-            mode="REPEATED",
-            fields=(
-                SchemaField("key", "INTEGER"),
-                SchemaField("value", "STRING"),
+            "a_boolean", "BOOLEAN", "NULLABLE", "You know... ones and zeros", (), None
+        ),
+        SchemaField("a_date", "DATE", "NULLABLE", None, (), None),
+        SchemaField("a_datetime", "DATETIME", "NULLABLE", None, (), None),
+        SchemaField("a_float", "FLOAT", "NULLABLE", None, (), None),
+        SchemaField("a_string", "STRING", "NULLABLE", "Words and stuff", (), None),
+        SchemaField("a_time", "TIME", "NULLABLE", None, (), None),
+        SchemaField("a_timestamp", "TIMESTAMP", "NULLABLE", None, (), None),
+        SchemaField("an_int", "INTEGER", "NULLABLE", None, (), None),
+        SchemaField("an_int_array", "INTEGER", "REPEATED", None, (), None),
+        SchemaField("a_str_array", "STRING", "REPEATED", None, (), None),
+        SchemaField(
+            "a_struct_array",
+            "RECORD",
+            "REPEATED",
+            None,
+            (
+                SchemaField("key", "INTEGER", "NULLABLE", None, (), None),
+                SchemaField("value", "STRING", "NULLABLE", None, (), None),
             ),
+            None,
         ),
         SchemaField(
-            name="a_struct",
-            field_type="RECORD",
-            fields=(
-                SchemaField("id", "INTEGER"),
-                SchemaField("label", "STRING"),
+            "a_struct",
+            "RECORD",
+            "NULLABLE",
+            None,
+            (
+                SchemaField("id", "INTEGER", "NULLABLE", None, (), None),
+                SchemaField("label", "STRING", "NULLABLE", None, (), None),
             ),
+            None,
         ),
-        SchemaField(name="a_boolean", field_type="BOOLEAN", mode="NULLABLE"),
-        SchemaField(name="a_date", field_type="DATE", mode="NULLABLE"),
-        SchemaField(name="a_datetime", field_type="DATETIME", mode="NULLABLE"),
-        SchemaField(name="a_float", field_type="FLOAT", mode="NULLABLE"),
-        SchemaField(name="a_string", field_type="STRING", mode="NULLABLE"),
-        SchemaField(name="a_time", field_type="TIME", mode="NULLABLE"),
-        SchemaField(name="an_int", field_type="INTEGER", mode="NULLABLE"),
     ]
 
 
 def test_schema_for_source():
-    class Model(AmoraModel, table=True):
-        a_boolean: bool
-        a_float: float
-        a_string: str = Field(primary_key=True)
+    class Model(AmoraModel):
+        a_boolean: bool = Field(Boolean)
+        a_float: float = Field(Float)
+        a_string: str = Field(String, primary_key=True)
 
         @classmethod
         def source(cls) -> Optional[Compilable]:
@@ -275,10 +354,10 @@ def test_schema_for_source():
 
 
 def test_schema_for_source_on_sourceless_model():
-    class Model(AmoraModel, table=True):
-        a_boolean: bool
-        a_float: float
-        a_string: str = Field(primary_key=True)
+    class Model(AmoraModel):
+        a_boolean: bool = Field(Boolean)
+        a_float: float = Field(Float)
+        a_string: str = Field(String, primary_key=True)
 
     assert schema_for_model_source(Model) is None
 
@@ -295,7 +374,11 @@ def test_column_for_schema_field_on_struct_field():
         ),
     )
     column = column_for_schema_field(struct_field)
-    assert column.type.get_col_spec() == "STRUCT<id STRING, x INT64, y INT64>"
+
+    assert (
+        column.metadata[SQLALCHEMY_METADATA_KEY].type.get_col_spec()
+        == "STRUCT<id STRING, x INT64, y INT64>"
+    )
 
 
 def test_columns_for_schema_field_on_repeated_struct_field():
@@ -310,7 +393,10 @@ def test_columns_for_schema_field_on_repeated_struct_field():
         ),
     )
     column = column_for_schema_field(repeated_struct_field)
-    assert repr(column.type) == "ARRAY(STRUCT(id=String(), x=Integer(), y=Integer()))"
+    assert (
+        repr(column.metadata[SQLALCHEMY_METADATA_KEY].type)
+        == "ARRAY(STRUCT(id=String(), x=Integer(), y=Integer()))"
+    )
 
 
 def test_columns_for_schema_field_on_repeated_struct_field_with_repeated_fields():
@@ -355,15 +441,15 @@ def test_columns_for_schema_field_on_repeated_struct_field_with_repeated_fields(
     )
     column = column_for_schema_field(complex_struct_field)
     assert (
-        repr(column.type)
+        repr(column.metadata[SQLALCHEMY_METADATA_KEY].type)
         == "ARRAY(STRUCT(nodes=ARRAY(STRUCT(id=String(), label=String())), edges=ARRAY(STRUCT(from_node=STRUCT(id=String(), label=String()), to_node=STRUCT(id=String(), label=String())))))"
     )
 
 
 def test_simple_struct():
     class Point(AmoraModel):
-        x: float
-        y: float
+        x: float = Field(Float, primary_key=True)
+        y: float = Field(Float)
 
     point_struct = struct_for_model(Point)
 
@@ -373,12 +459,12 @@ def test_simple_struct():
 
 def test_nested_struct():
     class Node(AmoraModel):
-        id: str
-        label: str
+        id: str = Field(String, primary_key=True)
+        label: str = Field(String)
 
     class Edge(AmoraModel):
-        from_node: Node
-        to_node: Node
+        from_node: Node = Field(struct_for_model(Node), primary_key=True)
+        to_node: Node = Field(struct_for_model(Node), primary_key=True)
 
     edge_struct = struct_for_model(Edge)
 
@@ -389,8 +475,8 @@ def test_nested_struct():
     )
 
     class Graph(AmoraModel):
-        nodes: List[Node]
-        edges: List[Edge]
+        nodes: List[Node] = Field(ARRAY(struct_for_model(Node)), primary_key=True)
+        edges: List[Edge] = Field(ARRAY(struct_for_model(Edge)))
 
     graph_struct = struct_for_model(Graph)
 
@@ -403,12 +489,12 @@ def test_nested_struct():
 
 def test_nested_repeated_struct():
     class Point(AmoraModel):
-        x: float
-        y: float
+        x: float = Field(Float, primary_key=True)
+        y: float = Field(Float)
 
     class Line(AmoraModel):
-        points: List[Point] = Field(sa_column=ARRAY(struct_for_model(Point)))
-        tags: List[str] = Field(sa_column=ARRAY(String))
+        points: List[Point] = Field(ARRAY(struct_for_model(Point)), primary_key=True)
+        tags: List[str] = Field(ARRAY(String))
 
     s = struct_for_model(Line)
 

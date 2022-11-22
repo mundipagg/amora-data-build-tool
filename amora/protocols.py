@@ -1,9 +1,11 @@
-from typing import Protocol, runtime_checkable
+from typing import Protocol, Union, runtime_checkable
 
-from amora.types import Compilable
+from sqlalchemy.sql import Select, Selectable
+
+Compilable = Union[Select, Selectable]
 
 
 @runtime_checkable
-class CompilableProtocol(Protocol):
+class CompilableProtocol(Protocol):  # pragma: nocover
     def source(self) -> Compilable:
         ...

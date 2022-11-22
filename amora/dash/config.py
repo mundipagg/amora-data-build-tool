@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List, Optional
 from uuid import uuid4
 
@@ -21,6 +22,21 @@ class DashSettings(BaseSettings):
     AUTH0_CALLBACK_PATH: str = "/callback"
     AUTH0_CALLBACK_REDIRECT_PATH: str = "/"
     AUTH0_SCOPE: str = "openid profile email"
+
+    METRICS_ENABLED: bool = True
+    METRICS_PORT: int = 9090
+    METRICS_COMPONENT_UPDATE_RESPONSE_SIZE_BUCKETS: List[int] = [
+        1000,
+        5000,
+        10_000,
+        100_000,
+        1_000_000,
+        10_000_000,
+        100_000_000,
+    ]
+
+    GUNICORN_WORKERS: int = 2
+    GUNICORN_WORKER_TIMEOUT: int = 30
 
     class Config:
         env_prefix = "AMORA_DASH_"
@@ -48,3 +64,20 @@ class DashSettings(BaseSettings):
 
 
 settings = DashSettings()
+
+
+class Size(str, Enum):
+    extra_small = "xs"
+    small = "sm"
+    medium = "md"
+    large = "lg"
+    extra_large = "xl"
+
+
+class Color(str, Enum):
+    primary = "primary"
+    secondary = "secondary"
+    success = "success"
+    warning = "warning"
+    info = "info"
+    danger = "danger"

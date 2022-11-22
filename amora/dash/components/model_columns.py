@@ -10,7 +10,7 @@ def component(model: Model) -> Component:
         [
             {
                 "column": col.key,
-                "description": col.comment if col.comment else "Undocumented",
+                "description": col.doc if col.doc else "Undocumented",
             }
             for col in model.__table__.columns
         ]
@@ -25,5 +25,5 @@ def component(model: Model) -> Component:
             style_cell={"textAlign": "left"},
             style_as_list_view=True,
         ),
-        id=f"model-columns-{model.unique_name}",
+        id=f"model-columns-{model.unique_name()}",
     )

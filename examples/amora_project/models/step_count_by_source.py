@@ -2,68 +2,60 @@ from datetime import datetime
 from typing import Optional
 
 import humanize
-from sqlalchemy import TIMESTAMP, Column, Integer, func, literal
+from pydantic import NameEmail
+from sqlalchemy import TIMESTAMP, Float, Integer, String, func, literal, select
 
 from amora.feature_store.decorators import feature_view
-from amora.models import (
-    AmoraModel,
-    Field,
-    Label,
-    MaterializationTypes,
-    ModelConfig,
-    select,
-)
+from amora.models import AmoraModel, Field, Label, MaterializationTypes, ModelConfig
+from amora.protocols import Compilable
 from amora.questions import question
 from amora.transformations import datetime_trunc_hour
-from amora.types import Compilable
 from amora.visualization import BigNumber, LineChart, PieChart
 from examples.amora_project.models.steps import Steps
 
 
 @feature_view
-class StepCountBySource(AmoraModel, table=True):
+class StepCountBySource(AmoraModel):
     __depends_on__ = [Steps]
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.table,
-        labels=[
+        labels={
             Label("quality", "golden"),
             Label("upstream", "apple_health"),
             Label("domain", "health"),
-        ],
-    )
-
-    value_avg: float = Field(
-        sa_column_kwargs=dict(comment="Average step count of the hour")
-    )
-    value_sum: float = Field(
-        sa_column_kwargs=dict(comment="Sum of the step counts of the hour")
-    )
-    value_count: float = Field(
-        sa_column_kwargs=dict(comment="Count of step count samples of the hour")
-    )
-
-    source_name: str = Field(
-        primary_key=True, sa_column_kwargs=dict(comment="Source of the metric")
-    )
-    event_timestamp: datetime = Field(
-        primary_key=True,
-        sa_column=Column(
-            TIMESTAMP, comment="Moment if time of which those features where observed"
+        },
+        owner=NameEmail(
+            name="Diogo Magalhães Machado", email="diogo.martins@stone.com.br"
         ),
+        description="Step count measurements aggregated by hour",
+    )
+
+    value_avg: float = Field(Float, doc="Average step count of the hour")
+    value_sum: float = Field(Float, doc="Sum of the step counts of the hour")
+    value_count: int = Field(Integer, doc="Count of step count samples of the hour")
+
+    source_name: str = Field(String, primary_key=True, doc="Source of the metric")
+    event_timestamp: datetime = Field(
+        TIMESTAMP,
+        doc="Moment if time of which those features where observed",
+        primary_key=True,
     )
 
     @classmethod
     def source(cls) -> Optional[Compilable]:
-        datetime_trunc = func.timestamp(datetime_trunc_hour(Steps.creationDate))
+        source_name = Steps.sourceName.label(cls.__table__.columns.source_name.key)
+        event_timestamp = func.timestamp(datetime_trunc_hour(Steps.creationDate)).label(
+            cls.__table__.columns.event_timestamp.key
+        )
         return select(
             [
-                func.avg(Steps.value).label(cls.value_avg.key),
-                func.sum(Steps.value).label(cls.value_sum.key),
-                func.count(Steps.value).label(cls.value_count.key),
-                Steps.sourceName.label(cls.source_name.key),
-                datetime_trunc.label(cls.event_timestamp.key),
+                func.avg(Steps.value).label(cls.__table__.columns.value_avg.key),
+                func.sum(Steps.value).label(cls.__table__.columns.value_sum.key),
+                func.count(Steps.value).label(cls.__table__.columns.value_count.key),
+                source_name,
+                event_timestamp,
             ]
-        ).group_by(cls.source_name.key, cls.event_timestamp.key)
+        ).group_by(source_name, event_timestamp)
 
     @classmethod
     def feature_view_entities(cls):

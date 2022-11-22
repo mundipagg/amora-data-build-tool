@@ -4,7 +4,7 @@ from amora.models import Column
 
 
 @runtime_checkable
-class FeatureViewSourceProtocol(Protocol):
+class FeatureViewSourceProtocol(Protocol):  # pragma: nocover
     """
     The contract needed to expose the [AmoraModel](amora-model) definition as a [Feature View](feature-view.md)
 
@@ -86,9 +86,9 @@ class FeatureViewSourceProtocol(Protocol):
 
 
         @feature_view
-        class FeatureViewModel(AmoraModel, table=True):
+        class FeatureViewModel(AmoraModel):
             ...
-            event_timestamp: datetime = Field(sa_column=Column(TIMESTAMP))
+            event_timestamp: datetime = Field(TIMESTAMP)
         ```
 
         """

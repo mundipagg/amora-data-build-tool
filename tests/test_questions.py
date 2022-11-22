@@ -1,11 +1,12 @@
+from unittest.mock import patch
+
 import markdown
 import pandas
 import pytest
-from sqlalchemy import literal
+from sqlalchemy import literal, select
 
-from amora.models import select
-from amora.questions import QUESTIONS, Question, question
-from amora.types import Compilable
+from amora.protocols import Compilable
+from amora.questions import Question, question
 from amora.visualization import Visualization
 
 
@@ -102,11 +103,12 @@ def test_question_decorator_storages_the_Question():
         """
         return select(literal(42).label("answer"))
 
-    assert Question(a_question) not in QUESTIONS
+    with patch("amora.questions.QUESTIONS", set()) as QUESTIONS:
+        assert Question(a_question) not in QUESTIONS
 
-    question()(a_question)
+        question()(a_question)
 
-    assert Question(a_question) in QUESTIONS
+        assert Question(a_question) in QUESTIONS
 
 
 def test_question_decorator_wraps_the_question_function_on_a_Question():

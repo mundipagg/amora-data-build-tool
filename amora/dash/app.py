@@ -1,38 +1,39 @@
 import dash
-from dash import Dash, dcc, html
+import dash_bootstrap_components as dbc
+from dash_extensions import EventListener
+from dash_extensions.enrich import Dash, dcc
 
 from amora.dash.authentication import add_auth0_login
 from amora.dash.components import side_bar
 from amora.dash.config import settings
-from amora.dash.css_styles import styles
+from amora.dash.metrics import add_prometheus_metrics
 from amora.models import list_models
 
 dash_app = Dash(
     __name__, external_stylesheets=settings.external_stylesheets, use_pages=True
 )
 
+if settings.METRICS_ENABLED:
+    add_prometheus_metrics(dash_app)
+
 if settings.auth0_login_enabled:
     add_auth0_login(dash_app)
 
+LISTENABLE_EVENTS = [
+    {
+        "event": "keydown",
+        "props": ["key", "altKey", "ctrlKey", "shiftKey", "metaKey"],
+    },
+]
 # App
-dash_app.layout = html.Div(
-    style=styles["container"],
+dash_app.layout = dbc.Container(
     children=[
-        html.Div(
-            [
-                dcc.Location(id="url"),
-                side_bar.component(),
-                html.Div(
-                    dash.page_container,
-                    style={
-                        "margin-left": "24rem",
-                        "margin-right": "2rem",
-                        "padding": "2rem 1rem",
-                        "overflow": "scroll",
-                    },
-                    id="page-content",
-                ),
-            ],
+        dcc.Location(id="url"),
+        EventListener(events=LISTENABLE_EVENTS, logging=True, id="event-listener"),
+        side_bar.layout(),
+        dbc.Row(
+            dash.page_container,
+            id="page-content",
         ),
     ],
 )

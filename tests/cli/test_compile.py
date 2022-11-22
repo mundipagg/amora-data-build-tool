@@ -42,10 +42,7 @@ def test_compile_with_models_options(
 
 
 def test_compile_without_arguments_and_options():
-    result = runner.invoke(
-        app,
-        ["compile"],
-    )
+    result = runner.invoke(app, ["compile"])
 
     assert result.exit_code == 0
 
@@ -55,6 +52,7 @@ def test_compile_without_arguments_and_options():
             "array_repeated_fields.sql",
             "heart_agg.sql",
             "heart_rate.sql",
+            "heart_rate_over_100.sql",
             "step_count_by_source.sql",
             "steps.sql",
         ]

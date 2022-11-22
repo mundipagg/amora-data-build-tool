@@ -5,10 +5,10 @@ from functools import wraps
 from typing import Callable, NamedTuple, Union
 
 import pandas as pd
+from sqlalchemy import MetaData, create_engine
 
 from amora import logger
 from amora.config import StorageCacheProviders, settings
-from amora.models import MetaData, create_engine
 
 local_engine = create_engine(
     f"sqlite:///{settings.LOCAL_ENGINE_SQLITE_FILE_PATH}",
@@ -62,11 +62,12 @@ class Cache(UserDict):
             blob_name = f"{key}{self.file_suffix}"
             gs_url = f"gs://{settings.STORAGE_GCS_BUCKET_NAME}/{blob_name}"
             return gs_url
-        elif self.type_ is StorageCacheProviders.local:
+
+        if self.type_ is StorageCacheProviders.local:
             blob_name = f"{key}{self.file_suffix}"
             return settings.STORAGE_LOCAL_CACHE_PATH.joinpath(blob_name).as_posix()
-        else:
-            raise NotImplementedError
+
+        raise NotImplementedError  # pragma: nocover
 
     @logger.log_execution()
     def __setitem__(self, key: CacheKey, value: pd.DataFrame):

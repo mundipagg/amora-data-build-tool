@@ -2,7 +2,6 @@ import json
 from unittest.mock import MagicMock, patch
 
 import rich
-from google.cloud.bigquery.exceptions import BigQueryError
 from typer.testing import CliRunner
 
 from amora.cli import app
@@ -72,7 +71,7 @@ def test_list_json_format_and_with_total_bytes_option(dry_run: MagicMock):
     assert dry_run.call_count == AMORA_MODELS_COUNT
 
 
-exc = BigQueryError()
+exc = Exception()
 
 
 @patch("amora.cli.models.dry_run", side_effect=exc)

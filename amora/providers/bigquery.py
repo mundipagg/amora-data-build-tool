@@ -1,12 +1,13 @@
+import dataclasses
 import decimal
-from dataclasses import dataclass
 from datetime import date, datetime, time
 from enum import Enum
-from typing import Any, Callable, Dict, Iterable, List, Optional, Union
+from typing import Any, Callable, Dict, Hashable, Iterable, List, Optional, Union
 
 import pandas as pd
 import sqlalchemy
 from google.api_core.client_info import ClientInfo
+from google.api_core.exceptions import NotFound
 from google.cloud.bigquery import (
     Client,
     QueryJobConfig,
@@ -15,30 +16,42 @@ from google.cloud.bigquery import (
     TableReference,
 )
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
-from pydantic.fields import SHAPE_LIST
-from sqlalchemy import func, literal, literal_column, tablesample
-from sqlalchemy.sql import coercions, expression, operators, roles, sqltypes
+from sqlalchemy import (
+    Column,
+    String,
+    func,
+    literal,
+    literal_column,
+    select,
+    tablesample,
+    union_all,
+)
+from sqlalchemy.sql import (
+    ColumnElement,
+    coercions,
+    expression,
+    operators,
+    roles,
+    sqltypes,
+)
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy.sql.sqltypes import ARRAY
 from sqlalchemy_bigquery import STRUCT
 from sqlalchemy_bigquery.base import BQArray, BQBinary, unnest
-from sqlmodel.main import get_sqlachemy_type
-from sqlmodel.sql import sqltypes as sqlmodel_types
 
-from amora import logger
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
+from amora.logger import log_execution, logger
 from amora.models import (
+    SQLALCHEMY_METADATA_KEY,
     AmoraModel,
-    Column,
-    ColumnElement,
+    Field,
     MaterializationTypes,
     Model,
-    select,
 )
+from amora.protocols import Compilable
 from amora.storage import cache
-from amora.types import Compilable
 from amora.version import VERSION
 
 Schema = List[SchemaField]
@@ -63,6 +76,7 @@ BIGQUERY_TYPES_TO_PYTHON_TYPES = {
     "TIMESTAMP": datetime,
     "RECORD": dict,
     "STRUCT": dict,
+    "BYNARY": bytes,
 }
 
 BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES = {
@@ -80,17 +94,18 @@ BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES = {
     "JSON": sqltypes.JSON,
     "NUMERIC": sqltypes.Numeric,
     "RECORD": STRUCT,
-    "STRING": sqltypes.String,
+    "STRING": String,
     "STRUCT": STRUCT,
     "TIME": sqltypes.Time,
     "TIMESTAMP": sqltypes.TIMESTAMP,
+    "BYNARY": sqltypes.BINARY,
 }
 
 
 SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES = {
     BQBinary: "BYTES",
     STRUCT: "RECORD",
-    sqlmodel_types.AutoString: "STRING",
+    sqltypes.String: "STRING",
     sqltypes.Boolean: "BOOLEAN",
     sqltypes.Date: "DATE",
     sqltypes.DateTime: "DATETIME",
@@ -98,7 +113,6 @@ SQLALCHEMY_TYPES_TO_BIGQUERY_TYPES = {
     sqltypes.Integer: "INTEGER",
     sqltypes.JSON: "JSON",
     sqltypes.Numeric: "NUMERIC",
-    sqltypes.String: "STRING",
     sqltypes.TIMESTAMP: "TIMESTAMP",
     sqltypes.Time: "TIME",
 }
@@ -119,17 +133,17 @@ class TimePart(Enum):
     HOUR = literal_column("HOUR")
 
 
-@dataclass
+@dataclasses.dataclass
 class DryRunResult(BaseResult):
     model: Model
-    schema: Schema
+    schema: Optional[Schema]
 
     @property
     def estimated_cost(self):
         return estimated_query_cost_in_usd(self.total_bytes)
 
 
-@dataclass
+@dataclasses.dataclass
 class RunResult(BaseResult):
     rows: Union[RowIterator, _EmptyRowIterator]
     execution_time_in_ms: int
@@ -157,7 +171,7 @@ def get_client() -> Client:
 
 
 def get_fully_qualified_id(model: Model) -> str:
-    return f"{model.metadata.schema}.{model.__tablename__}"
+    return f"{model.__table__.metadata.schema}.{model.__tablename__}"
 
 
 def get_schema(table_id: str) -> Schema:
@@ -169,7 +183,7 @@ def get_schema(table_id: str) -> Schema:
     return table.schema
 
 
-def column_for_schema_field(schema: SchemaField, **kwargs) -> Column:
+def column_for_schema_field(schema: SchemaField, **kwargs) -> dataclasses.Field:
     """
     Build a `Column` from a `google.cloud.bigquery.schema.SchemaField`
 
@@ -186,9 +200,7 @@ def column_for_schema_field(schema: SchemaField, **kwargs) -> Column:
         else:
             column_type = BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema.field_type]
 
-    return Column(
-        name=schema.name, type_=column_type, comment=schema.description, **kwargs
-    )
+    return Field(column_type, **kwargs)
 
 
 def schema_for_struct(struct: STRUCT) -> Schema:
@@ -202,7 +214,7 @@ def schema_for_struct(struct: STRUCT) -> Schema:
 
 
 def schema_field_for_column(column: Column) -> SchemaField:
-    fields: Optional[SchemaField] = None
+    fields: Iterable[SchemaField] = ()
 
     if isinstance(column.type, ARRAY):
         mode = "REPEATED"
@@ -220,7 +232,11 @@ def schema_field_for_column(column: Column) -> SchemaField:
             fields = tuple(schema_for_struct(column_type))
 
     return SchemaField(
-        name=column.name, field_type=field_type, mode=mode, fields=fields or ()
+        name=column.name,
+        field_type=field_type,
+        mode=mode,
+        fields=fields or (),
+        description=column.doc,
     )
 
 
@@ -249,7 +265,7 @@ def schema_for_model_source(model: Model) -> Optional[Schema]:
     return result.schema
 
 
-@logger.log_execution()
+@log_execution()
 def run(statement: Compilable) -> RunResult:
     """
     Executes a given query and returns its results
@@ -276,7 +292,7 @@ def run(statement: Compilable) -> RunResult:
     )
 
 
-@logger.log_execution()
+@log_execution()
 def dry_run(model: Model) -> Optional[DryRunResult]:
     """
     You can use the estimate returned by the dry run to calculate query
@@ -295,7 +311,7 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
     ```python
     DryRunResult(
         total_bytes_processed=170181834,
-        query=\"SELECT\\n  `health`.`creationDate`,\\n  `health`.`device`,\\n  `health`.`endDate`,\\n  `health`.`id`,\\n  `health`.`sourceName`,\\n  `health`.`startDate`,\\n  `health`.`unit`,\\n  `health`.`value`\\nFROM `diogo`.`health`\\nWHERE `health`.`type` = 'HeartRate'\",
+        query="SELECT\n  `health`.`creationDate`,\n  `health`.`device`,\n  `health`.`endDate`,\n  `health`.`id`,\n  `health`.`sourceName`,\n  `health`.`startDate`,\n  `health`.`unit`,\n  `health`.`value`\nFROM `diogo`.`health`\nWHERE `health`.`type` = 'HeartRate'",
         model=HeartRate,
         referenced_tables=["amora-data-build-tool.diogo.health"],
         schema=[
@@ -333,35 +349,42 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
                 total_bytes=query_job.total_bytes_processed,
                 user_email=query_job.user_email,
             )
-        else:
-            return DryRunResult(
-                job_id=None,
-                model=model,
-                query=None,
-                referenced_tables=[str(table.reference)],
-                schema=table.schema,
-                total_bytes=table.num_bytes,
-                user_email=None,
-            )
+
+        return DryRunResult(
+            job_id=None,
+            model=model,
+            query=None,
+            referenced_tables=[str(table.reference)],
+            schema=table.schema,
+            total_bytes=table.num_bytes,
+            user_email=None,
+        )
 
     query = compile_statement(source)
-
-    query_job = client.query(
-        query=query,
-        job_config=QueryJobConfig(dry_run=True, use_query_cache=False),
-    )
-    return DryRunResult(
-        job_id=query_job.job_id,
-        total_bytes=query_job.total_bytes_processed,
-        referenced_tables=[
-            ".".join(table.to_api_repr().values())
-            for table in query_job.referenced_tables
-        ],
-        query=query,
-        model=model,
-        schema=query_job.schema,
-        user_email=query_job.user_email,
-    )
+    try:
+        query_job = client.query(
+            query=query,
+            job_config=QueryJobConfig(dry_run=True, use_query_cache=False),
+        )
+    except NotFound:
+        logger.exception(
+            "The query may contain model references that are not materialized.",
+            extra={"sql": query},
+        )
+        return None
+    else:
+        return DryRunResult(
+            job_id=query_job.job_id,
+            total_bytes=query_job.total_bytes_processed,
+            referenced_tables=[
+                ".".join(table.to_api_repr().values())
+                for table in query_job.referenced_tables
+            ],
+            query=query,
+            model=model,
+            schema=query_job.schema,
+            user_email=query_job.user_email,
+        )
 
 
 class fixed_unnest(sqlalchemy.sql.roles.InElementRole, unnest):
@@ -383,7 +406,7 @@ class fixed_unnest(sqlalchemy.sql.roles.InElementRole, unnest):
         return new_func
 
 
-def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
+def cte_from_rows(rows: Iterable[Dict[Hashable, Any]]) -> CTE:
     """
     Returns a table like selectable (CTE) for the given hardcoded values.
 
@@ -434,8 +457,15 @@ def cte_from_rows(rows: Iterable[Dict[str, Any]]) -> CTE:
 
     if len(selects) == 1:
         return selects[0].cte()
-    else:
-        return selects[0].union_all(*(selects[1:])).cte()
+
+    return union_all(*selects).cte()
+
+
+def cte_from_dataframe(df: pd.DataFrame) -> CTE:
+    """
+    Returns a table like selectable (CTE) for the given DataFrame.
+    """
+    return cte_from_rows(rows=df.to_dict("records"))
 
 
 def estimated_query_cost_in_usd(total_bytes: int) -> float:
@@ -488,19 +518,26 @@ def struct_for_model(model: Union[Model, AmoraModel]) -> STRUCT:
     """
 
     def fields():
-        for field in model.__fields__.values():
-            if field.shape is SHAPE_LIST:
-                if issubclass(field.type_, AmoraModel):
-                    yield field.name, ARRAY(struct_for_model(field.type_))
+        for field in dataclasses.fields(model):
+
+            if field.type == list:
+                if issubclass(field.type, AmoraModel):
+                    yield field.name, ARRAY(
+                        struct_for_model(field.metadata[SQLALCHEMY_METADATA_KEY].type)
+                    )
                 else:
-                    yield field.name, ARRAY(get_sqlachemy_type(field))
-            elif field.sub_fields is None:
-                if issubclass(field.type_, AmoraModel):
-                    yield field.name, struct_for_model(field.type_)
+                    yield field.name, ARRAY(
+                        field.metadata[SQLALCHEMY_METADATA_KEY].type
+                    )
+            elif field.type == dict:
+                if issubclass(field.type, AmoraModel):
+                    yield field.name, struct_for_model(
+                        field.metadata[SQLALCHEMY_METADATA_KEY].type
+                    )
                 else:
-                    yield field.name, get_sqlachemy_type(field)
+                    yield field.name, field.metadata[SQLALCHEMY_METADATA_KEY].type
             else:
-                raise NotImplementedError
+                yield field.name, field.metadata[SQLALCHEMY_METADATA_KEY].type
 
     return STRUCT(*fields())
 
@@ -545,7 +582,7 @@ class struct(expression.ClauseList, expression.ColumnElement):  # type: ignore
         clauses = [
             coercions.expect(
                 roles.ExpressionElementRole,
-                model.dict(),
+                dataclasses.asdict(model),
                 type_=self.type,
             )
         ]
@@ -557,8 +594,8 @@ class struct(expression.ClauseList, expression.ColumnElement):  # type: ignore
     def self_group(self, against=None):
         if against in (operators.any_op, operators.all_op, operators.getitem):
             return expression.Grouping(self)
-        else:
-            return self
+
+        return self
 
 
 class array(expression.ClauseList, expression.ColumnElement):  # type: ignore
@@ -639,19 +676,18 @@ class array(expression.ClauseList, expression.ColumnElement):  # type: ignore
                 unique=True,
             )
 
-        else:
-            return array(
-                [
-                    self._bind_param(operator, o, _assume_scalar=True, type_=type_)
-                    for o in obj
-                ]
-            )
+        return array(
+            [
+                self._bind_param(operator, o, _assume_scalar=True, type_=type_)
+                for o in obj
+            ]
+        )
 
     def self_group(self, against=None):
         if against in (operators.any_op, operators.all_op, operators.getitem):
             return expression.Grouping(self)
-        else:
-            return self
+
+        return self
 
 
 def zip_arrays(
@@ -742,7 +778,7 @@ def zip_arrays(
 def _sample_cache_key(
     model, percentage=1, limit=settings.GCP_BIGQUERY_DEFAULT_LIMIT_SIZE
 ) -> str:
-    return f"{model.unique_name}.{percentage}.{limit}.{date.today()}"
+    return f"{model.unique_name()}.{percentage}.{limit}.{date.today()}"
 
 
 @cache(_sample_cache_key)

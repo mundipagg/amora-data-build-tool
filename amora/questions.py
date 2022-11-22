@@ -1,13 +1,13 @@
 from datetime import date
-from typing import Callable, Set
+from typing import Callable, Optional, Set
 
 import pandas as pd
 from sqlalchemy.sql import Selectable
 
 from amora.compilation import compile_statement
+from amora.protocols import Compilable
 from amora.providers.bigquery import run
 from amora.storage import cache
-from amora.types import Compilable
 from amora.visualization import Table, Visualization, VisualizationConfig
 
 QuestionFunc = Callable[[], Compilable]
@@ -76,7 +76,9 @@ class Question:
     """
 
     def __init__(
-        self, question_func: QuestionFunc, view_config: VisualizationConfig = None
+        self,
+        question_func: QuestionFunc,
+        view_config: Optional[VisualizationConfig] = None,
     ):
         if isinstance(question_func, Question):
             question_func = question_func.question_func
@@ -127,11 +129,12 @@ class Question:
         '''
         if self.question_func.__doc__:
             return self.question_func.__doc__.strip()
-        elif self.question_func.__name__ == "<lambda>":
+
+        if self.question_func.__name__ == "<lambda>":
             raise NotImplementedError
-        else:
-            question = self.question_func.__name__.replace("_", " ")
-            return question.capitalize() + "?"
+
+        question = self.question_func.__name__.replace("_", " ")
+        return question.capitalize() + "?"
 
     @property
     def sql(self) -> str:
@@ -166,6 +169,10 @@ class Question:
         result = run(self.question_func())
         return result.rows.to_dataframe(create_bqstorage_client=False)
 
+    @property
+    def uid(self) -> str:
+        return str(hash(self))
+
     def render(self) -> Visualization:
         """
         Renders the visual representation of the question's answer
@@ -175,13 +182,13 @@ class Question:
     def to_markdown(self) -> str:
         return f"""
             ## {self.name}
-            
+
             ```sql
             {self.sql}
             ```
-            
+
             ### Answer
-            
+
             {self.answer_df().to_markdown()}
         """
 
@@ -194,17 +201,17 @@ class Question:
     def __eq__(self, other):
         if not isinstance(other, Question):
             return False
-
-        return self.question_func == other.question_func
+        return hash(self) == hash(other)
 
     def __hash__(self):
-        return hash(self.question_func)
+        code = self.question_func.__code__
+        return hash(code.co_filename + code.co_name)
 
 
 QUESTIONS: Set[Question] = set()
 
 
-def question(view_config: VisualizationConfig = None):
+def question(view_config: Optional[VisualizationConfig] = None):
     """
     Wraps the function into a `amora.questions.Question`.
     The decorated function must return a `Compilable`

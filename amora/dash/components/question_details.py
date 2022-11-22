@@ -3,11 +3,17 @@ import plotly.express as px
 from dash import dash_table, dcc, html
 from dash.development.base_component import Component
 
+from amora.logger import logger
 from amora.questions import Question
-from amora.visualization import BarChart, BigNumber, LineChart, PieChart, Visualization
+from amora.visualization import BarChart, BigNumber, LineChart, PieChart
 
 
-def answer_visualization(visualization: Visualization) -> Component:
+def answer_visualization(question: Question) -> Component:
+    try:
+        visualization = question.render()
+    except Exception:
+        logger.exception("Unable to render question answer")
+        return dbc.Alert("⚠️ Unable to render question answer", color="warning")
     view_config = visualization.config
 
     df = visualization.data
@@ -17,7 +23,8 @@ def answer_visualization(visualization: Visualization) -> Component:
     if isinstance(view_config, BigNumber):
         big_number = view_config.value_func(df)
         return html.H4(big_number)
-    elif isinstance(view_config, LineChart):
+
+    if isinstance(view_config, LineChart):
         return dcc.Graph(
             figure=px.line(
                 df,
@@ -25,7 +32,8 @@ def answer_visualization(visualization: Visualization) -> Component:
                 y=view_config.y_func(df),
             )
         )
-    elif isinstance(view_config, BarChart):
+
+    if isinstance(view_config, BarChart):
         return dcc.Graph(
             figure=px.bar(
                 df,
@@ -33,27 +41,27 @@ def answer_visualization(visualization: Visualization) -> Component:
                 y=view_config.y_func(df),
             )
         )
-    elif isinstance(view_config, PieChart):
+
+    if isinstance(view_config, PieChart):
         return dcc.Graph(
             figure=px.pie(df, values=view_config.values, names=view_config.names)
         )
-    else:
-        return dash_table.DataTable(
-            columns=[
-                {"name": col, "id": col, "selectable": True}
-                for col in df.columns.values
-            ],
-            data=df.to_dict("records"),
-            row_selectable="multi",
-            sort_action="native",
-            style_cell={
-                "overflow": "hidden",
-                "textOverflow": "ellipsis",
-                "maxWidth": 0,
-            },
-            export_format="csv",
-            export_headers="display",
-        )
+
+    return dash_table.DataTable(
+        columns=[
+            {"name": col, "id": col, "selectable": True} for col in df.columns.values
+        ],
+        data=df.to_dict("records"),
+        row_selectable="multi",
+        sort_action="native",
+        style_cell={
+            "overflow": "hidden",
+            "textOverflow": "ellipsis",
+            "maxWidth": 0,
+        },
+        export_format="csv",
+        export_headers="display",
+    )
 
 
 def component(question: Question) -> Component:
@@ -62,7 +70,7 @@ def component(question: Question) -> Component:
         children=dbc.CardBody(
             [
                 html.H5(question.name, className="card-title"),
-                answer_visualization(question.render()),
+                answer_visualization(question),
                 dbc.Accordion(
                     [
                         dbc.AccordionItem(
