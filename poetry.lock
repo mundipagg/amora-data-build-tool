@@ -3205,7 +3205,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "1ac304feab9446a6e5f8f50e283e5d779cdd240585685c9428fd670c7615a2c9"
+content-hash = "df30e42b68c8fb4f6999f2ad41a72f1dfbf892113eda374184b822103a68c49f"
 
 [metadata.files]
 aiohttp = [
