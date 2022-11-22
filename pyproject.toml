@@ -31,7 +31,7 @@ sqlparse = ">=0.3.1,<0.5.0"
 feast = { version = "0.26.0", extras = ["redis", "gcp"], optional = true }
 SQLAlchemy = { version = "^1.4", extras = ["mypy"] }
 Werkzeug = { version = "2.2.2", optional = true }
-dash = { version = "2.6.2", extras = ["testing"], optional = true }
+dash = { version = "2.7.0", extras = ["testing"], optional = true }
 dash-cytoscape = { version = "0.3.0", optional = true }
 protobuf = "<5,>3"
 prometheus-fastapi-instrumentator = { version = "^5.8.1", optional = true }
@@ -51,7 +51,6 @@ gunicorn = { version = "^20.1.0", optional = true }
 [tool.poetry.dev-dependencies]
 pytest-cov = "^4.0.0"
 black = "^22.10"
-jupyter = "^1.0.0"
 mypy = "^0.982"
 lxml = "^4.6.3"
 pytest-env = "^0.8.1"
@@ -63,7 +62,6 @@ mkdocs-include-markdown-plugin = "^3.4.1"
 mkdocs-autorefs = "^0.4.1"
 mkdocstrings = { version = "^0.19.0", extras = ["python-legacy", "python"] }
 pre-commit = "^2.18.1"
-mkdocs-jupyter = "^0.22.0"
 pandas-stubs = "^1.5.1"
 freezegun = "^1.2.1"
 selenium = "^4.2.0"
@@ -86,6 +84,10 @@ dash = [
     "prometheus-flask-exporter",
     "gunicorn",
 ]
+
+[tool.poetry.group.dev.dependencies]
+mkdocs-jupyter = "^0.22.0"
+jupyter = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
