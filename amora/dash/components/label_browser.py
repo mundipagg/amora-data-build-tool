@@ -11,12 +11,18 @@ def layout() -> Component:
         {
             "key": "labels",
             "title": "🏷 Labels",
+            "disabled": True,
             "children": [
                 {
                     "key": str(label),
                     "title": str(label),
+                    "disabled": True,
                     "children": [
-                        {"key": path.as_posix(), "title": path.stem}
+                        {
+                            "key": path.as_posix(),
+                            "title": path.name,
+                            "icon": "antd-file",
+                        }
                         for model, path in models
                     ],
                 }
