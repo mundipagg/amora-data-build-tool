@@ -2275,7 +2275,7 @@ test = ["hypothesis (>=5.5.3)", "pytest (>=6.0)", "pytest-xdist (>=1.31)"]
 
 [[package]]
 name = "pandas-stubs"
-version = "1.5.0.220926"
+version = "1.5.1.221024"
 description = "Type annotations for pandas"
 category = "dev"
 optional = false
@@ -3650,7 +3650,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "7bce9490121cb674678e7ef860f9acfc6ce16225d361fa1c08e441e71f99c3f7"
+content-hash = "5236bce538d712e913dac3b2d1bf8a6ba3a02c8b1421979eb899e0aca77ca642"
 
 [metadata.files]
 aiohttp = [
@@ -5340,8 +5340,8 @@ pandas = [
     {file = "pandas-1.5.1.tar.gz", hash = "sha256:249cec5f2a5b22096440bd85c33106b6102e0672204abd2d5c014106459804ee"},
 ]
 pandas-stubs = [
-    {file = "pandas-stubs-1.5.0.220926.tar.gz", hash = "sha256:e0f69466cbd8cf1da137b5899e69d9d150648dd5f0398db0e6aeaefe3b2c7a76"},
-    {file = "pandas_stubs-1.5.0.220926-py3-none-any.whl", hash = "sha256:490b71dfa15eb862d8e0c2dc3af50dbb59546e3878a67822ec35f3ce0bc342c4"},
+    {file = "pandas-stubs-1.5.1.221024.tar.gz", hash = "sha256:a756ea4c7f2f973b9f9dfd64d724ba911e82e8ffa2e0188f56fadfdd9345771a"},
+    {file = "pandas_stubs-1.5.1.221024-py3-none-any.whl", hash = "sha256:363e3833137375aebd6ab272fe89d94e88a443891a48d536c905e16ce2800cf6"},
 ]
 pandavro = [
     {file = "pandavro-1.5.2.tar.gz", hash = "sha256:fd4ede1600cfc08150f28a7a1c1dd4abfbc87d76cd4a5b1639c8f55a04e97914"},
