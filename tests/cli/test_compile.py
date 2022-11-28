@@ -60,7 +60,7 @@ def test_compile_call_save_manifest(save: mock.MagicMock):
 
 @mock.patch("amora.manifest.Manifest.load")
 @mock.patch("amora.manifest.Manifest.from_project")
-@mock.patch("amora.manifest.get_models_to_compile")
+@mock.patch("amora.manifest.Manifest.get_models_to_compile")
 @mock.patch("amora.compilation.clean_compiled_files_of_removed_models")
 def test_compile_call_clean_compiled_files_of_removed_models(
     clean_compiled_files_of_removed_models: mock.MagicMock,
@@ -68,8 +68,7 @@ def test_compile_call_clean_compiled_files_of_removed_models(
     from_project: mock.MagicMock,
     load: mock.MagicMock,
 ):
-    # current_manifest: dict = {"models": {}}
-    # previous_manifest: dict = {"models": {"1": "1"}}
+    # previous_manifest.get_models_to_compile = mock.MagicMock()
 
     current_manifest = Manifest(models={})
     previous_manifest = Manifest(
@@ -95,7 +94,7 @@ def test_compile_call_clean_compiled_files_of_removed_models(
     clean_compiled_files_of_removed_models.assert_called_once_with(
         list(previous_manifest.models.keys()), list(current_manifest.models.keys())
     )
-    get_models_to_compile.assert_called_once_with(previous_manifest, current_manifest)
+    get_models_to_compile.assert_called_once_with(previous_manifest)
 
 
 @pytest.mark.parametrize(
