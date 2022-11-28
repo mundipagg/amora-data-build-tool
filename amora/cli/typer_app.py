@@ -40,9 +40,7 @@ def compile(
         compilation.clean_compiled_files_of_removed_models(
             list(previous_manifest.models.keys()), list(current_manifest.models.keys())
         )
-        models_to_compile = manifest.get_models_to_compile(
-            previous_manifest, current_manifest
-        )
+        models_to_compile = current_manifest.get_models_to_compile(previous_manifest)
 
     for model, model_file_path in models_to_compile:
         if models and model_file_path.stem not in models:

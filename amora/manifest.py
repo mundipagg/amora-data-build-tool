@@ -59,6 +59,43 @@ class Manifest(BaseModel):
         with open(settings.manifest_path, "w+") as f:
             json.dump(self.dict(), f)
 
+    def get_models_to_compile(
+        self: "Manifest", previous_manifest: "Manifest"
+    ) -> Set[Tuple[Model, Path]]:
+        models_to_compile = set()
+        deps_names_to_compile: Set = set()
+
+        for model, model_file_path in list_models():
+            model_unique_name = model.unique_name()
+
+            model_current_manifest = self.models[model_unique_name]
+            model_previous_manifest = previous_manifest.models.get(
+                model_unique_name
+            )  # model could not exist in previous
+
+            compile_model = not model_previous_manifest or (
+                model_current_manifest.size != model_previous_manifest.size
+                or model_current_manifest.deps != model_previous_manifest.deps
+                or (
+                    model_current_manifest.stat > model_previous_manifest.stat
+                    and (
+                        not exists(model.target_path())
+                        or model_current_manifest.hash != model_previous_manifest.hash
+                    )
+                )
+            )
+
+            if compile_model:
+                models_to_compile.add((model, model_file_path))
+                deps_names_to_compile = deps_names_to_compile.union(
+                    model_current_manifest.deps
+                )
+
+        deps_to_compile = amora_model_from_name_list(deps_names_to_compile)
+        models_to_compile = models_to_compile.union(deps_to_compile)
+
+        return models_to_compile
+
 
 def hash_file(file_path: Path) -> HASH:
     hash = hashlib.md5()
@@ -69,41 +106,3 @@ def hash_file(file_path: Path) -> HASH:
                 break
             hash.update(data)
     return hash
-
-
-def get_models_to_compile(
-    previous_manifest: Manifest, current_manifest: Manifest
-) -> Set[Tuple[Model, Path]]:
-    models_to_compile = set()
-    deps_names_to_compile: Set = set()
-
-    for model, model_file_path in list_models():
-        model_unique_name = model.unique_name()
-
-        model_current_manifest = current_manifest.models[model_unique_name]
-        model_previous_manifest = previous_manifest.models.get(
-            model_unique_name
-        )  # model could not exist in previous
-
-        compile_model = not model_previous_manifest or (
-            model_current_manifest.size != model_previous_manifest.size
-            or model_current_manifest.deps != model_previous_manifest.deps
-            or (
-                model_current_manifest.stat > model_previous_manifest.stat
-                and (
-                    not exists(model.target_path())
-                    or model_current_manifest.hash != model_previous_manifest.hash
-                )
-            )
-        )
-
-        if compile_model:
-            models_to_compile.add((model, model_file_path))
-            deps_names_to_compile = deps_names_to_compile.union(
-                model_current_manifest.deps
-            )
-
-    deps_to_compile = amora_model_from_name_list(deps_names_to_compile)
-    models_to_compile = models_to_compile.union(deps_to_compile)
-
-    return models_to_compile

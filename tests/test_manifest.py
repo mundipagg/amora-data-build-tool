@@ -8,7 +8,7 @@ import pytest
 from _hashlib import HASH
 
 from amora.config import settings
-from amora.manifest import Manifest, ModelMetadata, get_models_to_compile, hash_file
+from amora.manifest import Manifest, ModelMetadata, hash_file
 from amora.models import amora_model_for_path
 
 from tests.models.health import Health
@@ -115,7 +115,7 @@ def test_get_models_to_compile_when_both_manifests_are_equal(
         (Health, Health.path()),
     ]
 
-    models_to_compile = get_models_to_compile(sample_manifest, sample_manifest)
+    models_to_compile = sample_manifest.get_models_to_compile(sample_manifest)
 
     assert len(models_to_compile) == 0
 
@@ -146,7 +146,7 @@ def test_get_models_to_compile_when_has_new_model(
         deps=[],
     )
 
-    models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
+    models_to_compile = sample_manifest.get_models_to_compile(new_manifest)
 
     assert len(models_to_compile) == 1
     assert models_to_compile == {(StepCountBySource, StepCountBySource.path())}
@@ -171,7 +171,7 @@ def test_get_models_to_compile_when_a_model_has_changed_size(
     new_manifest = deepcopy(sample_manifest)
     new_manifest.models["amora-data-build-tool.amora.steps"].size = 4714
 
-    models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
+    models_to_compile = sample_manifest.get_models_to_compile(new_manifest)
 
     assert len(models_to_compile) == 1
     assert models_to_compile == {(Steps, Steps.path())}
@@ -196,7 +196,7 @@ def test_get_models_to_compile_when_a_model_has_changed_deps(
     new_manifest = deepcopy(sample_manifest)
     new_manifest.models["amora-data-build-tool.amora.steps"].deps = ["another-model"]
 
-    models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
+    models_to_compile = sample_manifest.get_models_to_compile(new_manifest)
 
     assert len(models_to_compile) == 1
     assert models_to_compile == {(Steps, Steps.path())}
@@ -222,7 +222,7 @@ def test_get_models_to_compile_when_a_model_stat_was_updated_and_has_no_target_f
     new_manifest = deepcopy(sample_manifest)
     new_manifest.models["amora-data-build-tool.amora.steps"].stat = 2665147859.6682658
 
-    models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
+    models_to_compile = sample_manifest.get_models_to_compile(new_manifest)
 
     assert len(models_to_compile) == 1
     assert models_to_compile == {(Steps, Steps.path())}
@@ -254,7 +254,7 @@ def test_get_models_to_compile_when_a_model_stat_was_updated_and_hashes_are_diff
     target_path = Steps.target_path()
     target_path.write_text("SELECT 1")
 
-    models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
+    models_to_compile = sample_manifest.get_models_to_compile(new_manifest)
 
     assert len(models_to_compile) == 1
     assert models_to_compile == {(Steps, Steps.path())}
@@ -299,7 +299,7 @@ def test_get_models_to_compile_return_all_dependencies_from_a_changed_model(
     new_manifest = deepcopy(sample_manifest)
     new_manifest.models["amora-data-build-tool.amora.health"].size = 1920
 
-    models_to_compile = get_models_to_compile(sample_manifest, new_manifest)
+    models_to_compile = sample_manifest.get_models_to_compile(new_manifest)
 
     assert len(models_to_compile) == 3
 
