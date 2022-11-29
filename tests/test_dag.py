@@ -71,18 +71,6 @@ def test_DependencyDAG_from_model():
 def test_DependencyDAG_from_project():
     dag = DependencyDAG.from_project()
 
-    # assert sorted(list(dag.nodes)) == sorted(
-    #     [
-    #         Health.unique_name(),
-    #         HeartRate.unique_name(),
-    #         ArrayRepeatedFields.unique_name(),
-    #         HeartRateAgg.unique_name(),
-    #         Steps.unique_name(),
-    #         StepCountBySource.unique_name(),
-    #         HeartRateOver100.unique_name(),
-    #     ]
-    # )
-
     assert sorted(list(dag.edges)) == sorted(
         [
             (Steps.unique_name(), StepCountBySource.unique_name()),
