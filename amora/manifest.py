@@ -57,7 +57,7 @@ class Manifest(BaseModel):
 
     def save(self) -> None:
         with open(settings.manifest_path, "w+") as f:
-            json.dump(self.dict(), f)
+            json.dump(self.dict(), f, indent=2)
 
     def get_models_to_compile(
         self: "Manifest", previous_manifest: "Manifest"
