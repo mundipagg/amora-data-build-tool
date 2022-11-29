@@ -9,7 +9,7 @@ from amora.compilation import compile_statement
 from amora.models import AmoraModel, amora_model_for_path
 from amora.providers.bigquery import fixed_unnest
 
-from tests.models.array_repeated_fields import ArrayRepeatedFields
+from tests.models.deeply.nested.array_repeated_fields import ArrayRepeatedFields
 
 
 def test_amora_model_for_path_with_invalid_file_path_type():

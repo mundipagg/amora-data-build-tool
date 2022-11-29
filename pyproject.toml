@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "amora"
-version = "0.1.16"
+version = "0.1.18"
 description = "Amora Data Build Tool"
 authors = ["diogommartins <diogo.martins@stone.com.br>"]
 license = "MIT"
@@ -11,26 +11,26 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: SQL",
 ]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
-pandas = "^1.3.0"
-numpy = "^1.21.1"
+pandas = { version = "^1.3.0", extras = ["output_formatting"] }
 matplotlib = "^3.4.2"
 sqlalchemy-bigquery = "^1.4"
 networkx = { extras = ["all"], version = "^2.6.3" }
-typer = { extras = ["all"], version = ">=0.4,<0.7" }
+typer = { extras = ["all"], version = ">=0.4,<0.8" }
 pytest = ">=6.2.5,<8.0.0"
-pytest-xdist = { extras = ['psutil'], version = "^2.5.0" }
+pytest-xdist = { extras = ['psutil'], version = ">=2.5,<4.0" }
 rich = ">=10.13,<13.0"
 Jinja2 = "^3.0.3"
 sqlparse = ">=0.3.1,<0.5.0"
 feast = { version = "0.26.0", extras = ["redis", "gcp"], optional = true }
 SQLAlchemy = { version = "^1.4", extras = ["mypy"] }
 Werkzeug = { version = "2.2.2", optional = true }
-dash = { version = "2.6.2", extras = ["testing"], optional = true }
+dash = { version = "2.7.0", extras = ["testing"], optional = true }
 dash-cytoscape = { version = "0.3.0", optional = true }
 protobuf = "<5,>3"
 prometheus-fastapi-instrumentator = { version = "^5.8.1", optional = true }
@@ -44,30 +44,37 @@ humanize = "^4.2.3"
 dash-extensions = { version = "^0.1.5", optional = true }
 dash-mantine-components = { version = "^0.10.2", optional = true }
 pydantic = { extras = ["email"], version = "^1.10.2" }
+prometheus-flask-exporter = { version = "0.21.0", optional = true }
+gunicorn = { version = "^20.1.0", optional = true }
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest-cov = "^4.0.0"
 black = "^22.10"
-jupyter = "^1.0.0"
 mypy = "^0.982"
 lxml = "^4.6.3"
-pytest-env = "^0.6.2"
-mkdocs-material = "8.5.6"
-mkdocs-minify-plugin = "^0.5.0"
-mkdocs-redirects = "^1.2.0"
-mkdocs-git-revision-date-plugin = "^0.3.1"
-mkdocs-include-markdown-plugin = "^3.4.1"
-mkdocs-autorefs = "^0.4.1"
-mkdocstrings = { version = "^0.19.0", extras = ["python-legacy", "python"] }
+pytest-env = "^0.8.1"
 pre-commit = "^2.18.1"
-mkdocs-jupyter = "^0.21.0"
-pandas-stubs = "^1.5.0"
+pandas-stubs = "^1.5.1"
 freezegun = "^1.2.1"
 selenium = "^4.2.0"
 types-Markdown = "^3.4.2"
 types-typed-ast = "^1.5.8"
 types-setuptools = "^65.3.0"
 types-protobuf = "^3.20.4"
+markdown = "*"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+mkdocs-material = "8.5.10"
+mkdocs-minify-plugin = "^0.6.1"
+mkdocs-redirects = "^1.2.0"
+mkdocs-git-revision-date-plugin = "^0.3.1"
+mkdocs-include-markdown-plugin = "^3.4.1"
+mkdocs-autorefs = "^0.4.1"
+mkdocstrings = { version = "^0.19.0", extras = ["python-legacy", "python"] }
+mkdocs-jupyter = "^0.22.0"
 
 [tool.poetry.extras]
 feature-store = ["feast", "prometheus-fastapi-instrumentator"]
@@ -80,6 +87,8 @@ dash = [
     "dash-ace",
     "dash-extensions",
     "dash-mantine-components",
+    "prometheus-flask-exporter",
+    "gunicorn",
 ]
 
 [build-system]

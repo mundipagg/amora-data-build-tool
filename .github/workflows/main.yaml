@@ -51,17 +51,17 @@ jobs:
         run: pip install -U pip>=22.2.2 poetry>=1.2.1
 
       - name: 🐍 poetry install - Installing python dependencies
-        run: poetry install --sync --no-interaction -E feature-store -E dash
+        run: poetry install --sync --no-interaction -E feature-store -E dash --with docs
         env:
           POETRY_VIRTUALENVS_IN_PROJECT: true
 
       - name: 🚧 GCP Auth
-        uses: "google-github-actions/auth@v0"
+        uses: "google-github-actions/auth@v1"
         with:
           credentials_json: ${{ env.gcp_service_account }}
 
       - name: 🚧 Set up GCP SDK
-        uses: "google-github-actions/setup-gcloud@v0"
+        uses: "google-github-actions/setup-gcloud@v1"
 
       - name: 🧪 pytest
         run: poetry run py.test --cov=amora --cov-report=term-missing --cov-report=xml ./tests

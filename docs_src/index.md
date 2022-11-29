@@ -1,4 +1,4 @@
-# Amora Data Build Tool (ADBT)
+# Amora Data Build Tool
 
 **Amora Data Build Tool** enables analysts and engineers to transform data on the data warehouse (BigQuery) 
 by writing *Amora Models* that describe the data schema using Python's [PEP484 - Type Hints](https://www.python.org/dev/peps/pep-0484/) 
