@@ -4,15 +4,13 @@ from typing import Dict, List, Optional
 import pytest
 import typer
 
-from amora import materialization
+from amora import compilation, manifest, materialization, utils
 from amora.cli import dash, feature_store, models
-from amora.cli.shared_options import models_option, target_option
+from amora.cli.shared_options import force_option, models_option, target_option
 from amora.cli.type_specs import Models
-from amora.compilation import compile_statement
 from amora.config import settings
 from amora.dag import DependencyDAG
 from amora.models import list_models
-from amora.utils import list_target_files
 
 app = typer.Typer(
     pretty_exceptions_enable=False,
@@ -26,11 +24,25 @@ app = typer.Typer(
 def compile(
     models: Optional[Models] = models_option,
     target: Optional[str] = target_option,
+    force: Optional[bool] = force_option,
 ) -> None:
     """
     Generates executable SQL from model files. Compiled SQL files are written to the `./target` directory.
     """
-    for model, model_file_path in list_models():
+
+    current_manifest = manifest.Manifest.from_project()
+    previous_manifest = manifest.Manifest.load()
+
+    if force or not previous_manifest:
+        utils.clean_compiled_files()
+        models_to_compile = list_models()
+    else:
+        compilation.clean_compiled_files_of_removed_models(
+            list(previous_manifest.models.keys()), list(current_manifest.models.keys())
+        )
+        models_to_compile = current_manifest.get_models_to_compile(previous_manifest)
+
+    for model, model_file_path in models_to_compile:
         if models and model_file_path.stem not in models:
             continue
 
@@ -42,9 +54,11 @@ def compile(
         target_file_path = model.target_path()
         typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
 
-        content = compile_statement(source_sql_statement)
+        content = compilation.compile_statement(source_sql_statement)
         target_file_path.parent.mkdir(parents=True, exist_ok=True)
         target_file_path.write_text(content)
+
+    current_manifest.save()
 
 
 @app.command()
@@ -67,7 +81,7 @@ def materialize(
 
     model_to_task: Dict[str, materialization.Task] = {}
 
-    for target_file_path in list_target_files():
+    for target_file_path in utils.list_target_files():
         if models and target_file_path.stem not in models:
             continue
 

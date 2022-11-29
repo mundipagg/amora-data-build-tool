@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     DASHBOARDS_PATH: Optional[Path]
     MODELS_PATH: Optional[Path]
     TARGET_PATH: Optional[Path]
+    MANIFEST_PATH: Optional[Path]
 
     CLI_CONSOLE_MAX_WIDTH: int = 160
     CLI_MATERIALIZATION_DAG_FIGURE_SIZE: Tuple[_Width, _Height] = (32, 32)
@@ -90,6 +91,16 @@ class Settings(BaseSettings):
 
         return values
 
+    @root_validator
+    def compute_MANIFEST_PATH(cls, values: dict) -> dict:
+        if values["MANIFEST_PATH"] is not None:
+            return values
+
+        values["MANIFEST_PATH"] = Path(
+            os.path.join(values["TARGET_PATH"], "manifest.json")
+        )
+        return values
+
     @validator("PROJECT_PATH")
     def project_path_is_a_valid_path(cls, v: Path) -> Path:
         if not v.is_dir():
@@ -105,6 +116,11 @@ class Settings(BaseSettings):
     def target_path(self) -> Path:
         assert isinstance(self.TARGET_PATH, Path)
         return self.TARGET_PATH
+
+    @property
+    def manifest_path(self) -> Path:
+        assert isinstance(self.MANIFEST_PATH, Path)
+        return self.MANIFEST_PATH
 
     @property
     def dashboards_path(self) -> Path:

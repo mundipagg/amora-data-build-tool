@@ -1,3 +1,5 @@
+import os
+
 import sqlparse
 from sqlalchemy_bigquery import STRUCT, BigQueryDialect
 from sqlalchemy_bigquery.base import BigQueryCompiler
@@ -49,3 +51,11 @@ def compile_statement(statement: Compilable) -> str:
     )
     formatted_sql = sqlparse.format(raw_sql, reindent=True, indent_columns=True)
     return formatted_sql
+
+
+def clean_compiled_files_of_removed_models(
+    previous_models: list, current_models: list
+) -> None:
+    removed_models_files = set(previous_models) - set(current_models)
+    for model_file in removed_models_files:
+        os.remove(model_file)

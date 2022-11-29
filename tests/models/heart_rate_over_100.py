@@ -9,6 +9,7 @@ from examples.amora_project.models.heart_rate import HeartRate
 
 
 class HeartRateOver100(AmoraModel):
+    __depends_on__ = [HeartRate]
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.view,
         labels={Label("freshness", "daily")},
