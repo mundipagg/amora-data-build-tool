@@ -129,7 +129,14 @@ def test(
     Runs tests on data in deployed models. Run this after `amora materialize`
     to ensure that the date state is up-to-date.
     """
-    return_code = pytest.main(["-n", "auto", "--verbose"])
+
+    test_models = [f"test_{model}" for model in (models if models else [])]
+    model_args = f"-k {' or '.join(test_models)}"
+
+    pytest_args = settings.DEFAULT_PYTEST_ARGS + [model_args]
+
+    return_code = pytest.main(pytest_args)
+
     raise typer.Exit(return_code)
 
 
