@@ -121,20 +121,16 @@ def materialize(
                     typer.echo(result)
 
 
-@app.command()
-def test(
-    models: Optional[Models] = models_option,
-) -> None:
+@app.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True}
+)
+def test(ctx: typer.Context) -> None:
     """
     Runs tests on data in deployed models. Run this after `amora materialize`
-    to ensure that the date state is up-to-date.
+    to ensure that the data state is up-to-date.
     """
 
-    test_models = [f"test_{model}" for model in (models if models else [])]
-    model_args = f"-k {' or '.join(test_models)}"
-
-    pytest_args = settings.DEFAULT_PYTEST_ARGS + [model_args]
-
+    pytest_args = settings.DEFAULT_PYTEST_ARGS + ctx.args
     return_code = pytest.main(pytest_args)
 
     raise typer.Exit(return_code)
