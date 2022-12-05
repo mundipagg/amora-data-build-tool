@@ -2737,11 +2737,11 @@ sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
 name = "sqlalchemy-bigquery"
-version = "1.4.4"
+version = "1.5.0"
 description = "SQLAlchemy dialect for BigQuery"
 category = "main"
 optional = false
-python-versions = ">=3.6, <3.11"
+python-versions = ">=3.7, <3.11"
 
 [package.dependencies]
 future = "*"
@@ -2749,8 +2749,9 @@ google-api-core = ">=1.31.5,<2.0.0 || >2.3.0,<3.0.0dev"
 google-auth = ">=1.25.0,<3.0.0dev"
 google-cloud-bigquery = ">=2.25.2,<4.0.0dev"
 google-cloud-bigquery-storage = ">=2.0.0,<3.0.0dev"
-pyarrow = ">=3.0.0,<7.0dev"
-sqlalchemy = ">=1.2.0,<=1.4.27"
+packaging = "*"
+pyarrow = ">=3.0.0"
+sqlalchemy = ">=1.2.0,<2.0.0dev"
 
 [package.extras]
 alembic = ["alembic"]
@@ -5380,8 +5381,8 @@ sqlalchemy = [
     {file = "SQLAlchemy-1.4.27.tar.gz", hash = "sha256:d768359daeb3a86644f3854c6659e4496a3e6bba2b4651ecc87ce7ad415b320c"},
 ]
 sqlalchemy-bigquery = [
-    {file = "sqlalchemy-bigquery-1.4.4.tar.gz", hash = "sha256:0d4a5fe04723034812a14e849632230eabbab33ca5234c7cae563adfcc506518"},
-    {file = "sqlalchemy_bigquery-1.4.4-py2.py3-none-any.whl", hash = "sha256:88f420dafb8119db08293e31cc18266c3158957efc64acb35d39ce79d1d4a32b"},
+    {file = "sqlalchemy-bigquery-1.5.0.tar.gz", hash = "sha256:945f6847877fee798d13e2159a91592f5931374e8008848429c623f6bbf26d05"},
+    {file = "sqlalchemy_bigquery-1.5.0-py2.py3-none-any.whl", hash = "sha256:fa5838b5a8da72b0d274b2a7890027861c04f179b8bd078c5465287d90fe04d0"},
 ]
 sqlalchemy2-stubs = [
     {file = "sqlalchemy2-stubs-0.0.2a25.tar.gz", hash = "sha256:2fbfddfee7fc6b45206dc52e9fe9d91a787efb6af13191debe84dda9b4798abd"},
