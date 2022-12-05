@@ -127,7 +127,8 @@ def materialize(
 def test(ctx: typer.Context) -> None:
     """
     Runs tests on data in deployed models. Run this after `amora materialize`
-    to ensure that the data state is up-to-date.
+    to ensure that the data state is up-to-date. Optional arguments are passed
+    to Pytest.
     """
 
     pytest_args = settings.DEFAULT_PYTEST_ARGS + ctx.args
