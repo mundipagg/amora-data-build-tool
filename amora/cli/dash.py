@@ -109,6 +109,9 @@ def serve():
     from amora.dash.config import settings
     from amora.dash.gunicorn.application import StandaloneApplication
     from amora.dash.gunicorn.config import child_exit, when_ready
+    from amora.dash.lifecycle import before_startup
+
+    before_startup()
 
     if settings.DEBUG:
         return dash_app.run(
