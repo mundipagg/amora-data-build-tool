@@ -1,26 +1,39 @@
 from unittest.mock import MagicMock, call, patch
 
+from typer.testing import CliRunner
+
+from amora.cli import app
 from amora.config import settings as amora_settings
-from amora.dash import lifecycle
 from amora.dash.config import settings
 from amora.meta_queries import summarize
 from amora.models import list_models
 from amora.providers.bigquery import sample
 from amora.questions import QUESTIONS
 
+runner = CliRunner()
 
-@patch("amora.dash.lifecycle.ThreadPoolExecutor")
+
+@patch("concurrent.futures.ThreadPoolExecutor")
 def test_before_startup_with_cache_disabled(ThreadPoolExecutor: MagicMock):
     with patch.multiple(amora_settings, STORAGE_CACHE_ENABLED=False):
-        lifecycle.before_startup()
+        result = runner.invoke(
+            app,
+            ["dash", "inspect"],
+        )
+
+        assert result.exit_code == 0
 
     ThreadPoolExecutor.assert_not_called()
 
 
-@patch("amora.dash.lifecycle.ThreadPoolExecutor")
+@patch("concurrent.futures.ThreadPoolExecutor")
 def test_before_startup_with_cache_enabled(ThreadPoolExecutor: MagicMock):
     with patch.multiple(amora_settings, STORAGE_CACHE_ENABLED=True):
-        lifecycle.before_startup()
+        result = runner.invoke(
+            app,
+            ["dash", "inspect"],
+        )
+        assert result.exit_code == 0
 
     ThreadPoolExecutor.assert_called_once_with(
         max_workers=settings.THREAD_POOL_EXECUTOR_WORKERS

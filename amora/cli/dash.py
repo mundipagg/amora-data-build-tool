@@ -109,9 +109,6 @@ def serve():
     from amora.dash.config import settings
     from amora.dash.gunicorn.application import StandaloneApplication
     from amora.dash.gunicorn.config import child_exit, when_ready
-    from amora.dash.lifecycle import before_startup
-
-    before_startup()
 
     if settings.DEBUG:
         return dash_app.run(
@@ -132,3 +129,38 @@ def serve():
         )
 
     StandaloneApplication(app=dash_app.server, options=options).run()
+
+
+@app.command(
+    "inspect",
+    help="Inspect the project data queries and generates a cache to speedup the interface",
+)
+def inspect():
+    from concurrent.futures import ThreadPoolExecutor
+
+    from amora.config import settings as amora_settings
+    from amora.dash.config import settings
+    from amora.logger import logger
+    from amora.meta_queries import summarize
+    from amora.models import list_models
+    from amora.providers.bigquery import sample
+    from amora.questions import QUESTIONS
+
+    if not amora_settings.STORAGE_CACHE_ENABLED:
+        logger.debug("Cache disabled. Skipping cache generation.")
+        return
+
+    with ThreadPoolExecutor(
+        max_workers=settings.THREAD_POOL_EXECUTOR_WORKERS
+    ) as executor:
+        # cache model summary
+        for model, path_ in list_models():
+            executor.submit(summarize, model)
+
+        # cache model data sample
+        for model, path_ in list_models():
+            executor.submit(sample, model)
+
+        # cache data questions
+        for question in QUESTIONS:
+            executor.submit(question.answer_df)
