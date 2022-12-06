@@ -813,4 +813,5 @@ def sample(
     model_sample = tablesample(model, sampling)  # type: ignore
     stmt = select(model_sample).limit(limit)
 
+    logger.debug(f"Sampling model `{model.unique_name()}`")
     return run(stmt).to_dataframe()

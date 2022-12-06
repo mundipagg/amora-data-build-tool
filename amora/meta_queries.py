@@ -17,6 +17,7 @@ from sqlalchemy import (
 from sqlalchemy_bigquery import STRUCT
 
 from amora.feature_store.protocols import FeatureViewSourceProtocol
+from amora.logger import logger
 from amora.models import Model
 from amora.providers.bigquery import run
 from amora.storage import cache
@@ -24,6 +25,7 @@ from amora.storage import cache
 
 @cache(suffix=lambda model: f"{model.unique_name()}.{date.today()}")
 def summarize(model: Model) -> pd.DataFrame:
+    logger.debug(f"Summarizing model `{model.unique_name()}`")
     return _summarize_columns(model)
 
 

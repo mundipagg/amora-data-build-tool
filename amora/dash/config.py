@@ -38,6 +38,8 @@ class DashSettings(BaseSettings):
     GUNICORN_WORKERS: int = 2
     GUNICORN_WORKER_TIMEOUT: int = 30
 
+    THREAD_POOL_EXECUTOR_WORKERS: int = 5
+
     class Config:
         env_prefix = "AMORA_DASH_"
 
