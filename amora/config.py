@@ -59,6 +59,8 @@ class Settings(BaseSettings):
 
     TEST_RUN_ID: str = os.getenv("PYTEST_XDIST_TESTRUNUID") or f"amora-{uuid4().hex}"
 
+    DEFAULT_PYTEST_ARGS: list = ["-n", "auto", "--verbose"]
+
     class Config:
         env_prefix = "AMORA_"
 
