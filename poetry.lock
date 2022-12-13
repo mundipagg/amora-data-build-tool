@@ -355,7 +355,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "dash"
-version = "2.7.0"
+version = "2.7.1"
 description = "A Python framework for building reactive web-apps. Developed by Plotly."
 category = "main"
 optional = true
@@ -379,7 +379,7 @@ waitress = {version = ">=1.4.4", optional = true, markers = "extra == \"testing\
 
 [package.extras]
 celery = ["celery[redis] (>=5.1.2)", "importlib-metadata (<5)", "redis (>=3.5.3)"]
-ci = ["black (==21.6b0)", "black (==22.3.0)", "dash-dangerously-set-inner-html", "dash-flow-example (==0.0.5)", "flake8 (==3.9.2)", "flaky (==3.7.0)", "flask-talisman (==1.0.0)", "isort (==4.3.21)", "mimesis", "mock (==4.0.3)", "numpy", "openpyxl", "orjson (==3.5.4)", "orjson (==3.6.7)", "pandas (==1.1.5)", "pandas (>=1.4.0)", "preconditions", "py (==1.11.0)", "pyarrow", "pyarrow (<3)", "pylint (==2.13.5)", "pytest-mock", "pytest-rerunfailures", "pytest-sugar (==0.9.5)", "xlrd (<2)", "xlrd (>=2.0.1)"]
+ci = ["black (==21.6b0)", "black (==22.3.0)", "dash-dangerously-set-inner-html", "dash-flow-example (==0.0.5)", "flake8 (==3.9.2)", "flaky (==3.7.0)", "flask-talisman (==1.0.0)", "isort (==4.3.21)", "mimesis", "mock (==4.0.3)", "numpy", "openpyxl", "orjson (==3.5.4)", "orjson (==3.6.7)", "pandas (==1.1.5)", "pandas (>=1.4.0)", "preconditions", "pyarrow", "pyarrow (<3)", "pylint (==2.13.5)", "pytest-mock", "pytest-rerunfailures", "pytest-sugar (==0.9.6)", "xlrd (<2)", "xlrd (>=2.0.1)"]
 compress = ["flask-compress"]
 dev = ["PyYAML (>=5.4.1)", "coloredlogs (>=15.0.1)", "fire (>=0.4.0)"]
 diskcache = ["diskcache (>=5.2.1)", "multiprocess (>=0.70.12)", "psutil (>=5.8.0)"]
@@ -3226,7 +3226,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "df30e42b68c8fb4f6999f2ad41a72f1dfbf892113eda374184b822103a68c49f"
+content-hash = "0ebc77910743199ab341b483ad00796f904cccbe74dc17ea09cda8d795707965"
 
 [metadata.files]
 aiohttp = [
@@ -3634,8 +3634,8 @@ cycler = [
     {file = "cycler-0.11.0.tar.gz", hash = "sha256:9c87405839a19696e837b3b818fed3f5f69f16f1eec1a1ad77e043dcea9c772f"},
 ]
 dash = [
-    {file = "dash-2.7.0-py3-none-any.whl", hash = "sha256:101ea41e06c49526964bc1943b341c7c57cbb607d1ec7f73d7debdbcbb0789f6"},
-    {file = "dash-2.7.0.tar.gz", hash = "sha256:0b8e550539760c9c4e1506f38e052a7123a15a86efc3aa9a2e0aa4e1a57f62bf"},
+    {file = "dash-2.7.1-py3-none-any.whl", hash = "sha256:0935490e3dd2d2a046291989824732901437bc0336d592eadcb93fd9c866d4c9"},
+    {file = "dash-2.7.1.tar.gz", hash = "sha256:13cd19d19288a8fb9c2a5cd069c72643758fc2fcda68cacc72474a4ec6b7667d"},
 ]
 dash-ace = [
     {file = "dash_ace-0.2.1.tar.gz", hash = "sha256:e533e150317787eec420c0631dcfbe768613eac1e79ae0a97991a17894d3f30e"},
