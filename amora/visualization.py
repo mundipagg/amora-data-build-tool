@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Protocol, Union, runtime_checkable
+from typing import Optional, Protocol, Union, runtime_checkable
 
 import pandas as pd
 from pandas import Series
@@ -45,6 +45,16 @@ class BarChart(VisualizationConfig, BaseModel):
 
 class LineChart(_2DChart):
     pass
+
+
+class Heatmap(VisualizationConfig, BaseModel):
+    x_func: SeriesSelectorFunc = lambda data: data["x"]
+    y_func: SeriesSelectorFunc = lambda data: data["y"]
+    z_func: Optional[SeriesSelectorFunc] = None
+    labels: dict = {}
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class BigNumber(VisualizationConfig, BaseModel):
