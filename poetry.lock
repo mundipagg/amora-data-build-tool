@@ -450,8 +450,8 @@ python-versions = "*"
 
 [[package]]
 name = "dash-mantine-components"
-version = "0.10.2"
-description = "Plotly Dash components based on Mantine"
+version = "0.11.0"
+description = "Plotly Dash Components based on Mantine"
 category = "main"
 optional = true
 python-versions = "*"
@@ -3226,7 +3226,7 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "0ebc77910743199ab341b483ad00796f904cccbe74dc17ea09cda8d795707965"
+content-hash = "a79ac6db8673fe6997f1845f8bbf2338072a4f2866eb35e535e76385ad3ad228"
 
 [metadata.files]
 aiohttp = [
@@ -3661,8 +3661,7 @@ dash-html-components = [
     {file = "dash_html_components-2.0.0.tar.gz", hash = "sha256:8703a601080f02619a6390998e0b3da4a5daabe97a1fd7a9cebc09d015f26e50"},
 ]
 dash-mantine-components = [
-    {file = "dash_mantine_components-0.10.2-py3-none-any.whl", hash = "sha256:e63ea6c623260e0f84ac4aee9c1928272adf3ca20478fd80bafce04eff017f8f"},
-    {file = "dash_mantine_components-0.10.2.tar.gz", hash = "sha256:5ec838653b856ae55869b7c661b7d74d2799c1259aa3ebaf57346c6a2f7282ea"},
+    {file = "dash_mantine_components-0.11.0-py3-none-any.whl", hash = "sha256:e2fa1a089926e7f7c9bc29a02ee06f8ce6cfb4d867b3e9bcd55d8a74cd27664c"},
 ]
 dash-table = [
     {file = "dash_table-5.0.0-py3-none-any.whl", hash = "sha256:19036fa352bb1c11baf38068ec62d172f0515f73ca3276c79dee49b95ddc16c9"},
