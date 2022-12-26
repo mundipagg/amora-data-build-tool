@@ -81,12 +81,6 @@ class Question:
         if isinstance(question_func, Question):
             question_func = question_func.question_func
         self.question_func = question_func
-        # FieldFilter = Dict[ColName, Column]
-        self.filters = {
-            field: filter_type
-            for field, filter_type in question_func.__annotations__.items()
-            if field != "return"
-        }
         self.view_config = view_config or Table(title=self.name)
 
     def __call__(self, *args, **kwargs):
