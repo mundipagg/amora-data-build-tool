@@ -5,7 +5,7 @@ from dash.development.base_component import Component
 
 from amora.logger import logger
 from amora.questions import Question
-from amora.visualization import BarChart, BigNumber, LineChart, PieChart
+from amora.visualization import BarChart, BigNumber, Heatmap, LineChart, PieChart
 
 
 def answer_visualization(question: Question) -> Component:
@@ -45,6 +45,18 @@ def answer_visualization(question: Question) -> Component:
     if isinstance(view_config, PieChart):
         return dcc.Graph(
             figure=px.pie(df, values=view_config.values, names=view_config.names)
+        )
+
+    if isinstance(view_config, Heatmap):
+        return dcc.Graph(
+            figure=px.density_heatmap(
+                x=view_config.x_func(df),
+                y=view_config.y_func(df),
+                z=view_config.z_func(df) if view_config.z_func else None,
+                text_auto=True,
+                labels=view_config.labels,
+                color_continuous_scale="Blues",
+            )
         )
 
     return dash_table.DataTable(
