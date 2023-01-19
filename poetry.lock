@@ -729,10 +729,10 @@ files = [
 cffi = ">=1.12"
 
 [package.extras]
-docs = ["sphinx (>=1.6.5,!=1.8.0,!=3.1.0,!=3.1.1)", "sphinx-rtd-theme"]
+docs = ["sphinx (>=1.6.5,!=1.8.0,!=3.1.0,!=3.1.1)", "sphinx_rtd_theme"]
 docstest = ["pyenchant (>=1.6.11)", "sphinxcontrib-spelling (>=4.0.1)", "twine (>=1.12.0)"]
 pep8test = ["black", "flake8", "flake8-import-order", "pep8-naming"]
-sdist = ["setuptools-rust (>=0.11.4)"]
+sdist = ["setuptools_rust (>=0.11.4)"]
 ssh = ["bcrypt (>=3.1.5)"]
 test = ["hypothesis (>=1.11.4,!=3.79.2)", "iso8601", "pretend", "pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-subtests", "pytest-xdist", "pytz"]
 
@@ -853,14 +853,14 @@ dash = "*"
 
 [[package]]
 name = "dash-extensions"
-version = "0.1.8"
+version = "0.1.10"
 description = "Extensions for Plotly Dash."
 category = "main"
 optional = true
 python-versions = ">=3.7,<4"
 files = [
-    {file = "dash_extensions-0.1.8-py3-none-any.whl", hash = "sha256:99d71dfd07571e344718d6079ca5dc47a59d500ab1231b444d9fe72ae50aa6de"},
-    {file = "dash_extensions-0.1.8.tar.gz", hash = "sha256:fd63227b363eaccc2a1061b51261ca1807a3cec15822fc3234dcc8ebf26d0331"},
+    {file = "dash_extensions-0.1.10-py3-none-any.whl", hash = "sha256:813cbcaa023b801fa4c72966dfe8994c54495a3e8b66339cf01421c959e77dcb"},
+    {file = "dash_extensions-0.1.10.tar.gz", hash = "sha256:0e5a6ab4e8311774b757293e882de0f661a4ac557b2e37d3c87997025186da72"},
 ]
 
 [package.dependencies]
@@ -868,6 +868,9 @@ dash = ">=2.7.0"
 Flask-Caching = "2.0.1"
 jsbeautifier = ">=1.14.3,<2.0.0"
 more-itertools = ">=8.12.0,<9.0.0"
+
+[package.extras]
+mantine = ["dash-mantine-components (>=0.11.0,<0.12.0)"]
 
 [[package]]
 name = "dash-html-components"
@@ -883,14 +886,13 @@ files = [
 
 [[package]]
 name = "dash-mantine-components"
-version = "0.10.2"
-description = "Plotly Dash components based on Mantine"
+version = "0.11.1"
+description = "Plotly Dash Components based on Mantine"
 category = "main"
 optional = true
 python-versions = "*"
 files = [
-    {file = "dash_mantine_components-0.10.2-py3-none-any.whl", hash = "sha256:e63ea6c623260e0f84ac4aee9c1928272adf3ca20478fd80bafce04eff017f8f"},
-    {file = "dash_mantine_components-0.10.2.tar.gz", hash = "sha256:5ec838653b856ae55869b7c661b7d74d2799c1259aa3ebaf57346c6a2f7282ea"},
+    {file = "dash_mantine_components-0.11.1-py3-none-any.whl", hash = "sha256:4940a7b2b0ef4a20de496c73b4ae4b534efeea6566a093be205b0c0370f3bf42"},
 ]
 
 [[package]]
@@ -2821,6 +2823,7 @@ packaging = ">=20.0"
 pillow = ">=6.2.0"
 pyparsing = ">=2.2.1"
 python-dateutil = ">=2.7"
+setuptools_scm = ">=7"
 
 [[package]]
 name = "mdit-py-plugins"
@@ -4702,6 +4705,28 @@ testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8 (<5)", "flake8-202
 testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
+name = "setuptools-scm"
+version = "7.1.0"
+description = "the blessed package to manage your versions by scm tags"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "setuptools_scm-7.1.0-py3-none-any.whl", hash = "sha256:73988b6d848709e2af142aa48c986ea29592bbcfca5375678064708205253d8e"},
+    {file = "setuptools_scm-7.1.0.tar.gz", hash = "sha256:6c508345a771aad7d56ebff0e70628bf2b0ec7573762be9960214730de278f27"},
+]
+
+[package.dependencies]
+packaging = ">=20.0"
+setuptools = "*"
+tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
+typing-extensions = "*"
+
+[package.extras]
+test = ["pytest (>=6.2)", "virtualenv (>20)"]
+toml = ["setuptools (>=42)"]
+
+[[package]]
 name = "shed"
 version = "0.10.8"
 description = "`shed` canonicalises Python code."
@@ -5751,4 +5776,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "0ebc77910743199ab341b483ad00796f904cccbe74dc17ea09cda8d795707965"
+content-hash = "4bf2cd21f31ab5393ca4c95cc525d3a7e01ef4998b836909d2cd055a33b3b00c"
