@@ -729,10 +729,10 @@ files = [
 cffi = ">=1.12"
 
 [package.extras]
-docs = ["sphinx (>=1.6.5,!=1.8.0,!=3.1.0,!=3.1.1)", "sphinx_rtd_theme"]
+docs = ["sphinx (>=1.6.5,!=1.8.0,!=3.1.0,!=3.1.1)", "sphinx-rtd-theme"]
 docstest = ["pyenchant (>=1.6.11)", "sphinxcontrib-spelling (>=4.0.1)", "twine (>=1.12.0)"]
 pep8test = ["black", "flake8", "flake8-import-order", "pep8-naming"]
-sdist = ["setuptools_rust (>=0.11.4)"]
+sdist = ["setuptools-rust (>=0.11.4)"]
 ssh = ["bcrypt (>=3.1.5)"]
 test = ["hypothesis (>=1.11.4,!=3.79.2)", "iso8601", "pretend", "pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-subtests", "pytest-xdist", "pytz"]
 
@@ -1166,26 +1166,26 @@ devel = ["colorama", "json-spec", "jsonschema", "pylint", "pytest", "pytest-benc
 
 [[package]]
 name = "feast"
-version = "0.26.0"
+version = "0.28.0"
 description = "Python SDK for Feast"
 category = "main"
 optional = true
-python-versions = ">=3.7.0"
+python-versions = ">=3.8.0"
 files = [
-    {file = "feast-0.26.0-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:d56cfe0337fc874ed2e714dee8943042903d10160d9c0904ab2fad8d1c4294fa"},
-    {file = "feast-0.26.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1a39cffd4c4402dfe13504845e1756de44bb1b1522f704734e4ee116a7e88312"},
-    {file = "feast-0.26.0-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:8c4529f205ae23025d0977b5ea955d008e198f7b69dfa4b0ce555fe524c859b3"},
-    {file = "feast-0.26.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:634d6617fd60618892e6595b861fc6a5e0c226511d491291cbd3bc48e2c866b9"},
-    {file = "feast-0.26.0-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:0b71054927c82dc302e1eae3b0735d06b19b2b8acc24c38b3bed7aa827e1b290"},
-    {file = "feast-0.26.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7958ec511441d314813073729046f671921ccf6dfdad8032b85d860243462a6a"},
-    {file = "feast-0.26.0.tar.gz", hash = "sha256:6221886498559e072058206152aa01c7fb205b2bd5c521a1e853b82f49309566"},
+    {file = "feast-0.28.0-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:080047dff12ca13ac888243e0042ba886998d45898fd1da76826cc02db9fe254"},
+    {file = "feast-0.28.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:28f6726667f8aea411a0701d6e31c48600e33110f688e2881ad7a8051e0b49d5"},
+    {file = "feast-0.28.0-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:e4e12ba38d8ebb3b72d1412cd72b9755a7e74c6b5263c29a37538c46d9b5c0a0"},
+    {file = "feast-0.28.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:44aa7889b5acac5ceb93e448307121ef9a0c11ee143ea292d154533dd2442974"},
+    {file = "feast-0.28.0-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:b106739e6c320066332a3664f60b2bfeae73b30052404388c350632bbe9c2263"},
+    {file = "feast-0.28.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:83a4c24a66bfd35a3e727f563f41f5950d45fd2cbb870b9601cb67425fdee547"},
+    {file = "feast-0.28.0.tar.gz", hash = "sha256:c6397ac97ca6986c33dd935dc213fa032cd6494007bf44f4d69b1d503f1da756"},
 ]
 
 [package.dependencies]
 bowler = "*"
 click = ">=7.0.0,<9.0.0"
 colorama = ">=0.3.9,<1"
-dask = ">=2021,<2022.02.0"
+dask = ">=2021"
 dill = ">=0.3.0,<0.4.0"
 fastapi = ">=0.68.0,<1"
 fastavro = ">=1.1.0,<2"
@@ -1223,11 +1223,11 @@ uvicorn = {version = ">=0.14.0,<1", extras = ["standard"]}
 [package.extras]
 aws = ["boto3 (>=1.17.0,<=1.20.23)", "docker (>=5.0.2)", "s3fs (>=0.4.0,<=2022.01.0)"]
 azure = ["SQLAlchemy (>=1.4.19)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "pymssql", "pyodbc (>=4.0.30)"]
-bytewax = ["bytewax (==0.10.0)", "docker (>=5.0.2)", "kubernetes (<=20.13.0)"]
+bytewax = ["bytewax (==0.13.1)", "docker (>=5.0.2)", "kubernetes (<=20.13.0)"]
 cassandra = ["cassandra-driver (>=3.24.0,<4)"]
-ci = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.10.0)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-bigtable (>=2.11,<3)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto (<4)", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "mysqlclient", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pyOpenSSL (<22.1.0)", "pybindgen", "pymssql", "pymysql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyMySQL", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
-dev = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.10.0)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-bigtable (>=2.11,<3)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.0.0,<2.0.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto (<4)", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "mysqlclient", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pyOpenSSL (<22.1.0)", "pybindgen", "pymssql", "pymysql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyMySQL", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
-docs = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.10.0)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-bigtable (>=2.11,<3)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto (<4)", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pyOpenSSL (<22.1.0)", "pybindgen", "pymssql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
+ci = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.13.1)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-bigtable (>=2.11,<3)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto (<4)", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "mysqlclient", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pyOpenSSL (<22.1.0)", "pybindgen", "pymssql", "pymysql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyMySQL", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
+dev = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.13.1)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-bigtable (>=2.11,<3)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.0.0,<2.0.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto (<4)", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "mysqlclient", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pyOpenSSL (<22.1.0)", "pybindgen", "pymssql", "pymysql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyMySQL", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
+docs = ["SQLAlchemy (>=1.4.19)", "Sphinx (!=4.0.0,<4.4.0)", "adlfs (==0.5.9)", "assertpy (==1.1)", "avro (==1.10.0)", "azure-identity (>=1.6.1)", "azure-storage-blob (>=0.37.0)", "black (>=22.6.0,<23)", "boto3 (>=1.17.0,<=1.20.23)", "build", "bytewax (==0.13.1)", "cassandra-driver (>=3.24.0,<4)", "cryptography (>=35.0,<36)", "docker (>=5.0.2)", "firebase-admin (>=5.2.0,<6)", "flake8", "gcsfs (>=0.4.0,<=2022.01.0)", "google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-bigtable (>=2.11,<3)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)", "great-expectations (>=0.14.0,<0.15.0)", "grpcio-testing (>=1.47.0)", "grpcio-tools (>=1.47.0)", "happybase (>=1.2.0,<3)", "hiredis (>=2.0.0,<3)", "isort (>=5,<6)", "kubernetes (<=20.13.0)", "minio (==7.1.0)", "mock (==2.0.0)", "moto (<4)", "mypy (>=0.931)", "mypy-protobuf (==3.1)", "pip-tools", "pre-commit", "psutil (==5.9.0)", "psycopg2-binary (>=2.8.3,<3)", "pyOpenSSL (<22.1.0)", "pybindgen", "pymssql", "pyodbc (>=4.0.30)", "pyspark (>=3.0.0,<4)", "pytest (>=6.0.0,<8)", "pytest-benchmark (>=3.4.1,<4)", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==1.10.4)", "pytest-ordering (>=0.6.0,<0.7.0)", "pytest-timeout (==1.4.2)", "pytest-xdist", "redis (==4.2.2)", "s3fs (>=0.4.0,<=2022.01.0)", "snowflake-connector-python[pandas] (>=2.7.3,<3)", "sphinx-rtd-theme", "testcontainers (>=3.5,<4)", "trino (>=0.305.0,<0.400.0)", "types-PyYAML", "types-protobuf", "types-python-dateutil", "types-pytz", "types-redis", "types-requests", "types-setuptools", "types-tabulate", "urllib3 (>=1.25.4,<2)"]
 gcp = ["google-cloud-bigquery-storage (>=2.0.0,<3)", "google-cloud-bigquery[pandas] (>=2,<4)", "google-cloud-bigtable (>=2.11,<3)", "google-cloud-datastore (>=2.1,<3)", "google-cloud-storage (>=1.34,<3)"]
 ge = ["great-expectations (>=0.14.0,<0.15.0)"]
 go = ["cffi (>=1.15.0,<1.16.0)"]
@@ -2823,7 +2823,6 @@ packaging = ">=20.0"
 pillow = ">=6.2.0"
 pyparsing = ">=2.2.1"
 python-dateutil = ">=2.7"
-setuptools_scm = ">=7"
 
 [[package]]
 name = "mdit-py-plugins"
@@ -4705,28 +4704,6 @@ testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8 (<5)", "flake8-202
 testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
-name = "setuptools-scm"
-version = "7.1.0"
-description = "the blessed package to manage your versions by scm tags"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "setuptools_scm-7.1.0-py3-none-any.whl", hash = "sha256:73988b6d848709e2af142aa48c986ea29592bbcfca5375678064708205253d8e"},
-    {file = "setuptools_scm-7.1.0.tar.gz", hash = "sha256:6c508345a771aad7d56ebff0e70628bf2b0ec7573762be9960214730de278f27"},
-]
-
-[package.dependencies]
-packaging = ">=20.0"
-setuptools = "*"
-tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
-typing-extensions = "*"
-
-[package.extras]
-test = ["pytest (>=6.2)", "virtualenv (>20)"]
-toml = ["setuptools (>=42)"]
-
-[[package]]
 name = "shed"
 version = "0.10.8"
 description = "`shed` canonicalises Python code."
@@ -5776,4 +5753,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "4bf2cd21f31ab5393ca4c95cc525d3a7e01ef4998b836909d2cd055a33b3b00c"
+content-hash = "4eb942877c5debd701ac905c61679117ce41b6f608c8fb8db622df3039056de8"
