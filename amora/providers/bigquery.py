@@ -2,12 +2,23 @@ import dataclasses
 import decimal
 from datetime import date, datetime, time
 from enum import Enum
-from typing import Any, Callable, Dict, Hashable, Iterable, List, Optional, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Hashable,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Union,
+)
 
 import pandas as pd
 import sqlalchemy
 from google.api_core.client_info import ClientInfo
 from google.api_core.exceptions import NotFound
+from google.cloud import bigquery
 from google.cloud.bigquery import (
     Client,
     QueryJobConfig,
@@ -815,3 +826,100 @@ def sample(
 
     logger.debug(f"Sampling model `{model.unique_name()}`")
     return run(stmt).to_dataframe()
+
+
+@log_execution()
+def export(
+    model: Model,
+    uri: Union[str, Sequence[str]],
+    compression: bigquery.Compression = bigquery.Compression.NONE,
+    destination_format: bigquery.DestinationFormat = bigquery.DestinationFormat.PARQUET,
+    labels: Optional[Dict[str, str]] = None,
+) -> bigquery.job.ExtractJob:
+    """
+    Exports data from BigQuery to Google Cloud Storage (GCS)
+
+    ```python
+    from datetime import date
+
+    from models.health import Health
+
+    exported_at = date.today().isoformat()
+
+    export(model=Health, uri=f"gs://my-bucket-name/{exported_at}/health.parquet")
+    ```
+
+    Exported data can also be compressed:
+
+    ```python
+    from datetime import date
+
+    from models.health import Health
+
+    exported_at = date.today().isoformat()
+
+    export(
+        model=Health,
+        uri="gs://my-bucket-name/{exported_at}/health.parquet.gz",
+        compression="GZIP",
+    )
+    ```
+
+    Read more on:
+        - https://cloud.google.com/bigquery/docs/reference/standard-sql/other-statements#export_data_to_parquet_format
+        - https://cloud.google.com/bigquery/docs/exporting-data#export_limitations
+
+    Args:
+        model:
+            The AmoraModel to be exported
+        uri:
+            Both Single URI and Wildcard URI supported. Since Single URI is limited to
+            1Gb, a Wildcard URI is recommended, as BigQuery shards the model data into
+            multiple files, based on the provided pattern.
+
+            E.g.:
+                Single URI:
+                    ```python
+                    export(model=Health, uri=f"gs://{bucket_name}/{folder}/health.parquet")
+                    ```
+
+                Wildcard URI:
+                    ```python
+                    export(model=Health, uri=f"gs://{bucket_name}/{folder}/health-*.parquet")
+                    ```
+
+            Read more on: https://cloud.google.com/bigquery/docs/exporting-data#exporting_data_into_one_or_more_files
+        compression:
+
+        destination_format:
+
+        labels:
+    """
+    if model.__model_config__.materialized is not MaterializationTypes.table:
+        raise ValueError("On BigQuery, only tables are exportable.")
+
+    if not uri.endswith("*"):
+        logger.warning("Single URI export is limited to 1Gb", extra=dict(uri=uri))
+
+    # question: Should we check for materialization freshness ?
+
+    # fixme: Files are being saved as `Content-Type: application/octet-stream`.
+    job_config = bigquery.job.ExtractJobConfig()
+    job_config.compression = compression
+    job_config.destination_format = destination_format
+
+    export_job = get_client().extract_table(
+        source=model.unique_name(),
+        destination_uris=uri,
+        # fixme: Location must match that of the source table.
+        location="US",
+        job_config=job_config,
+    )
+
+    export_result = export_job.result()
+
+    if labels:
+        # todo: Apply `labels` to `uri` bucket objects
+        raise NotImplementedError
+
+    return export_result
