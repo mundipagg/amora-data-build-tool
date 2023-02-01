@@ -7,18 +7,8 @@ import pandas as pd
 import pytest
 from google.api_core.exceptions import NotFound
 from google.cloud.bigquery.schema import SchemaField
-from sqlalchemy import (
-    ARRAY,
-    TIMESTAMP,
-    Boolean,
-    Date,
-    DateTime,
-    Float,
-    Integer,
-    String,
-    Time,
-    select,
-)
+from sqlalchemy import (ARRAY, TIMESTAMP, Boolean, Date, DateTime, Float,
+                        Integer, String, Time, select)
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy_bigquery import STRUCT
@@ -26,32 +16,18 @@ from sqlalchemy_bigquery.base import BQArray
 
 from amora.compilation import compile_statement
 from amora.config import settings
-from amora.models import (
-    SQLALCHEMY_METADATA_KEY,
-    AmoraModel,
-    Field,
-    MaterializationTypes,
-    ModelConfig,
-)
+from amora.models import (SQLALCHEMY_METADATA_KEY, AmoraModel, Field,
+                          MaterializationTypes, ModelConfig)
 from amora.protocols import Compilable
-from amora.providers.bigquery import (
-    DryRunResult,
-    array,
-    column_for_schema_field,
-    cte_from_dataframe,
-    cte_from_rows,
-    dry_run,
-    estimated_query_cost_in_usd,
-    estimated_storage_cost_in_usd,
-    get_fully_qualified_id,
-    run,
-    sample,
-    schema_for_model,
-    schema_for_model_source,
-    struct_for_model,
-    zip_arrays,
-)
-
+from amora.providers.bigquery import (DryRunResult, array,
+                                      column_for_schema_field,
+                                      cte_from_dataframe, cte_from_rows,
+                                      dry_run, estimated_query_cost_in_usd,
+                                      estimated_storage_cost_in_usd,
+                                      get_fully_qualified_id, run, sample,
+                                      schema_for_model,
+                                      schema_for_model_source,
+                                      struct_for_model, zip_arrays)
 from tests.models.health import Health
 from tests.models.heart_rate import HeartRate
 from tests.models.heart_rate_over_100 import HeartRateOver100

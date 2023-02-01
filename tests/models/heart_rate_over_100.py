@@ -3,7 +3,8 @@ from typing import Optional
 
 from sqlalchemy import TIMESTAMP, Float, Integer, String, select
 
-from amora.models import AmoraModel, Field, Label, MaterializationTypes, ModelConfig
+from amora.models import (AmoraModel, Field, Label, MaterializationTypes,
+                          ModelConfig)
 from amora.protocols import Compilable
 from examples.amora_project.models.heart_rate import HeartRate
 

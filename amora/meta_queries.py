@@ -2,18 +2,8 @@ from datetime import date
 
 import pandas as pd
 from numpy import nan
-from sqlalchemy import (
-    ARRAY,
-    Float,
-    Integer,
-    Numeric,
-    String,
-    cast,
-    func,
-    literal,
-    select,
-    union_all,
-)
+from sqlalchemy import (ARRAY, Float, Integer, Numeric, String, cast, func,
+                        literal, select, union_all)
 from sqlalchemy_bigquery import STRUCT
 
 from amora.feature_store.protocols import FeatureViewSourceProtocol

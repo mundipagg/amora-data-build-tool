@@ -8,7 +8,6 @@ from amora.feature_store import registry
 from amora.feature_store.decorators import feature_view
 from amora.feature_store.feature_view import name_for_model
 from amora.models import AmoraModel, Field
-
 from tests.models.step_count_by_source import StepCountBySource
 
 

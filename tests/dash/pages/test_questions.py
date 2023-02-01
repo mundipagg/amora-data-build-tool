@@ -1,6 +1,7 @@
 from dash.testing.composite import DashComposite
 
-from tests.models.step_count_by_source import how_many_data_points_where_acquired
+from tests.models.step_count_by_source import \
+    how_many_data_points_where_acquired
 
 
 def test_data_questions_page(amora_dash: DashComposite):

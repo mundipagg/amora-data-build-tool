@@ -2,11 +2,8 @@
 Tests that can be reused by multiple projects
 """
 from amora.models import MaterializationTypes, list_models
-from amora.providers.bigquery import (
-    get_schema,
-    schema_for_model,
-    schema_for_model_source,
-)
+from amora.providers.bigquery import (get_schema, schema_for_model,
+                                      schema_for_model_source)
 
 
 def test_materialized_schema_equal_local_schema():

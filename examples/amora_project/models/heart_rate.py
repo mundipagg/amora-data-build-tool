@@ -3,14 +3,8 @@ from datetime import datetime
 from pydantic import NameEmail
 from sqlalchemy import TIMESTAMP, Float, Integer, String, select
 
-from amora.models import (
-    AmoraModel,
-    Field,
-    Label,
-    MaterializationTypes,
-    ModelConfig,
-    PartitionConfig,
-)
+from amora.models import (AmoraModel, Field, Label, MaterializationTypes,
+                          ModelConfig, PartitionConfig)
 from amora.protocols import Compilable
 from examples.amora_project.models.health import Health
 

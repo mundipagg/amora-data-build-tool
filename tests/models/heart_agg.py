@@ -2,7 +2,6 @@ from sqlalchemy import Integer, func, select
 
 from amora.models import AmoraModel, Field
 from amora.protocols import Compilable
-
 from tests.models.heart_rate import HeartRate
 
 

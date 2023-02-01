@@ -4,12 +4,12 @@ from typing import Optional
 from sqlalchemy import TIMESTAMP, Float, Integer, String, func, select
 
 from amora.feature_store.decorators import feature_view
-from amora.models import AmoraModel, Field, Label, MaterializationTypes, ModelConfig
+from amora.models import (AmoraModel, Field, Label, MaterializationTypes,
+                          ModelConfig)
 from amora.protocols import Compilable
 from amora.questions import question
 from amora.transformations import datetime_trunc_hour
 from amora.visualization import BigNumber
-
 from tests.models.steps import Steps
 
 

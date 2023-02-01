@@ -3,15 +3,9 @@ from dash import html
 from dash.development.base_component import Component
 
 from amora.dag import DependencyDAG
-from amora.dash.components import (
-    dependency_dag,
-    materialization_type_badge,
-    model_code,
-    model_columns,
-    model_data_owner,
-    model_datatable,
-    model_summary,
-)
+from amora.dash.components import (dependency_dag, materialization_type_badge,
+                                   model_code, model_columns, model_data_owner,
+                                   model_datatable, model_summary)
 from amora.models import Model
 
 

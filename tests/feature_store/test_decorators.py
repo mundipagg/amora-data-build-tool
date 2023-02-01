@@ -2,7 +2,9 @@ from datetime import datetime
 from typing import List
 
 import pytest
-from feast import FeatureView, Field as FeastField, ValueType
+from feast import FeatureView
+from feast import Field as FeastField
+from feast import ValueType
 from feast.types import from_value_type
 from sqlalchemy import ARRAY, DateTime, Float, Integer, String
 

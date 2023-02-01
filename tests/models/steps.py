@@ -2,16 +2,9 @@ from datetime import datetime
 
 from sqlalchemy import TIMESTAMP, Float, Integer, String, select
 
-from amora.models import (
-    AmoraModel,
-    Field,
-    Label,
-    MaterializationTypes,
-    ModelConfig,
-    PartitionConfig,
-)
+from amora.models import (AmoraModel, Field, Label, MaterializationTypes,
+                          ModelConfig, PartitionConfig)
 from amora.protocols import Compilable
-
 from tests.models.health import Health
 
 

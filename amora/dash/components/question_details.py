@@ -5,7 +5,8 @@ from dash.development.base_component import Component
 
 from amora.logger import logger
 from amora.questions import Question
-from amora.visualization import BarChart, BigNumber, Heatmap, LineChart, PieChart
+from amora.visualization import (BarChart, BigNumber, Heatmap, LineChart,
+                                 PieChart)
 
 
 def answer_visualization(question: Question) -> Component:

@@ -4,7 +4,6 @@ from typer.testing import CliRunner
 
 from amora.cli import app
 from amora.utils import clean_compiled_files
-
 from tests.models.heart_rate import HeartRate
 from tests.models.step_count_by_source import StepCountBySource
 from tests.models.steps import Steps

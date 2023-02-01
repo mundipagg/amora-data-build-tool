@@ -1,11 +1,6 @@
-from amora.tests.assertions import (
-    expression_is_true,
-    has_accepted_values,
-    is_non_negative,
-    is_not_null,
-    is_unique,
-    that,
-)
+from amora.tests.assertions import (expression_is_true, has_accepted_values,
+                                    is_non_negative, is_not_null, is_unique,
+                                    that)
 from examples.amora_project.models.health import Health
 
 

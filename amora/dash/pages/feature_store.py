@@ -6,13 +6,9 @@ from dash import html
 from dash.development.base_component import Component
 from feast import Feature, FeatureView
 
-from amora.dash.components import (
-    materialization_badge,
-    model_columns,
-    model_datatable,
-    model_labels,
-    model_summary,
-)
+from amora.dash.components import (materialization_badge, model_columns,
+                                   model_datatable, model_labels,
+                                   model_summary)
 from amora.feature_store import fs as store
 from amora.feature_store.registry import FEATURE_REGISTRY
 from amora.models import Model

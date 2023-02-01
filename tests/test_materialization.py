@@ -9,17 +9,10 @@ from sqlalchemy import TIMESTAMP, DateTime, Integer
 from amora.config import settings
 from amora.dag import DependencyDAG
 from amora.materialization import Task, materialize
-from amora.models import (
-    AmoraModel,
-    Field,
-    Label,
-    MaterializationTypes,
-    ModelConfig,
-    PartitionConfig,
-)
+from amora.models import (AmoraModel, Field, Label, MaterializationTypes,
+                          ModelConfig, PartitionConfig)
 from amora.providers.bigquery import schema_for_model
 from amora.utils import clean_compiled_files
-
 from tests.models.heart_agg import HeartRateAgg
 from tests.models.heart_rate import HeartRate
 from tests.models.steps import Steps

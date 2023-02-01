@@ -1,20 +1,13 @@
 from sqlalchemy import func, literal
 
 from amora.providers.bigquery import array, cte_from_rows
-from amora.tests.assertions import (
-    are_unique_together,
-    expression_is_true,
-    has_accepted_values,
-    has_at_least_one_not_null_value,
-    has_the_same_array_length,
-    is_a_non_empty_string,
-    is_non_negative,
-    is_not_null,
-    is_numeric,
-    is_unique,
-    relationship,
-    that,
-)
+from amora.tests.assertions import (are_unique_together, expression_is_true,
+                                    has_accepted_values,
+                                    has_at_least_one_not_null_value,
+                                    has_the_same_array_length,
+                                    is_a_non_empty_string, is_non_negative,
+                                    is_not_null, is_numeric, is_unique,
+                                    relationship, that)
 
 
 def test_is_numeric_with_numeric_column():

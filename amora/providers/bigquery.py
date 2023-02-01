@@ -2,38 +2,20 @@ import dataclasses
 import decimal
 from datetime import date, datetime, time
 from enum import Enum
-from typing import Any, Callable, Dict, Hashable, Iterable, List, Optional, Union
+from typing import (Any, Callable, Dict, Hashable, Iterable, List, Optional,
+                    Union)
 
 import pandas as pd
 import sqlalchemy
 from google.api_core.client_info import ClientInfo
 from google.api_core.exceptions import NotFound
-from google.cloud.bigquery import (
-    Client,
-    QueryJobConfig,
-    SchemaField,
-    Table,
-    TableReference,
-)
+from google.cloud.bigquery import (Client, QueryJobConfig, SchemaField, Table,
+                                   TableReference)
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
-from sqlalchemy import (
-    Column,
-    String,
-    func,
-    literal,
-    literal_column,
-    select,
-    tablesample,
-    union_all,
-)
-from sqlalchemy.sql import (
-    ColumnElement,
-    coercions,
-    expression,
-    operators,
-    roles,
-    sqltypes,
-)
+from sqlalchemy import (Column, String, func, literal, literal_column, select,
+                        tablesample, union_all)
+from sqlalchemy.sql import (ColumnElement, coercions, expression, operators,
+                            roles, sqltypes)
 from sqlalchemy.sql.selectable import CTE
 from sqlalchemy.sql.sqltypes import ARRAY
 from sqlalchemy_bigquery import STRUCT
@@ -43,13 +25,8 @@ from amora.compilation import compile_statement
 from amora.config import settings
 from amora.contracts import BaseResult
 from amora.logger import log_execution, logger
-from amora.models import (
-    SQLALCHEMY_METADATA_KEY,
-    AmoraModel,
-    Field,
-    MaterializationTypes,
-    Model,
-)
+from amora.models import (SQLALCHEMY_METADATA_KEY, AmoraModel, Field,
+                          MaterializationTypes, Model)
 from amora.protocols import Compilable
 from amora.storage import cache
 from amora.version import VERSION

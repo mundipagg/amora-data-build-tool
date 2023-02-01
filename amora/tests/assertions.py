@@ -4,14 +4,16 @@ import os
 from typing import Callable, Iterable, Optional
 
 import pytest
-from sqlalchemy import ARRAY, Integer, and_, func, literal, or_, select, union_all
+from sqlalchemy import (ARRAY, Integer, and_, func, literal, or_, select,
+                        union_all)
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import ColumnElement, Select
 
 from amora.config import settings
 from amora.models import AmoraModel
 from amora.protocols import Compilable
-from amora.providers.bigquery import RunResult, estimated_query_cost_in_usd, run
+from amora.providers.bigquery import (RunResult, estimated_query_cost_in_usd,
+                                      run)
 from amora.storage import local_engine
 from amora.tests.audit import AuditLog
 

@@ -3,20 +3,14 @@ from pathlib import Path
 import pytest
 
 from amora.compilation import compile_statement
-from amora.models import (
-    AmoraModel,
-    Field,
-    Label,
-    ModelConfig,
-    amora_model_for_name,
-    amora_model_for_path,
-    amora_model_for_target_path,
-    amora_model_from_name_list,
-    select_models_with_label_keys,
-    select_models_with_labels,
-)
-
-from tests.models.deeply.nested.array_repeated_fields import ArrayRepeatedFields
+from amora.models import (AmoraModel, Field, Label, ModelConfig,
+                          amora_model_for_name, amora_model_for_path,
+                          amora_model_for_target_path,
+                          amora_model_from_name_list,
+                          select_models_with_label_keys,
+                          select_models_with_labels)
+from tests.models.deeply.nested.array_repeated_fields import \
+    ArrayRepeatedFields
 from tests.models.health import Health
 from tests.models.step_count_by_source import StepCountBySource
 from tests.models.steps import Steps
