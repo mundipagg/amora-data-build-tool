@@ -4,22 +4,11 @@ from pathlib import Path
 from typing import Optional
 
 import humanize
-from google.cloud.bigquery import (
-    Client,
-    PartitionRange,
-    QueryJobConfig,
-    RangePartitioning,
-    Table,
-    TimePartitioning,
-)
+from google.cloud.bigquery import (Client, PartitionRange, QueryJobConfig,
+                                   RangePartitioning, Table, TimePartitioning)
 
-from amora.models import (
-    MaterializationTypes,
-    Model,
-    ModelConfig,
-    amora_model_for_name,
-    amora_model_for_target_path,
-)
+from amora.models import (MaterializationTypes, Model, ModelConfig,
+                          amora_model_for_name, amora_model_for_target_path)
 from amora.providers.bigquery import schema_for_model
 
 
@@ -106,6 +95,9 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Resu
                     field=config.partition_by.field,
                     type_=config.partition_by.granularity.upper(),
                 )
+
+        if config.expiration_table:
+            table.expires = config.expiration_table
 
         client.create_table(table)
 
