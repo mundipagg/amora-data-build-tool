@@ -3,22 +3,13 @@ import importlib
 import inspect
 import re
 from collections import defaultdict
+from datetime import datetime
 from enum import Enum, auto
 from inspect import getfile
 from pathlib import Path
 from types import ModuleType
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    List,
-    NamedTuple,
-    Optional,
-    Set,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import (Any, Dict, Iterable, List, NamedTuple, Optional, Set,
+                    Tuple, Type, Union)
 
 from pydantic import NameEmail
 from sqlalchemy import Column, MetaData, Table
@@ -128,6 +119,7 @@ class ModelConfig:
     cluster_by: Optional[List[str]] = None
     labels: Labels = dataclasses.field(default_factory=set)
     owner: Optional[Owner] = None
+    expiration_table: Optional[datetime] = None
 
     @property
     def labels_dict(self) -> Dict[str, str]:
