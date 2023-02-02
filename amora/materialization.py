@@ -107,6 +107,9 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Resu
                     type_=config.partition_by.granularity.upper(),
                 )
 
+        if config.expiration_table:
+            table.expires = config.expiration_table
+
         client.create_table(table)
 
         query_job = client.query(
