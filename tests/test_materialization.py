@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import ANY, MagicMock, call, patch
 from uuid import uuid4
 
@@ -23,6 +23,9 @@ from amora.utils import clean_compiled_files
 from tests.models.heart_agg import HeartRateAgg
 from tests.models.heart_rate import HeartRate
 from tests.models.steps import Steps
+
+
+TABLE_EXPIRATION = datetime.utcnow()
 
 
 class ViewModel(AmoraModel):
@@ -71,6 +74,7 @@ class TableModelByrange(AmoraModel):
         cluster_by=["x", "y"],
         labels={Label("freshness", "daily")},
         description=uuid4().hex,
+        expiration_table=TABLE_EXPIRATION,
     )
 
     x: int = Field(Integer, primary_key=True)
@@ -243,6 +247,80 @@ def test_materialize_update_table_metadata(Client: MagicMock):
     assert table.description == TableModelByDay.__model_config__.description
     assert table.labels == TableModelByDay.__model_config__.labels_dict
     assert table.schema == schema_for_model(TableModelByDay)
+    assert table.expires == TableModelByDay.__model_config__.expiration_table
+
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_with_expiration_table(Client: MagicMock):
+    client = Client.return_value
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByrange.unique_name(),
+        config=TableModelByrange.__model_config__,
+    )
+
+    table = client.create_table.call_args.args[0]
+    expires = table.expires
+    assert expires.strftime("%Y/%m/%d %H:%M:%S") == TABLE_EXPIRATION.strftime(
+        "%Y/%m/%d %H:%M:%S"
+    )
+
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_with_expiration_table_is_null(Client: MagicMock):
+    client = Client.return_value
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByDay.unique_name(),
+        config=TableModelByDay.__model_config__,
+    )
+
+    table = client.create_table.call_args.args[0]
+    expires = table.expires
+    assert expires == None
+
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_with_expiration_table_update(Client: MagicMock):
+    client = Client.return_value
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByrange.unique_name(),
+        config=TableModelByrange.__model_config__,
+    )
+
+    table = client.create_table.call_args.args[0]
+
+    new_table_expiration = datetime.utcnow() + timedelta(days=1)
+
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByrange.unique_name(),
+        config=ModelConfig(
+            materialized=MaterializationTypes.table,
+            partition_by=PartitionConfig(
+                field="x",
+                data_type="int",
+                range={
+                    "start": 1,
+                    "end": 10,
+                },
+            ),
+            cluster_by=["x", "y"],
+            labels={Label("freshness", "daily")},
+            description=uuid4().hex,
+            expiration_table=new_table_expiration,
+        ),
+    )
+
+    table = client.create_table.call_args.args[0]
+
+    assert table.expires.strftime("%Y/%m/%d %H:%M:%S") != TABLE_EXPIRATION.strftime(
+        "%Y/%m/%d %H:%M:%S"
+    )
+    assert table.expires.strftime("%Y/%m/%d %H:%M:%S") == new_table_expiration.strftime(
+        "%Y/%m/%d %H:%M:%S"
+    )
 
 
 def test_materialize_invalid_materialization():
