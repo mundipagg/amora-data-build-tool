@@ -129,7 +129,7 @@ class ModelConfig:
     cluster_by: Optional[List[str]] = None
     labels: Labels = dataclasses.field(default_factory=set)
     owner: Optional[Owner] = None
-    expiration_table: Optional[datetime] = None
+    expiration_table: Optional[int] = None
 
     @property
     def labels_dict(self) -> Dict[str, str]:
