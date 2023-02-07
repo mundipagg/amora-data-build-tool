@@ -273,7 +273,7 @@ def test_materialize_with_expiration_table_is_null(Client: MagicMock):
     )
 
     table = client.create_table.call_args.args[0]
-    assert table.expires == None
+    assert table.expires is None
 
 
 def test_materialize_invalid_materialization():
