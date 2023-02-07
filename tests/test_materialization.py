@@ -25,7 +25,7 @@ from tests.models.heart_rate import HeartRate
 from tests.models.steps import Steps
 
 
-TABLE_EXPIRATION = datetime.utcnow()
+TABLE_EXPIRATION = datetime.utcnow() + timedelta(hours=10)
 
 
 class ViewModel(AmoraModel):
@@ -291,7 +291,7 @@ def test_materialize_with_expiration_table_update(Client: MagicMock):
 
     table = client.create_table.call_args.args[0]
 
-    new_table_expiration = datetime.utcnow() + timedelta(days=1)
+    new_table_expiration = datetime.utcnow() + timedelta(hours=48)
 
     materialize(
         sql="SELECT 1",
