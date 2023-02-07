@@ -25,7 +25,8 @@ from tests.models.heart_rate import HeartRate
 from tests.models.steps import Steps
 
 
-TABLE_EXPIRATION = datetime.utcnow() + timedelta(hours=10)
+TABLE_EXPIRATION = 10
+DATE_EXPIRATION = datetime.utcnow() + timedelta(hours=TABLE_EXPIRATION)
 
 
 class ViewModel(AmoraModel):
@@ -247,7 +248,7 @@ def test_materialize_update_table_metadata(Client: MagicMock):
     assert table.description == TableModelByDay.__model_config__.description
     assert table.labels == TableModelByDay.__model_config__.labels_dict
     assert table.schema == schema_for_model(TableModelByDay)
-    assert table.expires == TableModelByDay.__model_config__.expiration_table
+    assert table.expires == DATE_EXPIRATION
 
 
 @patch("amora.materialization.Client", spec=Client)
@@ -260,8 +261,7 @@ def test_materialize_with_expiration_table(Client: MagicMock):
     )
 
     table = client.create_table.call_args.args[0]
-    expires = table.expires
-    assert expires.strftime("%Y/%m/%d %H:%M:%S") == TABLE_EXPIRATION.strftime(
+    assert table.expires.strftime("%Y/%m/%d %H:%M:%S") == DATE_EXPIRATION.strftime(
         "%Y/%m/%d %H:%M:%S"
     )
 
@@ -276,8 +276,7 @@ def test_materialize_with_expiration_table_is_null(Client: MagicMock):
     )
 
     table = client.create_table.call_args.args[0]
-    expires = table.expires
-    assert expires == None
+    assert table.expires == None
 
 
 @patch("amora.materialization.Client", spec=Client)
@@ -309,13 +308,13 @@ def test_materialize_with_expiration_table_update(Client: MagicMock):
             cluster_by=["x", "y"],
             labels={Label("freshness", "daily")},
             description=uuid4().hex,
-            expiration_table=new_table_expiration,
+            expiration_table=48,
         ),
     )
 
     table = client.create_table.call_args.args[0]
 
-    assert table.expires.strftime("%Y/%m/%d %H:%M:%S") != TABLE_EXPIRATION.strftime(
+    assert table.expires.strftime("%Y/%m/%d %H:%M:%S") != DATE_EXPIRATION.strftime(
         "%Y/%m/%d %H:%M:%S"
     )
     assert table.expires.strftime("%Y/%m/%d %H:%M:%S") == new_table_expiration.strftime(
