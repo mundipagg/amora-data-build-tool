@@ -26,7 +26,6 @@ from tests.models.steps import Steps
 
 
 TABLE_EXPIRATION = 10
-DATE_EXPIRATION = datetime.utcnow() + timedelta(hours=TABLE_EXPIRATION)
 
 
 class ViewModel(AmoraModel):
@@ -260,6 +259,8 @@ def test_materialize_with_expiration_table(Client: MagicMock):
         config=TableModelByrange.__model_config__,
     )
 
+    DATE_EXPIRATION = datetime.utcnow() + timedelta(hours=TABLE_EXPIRATION)
+
     table = client.create_table.call_args.args[0]
     assert table.expires.strftime("%Y/%m/%d %H:%M:%S") == DATE_EXPIRATION.strftime(
         "%Y/%m/%d %H:%M:%S"
@@ -313,6 +314,7 @@ def test_materialize_with_expiration_table_update(Client: MagicMock):
     )
 
     table = client.create_table.call_args.args[0]
+    DATE_EXPIRATION = datetime.utcnow() + timedelta(hours=TABLE_EXPIRATION)
 
     assert table.expires.strftime("%Y/%m/%d %H:%M:%S") != DATE_EXPIRATION.strftime(
         "%Y/%m/%d %H:%M:%S"
