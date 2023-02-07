@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -108,7 +108,7 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Resu
                 )
 
         if config.expiration_table:
-            table.expires = config.expiration_table
+            table.expires = datetime.utcnow() + timedelta(hours=config.expiration_table)
 
         client.create_table(table)
 
