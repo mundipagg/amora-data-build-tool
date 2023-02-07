@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from unittest.mock import ANY, MagicMock, call, patch
 from uuid import uuid4
 
@@ -23,9 +23,6 @@ from amora.utils import clean_compiled_files
 from tests.models.heart_agg import HeartRateAgg
 from tests.models.heart_rate import HeartRate
 from tests.models.steps import Steps
-
-
-TABLE_EXPIRATION = 10
 
 
 class ViewModel(AmoraModel):
@@ -74,7 +71,7 @@ class TableModelByrange(AmoraModel):
         cluster_by=["x", "y"],
         labels={Label("freshness", "daily")},
         description=uuid4().hex,
-        hours_to_expire=TABLE_EXPIRATION,
+        hours_to_expire=1,
     )
 
     x: int = Field(Integer, primary_key=True)
@@ -260,9 +257,7 @@ def test_materialize_with_expiration_table(Client: MagicMock):
     )
 
     table = client.create_table.call_args.args[0]
-    assert table.expires.strftime("%Y/%m/%d %H:%M:%S") > datetime.utcnow().strftime(
-        "%Y/%m/%d %H:%M:%S"
-    )
+    assert table.expires > datetime.utcnow().astimezone(timezone.utc)
 
 
 @patch("amora.materialization.Client", spec=Client)
