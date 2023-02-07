@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import ANY, MagicMock, call, patch
 from uuid import uuid4
 
@@ -71,6 +71,7 @@ class TableModelByrange(AmoraModel):
         cluster_by=["x", "y"],
         labels={Label("freshness", "daily")},
         description=uuid4().hex,
+        hours_to_expire=1,
     )
 
     x: int = Field(Integer, primary_key=True)
@@ -243,6 +244,33 @@ def test_materialize_update_table_metadata(Client: MagicMock):
     assert table.description == TableModelByDay.__model_config__.description
     assert table.labels == TableModelByDay.__model_config__.labels_dict
     assert table.schema == schema_for_model(TableModelByDay)
+    assert table.expires == TableModelByDay.__model_config__.hours_to_expire
+
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_with_expiration_table(Client: MagicMock):
+    client = Client.return_value
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByrange.unique_name(),
+        config=TableModelByrange.__model_config__,
+    )
+
+    table = client.create_table.call_args.args[0]
+    assert table.expires > datetime.utcnow().astimezone(timezone.utc)
+
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_with_expiration_table_is_null(Client: MagicMock):
+    client = Client.return_value
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByDay.unique_name(),
+        config=TableModelByDay.__model_config__,
+    )
+
+    table = client.create_table.call_args.args[0]
+    assert table.expires is None
 
 
 def test_materialize_invalid_materialization():
