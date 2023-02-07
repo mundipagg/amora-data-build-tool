@@ -260,7 +260,9 @@ def test_materialize_with_expiration_table(Client: MagicMock):
     )
 
     table = client.create_table.call_args.args[0]
-    assert table.expires > datetime.utcnow()
+    assert table.expires.strftime("%Y/%m/%d %H:%M:%S") > datetime.utcnow().strftime(
+        "%Y/%m/%d %H:%M:%S"
+    )
 
 
 @patch("amora.materialization.Client", spec=Client)
