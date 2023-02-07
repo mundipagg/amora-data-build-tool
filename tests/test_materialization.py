@@ -248,7 +248,7 @@ def test_materialize_update_table_metadata(Client: MagicMock):
     assert table.description == TableModelByDay.__model_config__.description
     assert table.labels == TableModelByDay.__model_config__.labels_dict
     assert table.schema == schema_for_model(TableModelByDay)
-    assert table.expires == DATE_EXPIRATION
+    assert table.expires == TableModelByDay.__model_config__.expiration_table
 
 
 @patch("amora.materialization.Client", spec=Client)
