@@ -107,8 +107,8 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Resu
                     type_=config.partition_by.granularity.upper(),
                 )
 
-        if config.expiration_table:
-            table.expires = datetime.utcnow() + timedelta(hours=config.expiration_table)
+        if config.hours_to_expire:
+            table.expires = datetime.utcnow() + timedelta(hours=config.hours_to_expire)
 
         client.create_table(table)
 
