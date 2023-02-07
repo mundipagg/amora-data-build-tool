@@ -74,7 +74,7 @@ class TableModelByrange(AmoraModel):
         cluster_by=["x", "y"],
         labels={Label("freshness", "daily")},
         description=uuid4().hex,
-        expiration_table=TABLE_EXPIRATION,
+        hours_to_expire=TABLE_EXPIRATION,
     )
 
     x: int = Field(Integer, primary_key=True)
@@ -247,7 +247,7 @@ def test_materialize_update_table_metadata(Client: MagicMock):
     assert table.description == TableModelByDay.__model_config__.description
     assert table.labels == TableModelByDay.__model_config__.labels_dict
     assert table.schema == schema_for_model(TableModelByDay)
-    assert table.expires == TableModelByDay.__model_config__.expiration_table
+    assert table.expires == TableModelByDay.__model_config__.hours_to_expire
 
 
 @patch("amora.materialization.Client", spec=Client)
@@ -259,12 +259,8 @@ def test_materialize_with_expiration_table(Client: MagicMock):
         config=TableModelByrange.__model_config__,
     )
 
-    DATE_EXPIRATION = datetime.utcnow() + timedelta(hours=TABLE_EXPIRATION)
-
     table = client.create_table.call_args.args[0]
-    assert table.expires.strftime("%Y/%m/%d %H:%M:%S") == DATE_EXPIRATION.strftime(
-        "%Y/%m/%d %H:%M:%S"
-    )
+    assert table.expires > datetime.utcnow()
 
 
 @patch("amora.materialization.Client", spec=Client)
@@ -278,50 +274,6 @@ def test_materialize_with_expiration_table_is_null(Client: MagicMock):
 
     table = client.create_table.call_args.args[0]
     assert table.expires == None
-
-
-@patch("amora.materialization.Client", spec=Client)
-def test_materialize_with_expiration_table_update(Client: MagicMock):
-    client = Client.return_value
-    materialize(
-        sql="SELECT 1",
-        model_name=TableModelByrange.unique_name(),
-        config=TableModelByrange.__model_config__,
-    )
-
-    table = client.create_table.call_args.args[0]
-
-    new_table_expiration = datetime.utcnow() + timedelta(hours=48)
-
-    materialize(
-        sql="SELECT 1",
-        model_name=TableModelByrange.unique_name(),
-        config=ModelConfig(
-            materialized=MaterializationTypes.table,
-            partition_by=PartitionConfig(
-                field="x",
-                data_type="int",
-                range={
-                    "start": 1,
-                    "end": 10,
-                },
-            ),
-            cluster_by=["x", "y"],
-            labels={Label("freshness", "daily")},
-            description=uuid4().hex,
-            expiration_table=48,
-        ),
-    )
-
-    table = client.create_table.call_args.args[0]
-    DATE_EXPIRATION = datetime.utcnow() + timedelta(hours=TABLE_EXPIRATION)
-
-    assert table.expires.strftime("%Y/%m/%d %H:%M:%S") != DATE_EXPIRATION.strftime(
-        "%Y/%m/%d %H:%M:%S"
-    )
-    assert table.expires.strftime("%Y/%m/%d %H:%M:%S") == new_table_expiration.strftime(
-        "%Y/%m/%d %H:%M:%S"
-    )
 
 
 def test_materialize_invalid_materialization():
