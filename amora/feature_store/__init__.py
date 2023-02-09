@@ -24,7 +24,6 @@ repo_config = RepoConfig(
         "type": settings.OFFLINE_STORE_TYPE,
         **settings.OFFLINE_STORE_CONFIG,
     },
-    repo_path=settings.REPO_PATH,
     entity_key_serialization_version=2,
 )
 

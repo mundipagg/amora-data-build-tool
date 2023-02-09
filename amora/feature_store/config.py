@@ -29,7 +29,6 @@ class FeatureStoreSettings(BaseSettings):
     REGISTRY: str = NamedTemporaryFile(
         suffix="amora-feature-store-registry", delete=False
     ).name
-    REPO_PATH: str = NamedTemporaryFile(suffix="repo-path", delete=False).name
     PROVIDER: str = FeatureStoreProviders.local.value
     OFFLINE_STORE_TYPE: str = FeatureStoreOfflineStoreTypes.file.value
     OFFLINE_STORE_CONFIG: Dict[str, str] = {}
