@@ -5180,14 +5180,14 @@ test = ["black (>=22.3.0,<23.0.0)", "coverage (>=6.2,<7.0)", "isort (>=5.0.6,<6.
 
 [[package]]
 name = "types-markdown"
-version = "3.4.2.1"
+version = "3.4.2.3"
 description = "Typing stubs for Markdown"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-Markdown-3.4.2.1.tar.gz", hash = "sha256:03c0904cf5886a7d8193e2f50bcf842afc89e0ab80f060f389f6c2635c65628f"},
-    {file = "types_Markdown-3.4.2.1-py3-none-any.whl", hash = "sha256:b2333f6f4b8f69af83de359e10a097e4a3f14bbd6d2484e1829d9b0ec56fa0cb"},
+    {file = "types-Markdown-3.4.2.3.tar.gz", hash = "sha256:6beea6429478c64dcc45f1f420e4e4693f356ff9ec7380f898efe5b3c3472c18"},
+    {file = "types_Markdown-3.4.2.3-py3-none-any.whl", hash = "sha256:2c4e84e81025ca9bfd0d227f03703cdec939fbbd2f0b21c2554031923178d69e"},
 ]
 
 [[package]]
