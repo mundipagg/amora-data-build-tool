@@ -17,13 +17,11 @@ class HeartRateAgg(AmoraModel):
     @classmethod
     def source(cls) -> Compilable:
         return select(
-            [
-                func.avg(HeartRate.value).label("avg"),
-                func.sum(HeartRate.value).label("sum"),
-                func.count(HeartRate.value).label("count"),
-                func.extract("year", HeartRate.creationDate).label("year"),
-                func.extract("month", HeartRate.creationDate).label("month"),
-            ]
+            func.avg(HeartRate.value).label("avg"),
+            func.sum(HeartRate.value).label("sum"),
+            func.count(HeartRate.value).label("count"),
+            func.extract("year", HeartRate.creationDate).label("year"),
+            func.extract("month", HeartRate.creationDate).label("month"),
         ).group_by(
             func.extract("year", HeartRate.creationDate),
             func.extract("month", HeartRate.creationDate),

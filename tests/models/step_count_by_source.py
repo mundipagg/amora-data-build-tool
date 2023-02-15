@@ -41,13 +41,11 @@ class StepCountBySource(AmoraModel):
     def source(cls) -> Optional[Compilable]:
         datetime_trunc = func.timestamp(datetime_trunc_hour(Steps.creationDate))
         return select(
-            [
-                func.avg(Steps.value).label(cls.__table__.columns.value_avg.key),
-                func.sum(Steps.value).label(cls.__table__.columns.value_sum.key),
-                func.count(Steps.value).label(cls.__table__.columns.value_count.key),
-                Steps.sourceName,
-                datetime_trunc.label(cls.__table__.columns.event_timestamp.key),
-            ]
+            func.avg(Steps.value).label(cls.__table__.columns.value_avg.key),
+            func.sum(Steps.value).label(cls.__table__.columns.value_sum.key),
+            func.count(Steps.value).label(cls.__table__.columns.value_count.key),
+            Steps.sourceName,
+            datetime_trunc.label(cls.__table__.columns.event_timestamp.key),
         ).group_by(cls.source_name, cls.event_timestamp)
 
     @classmethod
