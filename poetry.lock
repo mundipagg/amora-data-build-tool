@@ -3010,14 +3010,14 @@ files = [
 
 [[package]]
 name = "mkdocs-minify-plugin"
-version = "0.6.1"
+version = "0.6.2"
 description = "An MkDocs plugin to minify HTML, JS or CSS files prior to being written to disk"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mkdocs-minify-plugin-0.6.1.tar.gz", hash = "sha256:29e14e4ab2d436cb05f56333c9bfbff561fc89402e04d0f1ccfe23a3e7070ba2"},
-    {file = "mkdocs_minify_plugin-0.6.1-py3-none-any.whl", hash = "sha256:6104f8132232da65cfe5d37c56b8ab3f5378f9fcedc341c180f62fdb25149cfe"},
+    {file = "mkdocs-minify-plugin-0.6.2.tar.gz", hash = "sha256:679f6e430bf49845649d0a1f183e36be3a0da5fdc60fee5fdab4356db0a18e2c"},
+    {file = "mkdocs_minify_plugin-0.6.2-py3-none-any.whl", hash = "sha256:b9f43751f515372b766f1e9e77422fd1c9acfaf8c2bf018ff461fd97476e05e3"},
 ]
 
 [package.dependencies]
