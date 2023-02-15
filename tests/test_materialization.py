@@ -1,9 +1,10 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from unittest.mock import ANY, MagicMock, call, patch
 from uuid import uuid4
 
 import pytest
 from google.cloud.bigquery import Client
+from pytz import UTC
 from sqlalchemy import TIMESTAMP, DateTime, Integer
 
 from amora.config import settings
@@ -257,7 +258,7 @@ def test_materialize_with_expiration_table(Client: MagicMock):
     )
 
     table = client.create_table.call_args.args[0]
-    assert table.expires > datetime.utcnow().astimezone(timezone.utc)
+    assert table.expires > datetime.now(UTC)
 
 
 @patch("amora.materialization.Client", spec=Client)
