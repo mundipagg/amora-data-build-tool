@@ -51,6 +51,8 @@ class FeatureStoreSettings(BaseSettings):
     USAGE_TRACKING_ENABLED: bool = False
     USAGE_ENDPOINT: str = FEAST_USAGE_ENDPOINT
 
+    MARKDOWN_FORMAT: str = "github"
+
     class Config:
         env_prefix = "AMORA_FEATURE_STORE_"
 
