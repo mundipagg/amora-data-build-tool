@@ -34,12 +34,11 @@ def compile(
     previous_manifest = manifest.Manifest.load()
 
     if force or not previous_manifest:
-        utils.clean_compiled_files()
+        compilation.remove_compiled_files()
         models_to_compile = list_models()
     else:
-        compilation.clean_compiled_files_of_removed_models(
-            list(previous_manifest.models.keys()), list(current_manifest.models.keys())
-        )
+        removed = previous_manifest.models.keys() - current_manifest.models.keys()
+        compilation.remove_compiled_files(removed)
         models_to_compile = current_manifest.get_models_to_compile(previous_manifest)
 
     for model, model_file_path in models_to_compile:
@@ -97,7 +96,6 @@ def materialize(
         max_workers=settings.MATERIALIZE_NUM_THREADS
     ) as executor:
         for models_to_materialize in dag.topological_generations():
-
             current_tasks: List[materialization.Task] = []
             for model_name in models_to_materialize:
                 if model_name in model_to_task:
