@@ -74,7 +74,7 @@ class PropertyDiff(BaseModel):
 
 class FeatureDiff(BaseModel):
     name: str
-    diff: List
+    diff: Iterable
 
 
 class Diff(BaseModel):
@@ -83,15 +83,16 @@ class Diff(BaseModel):
     features: List[FeatureDiff]
 
 
-def parse_feature_schema_diff(existing, declared):
+def parse_feature_schema_diff(existing: str, declared: str):
     def parse_diff_as_feature_records(value):
-        records = []
+        records = set()
         for item in value:
             if hasattr(item, "feature_columns"):
                 return parse_diff_as_feature_records(item.feature_columns)
-            else:
-                records.append((item.name, VALUE_TYPE_TO_NAME[item.value_type]))
-        return set(records)
+
+            records.add((item.name, VALUE_TYPE_TO_NAME[item.value_type]))
+
+        return records
 
     existing_features, declared_features = parse_diff_as_feature_records(
         existing
