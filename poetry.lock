@@ -729,10 +729,10 @@ files = [
 cffi = ">=1.12"
 
 [package.extras]
-docs = ["sphinx (>=1.6.5,!=1.8.0,!=3.1.0,!=3.1.1)", "sphinx-rtd-theme"]
+docs = ["sphinx (>=1.6.5,!=1.8.0,!=3.1.0,!=3.1.1)", "sphinx_rtd_theme"]
 docstest = ["pyenchant (>=1.6.11)", "sphinxcontrib-spelling (>=4.0.1)", "twine (>=1.12.0)"]
 pep8test = ["black", "flake8", "flake8-import-order", "pep8-naming"]
-sdist = ["setuptools-rust (>=0.11.4)"]
+sdist = ["setuptools_rust (>=0.11.4)"]
 ssh = ["bcrypt (>=3.1.5)"]
 test = ["hypothesis (>=1.11.4,!=3.79.2)", "iso8601", "pretend", "pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-subtests", "pytest-xdist", "pytz"]
 
@@ -934,6 +934,24 @@ dataframe = ["numpy (>=1.18)", "pandas (>=1.0)"]
 diagnostics = ["bokeh (>=2.1.1)", "jinja2"]
 distributed = ["distributed (==2022.01.1)"]
 test = ["pre-commit", "pytest", "pytest-rerunfailures", "pytest-xdist"]
+
+[[package]]
+name = "db-dtypes"
+version = "1.0.5"
+description = "Pandas Data Types for SQL systems (BigQuery, Spanner)"
+category = "main"
+optional = true
+python-versions = ">=3.7"
+files = [
+    {file = "db-dtypes-1.0.5.tar.gz", hash = "sha256:ee68f30cbccf343124ef0abebc7f8cc9a74ef8ed7ee4ff61f586117e8040a9d6"},
+    {file = "db_dtypes-1.0.5-py2.py3-none-any.whl", hash = "sha256:ab6782bf7a414dd7289ce4ba8ddea5ec44c1339d189c7738d7098efdfd148266"},
+]
+
+[package.dependencies]
+numpy = ">=1.16.6,<2.0dev"
+packaging = ">=17.0"
+pandas = ">=0.24.2,<2.0dev"
+pyarrow = ">=3.0.0"
 
 [[package]]
 name = "decorator"
@@ -1608,37 +1626,74 @@ tool = ["click (>=6.0.0)"]
 
 [[package]]
 name = "google-cloud-bigquery"
-version = "2.34.3"
+version = "3.4.1"
 description = "Google BigQuery API client library"
 category = "main"
 optional = false
-python-versions = ">=3.6, <3.11"
+python-versions = ">=3.7"
 files = [
-    {file = "google-cloud-bigquery-2.34.3.tar.gz", hash = "sha256:0ab6362a86a29f17e379e886b49544bc0b75626902a48d12c13a0b47f821bf4a"},
-    {file = "google_cloud_bigquery-2.34.3-py2.py3-none-any.whl", hash = "sha256:d702c609e57a3d7d7fbd37e4913d8d0e0e77eabaf7119037ceaa33e2370d7dcb"},
+    {file = "google-cloud-bigquery-3.4.1.tar.gz", hash = "sha256:884689714d98a2364dde9c7c367e8228c7116108bbad7a6365dfde391638985b"},
+    {file = "google_cloud_bigquery-3.4.1-py2.py3-none-any.whl", hash = "sha256:9e3dd435f026aae98969ef2b0073613f6571224e2f6da3f384830bee53cf822e"},
 ]
 
 [package.dependencies]
+db-dtypes = {version = ">=0.3.0,<2.0.0dev", optional = true, markers = "extra == \"pandas\""}
 google-api-core = {version = ">=1.31.5,<2.0.0 || >2.3.0,<3.0.0dev", extras = ["grpc"]}
 google-cloud-core = ">=1.4.1,<3.0.0dev"
 google-resumable-media = ">=0.6.0,<3.0dev"
-grpcio = ">=1.38.1,<2.0dev"
-packaging = ">=14.3"
-pandas = {version = ">=0.24.2", optional = true, markers = "extra == \"pandas\""}
-proto-plus = ">=1.15.0"
-protobuf = ">=3.12.0"
-pyarrow = {version = ">=3.0.0,<8.0dev", optional = true, markers = "extra == \"pandas\""}
+grpcio = ">=1.47.0,<2.0dev"
+packaging = ">=14.3,<22.0.0dev"
+pandas = {version = ">=1.1.0", optional = true, markers = "extra == \"pandas\""}
+proto-plus = ">=1.15.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+pyarrow = {version = ">=3.0.0", optional = true, markers = "extra == \"pandas\""}
 python-dateutil = ">=2.7.2,<3.0dev"
-requests = ">=2.18.0,<3.0.0dev"
+requests = ">=2.21.0,<3.0.0dev"
 
 [package.extras]
-all = ["Shapely (>=1.6.0,<2.0dev)", "geopandas (>=0.9.0,<1.0dev)", "google-cloud-bigquery-storage (>=2.0.0,<3.0.0dev)", "grpcio (>=1.38.1,<2.0dev)", "ipython (>=7.0.1,!=8.1.0)", "opentelemetry-api (>=1.1.0)", "opentelemetry-instrumentation (>=0.20b0)", "opentelemetry-sdk (>=1.1.0)", "pandas (>=0.24.2)", "pyarrow (>=3.0.0,<8.0dev)", "tqdm (>=4.7.4,<5.0.0dev)"]
-bignumeric-type = ["pyarrow (>=3.0.0,<8.0dev)"]
-bqstorage = ["google-cloud-bigquery-storage (>=2.0.0,<3.0.0dev)", "grpcio (>=1.38.1,<2.0dev)", "pyarrow (>=3.0.0,<8.0dev)"]
-geopandas = ["Shapely (>=1.6.0,<2.0dev)", "geopandas (>=0.9.0,<1.0dev)"]
+all = ["Shapely (>=1.8.4,<2.0dev)", "db-dtypes (>=0.3.0,<2.0.0dev)", "geopandas (>=0.9.0,<1.0dev)", "google-cloud-bigquery-storage (>=2.0.0,<3.0.0dev)", "grpcio (>=1.47.0,<2.0dev)", "ipython (>=7.0.1,!=8.1.0)", "ipywidgets (==7.7.1)", "opentelemetry-api (>=1.1.0)", "opentelemetry-instrumentation (>=0.20b0)", "opentelemetry-sdk (>=1.1.0)", "pandas (>=1.1.0)", "pyarrow (>=3.0.0)", "tqdm (>=4.7.4,<5.0.0dev)"]
+bqstorage = ["google-cloud-bigquery-storage (>=2.0.0,<3.0.0dev)", "grpcio (>=1.47.0,<2.0dev)", "pyarrow (>=3.0.0)"]
+geopandas = ["Shapely (>=1.8.4,<2.0dev)", "geopandas (>=0.9.0,<1.0dev)"]
 ipython = ["ipython (>=7.0.1,!=8.1.0)"]
+ipywidgets = ["ipywidgets (==7.7.1)"]
 opentelemetry = ["opentelemetry-api (>=1.1.0)", "opentelemetry-instrumentation (>=0.20b0)", "opentelemetry-sdk (>=1.1.0)"]
-pandas = ["pandas (>=0.24.2)", "pyarrow (>=3.0.0,<8.0dev)"]
+pandas = ["db-dtypes (>=0.3.0,<2.0.0dev)", "pandas (>=1.1.0)", "pyarrow (>=3.0.0)"]
+tqdm = ["tqdm (>=4.7.4,<5.0.0dev)"]
+
+[[package]]
+name = "google-cloud-bigquery"
+version = "3.5.0"
+description = "Google BigQuery API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-bigquery-3.5.0.tar.gz", hash = "sha256:dd3ca84e5be6fa9e0570fb21665a902cc5651cbd045842fb714164c99a2639c4"},
+    {file = "google_cloud_bigquery-3.5.0-py2.py3-none-any.whl", hash = "sha256:358f54c473938b2d022335118b4e56cdcdaf22a5a112fa0cfeb888fd8814ba62"},
+]
+
+[package.dependencies]
+db-dtypes = {version = ">=0.3.0,<2.0.0dev", optional = true, markers = "extra == \"pandas\""}
+google-api-core = {version = ">=1.31.5,<2.0.0 || >2.3.0,<3.0.0dev", extras = ["grpc"]}
+google-cloud-core = ">=1.4.1,<3.0.0dev"
+google-resumable-media = ">=0.6.0,<3.0dev"
+grpcio = {version = ">=1.47.0,<2.0dev", markers = "python_version < \"3.11\""}
+packaging = ">=20.0.0"
+pandas = {version = ">=1.1.0", optional = true, markers = "extra == \"pandas\""}
+proto-plus = ">=1.15.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+pyarrow = {version = ">=3.0.0", optional = true, markers = "extra == \"pandas\""}
+python-dateutil = ">=2.7.2,<3.0dev"
+requests = ">=2.21.0,<3.0.0dev"
+
+[package.extras]
+all = ["Shapely (>=1.8.4,<2.0dev)", "db-dtypes (>=0.3.0,<2.0.0dev)", "geopandas (>=0.9.0,<1.0dev)", "google-cloud-bigquery-storage (>=2.0.0,<3.0.0dev)", "grpcio (>=1.47.0,<2.0dev)", "grpcio (>=1.49.1,<2.0dev)", "ipython (>=7.0.1,!=8.1.0)", "ipywidgets (==7.7.1)", "opentelemetry-api (>=1.1.0)", "opentelemetry-instrumentation (>=0.20b0)", "opentelemetry-sdk (>=1.1.0)", "pandas (>=1.1.0)", "pyarrow (>=3.0.0)", "tqdm (>=4.7.4,<5.0.0dev)"]
+bqstorage = ["google-cloud-bigquery-storage (>=2.0.0,<3.0.0dev)", "grpcio (>=1.47.0,<2.0dev)", "grpcio (>=1.49.1,<2.0dev)", "pyarrow (>=3.0.0)"]
+geopandas = ["Shapely (>=1.8.4,<2.0dev)", "geopandas (>=0.9.0,<1.0dev)"]
+ipython = ["ipython (>=7.0.1,!=8.1.0)"]
+ipywidgets = ["ipywidgets (==7.7.1)"]
+opentelemetry = ["opentelemetry-api (>=1.1.0)", "opentelemetry-instrumentation (>=0.20b0)", "opentelemetry-sdk (>=1.1.0)"]
+pandas = ["db-dtypes (>=0.3.0,<2.0.0dev)", "pandas (>=1.1.0)", "pyarrow (>=3.0.0)"]
 tqdm = ["tqdm (>=4.7.4,<5.0.0dev)"]
 
 [[package]]
@@ -2823,6 +2878,7 @@ packaging = ">=20.0"
 pillow = ">=6.2.0"
 pyparsing = ">=2.2.1"
 python-dateutil = ">=2.7"
+setuptools_scm = ">=7"
 
 [[package]]
 name = "mdit-py-plugins"
@@ -3579,6 +3635,7 @@ files = [
 numpy = [
     {version = ">=1.20.3", markers = "python_version < \"3.10\""},
     {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
+    {version = ">=1.23.2", markers = "python_version >= \"3.11\""},
 ]
 python-dateutil = ">=2.8.1"
 pytz = ">=2020.1"
@@ -4703,6 +4760,28 @@ testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8 (<5)", "flake8-202
 testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
+name = "setuptools-scm"
+version = "7.1.0"
+description = "the blessed package to manage your versions by scm tags"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "setuptools_scm-7.1.0-py3-none-any.whl", hash = "sha256:73988b6d848709e2af142aa48c986ea29592bbcfca5375678064708205253d8e"},
+    {file = "setuptools_scm-7.1.0.tar.gz", hash = "sha256:6c508345a771aad7d56ebff0e70628bf2b0ec7573762be9960214730de278f27"},
+]
+
+[package.dependencies]
+packaging = ">=20.0"
+setuptools = "*"
+tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
+typing-extensions = "*"
+
+[package.extras]
+test = ["pytest (>=6.2)", "virtualenv (>20)"]
+toml = ["setuptools (>=42)"]
+
+[[package]]
 name = "shed"
 version = "0.10.8"
 description = "`shed` canonicalises Python code."
@@ -4873,14 +4952,14 @@ sqlcipher = ["sqlcipher3-binary"]
 
 [[package]]
 name = "sqlalchemy-bigquery"
-version = "1.5.0"
+version = "1.6.1"
 description = "SQLAlchemy dialect for BigQuery"
 category = "main"
 optional = false
-python-versions = ">=3.7, <3.11"
+python-versions = ">=3.7, <3.12"
 files = [
-    {file = "sqlalchemy-bigquery-1.5.0.tar.gz", hash = "sha256:945f6847877fee798d13e2159a91592f5931374e8008848429c623f6bbf26d05"},
-    {file = "sqlalchemy_bigquery-1.5.0-py2.py3-none-any.whl", hash = "sha256:fa5838b5a8da72b0d274b2a7890027861c04f179b8bd078c5465287d90fe04d0"},
+    {file = "sqlalchemy-bigquery-1.6.1.tar.gz", hash = "sha256:352fe5e1d2a9d2991a88c501a97624912e4b59b4b5c0d6a98c63b7228f37ea4e"},
+    {file = "sqlalchemy_bigquery-1.6.1-py2.py3-none-any.whl", hash = "sha256:e9ce790d5172fbcc867b4fc92ec5047ad5e906e0121691907aab86e8a69adb65"},
 ]
 
 [package.dependencies]
@@ -5751,5 +5830,5 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.8,<3.11"
-content-hash = "4bf2cd21f31ab5393ca4c95cc525d3a7e01ef4998b836909d2cd055a33b3b00c"
+python-versions = ">=3.8,<3.12"
+content-hash = "5843e5e1b1fbb70286aa01fb3fbdd73acef704e3668ef74286a6406adc364351"

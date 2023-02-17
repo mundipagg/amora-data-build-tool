@@ -23,6 +23,8 @@ jobs:
           - python: "3.8"
             experimental: true
           - python: "3.10"
+            experimental: false
+          - python: "3.11"
             experimental: true
     steps:
       - name: 🚧 Install OS dependencies
