@@ -114,7 +114,7 @@ name = "anyio"
 version = "3.6.1"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6.2"
 files = [
     {file = "anyio-3.6.1-py3-none-any.whl", hash = "sha256:cb29b9c70620506a9a8f87a309591713446953302d7d995344d0d7c6c0c9a7be"},
@@ -4883,14 +4883,14 @@ sqlcipher = ["sqlcipher3-binary"]
 
 [[package]]
 name = "sqlalchemy-bigquery"
-version = "1.5.0"
+version = "1.6.1"
 description = "SQLAlchemy dialect for BigQuery"
 category = "main"
 optional = false
-python-versions = ">=3.7, <3.11"
+python-versions = ">=3.7, <3.12"
 files = [
-    {file = "sqlalchemy-bigquery-1.5.0.tar.gz", hash = "sha256:945f6847877fee798d13e2159a91592f5931374e8008848429c623f6bbf26d05"},
-    {file = "sqlalchemy_bigquery-1.5.0-py2.py3-none-any.whl", hash = "sha256:fa5838b5a8da72b0d274b2a7890027861c04f179b8bd078c5465287d90fe04d0"},
+    {file = "sqlalchemy-bigquery-1.6.1.tar.gz", hash = "sha256:352fe5e1d2a9d2991a88c501a97624912e4b59b4b5c0d6a98c63b7228f37ea4e"},
+    {file = "sqlalchemy_bigquery-1.6.1-py2.py3-none-any.whl", hash = "sha256:e9ce790d5172fbcc867b4fc92ec5047ad5e906e0121691907aab86e8a69adb65"},
 ]
 
 [package.dependencies]
@@ -4941,7 +4941,7 @@ name = "starlette"
 version = "0.25.0"
 description = "The little ASGI library that shines."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "starlette-0.25.0-py3-none-any.whl", hash = "sha256:774f1df1983fd594b9b6fb3ded39c2aa1979d10ac45caac0f4255cbe2acb8628"},
