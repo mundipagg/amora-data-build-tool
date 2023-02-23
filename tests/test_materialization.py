@@ -1,11 +1,13 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from unittest.mock import ANY, MagicMock, call, patch
 from uuid import uuid4
 
 import pytest
 from google.cloud.bigquery import Client
+from pytz import UTC
 from sqlalchemy import TIMESTAMP, DateTime, Integer
 
+from amora.compilation import remove_compiled_files
 from amora.config import settings
 from amora.dag import DependencyDAG
 from amora.materialization import Task, materialize
@@ -18,7 +20,6 @@ from amora.models import (
     PartitionConfig,
 )
 from amora.providers.bigquery import schema_for_model
-from amora.utils import clean_compiled_files
 
 from tests.models.heart_agg import HeartRateAgg
 from tests.models.heart_rate import HeartRate
@@ -80,7 +81,7 @@ class TableModelByrange(AmoraModel):
 
 
 def setup_function(module):
-    clean_compiled_files()
+    remove_compiled_files()
 
 
 def test_it_creates_a_task_from_a_target_file_path():
@@ -257,7 +258,7 @@ def test_materialize_with_expiration_table(Client: MagicMock):
     )
 
     table = client.create_table.call_args.args[0]
-    assert table.expires > datetime.utcnow().astimezone(timezone.utc)
+    assert table.expires > datetime.now(UTC)
 
 
 @patch("amora.materialization.Client", spec=Client)

@@ -6,37 +6,38 @@ import pytest
 from typer.testing import CliRunner
 
 from amora.cli import app
+from amora.compilation import remove_compiled_files
 from amora.config import settings
 from amora.manifest import Manifest, ModelMetadata
-from amora.utils import clean_compiled_files, list_target_files
+from amora.utils import list_target_files
 
 runner = CliRunner(mix_stderr=False)
 
 
 def setup_function(_module):
-    clean_compiled_files()
+    remove_compiled_files()
     settings.manifest_path.unlink(missing_ok=True)
 
 
 def teardown_function(_module):
-    clean_compiled_files()
+    remove_compiled_files()
     settings.manifest_path.unlink(missing_ok=True)
 
 
-@mock.patch("amora.utils.clean_compiled_files")
-def test_compile_with_force_clean_compiled_files(clean_compiled_files: mock.MagicMock):
-    result = runner.invoke(
+@mock.patch("amora.compilation.remove_compiled_files")
+def test_compile_with_force_clean_compiled_files(remove_compiled_files: mock.MagicMock):
+    runner.invoke(
         app,
         ["compile", "--force"],
     )
 
-    clean_compiled_files.assert_called_once()
+    remove_compiled_files.assert_called_once()
 
 
 @mock.patch("amora.manifest.Manifest.load")
-@mock.patch("amora.utils.clean_compiled_files")
+@mock.patch("amora.compilation.remove_compiled_files")
 def test_compile_call_clean_compiled_files_when_manifest_doesnt_exists(
-    clean_compiled_files: mock.MagicMock, load: mock.MagicMock
+    remove_compiled_files: mock.MagicMock, load: mock.MagicMock
 ):
     load.return_value = None
 
@@ -45,12 +46,12 @@ def test_compile_call_clean_compiled_files_when_manifest_doesnt_exists(
         ["compile"],
     )
 
-    clean_compiled_files.assert_called_once()
+    remove_compiled_files.assert_called_once()
 
 
 @mock.patch("amora.manifest.Manifest.save")
 def test_compile_call_save_manifest(save: mock.MagicMock):
-    result = runner.invoke(
+    runner.invoke(
         app,
         ["compile"],
     )
@@ -61,15 +62,13 @@ def test_compile_call_save_manifest(save: mock.MagicMock):
 @mock.patch("amora.manifest.Manifest.load")
 @mock.patch("amora.manifest.Manifest.from_project")
 @mock.patch("amora.manifest.Manifest.get_models_to_compile")
-@mock.patch("amora.compilation.clean_compiled_files_of_removed_models")
-def test_compile_call_clean_compiled_files_of_removed_models(
-    clean_compiled_files_of_removed_models: mock.MagicMock,
+@mock.patch("amora.compilation.remove_compiled_files")
+def test_compile_call_remove_compiled_files(
+    remove_compiled_files: mock.MagicMock,
     get_models_to_compile: mock.MagicMock,
     from_project: mock.MagicMock,
     load: mock.MagicMock,
 ):
-    # previous_manifest.get_models_to_compile = mock.MagicMock()
-
     current_manifest = Manifest(models={})
     previous_manifest = Manifest(
         models={
@@ -86,13 +85,13 @@ def test_compile_call_clean_compiled_files_of_removed_models(
     from_project.return_value = current_manifest
     load.return_value = previous_manifest
 
-    result = runner.invoke(
+    runner.invoke(
         app,
         ["compile"],
     )
 
-    clean_compiled_files_of_removed_models.assert_called_once_with(
-        list(previous_manifest.models.keys()), list(current_manifest.models.keys())
+    remove_compiled_files.assert_called_once_with(
+        previous_manifest.models.keys() - current_manifest.models.keys()
     )
     get_models_to_compile.assert_called_once_with(previous_manifest)
 

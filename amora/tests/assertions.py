@@ -223,7 +223,7 @@ def relationship(
     )
 
     exceptions = (
-        select([left_table.c["id"].label(from_.key)])
+        select(left_table.c["id"].label(from_.key))
         .select_from(
             left_table.join(
                 right_table,
@@ -324,7 +324,7 @@ def expression_is_true(expression, condition=None) -> Optional[bool]:
     ```
 
     """
-    statement = select(["*"]).where(~expression)
+    statement = select("*").where(~expression)
 
     if condition is not None:
         statement = statement.where(condition)
@@ -398,7 +398,7 @@ def are_unique_together(columns: Iterable[ColumnElement]) -> Select:
     ```
 
     """
-    return select(columns).group_by(*columns).having(func.count(type_=Integer) > 1)
+    return select(*columns).group_by(*columns).having(func.count(type_=Integer) > 1)
 
 
 def has_the_same_array_length(columns: Iterable[ColumnElement[ARRAY]]) -> Select:
@@ -430,4 +430,4 @@ def has_the_same_array_length(columns: Iterable[ColumnElement[ARRAY]]) -> Select
         func.array_length(a) != func.array_length(b)
         for (a, b) in itertools.combinations(columns, 2)
     )
-    return select(columns).where(or_(*conditions))
+    return select(*columns).where(or_(*conditions))

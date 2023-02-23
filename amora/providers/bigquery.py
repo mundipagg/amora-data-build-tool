@@ -451,7 +451,7 @@ def cte_from_rows(rows: Iterable[Dict[Hashable, Any]]) -> CTE:
                     cols.append(struct(value).label(name))
                 else:
                     cols.append(literal(value).label(name))
-            yield select(cols)
+            yield select(*cols)
 
     selects = list(gen_selects(rows))
 
@@ -519,7 +519,6 @@ def struct_for_model(model: Union[Model, AmoraModel]) -> STRUCT:
 
     def fields():
         for field in dataclasses.fields(model):
-
             if field.type == list:
                 if issubclass(field.type, AmoraModel):
                     yield field.name, ARRAY(
@@ -768,7 +767,7 @@ def zip_arrays(
     if additional_columns:
         columns += additional_columns
 
-    return select(columns).join(
+    return select(*columns).join(
         fixed_unnest(arr_columns[0]).table_valued(with_offset=offset_alias),
         onclause=literal(1) == literal(1),
         isouter=True,

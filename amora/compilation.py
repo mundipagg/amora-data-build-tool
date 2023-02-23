@@ -1,10 +1,12 @@
-import os
+from pathlib import Path
+from typing import Iterable, Optional, Union
 
 import sqlparse
 from sqlalchemy_bigquery import STRUCT, BigQueryDialect
 from sqlalchemy_bigquery.base import BigQueryCompiler
 
 from amora.protocols import Compilable
+from amora.utils import list_target_files
 
 
 class AmoraBigQueryCompiler(BigQueryCompiler):
@@ -53,9 +55,9 @@ def compile_statement(statement: Compilable) -> str:
     return formatted_sql
 
 
-def clean_compiled_files_of_removed_models(
-    previous_models: list, current_models: list
-) -> None:
-    removed_models_files = set(previous_models) - set(current_models)
-    for model_file in removed_models_files:
-        os.remove(model_file)
+def remove_compiled_files(files: Optional[Iterable[Union[str, Path]]] = None) -> None:
+    if files is None:
+        files = list_target_files()
+
+    for model_file in files:
+        Path(model_file).unlink(missing_ok=True)

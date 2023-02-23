@@ -23,5 +23,5 @@ class HeartRateOver100(AmoraModel):
     @classmethod
     def source(cls) -> Optional[Compilable]:
         return select(
-            [HeartRate.id, HeartRate.unit, HeartRate.creationDate, HeartRate.value]
+            HeartRate.id, HeartRate.unit, HeartRate.creationDate, HeartRate.value
         ).where(HeartRate.value >= 100)
