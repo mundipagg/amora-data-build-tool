@@ -98,3 +98,93 @@ def test_parse_diff_nothing_changed():
         properties=[],
         features=[],
     )
+
+
+def test_parse_diff_feature_added():
+    diff = registry_diff.RegistryDiff()
+    diff.feast_object_diffs = [
+        registry_diff.FeastObjectDiff(
+            name="feature_service_diff",
+            feast_object_type=infra_registry.FeastObjectType.FEATURE_SERVICE,
+            current_feast_object=None,
+            new_feast_object=FeatureService(
+                name="feature_service",
+                features=[],
+            ),
+            feast_object_property_diffs=[],
+            transition_type=property_diff.TransitionType.CREATE,
+        )
+    ]
+
+    assert registry.parse_diff(diff) == registry.Diff(
+        objects=[
+            registry.ObjectDiff(
+                name="feature_service_diff",
+                transition_type="CREATE",
+                object_type="FEATURE_SERVICE",
+            )
+        ],
+        properties=[],
+        features=[],
+    )
+
+
+def test_parse_diff_feature_removed():
+    diff = registry_diff.RegistryDiff()
+    diff.feast_object_diffs = [
+        registry_diff.FeastObjectDiff(
+            name="feature_service_diff",
+            feast_object_type=infra_registry.FeastObjectType.FEATURE_SERVICE,
+            current_feast_object=FeatureService(
+                name="feature_service",
+                features=[],
+            ),
+            new_feast_object=None,
+            feast_object_property_diffs=[],
+            transition_type=property_diff.TransitionType.DELETE,
+        )
+    ]
+
+    assert registry.parse_diff(diff) == registry.Diff(
+        objects=[
+            registry.ObjectDiff(
+                name="feature_service_diff",
+                transition_type="DELETE",
+                object_type="FEATURE_SERVICE",
+            )
+        ],
+        properties=[],
+        features=[],
+    )
+
+
+def test_parse_diff_feature_changed():
+    diff = registry_diff.RegistryDiff()
+    diff.feast_object_diffs = [
+        registry_diff.FeastObjectDiff(
+            name="feature_service_diff",
+            feast_object_type=infra_registry.FeastObjectType.FEATURE_SERVICE,
+            current_feast_object=FeatureService(
+                name="feature_service",
+                features=[],
+            ),
+            new_feast_object=FeatureService(
+                name="feature_service",
+                features=[registry.FEATURE_REGISTRY["step_count_by_source"][0]],
+            ),
+            feast_object_property_diffs=[],
+            transition_type=property_diff.TransitionType.UPDATE,
+        )
+    ]
+
+    assert registry.parse_diff(diff) == registry.Diff(
+        objects=[
+            registry.ObjectDiff(
+                name="feature_service_diff",
+                transition_type="UPDATE",
+                object_type="FEATURE_SERVICE",
+            )
+        ],
+        properties=[],
+        features=[],
+    )
