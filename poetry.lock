@@ -3058,14 +3058,14 @@ test = ["autoflake", "black", "isort", "pytest"]
 
 [[package]]
 name = "mkdocstrings"
-version = "0.19.1"
+version = "0.20.0"
 description = "Automatic documentation from sources, for MkDocs."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mkdocstrings-0.19.1-py3-none-any.whl", hash = "sha256:32a38d88f67f65b264184ea71290f9332db750d189dea4200cbbe408d304c261"},
-    {file = "mkdocstrings-0.19.1.tar.gz", hash = "sha256:d1037cacb4b522c1e8c164ed5d00d724a82e49dcee0af80db8fb67b384faeef9"},
+    {file = "mkdocstrings-0.20.0-py3-none-any.whl", hash = "sha256:f17fc2c4f760ec302b069075ef9e31045aa6372ca91d2f35ded3adba8e25a472"},
+    {file = "mkdocstrings-0.20.0.tar.gz", hash = "sha256:c757f4f646d4f939491d6bc9256bfe33e36c5f8026392f49eaa351d241c838e5"},
 ]
 
 [package.dependencies]
@@ -5778,4 +5778,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "7386f6a9c6d1499ace71881ad16fe49e31e8f87f122f979355235c2ce7fe9f0e"
+content-hash = "d691ab8ba56fcb829eb1fb56803a49a8fa2efefb65019d7618e8a9eedf571f2e"
