@@ -856,21 +856,21 @@ dash = "*"
 
 [[package]]
 name = "dash-extensions"
-version = "0.1.10"
+version = "0.1.13"
 description = "Extensions for Plotly Dash."
 category = "main"
 optional = true
-python-versions = ">=3.7,<4"
+python-versions = ">=3.8,<4"
 files = [
-    {file = "dash_extensions-0.1.10-py3-none-any.whl", hash = "sha256:813cbcaa023b801fa4c72966dfe8994c54495a3e8b66339cf01421c959e77dcb"},
-    {file = "dash_extensions-0.1.10.tar.gz", hash = "sha256:0e5a6ab4e8311774b757293e882de0f661a4ac557b2e37d3c87997025186da72"},
+    {file = "dash_extensions-0.1.13-py3-none-any.whl", hash = "sha256:8369db7362513896116495080b425a748e49bfa9197723d101789a86b6c88434"},
+    {file = "dash_extensions-0.1.13.tar.gz", hash = "sha256:8a8da362f83c583350517e883f88514cae0c46c6d075f39579b0fdd1750f5792"},
 ]
 
 [package.dependencies]
-dash = ">=2.7.0"
-Flask-Caching = "2.0.1"
+dash = ">=2.8.1"
+Flask-Caching = "2.0.2"
 jsbeautifier = ">=1.14.3,<2.0.0"
-more-itertools = ">=8.12.0,<9.0.0"
+more-itertools = ">=9.0.0,<10.0.0"
 
 [package.extras]
 mantine = ["dash-mantine-components (>=0.11.0,<0.12.0)"]
@@ -1298,18 +1298,18 @@ dotenv = ["python-dotenv"]
 
 [[package]]
 name = "flask-caching"
-version = "2.0.1"
+version = "2.0.2"
 description = "Adds caching support to Flask applications."
 category = "main"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "Flask-Caching-2.0.1.tar.gz", hash = "sha256:10df200a03f032af60077befe41779dd94898b67c82040d34e87210b71ba2638"},
-    {file = "Flask_Caching-2.0.1-py3-none-any.whl", hash = "sha256:703df847cbe904d8ddffd5f5fb320e236a31cb7bebac4a93d6b1701dd16dbf37"},
+    {file = "Flask-Caching-2.0.2.tar.gz", hash = "sha256:24b60c552d59a9605cc1b6a42c56cdb39a82a28dab4532bbedb9222ae54ecb4e"},
+    {file = "Flask_Caching-2.0.2-py3-none-any.whl", hash = "sha256:19571f2570e9b8dd9dd9d2f49d7cbee69c14ebe8cc001100b1eb98c379dd80ad"},
 ]
 
 [package.dependencies]
-cachelib = ">=0.9.0"
+cachelib = ">=0.9.0,<0.10.0"
 Flask = "<3"
 
 [[package]]
@@ -3152,14 +3152,14 @@ files = [
 
 [[package]]
 name = "more-itertools"
-version = "8.14.0"
+version = "9.1.0"
 description = "More routines for operating on iterables, beyond itertools"
 category = "main"
 optional = true
-python-versions = ">=3.5"
+python-versions = ">=3.7"
 files = [
-    {file = "more-itertools-8.14.0.tar.gz", hash = "sha256:c09443cd3d5438b8dafccd867a6bc1cb0894389e90cb53d227456b0b0bccb750"},
-    {file = "more_itertools-8.14.0-py3-none-any.whl", hash = "sha256:1bc4f91ee5b1b31ac7ceacc17c09befe6a40a503907baf9c839c229b5095cfd2"},
+    {file = "more-itertools-9.1.0.tar.gz", hash = "sha256:cabaa341ad0389ea83c17a94566a53ae4c9d07349861ecb14dc6d0345cf9ac5d"},
+    {file = "more_itertools-9.1.0-py3-none-any.whl", hash = "sha256:d2bc7f02446e86a68911e58ded76d6561eea00cddfb2a91e7019bbb586c799f3"},
 ]
 
 [[package]]
