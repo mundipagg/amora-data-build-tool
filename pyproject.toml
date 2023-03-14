@@ -67,7 +67,7 @@ markdown = "*"
 optional = true
 
 [tool.poetry.group.docs.dependencies]
-mkdocs-material = "8.5.10"
+mkdocs-material = "8.5.11"
 mkdocs-minify-plugin = "^0.6.1"
 mkdocs-redirects = "^1.2.0"
 mkdocs-git-revision-date-plugin = "^0.3.1"
