@@ -3875,14 +3875,14 @@ prometheus-client = ">=0.8.0,<1.0.0"
 
 [[package]]
 name = "prometheus-flask-exporter"
-version = "0.22.2"
+version = "0.22.3"
 description = "Prometheus metrics exporter for Flask"
 category = "main"
 optional = true
 python-versions = "*"
 files = [
-    {file = "prometheus_flask_exporter-0.22.2-py3-none-any.whl", hash = "sha256:299c53dc068afe8c5510e17a8d2e50cfe22ae9cfe6c0755556ebd6fd9d0b3bd4"},
-    {file = "prometheus_flask_exporter-0.22.2.tar.gz", hash = "sha256:2a41b7fcc72a413f3023f5f1be6142b2023b8adb54454f660ba0fb5c8f98a29c"},
+    {file = "prometheus_flask_exporter-0.22.3-py3-none-any.whl", hash = "sha256:16e6a3a7ce0089fc7c78a6956cdf28c184c3ac518e2b46a2a8e410b68d3a84a3"},
+    {file = "prometheus_flask_exporter-0.22.3.tar.gz", hash = "sha256:32b152aeb7970cbf04616627fc5bf20d82b0918e54c54f80dc8aaef3349fd333"},
 ]
 
 [package.dependencies]
@@ -5779,4 +5779,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "8f8d1f70bdb1847e0e609f92471f3c4a5b62e7394f7d7e1a38077303192c3a08"
+content-hash = "e5d5742c4e1a83e9cdc0c15f087f1b9999c8e44ef934f02fac3cafe792ba7428"
