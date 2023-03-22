@@ -32,6 +32,8 @@ nav:
         - Feature View Protocol: 'feature-store/feature-view-protocol.md'
       - 'concepts/data-questions.md'
       - 'concepts/data-visualization.md'
+  - 🤖 A.I.:
+      - 'ai.md'
   - 🧑‍🏫 User Guide:
       - 'user-guide/cli.md'
       - 'user-guide/web-ui.md'
@@ -42,6 +44,7 @@ nav:
       - 'api/storage.md'
   - ↔️ Providers:
       - 'providers/bigquery.md'
+      - 'providers/openai.md'
   - 🧪 Testing:
       - 'tests/assertions.md'
   -  🔖 Glossary: 'glossary.md'
