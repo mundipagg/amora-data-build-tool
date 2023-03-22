@@ -23,26 +23,29 @@ def sql_translate(question: str, dialect='BigQuery', stop: str = "#", **request_
     Returns:
         The prompt context to be used for completion
 
+    Read more:
+        https://platform.openai.com/examples/default-sql-translate
+
     Examples:
 
-    ```python
-        assert sql_translate("What is the maximum heart rate observed today?") == SQLPromptAnswer(
-            completion_tokens=100,
-            prompt_tokens=35,
-            total_tokens=135,
-            request_params={
-                "model": "code-davinci-002",
-                "temperature": 0,
-                "max_tokens": 150,
-                "top_p": 1.0,
-                "frequency_penalty": 0.0,
-                "presence_penalty": 0.0,
-                "stop": ["#"],
-                "prompt": ...
-            },
-            sql="SELECT MAX(value) FROM heart_rate WHERE DATE(creationDate) = CURRENT_DATE()"
-        )
-    ```
+        ```python
+            assert sql_translate("What is the maximum heart rate observed today?") == SQLPromptAnswer(
+                completion_tokens=100,
+                prompt_tokens=35,
+                total_tokens=135,
+                request_params={
+                    "model": "code-davinci-002",
+                    "temperature": 0,
+                    "max_tokens": 150,
+                    "top_p": 1.0,
+                    "frequency_penalty": 0.0,
+                    "presence_penalty": 0.0,
+                    "stop": ["#"],
+                    "prompt": ...
+                },
+                sql="SELECT MAX(value) FROM heart_rate WHERE DATE(creationDate) = CURRENT_DATE()"
+            )
+        ```
 
     """
     request_params = dict(
