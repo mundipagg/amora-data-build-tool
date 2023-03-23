@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import markdown
 import pandas
@@ -129,3 +129,10 @@ def test_question_raises_an_error_if_the_decorated_function_doesnt_return_a_comp
 
     with pytest.raises(AttributeError):
         an_invalid_question.render()
+
+
+def test_question_from_prompt():
+    with patch("amora.questions.sql_translate", Mock(sql="SELECT 8 AS weight")):
+        question = Question.from_prompt("What is Apolo current weight?")
+
+    assert isinstance(question, Question)

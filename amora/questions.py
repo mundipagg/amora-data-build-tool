@@ -1,15 +1,35 @@
+import re
 from datetime import date
 from typing import Callable, Optional, Set
 
 import pandas as pd
+import sqlalchemy
 
 from amora.compilation import compile_statement
 from amora.protocols import Compilable
 from amora.providers.bigquery import run
+from amora.providers.openai import sql_translate
 from amora.storage import cache
 from amora.visualization import Table, Visualization, VisualizationConfig
 
 QuestionFunc = Callable[[], Compilable]
+
+
+def parse_name(question_name: str, replace_non_alpha_to: str = "_"):
+    """
+    Parses a string to a valid Python function name.
+
+    :param s: String to parse
+    :return: Valid Python function name
+    """
+
+    # Replace any non-alphanumeric characters with underscores
+    question_name.lower()
+    question_name = re.sub("[^0-9a-zA-Z_]", replace_non_alpha_to, question_name)
+
+    # Remove any non-alphabetic characters from the beginning of the string
+    question_name = re.sub("^[^a-zA-Z_]+", "", question_name)
+    return question_name
 
 
 class Question:
@@ -164,6 +184,29 @@ class Question:
     @property
     def uid(self) -> str:
         return str(hash(self))
+
+    @classmethod
+    def from_prompt(cls, question: str) -> "Question":
+        """
+        Creates a Data Question from a natural language question
+
+        Args:
+            question: A natural language question.
+
+        Examples:
+            ```python
+            Question.from_prompt("What is Apolo current weight?")
+            ```
+
+        """
+        prompt_answer = sql_translate(question)
+
+        def question_func():
+            return sqlalchemy.text(prompt_answer.sql)
+
+        question_func.__doc__ = question
+
+        return cls(question_func=question_func)
 
     def render(self) -> Visualization:
         """
