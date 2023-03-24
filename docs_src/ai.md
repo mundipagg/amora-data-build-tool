@@ -1,6 +1,6 @@
 ## A.I.
 
-::: amora.ai.prompt_context
+::: amora.ai.PromptContext
     rendering:
         heading_level: 4
         show_root_heading: true
