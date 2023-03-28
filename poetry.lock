@@ -5229,14 +5229,14 @@ files = [
 
 [[package]]
 name = "types-protobuf"
-version = "3.20.4.6"
+version = "4.22.0.0"
 description = "Typing stubs for protobuf"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-protobuf-3.20.4.6.tar.gz", hash = "sha256:ba27443c592bbec1629dd69494a24c84461c63f0d3b7d648ce258aaae9680965"},
-    {file = "types_protobuf-3.20.4.6-py3-none-any.whl", hash = "sha256:ab2d315ba82246b83d28f8797c98dc0fe1dd5cfd187909e56faf87239aedaae3"},
+    {file = "types-protobuf-4.22.0.0.tar.gz", hash = "sha256:bf2b414d815dc387c0a041d9207db054c7cdb94591bb233d9b71a85243e05efc"},
+    {file = "types_protobuf-4.22.0.0-py3-none-any.whl", hash = "sha256:1e59294618c9518f35f17ae1a3d866cdf7e998eb4b9907d41e9ebe5b84fde636"},
 ]
 
 [[package]]
@@ -5792,4 +5792,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "637ed6e38ebb646b2ad35e70e882ff3c1d673ac620f477a452a682e048b3141d"
+content-hash = "65219ffcb1b94f055f59889294035a207665a2af561dd25e202d7d4d881f3d58"
