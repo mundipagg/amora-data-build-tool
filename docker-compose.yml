@@ -1,0 +1,44 @@
+services:
+  online-store:
+    image: "redis:7-alpine"
+    container_name: online-store
+    hostname: online-store
+    ports:
+      - "6379:6379"
+  feature-server:
+    image: "gcr.io/amora-data-build-tool/amora:latest"
+    build: .
+    container_name: feature-server
+    hostname: feature-server
+    env_file:
+      - examples/amora_project/.env
+    command: "amora feature-store serve"
+    ports:
+      - "8667:8667"
+    volumes:
+      - type: bind
+        source: ~/.config/gcloud/
+        target: /opt/app/config/
+      - type: bind
+        source: .
+        target: /opt/app
+    depends_on:
+      - online-store
+  ui:
+    image: "gcr.io/amora-data-build-tool/amora:latest"
+    build: .
+    container_name: ui
+    hostname: ui
+    env_file:
+      - examples/amora_project/.env
+    command: "amora dash serve"
+    ports:
+      - "8050:8050"
+      - "9090:9090"
+    volumes:
+      - type: bind
+        source: ~/.config/gcloud/
+        target: /opt/app/config/
+      - type: bind
+        source: .
+        target: /opt/app
