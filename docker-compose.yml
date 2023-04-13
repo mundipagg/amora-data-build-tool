@@ -55,6 +55,7 @@ services:
       - type: bind
         source: ~/.config/gcloud/
         target: /opt/app/config/
+        read_only: true
       - type: bind
         source: .
         target: /opt/app
@@ -76,6 +77,7 @@ services:
       - type: bind
         source: ~/.config/gcloud/
         target: /opt/app/config/
+        read_only: true
       - type: bind
         source: .
         target: /opt/app
