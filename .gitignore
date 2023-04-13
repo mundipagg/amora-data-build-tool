@@ -157,6 +157,6 @@ config/*/**
 !config/*/.gitkeep
 
 */.sqlfluff_output/annotations.json
-
+.prometheus_multiproc_dir/*.db
 
 docs/
