@@ -21,7 +21,26 @@ jobs:
           python-version: 3.9
 
       - name: 🐍 Install Pip and Poetry
-        run: pip install -U pip>=22.2.2 poetry>=1.2.1
+        run: pip install -U pip>=23.0.1 poetry>=1.4.2
 
       - name: 🚀 Deploy to PyPI
         run: poetry publish --build --username __token__ --password ${{ secrets.PYPI_TOKEN }}
+
+      - name: 🐳 Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: 🐳 Login to GCR
+        uses: docker/login-action@v2
+        with:
+          registry: gcr.io
+          username: _json_key
+          password: ${{ env.gcp_service_account }}
+
+      - name: 🐳 Docker Build and Push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: gcr.io/amora-data-build-tool/amora:latest
