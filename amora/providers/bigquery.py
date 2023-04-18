@@ -354,6 +354,54 @@ def import_model(table_reference: str) -> str:
     return model_source_code
 
 
+def import_table(table_reference: str, overwrite=False) -> Tuple[Model, Path]:
+    """
+    Creates an `AmoraModel` file from a table reference and returns the model reference.
+    E.g.:
+
+    >>> amora.providers.bigquery.import_table("amora-data-build-tool.amora.health")
+    """
+    destination_file_path = settings.models_path.joinpath(
+        table_reference.replace("-", "_").replace(".", "/") + ".py"
+    )
+
+    if destination_file_path.exists() and not overwrite:
+        raise ValueError(
+            f"`{destination_file_path}` already exists. "
+            f"Pass `--overwrite` to overwrite file.",
+        )
+
+    project, dataset, table = table_reference.split(".")
+    model_name = "".join(part.title() for part in table.split("_"))
+    sorted_schema = sorted(get_schema(table_reference), key=lambda field: field.name)
+
+    model_source_code = JINJA2_NEW_MODEL_TEMPLATE.render(
+        BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
+        BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES=BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
+        dataset=dataset,
+        dataset_id=f"{project}.{dataset}",
+        model_name=model_name,
+        project=project,
+        schema=sorted_schema,
+        table=table,
+    )
+
+    formatted_source_code = shed(model_source_code)
+
+    destination_file_path.parent.mkdir(parents=True, exist_ok=True)
+    destination_file_path.write_text(data=formatted_source_code)
+
+    logger.info(
+        f"🎉 Amora Model imported",
+        extra=dict(
+            destination_file_path=destination_file_path,
+            model_name=model_name,
+            table_reference=table_reference,
+        ),
+    )
+    return amora_model_for_path(destination_file_path), destination_file_path
+
+
 @log_execution()
 def run(statement: Compilable) -> RunResult:
     """
