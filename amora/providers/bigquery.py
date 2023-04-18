@@ -2,7 +2,8 @@ import dataclasses
 import decimal
 from datetime import date, datetime, time
 from enum import Enum
-from typing import Any, Callable, Dict, Hashable, Iterable, List, Optional, Union
+from pathlib import Path
+from typing import Any, Callable, Dict, Hashable, Iterable, List, Optional, Union, Tuple
 
 import pandas as pd
 import sqlalchemy
@@ -16,6 +17,8 @@ from google.cloud.bigquery import (
     TableReference,
 )
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
+from jinja2 import Environment, PackageLoader, select_autoescape
+from shed import shed
 from sqlalchemy import (
     Column,
     String,
@@ -48,7 +51,7 @@ from amora.models import (
     AmoraModel,
     Field,
     MaterializationTypes,
-    Model,
+    Model, amora_model_for_path,
 )
 from amora.protocols import Compilable
 from amora.storage import cache
@@ -56,6 +59,13 @@ from amora.version import VERSION
 
 Schema = List[SchemaField]
 BQTable = Union[Table, TableReference, str]
+
+JINJA2_NEW_MODEL_TEMPLATE = Environment(
+    loader=PackageLoader("amora"),
+    autoescape=select_autoescape(),
+    trim_blocks=True,
+    lstrip_blocks=True,
+).get_template("new-model.py.jinja2")
 
 BIGQUERY_TYPES_TO_PYTHON_TYPES = {
     "ARRAY": list,
@@ -264,6 +274,30 @@ def schema_for_model_source(model: Model) -> Optional[Schema]:
 
     return result.schema
 
+
+def list_tables(dataset_reference: str) -> List[str]:
+    """
+    List tables in the dataset.
+
+    Read more:
+        https://cloud.google.com/bigquery/docs/reference/rest/v2/tables/list
+        
+    Examples:
+
+        >>> amora.providers.bigquery.list_tables("amora-data-build-tool.amora")
+        [
+            'amora-data-build-tool.amora.array_repeated_fields',
+            'amora-data-build-tool.amora.health',
+            'amora-data-build-tool.amora.heart_rate',
+            'amora-data-build-tool.amora.heart_rate_agg',
+            'amora-data-build-tool.amora.heart_rate_over_100',
+            'amora-data-build-tool.amora.step_count_by_source',
+            'amora-data-build-tool.amora.steps',
+            'amora-data-build-tool.amora.steps_agg'
+        ]
+    """
+    for table_list_item in get_client().list_tables(dataset_reference):
+        yield str(table_list_item.reference)
 
 @log_execution()
 def run(statement: Compilable) -> RunResult:
