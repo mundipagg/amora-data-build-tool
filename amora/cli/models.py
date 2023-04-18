@@ -9,6 +9,7 @@ from rich.text import Text
 
 from amora.config import settings
 from amora.models import Model, list_models
+from amora.providers import bigquery
 from amora.providers.bigquery import (
     DryRunResult,
     dry_run,
@@ -159,3 +160,103 @@ def models_list(
     elif format == "json":
         output = {"models": [result.as_dict() for result in results]}
         typer.echo(json.dumps(output))
+
+
+models_import = typer.Typer(help="Import models")
+app.add_typer(models_import, name="import")
+
+
+@models_import.command("table", help="Generate an AmoraModel file from a table")
+def models_import_table(
+    table_reference: str = typer.Argument(
+        None,
+        help="BigQuery unique table identifier. "
+        "E.g.: `amora-data-build-tool.amora.health`",
+    ),
+    overwrite: bool = typer.Option(
+        False, help="Overwrite the output file if one already exists"
+    ),
+):
+    """
+    Generates an `AmoraModel` file from a table in BigQuery. Imports the table metadata and generates the
+    `AmoraModel` file using the `bigquery.import_table()` method.
+
+    Args:
+        table_reference (str): Represents the unique identifier of the BigQuery table from which to
+        generate the AmoraModel file. The format for table_reference is `project_id.dataset_id.table_id`.
+        overwrite (bool): Determines whether or not to overwrite the output file if it already exists.
+        he default value is `False`. If `True`, the function will overwrite the output file.
+
+    Examples:
+        ```shell
+        amora models import table "amora-data-build-tool.amora.health"
+        ```
+    """
+    bigquery.import_table(table_reference, overwrite)
+
+
+@models_import.command(
+    "dataset", help="Generate AmoraModel files for dataset contents."
+)
+def models_import_dataset(
+    dataset_reference: str = typer.Argument(
+        None,
+        help="BigQuery unique dataset identifier. "
+        "E.g.: `amora-data-build-tool.amora`",
+    ),
+    overwrite: bool = typer.Option(
+        False, help="Overwrite the output file if one already exists"
+    ),
+):
+    """
+    Generates `AmoraModel` files for a dataset in BigQuery. Imports the table metadata for all tables
+    in the dataset and generates `AmoraModel` files using the `bigquery.import_table()` method.
+
+    Args:
+        dataset_reference (str): Represents the unique identifier of the BigQuery dataset for which
+        to generate AmoraModel files. The format for dataset_reference is `project_id.dataset_id`.
+        overwrite (bool): Determines whether or not to overwrite the output file if it already exists.
+        The default value is `False`. If `True`, the function will overwrite the output file.
+
+    Examples:
+        ```shell
+        amora models import dataset "amora-data-build-tool.amora"
+        ```
+    """
+    typer.echo(f"🏗 Generating AmoraModel files from dataset `{dataset_reference}`")
+    for table in bigquery.list_tables(dataset_reference):
+        bigquery.import_table(table, overwrite)
+
+
+@models_import.command(
+    "project", help="Generate AmoraModel files for the project contents."
+)
+def models_import_project(
+    project_id: str = typer.Argument(
+        None,
+        help="BigQuery project id."
+        "E.g.: `amora-data-build-tool`",
+    ),
+    overwrite: bool = typer.Option(
+        False, help="Overwrite the output file if one already exists"
+    ),
+):
+    """
+    Generates `AmoraModel` files for the contents of a Google Cloud project. Iterates through all the
+    datasets and tables in the project and generates an `AmoraModel` file for each table.
+
+    Args:
+        project_id (str): The ID of the Google Cloud project that the BigQuery dataset belongs to.
+            The format for project_id is `project_id`. For example: `amora-data-build-tool`.
+        overwrite (bool): Determines whether to overwrite the output file if it already exists.
+            The default value is `False`. If `True`, the function will overwrite the output file.
+
+    Examples:
+        ```shell
+        amora models import project "amora-data-build-tool"
+        ```
+    """
+    typer.echo(f"🏗 Generating AmoraModel files from project `{project_id}`")
+    for dataset in bigquery.list_datasets(project_id):
+        for table in bigquery.list_tables(dataset):
+            bigquery.import_table(table, overwrite)
