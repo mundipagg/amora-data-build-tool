@@ -299,6 +299,35 @@ def list_tables(dataset_reference: str) -> List[str]:
     for table_list_item in get_client().list_tables(dataset_reference):
         yield str(table_list_item.reference)
 
+
+def list_datasets(project_id: str) -> Iterable[str]:
+    """
+    Returns an iterable of dataset IDs for a given project.
+
+    Args:
+        project_id (str): The ID of the project to list datasets for.
+
+    Returns:
+        An iterable of dataset IDs as strings
+
+    Examples:
+        >>> list(list_datasets("amora-data-build-tool"))
+        [
+            'amora-data-build-tool.amora',
+            'amora-data-build-tool.amora_feature_store',
+            'amora-data-build-tool.apolo',
+            'amora-data-build-tool.diogo',
+            'amora-data-build-tool.home',
+            'amora-data-build-tool.raw',
+            'amora-data-build-tool.raw_diogo',
+            'amora-data-build-tool.raw_mi_fitness',
+            'amora-data-build-tool.tmp'
+        ]
+    """
+    for d in get_client().list_datasets(project_id):
+        yield d.full_dataset_id.replace(":", ".")
+
+
 @log_execution()
 def run(statement: Compilable) -> RunResult:
     """
