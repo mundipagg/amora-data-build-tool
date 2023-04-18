@@ -49,6 +49,8 @@ class Settings(BaseSettings):
     )
 
     OPENAI_COST_PER_1000_TOKENS: float = 0.0016
+    OPENAI_SQL_TRANSLATE_MODEL: str = "text-davinci-003"
+    OPENAI_SQL_TRANSLATE_MAX_TOKENS: int = 1000
 
     STORAGE_CACHE_ENABLED: bool = False
     STORAGE_CACHE_PROVIDER: StorageCacheProviders = StorageCacheProviders.local

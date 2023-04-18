@@ -3,7 +3,7 @@ import os
 import openai
 from pydantic import BaseModel
 
-from amora.ai import prompt_context
+from amora.ai import PromptContext
 from amora.config import settings
 from amora.logger import log_execution
 from amora.sql import format_sql
@@ -38,8 +38,8 @@ class SQLPromptAnswer(BaseModel):
     @property
     def estimated_cost_in_usd(self):
         """
-        The estimated cost of completion. OpenAI has a per 1000 tokens pricing. You can think of tokens as pieces of words, where 1,000 tokens is
-        about 750 words.
+        The estimated cost of completion. OpenAI has a per 1000 tokens pricing. You can think of tokens as
+        pieces of words, where 1,000 tokens is about 750 words.
 
         Read More:
             https://openai.com/pricing
@@ -97,16 +97,16 @@ def sql_translate(
 
     """
     request_params = dict(
-        model="code-davinci-002",
+        model=settings.OPENAI_SQL_TRANSLATE_MODEL,
         temperature=0,
-        max_tokens=150,
+        max_tokens=settings.OPENAI_SQL_TRANSLATE_MAX_TOKENS,
         top_p=1.0,
         frequency_penalty=0.0,
         presence_penalty=0.0,
         stop=[stop],
         prompt=f""" 
             ### {dialect} SQL tables, with their properties:
-            {prompt_context(stop)}
+            {PromptContext.from_project(stop)}
             ### A query to answer '{question}'
             SELECT
         """,
