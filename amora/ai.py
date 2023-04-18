@@ -70,7 +70,7 @@ class PromptContext(BaseModel):
                 yield f"{stop} {model.unique_name()}({columns})"
 
         def columns_documentation():
-            for (model, _model_path) in list_models():
+            for model, _model_path in list_models():
                 yield f"{stop} Table {model.unique_name()}: {model.__model_config__.description}"
                 for column in model.__table__.columns:
                     if column.doc is not None:

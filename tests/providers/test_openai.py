@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from openai.openai_object import OpenAIObject
 
-from amora.providers.openai import sql_translate, SQLPromptAnswer
+from amora.providers.openai import SQLPromptAnswer, sql_translate
 
 
 def test_sql_translate():
@@ -71,7 +71,7 @@ def test_sql_translate():
             prompt_tokens=35,
             total_tokens=135,
             request_params={
-                "model": "code-davinci-002",
+                "model": "text-davinci-003",
                 "temperature": 0,
                 "max_tokens": 150,
                 "top_p": 1.0,
