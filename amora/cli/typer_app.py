@@ -5,7 +5,7 @@ import pytest
 import typer
 
 from amora import compilation, manifest, materialization, utils
-from amora.cli import dash, feature_store, models
+from amora.cli import ai, dash, feature_store, models
 from amora.cli.shared_options import force_option, models_option, target_option
 from amora.cli.type_specs import Models
 from amora.config import settings
@@ -137,4 +137,5 @@ def test(ctx: typer.Context) -> None:
 
 app.add_typer(dash.app, name="dash")
 app.add_typer(models.app, name="models")
+app.add_typer(ai.app, name="ai")
 app.add_typer(feature_store.app, name="feature-store")
