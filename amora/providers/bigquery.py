@@ -328,6 +328,32 @@ def list_datasets(project_id: str) -> Iterable[str]:
         yield d.full_dataset_id.replace(":", ".")
 
 
+def import_model(table_reference: str) -> str:
+    env = Environment(
+        loader=PackageLoader("amora"),
+        autoescape=select_autoescape(),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("new-model.py.jinja2")
+
+    project, dataset, table = table_reference.split(".")
+    model_name = "".join(part.title() for part in table.split("_"))
+
+    sorted_schema = sorted(get_schema(table_reference), key=lambda field: field.name)
+    model_source_code = template.render(
+        BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
+        BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES=BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
+        dataset=dataset,
+        dataset_id=f"{project}.{dataset}",
+        model_name=model_name,
+        project=project,
+        schema=sorted_schema,
+        table=table,
+    )
+    return model_source_code
+
+
 @log_execution()
 def run(statement: Compilable) -> RunResult:
     """
