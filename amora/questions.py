@@ -44,9 +44,10 @@ class Question:
     Lets define a new data question:
 
     ```python
+    from examples.models.step_count_by_source import StepCountBySource
+
     from amora.models import select
     from amora.questions import question
-    from examples.models.step_count_by_source import StepCountBySource
 
 
     @question
@@ -216,16 +217,16 @@ class Question:
 
     def to_markdown(self) -> str:
         return f"""
-            ## {self.name}
+## {self.name}
 
-            ```sql
-            {self.sql}
-            ```
+```sql
+{self.sql}
+```
 
-            ### Answer
+### Answer
 
-            {self.answer_df().to_markdown()}
-        """
+{self.answer_df().to_markdown()}
+"""
 
     def _repr_markdown_(self):
         return self.to_markdown()
