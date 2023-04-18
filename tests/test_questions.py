@@ -6,7 +6,7 @@ import pytest
 from sqlalchemy import literal, select
 
 from amora.protocols import Compilable
-from amora.questions import Question, question
+from amora.questions import Question, parse_name, question
 from amora.visualization import Visualization
 
 
@@ -136,3 +136,24 @@ def test_question_from_prompt():
         question = Question.from_prompt("What is Apolo current weight?")
 
     assert isinstance(question, Question)
+
+
+@pytest.fixture(
+    params=[
+        (
+            "Qual o maior batimento cardíaco observado?",
+            "qual_o_maior_batimento_cardiaco_observado",
+        ),
+        (
+            "Qual o total de passos dados, por dispositivo?",
+            "qual_o_total_de_passos_dados__por_dispositivo",
+        ),
+    ]
+)
+def questions_and_expected_function_name(request):
+    return request.param
+
+
+def test_parse_name(questions_and_expected_function_name):
+    question_name, expected_function_name = questions_and_expected_function_name
+    assert expected_function_name == parse_name(question_name)

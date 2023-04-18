@@ -1,4 +1,4 @@
-import re
+import unicodedata
 from datetime import date
 from typing import Callable, Optional, Set
 
@@ -19,17 +19,19 @@ def parse_name(question_name: str, replace_non_alpha_to: str = "_"):
     """
     Parses a string to a valid Python function name.
 
-    :param s: String to parse
-    :return: Valid Python function name
+    Args:
+        question_name: Question name to parse
+
+    Returns:
+        A valid Python function name
     """
-
-    # Replace any non-alphanumeric characters with underscores
-    question_name.lower()
-    question_name = re.sub("[^0-9a-zA-Z_]", replace_non_alpha_to, question_name)
-
-    # Remove any non-alphabetic characters from the beginning of the string
-    question_name = re.sub("^[^a-zA-Z_]+", "", question_name)
-    return question_name
+    s = question_name.replace("?", "")
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = s.encode("ascii", "ignore").decode("ascii")
+    s = "".join(c if c.isalnum() else replace_non_alpha_to for c in s)
+    s = s.lower()
+    return s
 
 
 class Question:
@@ -39,7 +41,7 @@ class Question:
     The __query__ is expressed as an `amora.protocols.Compilable`, its __results__ is a
     `pandas.DataFrame` and the results __visualization__ as an `amora.visualization.Visualization`.
 
-    ## Example
+    Examples:
 
     Lets define a new data question:
 
