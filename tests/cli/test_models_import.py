@@ -142,3 +142,26 @@ def test_models_import_with_valid_table_reference_and_existing_destination_file_
 
         assert result.exit_code == 0, result.stderr
         assert issubclass(amora_model_for_path(path=output_path), AmoraModel)  # type: ignore
+
+
+def test_models_import_dataset():
+    dataset_reference = "amora-data-build-tool.amora"
+
+    result = runner.invoke(
+        app,
+        ["models", "import", "dataset", dataset_reference, "--overwrite"],
+    )
+
+    assert result.exit_code == 0
+    assert f"🏗 Generating AmoraModel files from dataset `{dataset_reference}`" in result.stdout
+
+
+def test_models_import_project():
+    project_id = "amora-data-build-tool"
+
+    result = runner.invoke(
+        app, ["models", "import", "project", project_id, "--overwrite"]
+    )
+
+    assert result.exit_code == 0
+    assert f"🏗 Generating AmoraModel files from project `{project_id}`" in result.stdout
