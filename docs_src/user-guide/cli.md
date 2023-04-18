@@ -114,7 +114,14 @@ $ amora models list --format json
 ```
 
 ### amora models import
-::: amora.cli.models.models_import
+#### amora models import project
+::: amora.cli.models.models_import_project
+
+#### amora models import dataset
+::: amora.cli.models.models_import_dataset
+
+#### amora models import table
+::: amora.cli.models.models_import_table
 
 ## amora feature-store 
 
