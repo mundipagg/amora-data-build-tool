@@ -3872,14 +3872,14 @@ twisted = ["twisted"]
 
 [[package]]
 name = "prometheus-fastapi-instrumentator"
-version = "5.9.1"
-description = "Instrument your FastAPI with Prometheus metrics"
+version = "6.0.0"
+description = "Instrument your FastAPI with Prometheus metrics."
 category = "main"
 optional = true
 python-versions = ">=3.7.0,<4.0.0"
 files = [
-    {file = "prometheus-fastapi-instrumentator-5.9.1.tar.gz", hash = "sha256:3651a72f73359a28e8afb0d370ebe3774147323ee2285e21236b229ce79172fc"},
-    {file = "prometheus_fastapi_instrumentator-5.9.1-py3-none-any.whl", hash = "sha256:b5206ea9aa6975a0b07f3bf7376932b8a1b2983164b5abb04878e75ba336d9ed"},
+    {file = "prometheus_fastapi_instrumentator-6.0.0-py3-none-any.whl", hash = "sha256:6f66a951a4801667f7311d161f3aebfe0cd202391d0f067fbbe169792e2d987b"},
+    {file = "prometheus_fastapi_instrumentator-6.0.0.tar.gz", hash = "sha256:f1ddd0b8ead75e71d055bdf4cb7e995ec6a6ca63543245e7bbc5ca9b14c45191"},
 ]
 
 [package.dependencies]
@@ -5792,4 +5792,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "9b723e666df12d174c52bae5e8eb032bdcb1f2cc5dec5d5cc7601308251b3e3b"
+content-hash = "84a4b0f47f93dcfe0610b474ba83e0b84dd0e10aaa5219f4fe5f8ee76803dd90"
