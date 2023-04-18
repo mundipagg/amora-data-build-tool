@@ -1,11 +1,11 @@
 from pathlib import Path
 from typing import Iterable, Optional, Union
 
-import sqlparse
 from sqlalchemy_bigquery import STRUCT, BigQueryDialect
 from sqlalchemy_bigquery.base import BigQueryCompiler
 
 from amora.protocols import Compilable
+from amora.sql import format_sql
 from amora.utils import list_target_files
 
 
@@ -51,7 +51,7 @@ def compile_statement(statement: Compilable) -> str:
     raw_sql = str(
         statement.compile(dialect=dialect, compile_kwargs={"literal_binds": True})
     )
-    formatted_sql = sqlparse.format(raw_sql, reindent=True, indent_columns=True)
+    formatted_sql = format_sql(raw_sql)
     return formatted_sql
 
 
