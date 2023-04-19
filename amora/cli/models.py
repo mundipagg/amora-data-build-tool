@@ -192,6 +192,7 @@ def models_import_table(
         amora models import table "amora-data-build-tool.amora.health"
         ```
     """
+    typer.echo(f"🏗 Generating AmoraModel file from table `{table_reference}`")
     bigquery.import_table(table_reference, overwrite)
 
 
@@ -234,8 +235,7 @@ def models_import_dataset(
 def models_import_project(
     project_id: str = typer.Argument(
         None,
-        help="BigQuery project id."
-        "E.g.: `amora-data-build-tool`",
+        help="BigQuery project id." "E.g.: `amora-data-build-tool`",
     ),
     overwrite: bool = typer.Option(
         False, help="Overwrite the output file if one already exists"
