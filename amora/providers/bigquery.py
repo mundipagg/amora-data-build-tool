@@ -3,7 +3,7 @@ import decimal
 from datetime import date, datetime, time
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, Hashable, Iterable, List, Optional, Union, Tuple
+from typing import Any, Callable, Dict, Hashable, Iterable, List, Optional, Tuple, Union
 
 import pandas as pd
 import sqlalchemy
@@ -51,7 +51,8 @@ from amora.models import (
     AmoraModel,
     Field,
     MaterializationTypes,
-    Model, amora_model_for_path,
+    Model,
+    amora_model_for_path,
 )
 from amora.protocols import Compilable
 from amora.storage import cache
@@ -281,7 +282,7 @@ def list_tables(dataset_reference: str) -> List[str]:
 
     Read more:
         https://cloud.google.com/bigquery/docs/reference/rest/v2/tables/list
-        
+
     Examples:
 
         >>> amora.providers.bigquery.list_tables("amora-data-build-tool.amora")
