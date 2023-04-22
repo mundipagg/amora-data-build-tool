@@ -1,11 +1,12 @@
 from datetime import date
-from typing import Callable, Optional, Set
+from typing import Callable, Optional, Set, List
 
 import pandas as pd
+from sqlalchemy import Column
 
 from amora.compilation import compile_statement
 from amora.protocols import Compilable
-from amora.providers.bigquery import run
+from amora.providers import bigquery
 from amora.storage import cache
 from amora.visualization import Table, Visualization, VisualizationConfig
 
@@ -158,8 +159,23 @@ class Question:
         2            11644600.0        116446.00            116.44600        iPhone
         ```
         """
-        result = run(self.question_func())
+        result = bigquery.run(self.question_func())
         return result.rows.to_dataframe(create_bqstorage_client=False)
+
+    def answer_columns(self) -> List[Column]:
+        """
+        Returns an iterable of SQLAlchemy `Column` objects that correspond to the columns returned by executing the
+        SQL query associated with this `Question` instance.
+
+        Returns:
+            Iterable[sqlalchemy.sql.schema.Column]: An iterable of `Column` objects that correspond to the columns returned
+            by executing the SQL query associated with this `Question` instance.
+
+        Raises:
+            google.api_core.exceptions.GoogleAPIError: If the query job fails.
+        """
+        result = bigquery.dry_run_query(self.sql)
+        return [bigquery.column_for_schema_field(field) for field in result.schema]
 
     @property
     def uid(self) -> str:
