@@ -71,4 +71,7 @@ class StepCountBySource(AmoraModel):
 
 @question(view_config=BigNumber())
 def how_many_data_points_where_acquired():
-    return select(func.sum(StepCountBySource.value_count).label("total"))
+    return select(
+        func.sum(StepCountBySource.value_count).label("total"),
+        StepCountBySource.source_name,
+    ).group_by(StepCountBySource.source_name)
