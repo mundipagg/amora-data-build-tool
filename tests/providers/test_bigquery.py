@@ -27,7 +27,6 @@ from sqlalchemy_bigquery.base import BQArray
 from amora.compilation import compile_statement
 from amora.config import settings
 from amora.models import (
-    SQLALCHEMY_METADATA_KEY,
     AmoraModel,
     Field,
     MaterializationTypes,
@@ -293,38 +292,42 @@ def test_schema_for_model():
 
     assert schema == [
         SchemaField(
-            "a_boolean", "BOOLEAN", "NULLABLE", "You know... ones and zeros", (), None
+            name="a_boolean",
+            field_type="BOOLEAN",
+            mode="NULLABLE",
+            description="You know... ones and zeros",
         ),
-        SchemaField("a_date", "DATE", "NULLABLE", None, (), None),
-        SchemaField("a_datetime", "DATETIME", "NULLABLE", None, (), None),
-        SchemaField("a_float", "FLOAT", "NULLABLE", None, (), None),
-        SchemaField("a_string", "STRING", "NULLABLE", "Words and stuff", (), None),
-        SchemaField("a_time", "TIME", "NULLABLE", None, (), None),
-        SchemaField("a_timestamp", "TIMESTAMP", "NULLABLE", None, (), None),
-        SchemaField("an_int", "INTEGER", "NULLABLE", None, (), None),
-        SchemaField("an_int_array", "INTEGER", "REPEATED", None, (), None),
-        SchemaField("a_str_array", "STRING", "REPEATED", None, (), None),
+        SchemaField(name="a_date", field_type="DATE", mode="NULLABLE"),
+        SchemaField(name="a_datetime", field_type="DATETIME", mode="NULLABLE"),
+        SchemaField(name="a_float", field_type="FLOAT", mode="NULLABLE"),
         SchemaField(
-            "a_struct_array",
-            "RECORD",
-            "REPEATED",
-            None,
-            (
-                SchemaField("key", "INTEGER", "NULLABLE", None, (), None),
-                SchemaField("value", "STRING", "NULLABLE", None, (), None),
+            name="a_string",
+            field_type="STRING",
+            mode="NULLABLE",
+            description="Words and stuff",
+        ),
+        SchemaField(name="a_time", field_type="TIME", mode="NULLABLE"),
+        SchemaField(name="a_timestamp", field_type="TIMESTAMP", mode="NULLABLE"),
+        SchemaField(name="an_int", field_type="INTEGER", mode="NULLABLE"),
+        SchemaField(name="an_int_array", field_type="INTEGER", mode="REPEATED"),
+        SchemaField(name="a_str_array", field_type="STRING", mode="REPEATED"),
+        SchemaField(
+            name="a_struct_array",
+            field_type="RECORD",
+            mode="REPEATED",
+            fields=(
+                SchemaField(name="key", field_type="INTEGER", mode="NULLABLE"),
+                SchemaField(name="value", field_type="STRING", mode="NULLABLE"),
             ),
-            None,
         ),
         SchemaField(
-            "a_struct",
-            "RECORD",
-            "NULLABLE",
-            None,
-            (
-                SchemaField("id", "INTEGER", "NULLABLE", None, (), None),
-                SchemaField("label", "STRING", "NULLABLE", None, (), None),
+            name="a_struct",
+            field_type="RECORD",
+            mode="NULLABLE",
+            fields=(
+                SchemaField(name="id", field_type="INTEGER", mode="NULLABLE"),
+                SchemaField(name="label", field_type="STRING", mode="NULLABLE"),
             ),
-            None,
         ),
     ]
 
@@ -368,17 +371,14 @@ def test_column_for_schema_field_on_struct_field():
         field_type="RECORD",
         mode="NULLABLE",
         fields=(
-            SchemaField("id", "STRING", "NULLABLE", None, (), None),
-            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
-            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField(name="id", field_type="STRING"),
+            SchemaField(name="x", field_type="INTEGER"),
+            SchemaField(name="y", field_type="INTEGER"),
         ),
     )
     column = column_for_schema_field(struct_field)
 
-    assert (
-        column.metadata[SQLALCHEMY_METADATA_KEY].type.get_col_spec()
-        == "STRUCT<id STRING, x INT64, y INT64>"
-    )
+    assert column.type.get_col_spec() == "STRUCT<id STRING, x INT64, y INT64>"
 
 
 def test_columns_for_schema_field_on_repeated_struct_field():
@@ -387,16 +387,13 @@ def test_columns_for_schema_field_on_repeated_struct_field():
         field_type="RECORD",
         mode="REPEATED",
         fields=(
-            SchemaField("id", "STRING", "NULLABLE", None, (), None),
-            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
-            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField(name="id", field_type="STRING"),
+            SchemaField(name="x", field_type="INTEGER"),
+            SchemaField(name="y", field_type="INTEGER"),
         ),
     )
     column = column_for_schema_field(repeated_struct_field)
-    assert (
-        repr(column.metadata[SQLALCHEMY_METADATA_KEY].type)
-        == "ARRAY(STRUCT(id=String(), x=Integer(), y=Integer()))"
-    )
+    assert repr(column.type) == "ARRAY(STRUCT(id=String(), x=Integer(), y=Integer()))"
 
 
 def test_columns_for_schema_field_on_repeated_struct_field_with_repeated_fields():
@@ -441,7 +438,7 @@ def test_columns_for_schema_field_on_repeated_struct_field_with_repeated_fields(
     )
     column = column_for_schema_field(complex_struct_field)
     assert (
-        repr(column.metadata[SQLALCHEMY_METADATA_KEY].type)
+        repr(column.type)
         == "ARRAY(STRUCT(nodes=ARRAY(STRUCT(id=String(), label=String())), edges=ARRAY(STRUCT(from_node=STRUCT(id=String(), label=String()), to_node=STRUCT(id=String(), label=String())))))"
     )
 
