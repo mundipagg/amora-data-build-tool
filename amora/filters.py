@@ -63,7 +63,7 @@ class Filter(BaseModel):
             return select(base).where(base.c[self.field] == value)
 
         question_func.__doc__ = question.question_func.__doc__
-        question_func.__name__ = f"{question.question_func.__name__}_{value}"
+        question_func.__name__ = f"{question.question_func.__name__}_filtered_by_{self.field}_{parse_name(value)}"
 
         return Question(question_func=question_func)
 
@@ -113,7 +113,7 @@ class DateFilter(Filter):
 
         question_func.__doc__ = question.question_func.__doc__
         question_func.__name__ = (
-            f"{question.question_func.__name__}_{value.isoformat()}"
+            f"{question.question_func.__name__}_at_{value.isoformat()}"
         )
 
         return Question(question_func=question_func)
