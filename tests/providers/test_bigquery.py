@@ -26,12 +26,7 @@ from sqlalchemy_bigquery.base import BQArray
 
 from amora.compilation import compile_statement
 from amora.config import settings
-from amora.models import (
-    AmoraModel,
-    Field,
-    MaterializationTypes,
-    ModelConfig,
-)
+from amora.models import AmoraModel, Field, MaterializationTypes, ModelConfig
 from amora.protocols import Compilable
 from amora.providers.bigquery import (
     DryRunResult,
