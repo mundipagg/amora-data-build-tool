@@ -260,7 +260,7 @@ def schema_field_for_column(column: Column) -> SchemaField:
         field_type=field_type,
         mode=mode,
         fields=fields or (),
-        description=column.doc or "",
+        description=column.doc,
     )
 
 
