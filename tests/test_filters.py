@@ -3,9 +3,9 @@ from datetime import date, datetime
 import pytest
 from sqlalchemy import select
 
-from amora.filters import DateFilter, ValueFilter
+from amora.filters import DateFilter, DateRangeFilter, ValueFilter
 from amora.providers.bigquery import cte_from_rows
-from amora.questions import question
+from amora.questions import question, Question
 
 from tests.models.step_count_by_source import how_many_data_points_where_acquired
 
@@ -102,48 +102,58 @@ def test_DateFilter_filter_on_date_column():
         },
     ]
 
-
-def test_DateFilter_filter_on_datetime_column():
+@pytest.fixture(scope="module")
+def mock_question():
     @question()
-    def a_question():
+    def q():
         cte = cte_from_rows(
             [
                 {
                     "name": "Diogo",
                     "count": 0,
+                    "date_col": date(2021, 1, 1),
                     "datetime_col": datetime(2021, 1, 1),
                 },
                 {
                     "name": "Diogo",
                     "count": 1,
+                    "date_col": date(2022, 8, 27),
                     "datetime_col": datetime(2022, 8, 27, 23, 00),
                 },
                 {
                     "name": "Diogo",
                     "count": 2,
+                    "date_col": date(2022, 8, 28),
                     "datetime_col": datetime(2022, 8, 28, 23, 33),
                 },
                 {
                     "name": "Lorena",
                     "count": 1,
+                    "date_col": date(2021, 1, 1),
                     "datetime_col": datetime(2021, 1, 1),
                 },
                 {
                     "name": "Lorena",
                     "count": 1,
+                    "date_col": date(2022, 8, 27),
                     "datetime_col": datetime(2022, 8, 27, 23, 00),
                 },
                 {
                     "name": "Lorena",
                     "count": 2,
+                    "date_col": date(2022, 8, 28),
                     "datetime_col": datetime(2022, 8, 28, 23, 33),
                 },
             ]
         )
         return select(cte)
 
+    return mock_question
+
+
+def test_DateFilter_filter_on_datetime_column(mock_question: Question):
     date_filter = DateFilter(field="datetime_col")
-    filtered_question = date_filter.filter(a_question, value=date(2022, 8, 28))
+    filtered_question = date_filter.filter(mock_question, value=date(2022, 8, 28))
 
     assert filtered_question.answer_df().to_dict(orient="rows") == [
         {
@@ -157,3 +167,36 @@ def test_DateFilter_filter_on_datetime_column():
             "datetime_col": datetime(2022, 8, 28, 23, 33),
         },
     ]
+
+
+def test_DateRange_filter(mock_question):
+    date_filter = DateRangeFilter(field="datetime_col")
+
+    filtered_question = date_filter.filter(
+        mock_question,
+        value=DateRangeFilter.Range(start=date(2022, 1, 1), end=date(2023, 1, 1)),
+    )
+
+    assert filtered_question.answer_df().to_dict(orient="rows") == [
+        {
+            "name": "Diogo",
+            "count": 1,
+            "datetime_col": datetime(2022, 8, 27, 23, 0, 0),
+        },
+        {
+            "name": "Diogo",
+            "count": 2,
+            "datetime_col": datetime(2022, 8, 28, 23, 33, 0),
+        },
+        {
+            "name": "Lorena",
+            "count": 1,
+            "datetime_col": datetime(2022, 8, 27, 23, 0, 0),
+        },
+        {
+            "name": "Lorena",
+            "count": 2,
+            "datetime_col": datetime(2022, 8, 28, 23, 33, 0),
+        },
+    ]
+
