@@ -1,5 +1,6 @@
+import re
 from datetime import date
-from typing import Callable, Optional, Set, List
+from typing import Callable, List, Optional, Set
 
 import pandas as pd
 from sqlalchemy import Column
@@ -11,6 +12,23 @@ from amora.storage import cache
 from amora.visualization import Table, Visualization, VisualizationConfig
 
 QuestionFunc = Callable[[], Compilable]
+
+
+def parse_name(question_name: str, replace_non_alpha_to: str = "_"):
+    """
+    Parses a string to a valid Python function name.
+
+    :param question_name: String to parse
+    :return: Valid Python function name
+    """
+
+    # Replace any non-alphanumeric characters with underscores
+    question_name.lower()
+    question_name = re.sub("[^0-9a-zA-Z_]", replace_non_alpha_to, question_name)
+
+    # Remove any non-alphabetic characters from the beginning of the string
+    question_name = re.sub("^[^a-zA-Z_]+", "", question_name)
+    return question_name
 
 
 class Question:
@@ -25,9 +43,10 @@ class Question:
     Lets define a new data question:
 
     ```python
+    from examples.models.step_count_by_source import StepCountBySource
+
     from amora.models import select
     from amora.questions import question
-    from examples.models.step_count_by_source import StepCountBySource
 
 
     @question
