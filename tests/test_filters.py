@@ -3,9 +3,9 @@ from datetime import date, datetime
 import pytest
 from sqlalchemy import select
 
-from amora.filters import DateFilter, DateRangeFilter, ValueFilter
+from amora.filters import AcceptedValuesFilter, DateFilter, DateRangeFilter, ValueFilter
 from amora.providers.bigquery import cte_from_rows
-from amora.questions import question, Question
+from amora.questions import Question, question
 
 from tests.models.step_count_by_source import how_many_data_points_where_acquired
 
@@ -102,6 +102,7 @@ def test_DateFilter_filter_on_date_column():
         },
     ]
 
+
 @pytest.fixture(scope="module")
 def mock_question():
     @question()
@@ -148,7 +149,7 @@ def mock_question():
         )
         return select(cte)
 
-    return mock_question
+    return q
 
 
 def test_DateFilter_filter_on_datetime_column(mock_question: Question):
@@ -159,11 +160,13 @@ def test_DateFilter_filter_on_datetime_column(mock_question: Question):
         {
             "name": "Diogo",
             "count": 2,
+            "date_col": date(2022, 8, 28),
             "datetime_col": datetime(2022, 8, 28, 23, 33),
         },
         {
             "name": "Lorena",
             "count": 2,
+            "date_col": date(2022, 8, 28),
             "datetime_col": datetime(2022, 8, 28, 23, 33),
         },
     ]
@@ -181,22 +184,115 @@ def test_DateRange_filter(mock_question):
         {
             "name": "Diogo",
             "count": 1,
+            "date_col": date(2022, 8, 27),
             "datetime_col": datetime(2022, 8, 27, 23, 0, 0),
         },
         {
             "name": "Diogo",
             "count": 2,
+            "date_col": date(2022, 8, 28),
             "datetime_col": datetime(2022, 8, 28, 23, 33, 0),
         },
         {
             "name": "Lorena",
             "count": 1,
+            "date_col": date(2022, 8, 27),
             "datetime_col": datetime(2022, 8, 27, 23, 0, 0),
         },
         {
             "name": "Lorena",
             "count": 2,
+            "date_col": date(2022, 8, 28),
             "datetime_col": datetime(2022, 8, 28, 23, 33, 0),
         },
     ]
 
+
+def test_AcceptedValues_filter(mock_question):
+    accepted_values_filter = AcceptedValuesFilter(
+        field="name", selectable_values=["Xena", "Diogo", "Lorena"]
+    )
+
+    filtered_question = accepted_values_filter.filter(
+        mock_question,
+        values=["Diogo", "Lorena"],
+    )
+
+    assert filtered_question.answer_df().to_dict(orient="rows") == [
+        {
+            "count": 0,
+            "date_col": date(2021, 1, 1),
+            "datetime_col": datetime(2021, 1, 1, 00, 00, 00),
+            "name": "Diogo",
+        },
+        {
+            "count": 1,
+            "date_col": date(2022, 8, 27),
+            "datetime_col": datetime(2022, 8, 27, 23, 00, 00),
+            "name": "Diogo",
+        },
+        {
+            "count": 2,
+            "date_col": date(2022, 8, 28),
+            "datetime_col": datetime(2022, 8, 28, 23, 33, 00),
+            "name": "Diogo",
+        },
+        {
+            "count": 1,
+            "date_col": date(2021, 1, 1),
+            "datetime_col": datetime(2021, 1, 1, 00, 00, 00),
+            "name": "Lorena",
+        },
+        {
+            "count": 1,
+            "date_col": date(2022, 8, 27),
+            "datetime_col": datetime(2022, 8, 27, 23, 00, 00),
+            "name": "Lorena",
+        },
+        {
+            "count": 2,
+            "date_col": date(2022, 8, 28),
+            "datetime_col": datetime(2022, 8, 28, 23, 33, 00),
+            "name": "Lorena",
+        },
+    ]
+
+
+def test_AcceptedValuesFilter_from_column_values(mock_question):
+    cte = cte_from_rows(
+        [
+            {
+                "name": "Diogo",
+                "count": 0,
+                "event_timestamp": datetime(2021, 1, 1, 0, 0),
+            },
+            {
+                "name": "Diogo",
+                "count": 1,
+                "event_timestamp": datetime(2022, 8, 27, 23, 00),
+            },
+            {
+                "name": "Diogo",
+                "count": 2,
+                "event_timestamp": datetime(2022, 8, 28, 23, 33),
+            },
+            {
+                "name": "Lorena",
+                "count": 1,
+                "event_timestamp": datetime(2021, 1, 1, 0, 0),
+            },
+            {
+                "name": "Lorena",
+                "count": 1,
+                "event_timestamp": datetime(2022, 8, 27, 23, 00),
+            },
+            {
+                "name": "Lorena",
+                "count": 2,
+                "event_timestamp": datetime(2022, 8, 28, 23, 33),
+            },
+        ]
+    )
+
+    accepted_values_filter = AcceptedValuesFilter.from_column_values(cte.c.name)
+    assert accepted_values_filter.selectable_values == ["Diogo", "Lorena"]

@@ -174,3 +174,40 @@ class DateRangeFilter(Filter):
 
         return Question(question_func=question_func)
 
+
+class AcceptedValuesFilter(Filter):
+    """
+    This filter performs OR query on the selected options.
+
+    Attributes:
+        field: name of the column to be filtered.
+        title: title of the filter for display purposes.
+        default: the default value for the filter.
+        selectable_values: the list of values to be displayed in the filter.
+    """
+
+    _field_class = String
+    default: Optional[str] = None
+    selectable_values: Optional[List[str]] = None
+
+    @classmethod
+    def from_column_values(cls, column: Column) -> "AcceptedValuesFilter":
+        result = bigquery.run(select(column.distinct().label("values")))
+        # fixme: validate distinct count before
+        df = result.to_dataframe()
+        return cls(field=column.key, selectable_values=df["values"].tolist())
+
+    def filter(self, question: Question, values: List[str]) -> Question:
+        if not self.is_valid_for(question):
+            raise ValueError("Invalid filter")
+
+        values.sort()
+
+        def question_func():
+            base = question.question_func().cte(question.question_func.__name__)
+            return select(base).where(base.c[self.field].in_(values))
+
+        question_func.__doc__ = question.question_func.__doc__
+        question_func.__name__ = f"{question.question_func.__name__}_{'_'.join((parse_name(v) for v in values))}"
+
+        return Question(question_func=question_func)
