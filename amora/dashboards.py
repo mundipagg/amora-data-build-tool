@@ -1,38 +1,14 @@
-from datetime import date
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Dict, List
 
 from pydantic import BaseModel
 
 from amora.config import settings
+from amora.filters import Filter
 from amora.logger import logger
 from amora.questions import Question
 from amora.utils import list_files
-
-
-class Filter(BaseModel):
-    type: str
-    id: str
-    default: Any
-    title: str
-
-
-class DateFilter(Filter):
-    type = "date"
-    default: date = date.today()
-    python_type = date
-    min_selectable_date: Optional[date] = None
-    max_selectable_date: Optional[date] = None
-
-
-class AcceptedValuesFilter(Filter):
-    type = "accepted_values"
-    values: List[str]
-    default: Optional[str] = None
-
-    # todo: validate that "self.default in self.values"
-
 
 DashboardUid = str
 
@@ -49,7 +25,7 @@ class Dashboard(BaseModel):
     ```python
     # $AMORA_PROJECT_PATH/dashboards/steps.py
 
-    from amora.dashboards import AcceptedValuesFilter, Dashboard, DateFilter
+    from amora.filters import AcceptedValuesFilter, Dashboard, DateFilter
     from examples.amora_project.models.step_count_by_source import (
         how_many_data_points_where_acquired,
         what_are_the_available_data_sources,

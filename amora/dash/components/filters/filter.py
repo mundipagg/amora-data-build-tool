@@ -1,7 +1,7 @@
 from dash.development.base_component import Component
 
 from amora.dash.components.filters import accepted_values_filter, date_filter
-from amora.dashboards import AcceptedValuesFilter, DateFilter, Filter
+from amora.filters import AcceptedValuesFilter, DateFilter, Filter
 
 
 def layout(filter: Filter) -> Component:
