@@ -1,4 +1,4 @@
-import re
+import unicodedata
 from datetime import date
 from typing import Callable, List, Optional, Set
 
@@ -18,17 +18,19 @@ def parse_name(question_name: str, replace_non_alpha_to: str = "_"):
     """
     Parses a string to a valid Python function name.
 
-    :param question_name: String to parse
-    :return: Valid Python function name
+    Args:
+        question_name: Question name to parse
+
+    Returns:
+        A valid Python function name
     """
-
-    # Replace any non-alphanumeric characters with underscores
-    question_name.lower()
-    question_name = re.sub("[^0-9a-zA-Z_]", replace_non_alpha_to, question_name)
-
-    # Remove any non-alphabetic characters from the beginning of the string
-    question_name = re.sub("^[^a-zA-Z_]+", "", question_name)
-    return question_name
+    s = question_name.replace("?", "")
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = s.encode("ascii", "ignore").decode("ascii")
+    s = "".join(c if c.isalnum() else replace_non_alpha_to for c in s)
+    s = s.lower()
+    return s
 
 
 class Question:
@@ -207,16 +209,24 @@ class Question:
         return Visualization(data=self.answer_df(), config=self.view_config)
 
     def to_markdown(self) -> str:
+        return "\n".join(
+            [
+                f"## {self.name}",
+                f"```sql \n {self.sql} \n```",
+                f"### Answer",
+                self.answer_df().to_markdown(),
+            ]
+        )
+
+    def to_html(self):
         return f"""
-            ## {self.name}
+            <h2>{self.name}</h2>
 
-            ```sql
-            {self.sql}
-            ```
+            <pre><code>{self.sql}</code></pre>
 
-            ### Answer
+            <h3>Answer</h3>
 
-            {self.answer_df().to_markdown()}
+            {self.answer_df().to_html()}
         """
 
     def _repr_markdown_(self):

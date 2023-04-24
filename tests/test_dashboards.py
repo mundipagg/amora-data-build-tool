@@ -3,9 +3,12 @@ from datetime import date
 import pytest
 
 from amora.dashboards import Dashboard
-from amora.filters import ValueFilter, DateFilter
-from tests.models.step_count_by_source import how_many_data_points_where_acquired, \
-    how_many_data_points_where_acquired_per_day
+from amora.filters import DateFilter, ValueFilter
+
+from tests.models.step_count_by_source import (
+    how_many_data_points_where_acquired,
+    how_many_data_points_where_acquired_per_day,
+)
 
 
 @pytest.fixture(scope="module")
@@ -16,13 +19,15 @@ def mock_dashboard_with_value_filter():
         questions=[
             [how_many_data_points_where_acquired],
         ],
-        filters=[ValueFilter(field='source_name')]
+        filters=[ValueFilter(field="source_name")],
     )
 
 
 def test_dashboard_to_markdown(mock_dashboard_with_value_filter):
     md = mock_dashboard_with_value_filter.to_markdown()
-    assert md == """# A dashboard with value filter
+    assert (
+        md
+        == """# A dashboard with value filter
 ---
 ---
 ## How many data points where acquired?
@@ -39,12 +44,15 @@ GROUP BY `step_count_by_source`.`source_name`
 |  0 |    6880 | Diogo iPhone  |
 |  1 |   11163 | Mi Fit        |
 |  2 |     742 | iPhone        |"""
+    )
 
 
 def test_dashboard_with_value_filter(mock_dashboard_with_value_filter):
     filtered_dashboard = mock_dashboard_with_value_filter.filter(source_name="iPhone")
     md = filtered_dashboard.to_markdown()
-    assert md == """# My dashboard
+    assert (
+        md
+        == """# A dashboard with value filter
 ---
 ---
 ## How many data points where acquired filtered by source name iphone?
@@ -65,27 +73,25 @@ WHERE `how_many_data_points_where_acquired`.`source_name` = 'iPhone'
 |    |   total | source_name   |
 |---:|--------:|:--------------|
 |  0 |     742 | iPhone        |"""
+    )
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def mock_dashboard_with_date_filter():
     return Dashboard(
-        uid='mock_dashboard_with_date_filter',
+        uid="mock_dashboard_with_date_filter",
         name="A dashboard with date filter",
-        questions=[
-            [how_many_data_points_where_acquired_per_day]
-        ],
-        filters=[
-            DateFilter(field='day'),
-            ValueFilter(field='source_name')
-        ]
+        questions=[[how_many_data_points_where_acquired_per_day]],
+        filters=[DateFilter(field="day"), ValueFilter(field="source_name")],
     )
 
 
 def test_dashboard_with_date_filter(mock_dashboard_with_date_filter):
     md = mock_dashboard_with_date_filter.filter(day=date(2021, 2, 26)).to_markdown()
 
-    assert md == """# A dashboard with date filter
+    assert (
+        md
+        == """# A dashboard with date filter
 ---
 ---
 ## How many data points where acquired per day at 2021-02-26?
@@ -111,9 +117,14 @@ WHERE date(`how_many_data_points_where_acquired_per_day`.`day`) = date(DATE '202
 |---:|--------:|:--------------|:-----------|
 |  0 |      26 | Diogo iPhone  | 2021-02-26 |
 |  1 |    1220 | Mi Fit        | 2021-02-26 |"""
+    )
 
-    md = mock_dashboard_with_date_filter.filter(day=date(2021, 2, 26), source_name="Diogo iPhone").to_markdown()
-    assert md == """# A dashboard with date filter
+    md = mock_dashboard_with_date_filter.filter(
+        day=date(2021, 2, 26), source_name="Diogo iPhone"
+    ).to_markdown()
+    assert (
+        md
+        == """# A dashboard with date filter
 ---
 ---
 ## How many data points where acquired per day at 2021-02-26 filtered by source name diogo iphone?
@@ -146,3 +157,4 @@ WHERE `how_many_data_points_where_acquired_per_day_at_2021-02-26`.`source_name` 
 |    |   total | source_name   | day        |
 |---:|--------:|:--------------|:-----------|
 |  0 |      26 | Diogo iPhone  | 2021-02-26 |"""
+    )

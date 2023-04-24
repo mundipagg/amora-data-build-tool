@@ -1,8 +1,8 @@
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Union
+from typing import Any, Dict, List
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 
 from amora.config import settings
 from amora.filters import Filter
@@ -78,6 +78,7 @@ class Dashboard(BaseModel):
         """
         Converts the dashboard and all its questions to a Markdown-formatted string.
         """
+
         def gen_sections():
             yield f"# {self.name}"
             yield "---"
@@ -126,10 +127,7 @@ class Dashboard(BaseModel):
         new_uid = f"{self.uid}_{'__'.join(f'{field}_{value}' for field, value in kwargs.items())}"
 
         return Dashboard(
-            questions=questions,
-            filters=self.filters,
-            name=self.name,
-            uid=new_uid
+            questions=questions, filters=self.filters, name=self.name, uid=new_uid
         )
 
 
