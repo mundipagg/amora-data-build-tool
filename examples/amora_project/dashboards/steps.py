@@ -1,5 +1,9 @@
-from amora.dashboards import AcceptedValuesFilter, Dashboard, DateFilter
+from datetime import date
+
+from amora.dashboards import Dashboard
+from amora.filters import AcceptedValuesFilter, DateFilter
 from examples.amora_project.models.step_count_by_source import (
+    StepCountBySource,
     how_many_data_points_where_acquired,
     what_are_the_available_data_sources,
     what_are_the_values_observed_on_the_iphone,
@@ -25,14 +29,12 @@ dashboard = Dashboard(
     ],
     filters=[
         DateFilter(
-            default="2021-01-01", title="data de início", id="start-date-filter"
+            field="event_timestamp", default=date(2021, 1, 1), title="data de início"
         ),
-        DateFilter(default="2023-01-01", title="data fim", id="end-date-filter"),
-        AcceptedValuesFilter(
-            default="iPhone",
-            values=["Diogo's iPhone", "iPhone"],
+        DateFilter(field="event_timestamp", default=date(2023, 1, 1), title="data fim"),
+        AcceptedValuesFilter.from_column_values(
+            column=StepCountBySource.source_name,
             title="Source device",
-            id="source-device-filter",
         ),
     ],
 )
