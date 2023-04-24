@@ -191,11 +191,11 @@ class AcceptedValuesFilter(Filter):
     selectable_values: Optional[List[str]] = None
 
     @classmethod
-    def from_column_values(cls, column: Column) -> "AcceptedValuesFilter":
+    def from_column_values(cls, column: Column, **kwargs) -> "AcceptedValuesFilter":
         result = bigquery.run(select(column.distinct().label("values")))
         # fixme: validate distinct count before
         df = result.to_dataframe()
-        return cls(field=column.key, selectable_values=df["values"].tolist())
+        return cls(field=column.key, selectable_values=df["values"].tolist(), **kwargs)
 
     def filter(self, question: Question, values: List[str]) -> Question:
         if not self.is_valid_for(question):
