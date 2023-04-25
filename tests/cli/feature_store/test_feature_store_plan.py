@@ -31,5 +31,5 @@ def test_feature_store_plan(
     get_repo_contents.assert_called_once()
     assert (
         result.stdout
-        == "Amora: Feature Store :: Registry diff\nregistry diff\nAmora: Feature Store :: Infrastructure diff\ninfra diff\n"
+        == "## Amora :: Feature Store :: Registry objects diff\n\n\n## Amora :: Feature Store :: Properties diff\n\n\n## Amora :: Feature Store :: Features diff\n\n## Amora :: Feature Store :: Infrastructure diff\n\ninfra diff\n"
     )

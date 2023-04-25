@@ -1,11 +1,14 @@
 from typing import Dict, Iterable, List, Tuple
 
 from feast import Entity, FeatureService, FeatureView
+from feast.diff.property_diff import TransitionType
+from feast.diff.registry_diff import RegistryDiff
 from feast.repo_contents import RepoContents
+from pydantic import BaseModel
 from sqlalchemy.orm import InstrumentedAttribute
 
 from amora.feature_store.feature_view import name_for_model
-from amora.feature_store.type_mapping import value_type_for_column
+from amora.feature_store.type_mapping import VALUE_TYPE_TO_NAME, value_type_for_column
 from amora.models import Model, list_models
 
 FEATURE_REGISTRY: Dict[str, Tuple[FeatureView, FeatureService, Model]] = {}
@@ -53,4 +56,99 @@ def get_repo_contents() -> RepoContents:
         on_demand_feature_views=[],
         request_feature_views=[],
         stream_feature_views=[],
+    )
+
+
+class ObjectDiff(BaseModel):
+    name: str
+    transition_type: str
+    object_type: str
+
+
+class PropertyDiff(BaseModel):
+    object_name: str
+    property_name: str
+    declared: str
+    existing: str
+
+
+class FeatureDiff(BaseModel):
+    name: str
+    diff: Iterable
+
+
+class Diff(BaseModel):
+    objects: List[ObjectDiff]
+    properties: List[PropertyDiff]
+    features: List[FeatureDiff]
+
+
+def parse_feature_schema_diff(existing: str, declared: str):
+    def parse_diff_as_feature_records(value):
+        records = set()
+        for item in value:
+            if hasattr(item, "feature_columns"):
+                return parse_diff_as_feature_records(item.feature_columns)
+
+            records.add((item.name, VALUE_TYPE_TO_NAME[item.value_type]))
+
+        return records
+
+    existing_features, declared_features = parse_diff_as_feature_records(
+        existing
+    ), parse_diff_as_feature_records(declared)
+
+    removed = existing_features - declared_features
+    added = declared_features - existing_features
+
+    for name, value_type in added:
+        yield {"name": name, "value_type": value_type, "change": "added"}
+
+    for name, value_type in removed:
+        yield {"name": f"~~{name}~~", "value_type": value_type, "change": "removed"}
+
+
+def parse_diff(registry_diff: RegistryDiff):
+    objects = []
+    properties = []
+    features = []
+
+    for object_diff in registry_diff.feast_object_diffs:
+        if object_diff.transition_type is TransitionType.UNCHANGED:
+            continue
+
+        objects.append(
+            ObjectDiff(
+                name=object_diff.name,
+                transition_type=object_diff.transition_type.name,
+                object_type=object_diff.feast_object_type.name,
+            )
+        )
+
+        for property_diff in object_diff.feast_object_property_diffs:
+            if property_diff.property_name == "features":
+                features.append(
+                    FeatureDiff(
+                        name=object_diff.name,
+                        diff=parse_feature_schema_diff(
+                            property_diff.val_existing,
+                            property_diff.val_declared,
+                        ),
+                    )
+                )
+
+            else:
+                properties.append(
+                    PropertyDiff(
+                        object_name=object_diff.name,
+                        property_name=property_diff.property_name,
+                        declared=str(property_diff.val_declared),
+                        existing=str(property_diff.val_existing),
+                    )
+                )
+
+    return Diff(
+        objects=objects,
+        properties=properties,
+        features=features,
     )
