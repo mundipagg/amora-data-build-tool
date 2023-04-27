@@ -3,9 +3,8 @@ from unittest.mock import patch
 import markdown
 import pandas
 import pytest
-from sqlalchemy import literal
+from sqlalchemy import literal, select
 
-from amora.models import select
 from amora.protocols import Compilable
 from amora.questions import Question, question
 from amora.visualization import Visualization
@@ -123,9 +122,10 @@ def test_question_decorator_wraps_the_question_function_on_a_Question():
     assert isinstance(wrapped_question, Question)
 
 
-def test_question_decorator_raises_an_error_if_the_decorated_functions_doesnt_return_a_compilable():
-    with pytest.raises(ValueError):
+def test_question_raises_an_error_if_the_decorated_function_doesnt_return_a_compilable():
+    @question()
+    def an_invalid_question():
+        return 42
 
-        @question()
-        def an_invalid_question():
-            return 42
+    with pytest.raises(AttributeError):
+        an_invalid_question.render()

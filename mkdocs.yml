@@ -33,7 +33,8 @@ nav:
       - 'concepts/data-questions.md'
       - 'concepts/data-visualization.md'
   - 🧑‍🏫 User Guide:
-      - 'cli.md'
+      - 'user-guide/cli.md'
+      - 'user-guide/web-ui.md'
   - 🎁 Examples:
     - Amora Project: 'examples.md'
     - Feature Store Notebook: 'notebooks/feature_store.ipynb'

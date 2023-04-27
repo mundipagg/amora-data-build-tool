@@ -1,6 +1,7 @@
-import os
+import functools
+import sys
 from pathlib import Path
-from typing import Iterable, Union
+from typing import Callable, Iterable, Union
 
 from amora.config import settings
 
@@ -25,10 +26,16 @@ def target_path_for_model_path(path: Path) -> Path:
     )
 
 
-def clean_compiled_files() -> None:
-    for sql_file in list_target_files():
-        os.remove(sql_file)
-
-
 def list_target_files() -> Iterable[Path]:
     return list_files(settings.target_path, suffix=".sql")
+
+
+def ensure_path(func: Callable) -> Callable:
+    if settings.models_path not in sys.path:
+        sys.path.append(settings.models_path.as_posix())
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+
+    return wrapper

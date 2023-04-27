@@ -1,11 +1,6 @@
-from unittest.mock import patch
-
-import pandas as pd
-import pytest
 from dash.testing.composite import DashComposite
 
 
-@pytest.mark.skip
 def test_feature_store_page(amora_dash: DashComposite):
     with patch(
         "amora.dash.pages.feature_store.summarize", return_value=pd.DataFrame()

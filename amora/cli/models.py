@@ -1,5 +1,6 @@
 import json
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Optional
 
 import typer
@@ -13,6 +14,7 @@ from amora.config import settings
 from amora.models import Model, list_models
 from amora.providers.bigquery import (
     BIGQUERY_TYPES_TO_PYTHON_TYPES,
+    BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
     DryRunResult,
     dry_run,
     estimated_query_cost_in_usd,
@@ -78,9 +80,7 @@ def models_list(
 
         @property
         def depends_on(self) -> List[str]:
-            return sorted(
-                dependency.__name__ for dependency in self.model.dependencies()
-            )
+            return sorted(dependency.name for dependency in self.model.dependencies())
 
         @property
         def estimated_query_cost_in_usd(self) -> Optional[str]:
@@ -204,9 +204,21 @@ def models_import(
     project, dataset, table = table_reference.split(".")
     model_name = "".join(part.title() for part in table.split("_"))
 
-    destination_file_path = settings.models_path.joinpath(
-        (model_file_path or model_name.replace(".", "/")) + ".py"
-    )
+    if model_file_path:
+        destination_file_path = Path(model_file_path)
+        if (
+            destination_file_path.is_absolute()
+            and settings.models_path not in destination_file_path.parents
+        ):
+            typer.echo(
+                "Destination path must be relative to the configured models path",
+                err=True,
+            )
+            raise typer.Exit(1)
+    else:
+        destination_file_path = settings.models_path.joinpath(
+            model_name.replace(".", "/") + ".py"
+        )
 
     if destination_file_path.exists() and not overwrite:
         typer.echo(
@@ -219,6 +231,7 @@ def models_import(
     sorted_schema = sorted(get_schema(table_reference), key=lambda field: field.name)
     model_source_code = template.render(
         BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
+        BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES=BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
         dataset=dataset,
         dataset_id=f"{project}.{dataset}",
         model_name=model_name,

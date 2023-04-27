@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Union
 
 import dash
 import dash_bootstrap_components as dbc
@@ -39,7 +39,7 @@ def icon_for_model(model: Model) -> html.I:
     return html.I(className=f"fa-solid {icon}")
 
 
-def card_item(model: Model, fv: FeatureView) -> Component:
+def card_item(model: Model, fv: Union[FeatureView, None]) -> Component:
     return dbc.Card(
         [
             dbc.CardHeader(
@@ -47,7 +47,7 @@ def card_item(model: Model, fv: FeatureView) -> Component:
                     [
                         dbc.Col(icon_for_model(model)),
                         dbc.Col(
-                            html.H4(fv.name, className="card-title"),
+                            html.H4(model.__tablename__, className="card-title"),
                         ),
                     ],
                     justify="between",
@@ -56,7 +56,9 @@ def card_item(model: Model, fv: FeatureView) -> Component:
             dbc.CardBody(
                 [
                     model_labels.component(model),
-                    materialization_badge.component(fv.last_updated_timestamp),
+                    materialization_badge.component(
+                        fv.last_updated_timestamp if fv else None
+                    ),
                     dbc.Accordion(
                         [
                             dbc.AccordionItem(

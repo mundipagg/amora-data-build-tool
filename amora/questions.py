@@ -1,8 +1,7 @@
 from datetime import date
-from typing import Callable, Set
+from typing import Callable, Optional, Set
 
 import pandas as pd
-from sqlalchemy.sql import Selectable
 
 from amora.compilation import compile_statement
 from amora.protocols import Compilable
@@ -17,18 +16,17 @@ class Question:
     """
     A Data Question is a __query__, its __results__, and its __visualization__.
 
-    The __query__ is expressed as an `amora.types.Compilable`, its __results__ is a
-    `pandas.DataFrame` and the results __visualization__ as an `amora.views.View`.
+    The __query__ is expressed as an `amora.protocols.Compilable`, its __results__ is a
+    `pandas.DataFrame` and the results __visualization__ as an `amora.visualization.Visualization`.
 
     ## Example
 
     Lets define a new data question:
 
     ```python
-    from examples.models.step_count_by_source import StepCountBySource
-
     from amora.models import select
     from amora.questions import question
+    from examples.models.step_count_by_source import StepCountBySource
 
 
     @question
@@ -76,16 +74,12 @@ class Question:
     """
 
     def __init__(
-        self, question_func: QuestionFunc, view_config: VisualizationConfig = None
+        self,
+        question_func: QuestionFunc,
+        view_config: Optional[VisualizationConfig] = None,
     ):
         if isinstance(question_func, Question):
             question_func = question_func.question_func
-        if not isinstance(question_func(), Selectable):
-            raise ValueError(
-                "Valid questions should return a `Selectable`. "
-                "Please refer to the 'data questions' documentation."
-            )
-
         self.question_func = question_func
         self.view_config = view_config or Table(title=self.name)
 
@@ -209,7 +203,7 @@ class Question:
 QUESTIONS: Set[Question] = set()
 
 
-def question(view_config: VisualizationConfig = None):
+def question(view_config: Optional[VisualizationConfig] = None):
     """
     Wraps the function into a `amora.questions.Question`.
     The decorated function must return a `Compilable`

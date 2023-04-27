@@ -6,6 +6,6 @@ Compilable = Union[Select, Selectable]
 
 
 @runtime_checkable
-class CompilableProtocol(Protocol):
+class CompilableProtocol(Protocol):  # pragma: nocover
     def source(self) -> Compilable:
         ...

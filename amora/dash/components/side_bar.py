@@ -53,7 +53,7 @@ def layout() -> Component:
             dmc.Center(id="user-account"),
             dmc.Center(
                 dbc.Alert(
-                    ["Press ", dmc.Kbd("⌘"), " to toggle the menu"], color="light"
+                    ["Press ", dmc.Kbd("m"), " to toggle the menu"], color="light"
                 )
             ),
         ],
@@ -83,6 +83,7 @@ def display_user(pathname):
 def toggle_menu_on_keydown(
     _n_events: Optional[int], is_open: bool, event: Optional[dict]
 ) -> bool:
-    if event and event["metaKey"]:
+    if event and event.get("shiftKey") and event["key"] == "M":
         return not is_open
-    return is_open
+
+    raise dash.exceptions.PreventUpdate

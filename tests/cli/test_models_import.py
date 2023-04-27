@@ -7,6 +7,7 @@ from google.cloud.bigquery import SchemaField
 from typer.testing import CliRunner
 
 from amora.cli import app
+from amora.config import settings
 from amora.models import AmoraModel, amora_model_for_path
 
 runner = CliRunner()
@@ -19,7 +20,7 @@ exc = NotFound("Table not found")
 def test_models_import_with_invalid_table_reference(get_schema: MagicMock):
     table_reference = "project.dataset.table"
 
-    with NamedTemporaryFile(suffix=".py") as fp:
+    with NamedTemporaryFile(suffix=".py", dir=settings.models_path) as fp:
         output = Path(fp.name).parent.joinpath(Path(fp.name).stem)
         result = runner.invoke(
             app,
@@ -40,14 +41,12 @@ def test_models_import_with_invalid_table_reference(get_schema: MagicMock):
 
 
 mock_schema = [
-    SchemaField(name="BOOL_COLUMN", field_type="BOOL"),
     SchemaField(name="BOOLEAN_COLUMN", field_type="BOOLEAN"),
-    SchemaField(name="BYTES_COLUMN", field_type="BYTES"),
+    SchemaField(name="BOOL_COLUMN", field_type="BOOL"),
+    SchemaField(name="BYNARY_COLUMN", field_type="BYNARY"),
     SchemaField(name="DATE_COLUMN", field_type="DATE"),
     SchemaField(name="DATETIME_COLUMN", field_type="DATETIME"),
-    SchemaField(name="FLOAT64_COLUMN", field_type="FLOAT64"),
     SchemaField(name="FLOAT_COLUMN", field_type="FLOAT"),
-    SchemaField(name="INT64_COLUMN", field_type="INT64"),
     SchemaField(name="INTEGER_COLUMN", field_type="INTEGER"),
     SchemaField(name="JSON_COLUMN", field_type="JSON"),
     SchemaField(name="STRING_COLUMN", field_type="STRING"),
@@ -61,18 +60,18 @@ mock_schema = [
         field_type="RECORD",
         mode="REPEATED",
         fields=(
-            SchemaField("id", "STRING", "NULLABLE", None, (), None),
-            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
-            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField(name="id", field_type="STRING", mode="NULLABLE"),
+            SchemaField(name="x", field_type="INTEGER", mode="NULLABLE"),
+            SchemaField(name="y", field_type="INTEGER", mode="NULLABLE"),
         ),
     ),
     SchemaField(
         name="STRUCT_COLUMN",
         field_type="RECORD",
         fields=(
-            SchemaField("id", "STRING", "NULLABLE", None, (), None),
-            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
-            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField(name="id", field_type="STRING", mode="NULLABLE"),
+            SchemaField(name="x", field_type="INTEGER", mode="NULLABLE"),
+            SchemaField(name="y", field_type="INTEGER", mode="NULLABLE"),
         ),
     ),
 ]
@@ -82,9 +81,7 @@ mock_schema = [
 def test_models_import_with_valid_table_reference_and_existing_destination_file_path(
     get_schema: MagicMock,
 ):
-    with NamedTemporaryFile(suffix=".py") as fp:
-        output = Path(fp.name).parent.joinpath(Path(fp.name).stem)
-
+    with NamedTemporaryFile(suffix=".py", dir=settings.models_path) as fp:
         result = runner.invoke(
             app,
             [
@@ -92,26 +89,44 @@ def test_models_import_with_valid_table_reference_and_existing_destination_file_
                 "import",
                 "--table-reference",
                 "project.dataset.table",
-                output.as_posix(),
+                Path(fp.name).as_posix(),
             ],
         )
 
-        assert result.exit_code == 1, result.stderr
+        assert result.exit_code == 1
         assert not get_schema.called
         assert not fp.read()
         assert "Pass `--overwrite` to overwrite file." in result.stdout
 
 
 @patch("amora.cli.models.get_schema", return_value=mock_schema)
+def test_models_import_fails_when_destination_file_path_is_an_absolute_unrelated_path(
+    get_schema: MagicMock,
+):
+    result = runner.invoke(
+        app,
+        [
+            "models",
+            "import",
+            "--overwrite",
+            "--table-reference",
+            "project.dataset.table",
+            "/tmp/absolute-and-unrelated-to-models-path",
+        ],
+        catch_exceptions=False,
+    )
+
+    assert result.exit_code == 1
+    get_schema.assert_not_called()
+
+
+@patch("amora.cli.models.get_schema", return_value=mock_schema)
 def test_models_import_with_valid_table_reference_and_existing_destination_file_path_and_overwrite(
     get_schema: MagicMock,
 ):
-    with NamedTemporaryFile(suffix=".py") as fp:
-        output_path = Path(fp.name)
-        output = output_path.parent.joinpath(output_path.stem)
-
+    with NamedTemporaryFile(suffix=".py", dir=settings.MODELS_PATH) as fp:
         table_reference = "project.dataset.table"
-
+        output_path = Path(fp.name)
         result = runner.invoke(
             app,
             [
@@ -120,10 +135,10 @@ def test_models_import_with_valid_table_reference_and_existing_destination_file_
                 "--overwrite",
                 "--table-reference",
                 table_reference,
-                output.as_posix(),
+                output_path.as_posix(),
             ],
+            catch_exceptions=False,
         )
 
         assert result.exit_code == 0, result.stderr
-        assert output_path.read_text()
         assert issubclass(amora_model_for_path(path=output_path), AmoraModel)  # type: ignore

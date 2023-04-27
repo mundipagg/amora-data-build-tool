@@ -1,11 +1,11 @@
-from typing import Dict, Iterable, List, Tuple
+from typing import Any, Dict, Generator, Iterable, List, Tuple
 
 import networkx as nx
 from matplotlib import pyplot as plt
 
 from amora.config import settings
 from amora.materialization import Task
-from amora.models import Column, Model
+from amora.models import Column, Model, list_models
 from amora.utils import list_target_files
 
 CytoscapeElements = List[Dict]
@@ -32,30 +32,42 @@ class DependencyDAG(nx.DiGraph):
         return dag
 
     @classmethod
+    def from_project(cls) -> "DependencyDAG":
+        """
+        Builds the DependencyDAG for all models.
+        """
+        dag = cls()
+
+        def fetch_edges(node: Model):
+            for dependency in getattr(node, "__depends_on__", []):
+                dag.add_edge(dependency.unique_name(), node.unique_name())
+                fetch_edges(dependency)
+
+        for model, _ in list_models():
+            dag.add_node(model.unique_name())
+            fetch_edges(model)
+
+        return dag
+
+    @classmethod
     def from_tasks(cls, tasks: Iterable[Task]) -> "DependencyDAG":
         dag = cls()
 
         for task in tasks:
             dag.add_node(task.model.unique_name())
-            for dependency in getattr(task.model, "__depends_on__", []):
-                dag.add_edge(dependency.unique_name(), task.model.unique_name())
+            for dependency in task.model.dependencies():
+                dag.add_edge(dependency.fullname, task.model.unique_name())
 
         return dag
 
     @classmethod
-    def from_target(cls, models=None) -> "DependencyDAG":
+    def from_target(cls) -> "DependencyDAG":
         """
         Builds a DependencyDAG from the files compiled at `settings.AMORA_TARGET_PATH`
-
-        :param models:
-        :return:
         """
         model_to_task = {}
 
         for target_file_path in list_target_files():
-            if models and target_file_path.stem not in models:
-                continue
-
             task = Task.for_target(target_file_path)
             model_to_task[task.model.unique_name()] = task
 
@@ -73,6 +85,15 @@ class DependencyDAG(nx.DiGraph):
                     dag.add_edge(dependency_columns[column.key], column)
 
         return dag
+
+    def topological_generations(self) -> Generator[List[Any], None, None]:
+        for generation in nx.topological_generations(self):
+            yield sorted(generation)
+
+    def get_all_dependencies(self, source: Any) -> Generator[Any, None, None]:
+        for dep in nx.predecessor(self, source=source):
+            if dep != source:
+                yield dep
 
     def to_cytoscape_elements(self) -> CytoscapeElements:
         """
