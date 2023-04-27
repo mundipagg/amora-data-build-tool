@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Optional, Iterable
+from typing import Any, Callable, List, Optional
 
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -96,7 +96,6 @@ def create_component_for_one_unique_value(series: pd.Series) -> html.P:
 def get_most_common_values(
     df_value_counts_normalized: pd.DataFrame,
 ) -> List[Component]:
-
     elements = []
 
     for _, row in df_value_counts_normalized.head(2).iterrows():
@@ -139,7 +138,6 @@ def create_bar_plot(
     df_value_counts: pd.DataFrame,
     **bar_kwargs: Any,
 ) -> dcc.Graph:
-
     figure = figure_apply_default_layout(
         px.bar(
             df_value_counts,
@@ -167,6 +165,7 @@ def create_component_numeric_type(series: pd.Series) -> dcc.Graph:
     else:
         figure = plotly.hist_series(series)
         return dcc.Graph(figure=figure_apply_default_layout(figure))
+
 
 def create_component_datetime_type(series: pd.Series) -> dcc.Graph:
     datetime_series_agg = datetime_series_aggregation(series)
