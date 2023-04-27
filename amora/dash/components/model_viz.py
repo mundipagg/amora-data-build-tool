@@ -235,14 +235,14 @@ def component(model: Model) -> Component:
         df = sample(model, percentage=1)
     except ValueError:
         return html.Div(
-            f"This component depends Sample and it is not implemented for model {model.unique_name}"
+            f"This component depends on `amora.providers.bigquery.sample`, which isn't available for model `{model.unique_name}`"
         )
     else:
         return dbc.Row(
             [
                 dbc.Row(
                     dbc.Alert(
-                        "The visualizations bellow are generated from the model sample data",
+                        "The visualizations bellow are generated from a 1% model sample data",
                         color="info",
                     )
                 ),
