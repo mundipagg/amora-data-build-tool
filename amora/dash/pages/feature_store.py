@@ -87,14 +87,20 @@ def layout() -> Component:
         fv.name: fv for fv in store.registry.list_feature_views(store.project)
     }
 
-    feature_views = html.Div(
-        [
-            card_item(model=model, fv=registry_fvs.get(fv.name))
-            for (fv, fs, model) in list(FEATURE_REGISTRY.values())
-        ]
-    )
+    if registry_fvs:
+        id_ = "feature-store-content"
+        feature_views = html.Div(
+            [
+                card_item(model=model, fv=registry_fvs.get(fv.name))
+                for (fv, fs, model) in list(FEATURE_REGISTRY.values())
+            ]
+        )
+    else:
+        id_ = "feature-views-loading-error"
+        feature_views = html.Div([html.H1("Error loading feature view...")])
+
     return html.Div(
-        id="feature-store-content",
+        id=id_,
         children=[
             html.H1("Feature Store"),
             html.Hr(),
