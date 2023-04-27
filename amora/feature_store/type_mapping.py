@@ -16,6 +16,8 @@ _SQLALCHEMY_TYPES_TO_FS_TYPES = {
     (sqltypes.ARRAY, sqltypes.Float): ValueType.FLOAT_LIST,
 }
 
+VALUE_TYPE_TO_NAME = {t.value: t.name for t in ValueType}
+
 
 def value_type_for_column(col: Column) -> ValueType:
     if isinstance(col.type, sqltypes.ARRAY):
