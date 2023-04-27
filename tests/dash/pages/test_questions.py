@@ -12,7 +12,7 @@ def test_data_questions_page(amora_dash: DashComposite):
     )
     amora_dash.multiple_click("#side-bar .btn-close", clicks=1)
     amora_dash.select_dcc_dropdown(
-        "div#questions-selector", value=how_many_data_points_where_acquired.name
+        "div#questions-selector", value=how_many_data_points_where_acquired.uid
     )
 
     amora_dash.wait_for_text_to_equal(
