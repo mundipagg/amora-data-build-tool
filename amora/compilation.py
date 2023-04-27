@@ -1,8 +1,12 @@
+from pathlib import Path
+from typing import Iterable, Optional, Union
+
 import sqlparse
 from sqlalchemy_bigquery import STRUCT, BigQueryDialect
 from sqlalchemy_bigquery.base import BigQueryCompiler
 
 from amora.protocols import Compilable
+from amora.utils import list_target_files
 
 
 class AmoraBigQueryCompiler(BigQueryCompiler):
@@ -49,3 +53,11 @@ def compile_statement(statement: Compilable) -> str:
     )
     formatted_sql = sqlparse.format(raw_sql, reindent=True, indent_columns=True)
     return formatted_sql
+
+
+def remove_compiled_files(files: Optional[Iterable[Union[str, Path]]] = None) -> None:
+    if files is None:
+        files = list_target_files()
+
+    for model_file in files:
+        Path(model_file).unlink(missing_ok=True)

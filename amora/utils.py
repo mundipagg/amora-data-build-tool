@@ -1,5 +1,4 @@
 import functools
-import os
 import sys
 from pathlib import Path
 from typing import Callable, Iterable, Union
@@ -25,11 +24,6 @@ def target_path_for_model_path(path: Path) -> Path:
         .replace(settings.models_path.as_posix(), settings.target_path.as_posix())
         .replace(".py", ".sql")
     )
-
-
-def clean_compiled_files() -> None:
-    for sql_file in list_target_files():
-        os.remove(sql_file)
 
 
 def list_target_files() -> Iterable[Path]:

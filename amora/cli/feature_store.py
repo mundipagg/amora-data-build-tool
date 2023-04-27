@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
+import pandas as pd
 import typer
 
 from amora.cli.shared_options import models_option
@@ -15,22 +16,42 @@ def feature_store_plan():
     Dry-run registering objects to the Feature Registry
 
     The plan method dry-runs registering one or more definitions (e.g.: Entity, Feature View)
-    and produces a list of all the changes that would be introduced in the Feature Registry
-    by an `amora feature-store apply` execution.
+    and produces a markdown formatted report of all the changes that would be introduced
+    in the Feature Registry by an `amora feature-store apply` execution.
 
     The changes computed by the `plan` command are informational, and are not actually applied to the registry.
     """
-    from amora.feature_store import fs
-    from amora.feature_store.registry import get_repo_contents
+
+    from amora.feature_store import fs, registry
+    from amora.feature_store.config import settings
 
     registry_diff, infra_diff, _infra = fs.plan(
-        desired_repo_contents=get_repo_contents()
+        desired_repo_contents=registry.get_repo_contents()
     )
 
-    typer.echo("Amora: Feature Store :: Registry diff")
-    typer.echo(registry_diff.to_string())
+    def records_as_markdown_table(records) -> str:
+        return pd.DataFrame.from_records(records).to_markdown(
+            tablefmt=settings.MARKDOWN_FORMAT
+        )
 
-    typer.echo("Amora: Feature Store :: Infrastructure diff")
+    def diff_as_markdown_table(diff) -> str:
+        records = [dict(o) for o in diff]
+        return records_as_markdown_table(records)
+
+    diff = registry.parse_diff(registry_diff)
+
+    typer.echo("## Amora :: Feature Store :: Registry objects diff\n")
+    typer.echo(diff_as_markdown_table(diff.objects))
+
+    typer.echo("## Amora :: Feature Store :: Properties diff\n")
+    typer.echo(diff_as_markdown_table(diff.properties))
+
+    typer.echo("## Amora :: Feature Store :: Features diff\n")
+    for feature_diff in diff.features:
+        typer.echo(f"### {feature_diff.name}\n")
+        typer.echo(records_as_markdown_table(feature_diff.diff))
+
+    typer.echo("## Amora :: Feature Store :: Infrastructure diff\n")
     typer.echo(infra_diff.to_string())
 
 

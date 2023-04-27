@@ -9,6 +9,7 @@ from examples.amora_project.models.heart_rate import HeartRate
 
 
 class HeartRateOver100(AmoraModel):
+    __depends_on__ = [HeartRate]
     __model_config__ = ModelConfig(
         materialized=MaterializationTypes.view,
         labels={Label("freshness", "daily")},
@@ -22,5 +23,5 @@ class HeartRateOver100(AmoraModel):
     @classmethod
     def source(cls) -> Optional[Compilable]:
         return select(
-            [HeartRate.id, HeartRate.unit, HeartRate.creationDate, HeartRate.value]
+            HeartRate.id, HeartRate.unit, HeartRate.creationDate, HeartRate.value
         ).where(HeartRate.value >= 100)

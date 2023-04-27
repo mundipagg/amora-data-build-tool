@@ -4,8 +4,10 @@ from uuid import uuid4
 
 import pytest
 from google.cloud.bigquery import Client
+from pytz import UTC
 from sqlalchemy import TIMESTAMP, DateTime, Integer
 
+from amora.compilation import remove_compiled_files
 from amora.config import settings
 from amora.dag import DependencyDAG
 from amora.materialization import Task, materialize
@@ -18,7 +20,6 @@ from amora.models import (
     PartitionConfig,
 )
 from amora.providers.bigquery import schema_for_model
-from amora.utils import clean_compiled_files
 
 from tests.models.heart_agg import HeartRateAgg
 from tests.models.heart_rate import HeartRate
@@ -71,6 +72,7 @@ class TableModelByrange(AmoraModel):
         cluster_by=["x", "y"],
         labels={Label("freshness", "daily")},
         description=uuid4().hex,
+        hours_to_expire=1,
     )
 
     x: int = Field(Integer, primary_key=True)
@@ -79,7 +81,7 @@ class TableModelByrange(AmoraModel):
 
 
 def setup_function(module):
-    clean_compiled_files()
+    remove_compiled_files()
 
 
 def test_it_creates_a_task_from_a_target_file_path():
@@ -243,6 +245,33 @@ def test_materialize_update_table_metadata(Client: MagicMock):
     assert table.description == TableModelByDay.__model_config__.description
     assert table.labels == TableModelByDay.__model_config__.labels_dict
     assert table.schema == schema_for_model(TableModelByDay)
+    assert table.expires == TableModelByDay.__model_config__.hours_to_expire
+
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_with_expiration_table(Client: MagicMock):
+    client = Client.return_value
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByrange.unique_name(),
+        config=TableModelByrange.__model_config__,
+    )
+
+    table = client.create_table.call_args.args[0]
+    assert table.expires > datetime.now(UTC)
+
+
+@patch("amora.materialization.Client", spec=Client)
+def test_materialize_with_expiration_table_is_null(Client: MagicMock):
+    client = Client.return_value
+    materialize(
+        sql="SELECT 1",
+        model_name=TableModelByDay.unique_name(),
+        config=TableModelByDay.__model_config__,
+    )
+
+    table = client.create_table.call_args.args[0]
+    assert table.expires is None
 
 
 def test_materialize_invalid_materialization():

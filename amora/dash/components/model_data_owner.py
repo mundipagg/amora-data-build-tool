@@ -1,5 +1,4 @@
-import dash_core_components as dcc
-from dash import html
+from dash import dcc, html
 from dash.development.base_component import Component
 
 from amora.models import Model

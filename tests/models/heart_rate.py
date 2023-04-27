@@ -38,14 +38,12 @@ class HeartRate(AmoraModel):
     @classmethod
     def source(cls) -> Compilable:
         return select(
-            [
-                Health.creationDate,
-                Health.device,
-                Health.endDate,
-                Health.id,
-                Health.sourceName,
-                Health.startDate,
-                Health.unit,
-                Health.value,
-            ]
+            Health.creationDate,
+            Health.device,
+            Health.endDate,
+            Health.id,
+            Health.sourceName,
+            Health.startDate,
+            Health.unit,
+            Health.value,
         ).where(Health.type == "HeartRate")

@@ -11,6 +11,7 @@ from amora.models import (
     amora_model_for_name,
     amora_model_for_path,
     amora_model_for_target_path,
+    amora_model_from_name_list,
     select_models_with_label_keys,
     select_models_with_labels,
 )
@@ -48,6 +49,21 @@ def test_amora_model_for_name():
 
     assert issubclass(model, AmoraModel)
     assert model.__table__ == Health.__table__
+
+
+def test_amora_model_from_name_list():
+    expected_models = [Health, Steps]
+    expected_models_name_list = [model.unique_name() for model in expected_models]
+
+    models = list(amora_model_from_name_list(expected_models_name_list))
+
+    assert len(expected_models) == len(models)
+    for (model, _), expected_model in zip(
+        sorted(models, key=lambda x: x[0].unique_name()),
+        sorted(expected_models, key=lambda x: x.unique_name()),
+    ):
+        assert issubclass(model, AmoraModel)
+        assert expected_model.__table__ == model.__table__
 
 
 def test_amora_model_for_name_on_invalid_name():

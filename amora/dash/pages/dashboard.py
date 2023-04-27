@@ -32,7 +32,7 @@ def render(dashboard: Dashboard) -> Component:
     ]
     filters = [filter.layout(f) for f in dashboard.filters]
 
-    return html.Div([html.Div(filters), html.Div(questions)])
+    return html.Div([html.H2(dashboard.name), html.Div(filters), html.Div(questions)])
 
 
 def dashboards_dropdown() -> Component:

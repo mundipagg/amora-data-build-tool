@@ -2,8 +2,7 @@ import urllib.parse
 
 import dash
 import dash_bootstrap_components as dbc
-import dash_core_components as dcc
-from dash import html
+from dash import dcc, html
 from dash.development.base_component import Component
 
 from amora.models import list_models_with_owner, owners_to_models_dict

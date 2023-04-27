@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, call, patch
 from typer.testing import CliRunner
 
 from amora.cli import app
-from amora.utils import clean_compiled_files
+from amora.compilation import remove_compiled_files
 
 from tests.models.heart_rate import HeartRate
 from tests.models.step_count_by_source import StepCountBySource
@@ -13,11 +13,11 @@ runner = CliRunner()
 
 
 def setup_function(module):
-    clean_compiled_files()
+    remove_compiled_files()
 
 
 def teardown_function(module):
-    clean_compiled_files()
+    remove_compiled_files()
 
 
 @patch("concurrent.futures.ProcessPoolExecutor")
@@ -97,7 +97,6 @@ def test_materialize_with_model_options(
 def test_materialize_with_draw_dag_option(
     draw: MagicMock, _materialize: MagicMock, _compile: MagicMock, _pool_mock: MagicMock
 ):
-
     result = runner.invoke(
         app,
         ["materialize", "--draw-dag"],
