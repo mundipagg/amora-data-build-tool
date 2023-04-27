@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, List, Optional, Iterable
 
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -59,9 +59,10 @@ def get_binned_dataframe(
     cut = pd.cut(x=series, bins=bins, include_lowest=True, precision=0, right=False)
 
     if formatter_function:
-        cut = cut_formatter(cut, formatter_function)
-
-    frequencies = pd.value_counts(cut, sort=False)
+        formatted = cut_formatter(cut, formatter_function)
+        frequencies = pd.value_counts(formatted, sort=False)
+    else:
+        frequencies = pd.value_counts(cut, sort=False)
 
     df_frequencies = (
         frequencies.to_frame()
@@ -191,7 +192,7 @@ def visualization_for_series(series: pd.Series) -> dbc.Card:
             "Visualization not implemented for arrays", color="info"
         )
     elif series.nunique() == 1:
-        component_title = series.name
+        component_title = str(series.name)
         component_viz = create_component_for_one_unique_value(series)
     elif is_bool_dtype(series):
         component_title = f"✔️ {series.name}"
