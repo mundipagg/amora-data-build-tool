@@ -11,6 +11,7 @@ from amora.dash.components import (
     model_data_owner,
     model_datatable,
     model_summary,
+    model_viz,
 )
 from amora.models import Model
 
@@ -39,6 +40,11 @@ def component(model: Model) -> Component:
                                 model_summary.component(model),
                                 title="📈 Summary",
                                 item_id="summary",
+                            ),
+                            dbc.AccordionItem(
+                                model_viz.component(model),
+                                title="🐿️ Summary Visualization",
+                                item_id="summary-visualization",
                             ),
                             dbc.AccordionItem(
                                 model_columns.component(model),
