@@ -6,7 +6,7 @@ from dash.testing.composite import DashComposite
 
 def test_feature_store_page(amora_dash: DashComposite):
     with patch(
-        "amora.dash.pages.feature_store.card_item", lambda model, fv: html.Div(id=fv.name)
+        "amora.dash.pages.feature_store.card_item", return_value=html.Div()
     ) as card_item:
         amora_dash.visit_and_snapshot(
             resource_path="/feature-store",
