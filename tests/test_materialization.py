@@ -3,6 +3,7 @@ from unittest.mock import ANY, MagicMock, call, patch
 from uuid import uuid4
 
 import pytest
+from google.api_core.exceptions import BadRequest
 from google.cloud.bigquery import Client
 from pytz import UTC
 from sqlalchemy import TIMESTAMP, DateTime, Integer
@@ -309,3 +310,24 @@ def test_materialize_as_ephemeral(Client: MagicMock):
         is None
     )
     assert not Client.called
+
+
+def test_materialize_with_error_on_source_query():
+    with patch(
+        "amora.materialization.Client",
+        return_value=MagicMock(
+            query=MagicMock(
+                side_effect=BadRequest("Resources exceeded during query execution")
+            ),
+        ),
+    ) as Client:
+        client = Client.return_value
+
+        with pytest.raises(ValueError):
+            materialize(
+                sql="SELECT 1",
+                model_name=TableModelByDay.unique_name(),
+                config=TableModelByDay.__model_config__,
+            )
+
+        assert client.query.call_args_list == [call("SELECT 1", job_config=ANY)]
