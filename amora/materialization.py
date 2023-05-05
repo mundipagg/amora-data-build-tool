@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 import humanize
+from google.api_core.exceptions import ClientError
 from google.cloud.bigquery import (
     Client,
     PartitionRange,
@@ -111,21 +112,25 @@ def materialize(sql: str, model_name: str, config: ModelConfig) -> Optional[Resu
             table.expires = datetime.utcnow() + timedelta(hours=config.hours_to_expire)
 
         client.create_table(table)
-
-        query_job = client.query(
-            sql,
-            job_config=QueryJobConfig(destination=table),
-        )
-        result = query_job.result()
-
-        return Result(
-            model_name=model_name,
-            model_config=config,
-            destination_table=client.get_table(table),
-            total_bytes_billed=query_job.total_bytes_billed,
-            total_bytes_processed=query_job.total_bytes_processed,
-            duration=query_job.ended - query_job.created,
-        )
+        try:
+            query_job = client.query(
+                sql,
+                job_config=QueryJobConfig(destination=table),
+            )
+            _result = query_job.result()
+        except ClientError as e:
+            raise ValueError(
+                f"Materialization failed for model `{model_name}` to destination `{table}`"
+            ) from e
+        else:
+            return Result(
+                model_name=model_name,
+                model_config=config,
+                destination_table=client.get_table(table),
+                total_bytes_billed=query_job.total_bytes_billed,
+                total_bytes_processed=query_job.total_bytes_processed,
+                duration=query_job.ended - query_job.created,
+            )
 
     raise ValueError(
         f"Invalid model materialization configuration. "
