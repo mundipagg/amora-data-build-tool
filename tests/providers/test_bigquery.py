@@ -293,25 +293,34 @@ def test_schema_for_model():
 
     assert schema == [
         SchemaField(
-            "a_boolean", "BOOLEAN", "NULLABLE", "You know... ones and zeros", (), None
+            "a_boolean",
+            "BOOLEAN",
+            "NULLABLE",
+            None,
+            "You know... ones and zeros",
+            (),
+            None,
         ),
-        SchemaField("a_date", "DATE", "NULLABLE", None, (), None),
-        SchemaField("a_datetime", "DATETIME", "NULLABLE", None, (), None),
-        SchemaField("a_float", "FLOAT", "NULLABLE", None, (), None),
-        SchemaField("a_string", "STRING", "NULLABLE", "Words and stuff", (), None),
-        SchemaField("a_time", "TIME", "NULLABLE", None, (), None),
-        SchemaField("a_timestamp", "TIMESTAMP", "NULLABLE", None, (), None),
-        SchemaField("an_int", "INTEGER", "NULLABLE", None, (), None),
-        SchemaField("an_int_array", "INTEGER", "REPEATED", None, (), None),
-        SchemaField("a_str_array", "STRING", "REPEATED", None, (), None),
+        SchemaField("a_date", "DATE", "NULLABLE", None, None, (), None),
+        SchemaField("a_datetime", "DATETIME", "NULLABLE", None, None, (), None),
+        SchemaField("a_float", "FLOAT", "NULLABLE", None, None, (), None),
+        SchemaField(
+            "a_string", "STRING", "NULLABLE", None, "Words and stuff", (), None
+        ),
+        SchemaField("a_time", "TIME", "NULLABLE", None, None, (), None),
+        SchemaField("a_timestamp", "TIMESTAMP", "NULLABLE", None, None, (), None),
+        SchemaField("an_int", "INTEGER", "NULLABLE", None, None, (), None),
+        SchemaField("an_int_array", "INTEGER", "REPEATED", None, None, (), None),
+        SchemaField("a_str_array", "STRING", "REPEATED", None, None, (), None),
         SchemaField(
             "a_struct_array",
             "RECORD",
             "REPEATED",
             None,
+            None,
             (
-                SchemaField("key", "INTEGER", "NULLABLE", None, (), None),
-                SchemaField("value", "STRING", "NULLABLE", None, (), None),
+                SchemaField("key", "INTEGER", "NULLABLE", None, None, (), None),
+                SchemaField("value", "STRING", "NULLABLE", None, None, (), None),
             ),
             None,
         ),
@@ -320,9 +329,10 @@ def test_schema_for_model():
             "RECORD",
             "NULLABLE",
             None,
+            None,
             (
-                SchemaField("id", "INTEGER", "NULLABLE", None, (), None),
-                SchemaField("label", "STRING", "NULLABLE", None, (), None),
+                SchemaField("id", "INTEGER", "NULLABLE", None, None, (), None),
+                SchemaField("label", "STRING", "NULLABLE", None, None, (), None),
             ),
             None,
         ),
@@ -368,9 +378,30 @@ def test_column_for_schema_field_on_struct_field():
         field_type="RECORD",
         mode="NULLABLE",
         fields=(
-            SchemaField("id", "STRING", "NULLABLE", None, (), None),
-            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
-            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField(
+                "id",
+                "STRING",
+                "NULLABLE",
+                None,
+                None,
+                (),
+            ),
+            SchemaField(
+                "x",
+                "INTEGER",
+                "NULLABLE",
+                None,
+                None,
+                (),
+            ),
+            SchemaField(
+                "y",
+                "INTEGER",
+                "NULLABLE",
+                None,
+                None,
+                (),
+            ),
         ),
     )
     column = column_for_schema_field(struct_field)
@@ -387,9 +418,30 @@ def test_columns_for_schema_field_on_repeated_struct_field():
         field_type="RECORD",
         mode="REPEATED",
         fields=(
-            SchemaField("id", "STRING", "NULLABLE", None, (), None),
-            SchemaField("x", "INTEGER", "NULLABLE", None, (), None),
-            SchemaField("y", "INTEGER", "NULLABLE", None, (), None),
+            SchemaField(
+                "id",
+                "STRING",
+                "NULLABLE",
+                None,
+                None,
+                (),
+            ),
+            SchemaField(
+                "x",
+                "INTEGER",
+                "NULLABLE",
+                None,
+                None,
+                (),
+            ),
+            SchemaField(
+                "y",
+                "INTEGER",
+                "NULLABLE",
+                None,
+                None,
+                (),
+            ),
         ),
     )
     column = column_for_schema_field(repeated_struct_field)
