@@ -50,7 +50,7 @@ gunicorn = { version = "^20.1.0", optional = true }
 [tool.poetry.group.dev.dependencies]
 pytest-cov = "^4.0.0"
 black = ">=22.10,<24.0"
-mypy = "^0.982"
+mypy = ">=0.982,<1.4"
 lxml = "^4.6.3"
 pytest-env = "^0.8.1"
 pre-commit = "^2.18.1"
@@ -73,7 +73,10 @@ mkdocs-redirects = "^1.2.0"
 mkdocs-git-revision-date-plugin = "^0.3.1"
 mkdocs-include-markdown-plugin = ">=3.4.1,<5.0.0"
 mkdocs-autorefs = "^0.4.1"
-mkdocstrings = { version = ">=0.19,<0.21", extras = ["python-legacy", "python"] }
+mkdocstrings = { version = ">=0.19,<0.21", extras = [
+    "python-legacy",
+    "python",
+] }
 mkdocs-jupyter = "^0.22.0"
 
 [tool.poetry.extras]
@@ -102,4 +105,8 @@ amora = "amora.tests.pytest_plugin"
 amora = "amora.cli:main"
 
 [tool.mypy]
-plugins = ["sqlalchemy.ext.mypy.plugin"]
+plugins = ["sqlalchemy.ext.mypy.plugin", "pydantic.mypy"]
+# Conflito entre tests/models e examples/amora_project/models
+no_namespace_packages = true
+# Ignora funções sem anotação de tipos
+implicit_optional = true
