@@ -582,7 +582,7 @@ class struct(expression.ClauseList, expression.ColumnElement):  # type: ignore
         clauses = [
             coercions.expect(
                 roles.ExpressionElementRole,
-                dataclasses.asdict(model),
+                dataclasses.asdict(model),  # type: ignore
                 type_=self.type,
             )
         ]
