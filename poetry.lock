@@ -839,14 +839,14 @@ files = [
 
 [[package]]
 name = "dash"
-version = "2.9.3"
+version = "2.10.0"
 description = "A Python framework for building reactive web-apps. Developed by Plotly."
 category = "main"
 optional = true
 python-versions = ">=3.6"
 files = [
-    {file = "dash-2.9.3-py3-none-any.whl", hash = "sha256:a749ae1ea9de3fe7b785353a818ec9b629d39c6b7e02462954203bd1e296fd0e"},
-    {file = "dash-2.9.3.tar.gz", hash = "sha256:47392f8d6455dc989a697407eb5941f3bad80604df985ab1ac9d4244568ffb34"},
+    {file = "dash-2.10.0-py3-none-any.whl", hash = "sha256:2a010cd593f952041ab1737ea8af574b19be54584f52665f269eb0bcfef765fa"},
+    {file = "dash-2.10.0.tar.gz", hash = "sha256:33abd550733a609247b792d29d5b8fc9663e5161409a3179ec24551f4b74f2a6"},
 ]
 
 [package.dependencies]
@@ -855,7 +855,7 @@ dash-core-components = "2.0.0"
 dash-html-components = "2.0.0"
 dash-table = "5.0.0"
 dash-testing-stub = {version = ">=0.0.2", optional = true, markers = "extra == \"testing\""}
-Flask = ">=1.0.4"
+Flask = ">=1.0.4,<=2.2.3"
 lxml = {version = ">=4.6.2", optional = true, markers = "extra == \"testing\""}
 multiprocess = {version = ">=0.70.12", optional = true, markers = "extra == \"testing\""}
 percy = {version = ">=2.0.2", optional = true, markers = "extra == \"testing\""}
@@ -865,6 +865,7 @@ pytest = {version = ">=6.0.2", optional = true, markers = "extra == \"testing\""
 requests = {version = ">=2.21.0", extras = ["security"], optional = true, markers = "extra == \"testing\""}
 selenium = {version = ">=3.141.0,<=4.2.0", optional = true, markers = "extra == \"testing\""}
 waitress = {version = ">=1.4.4", optional = true, markers = "extra == \"testing\""}
+Werkzeug = "<=2.2.3"
 
 [package.extras]
 celery = ["celery[redis] (>=5.1.2)", "importlib-metadata (<5)", "redis (>=3.5.3)"]
@@ -1396,14 +1397,14 @@ appdirs = "*"
 
 [[package]]
 name = "flask"
-version = "2.2.4"
+version = "2.2.3"
 description = "A simple framework for building complex web applications."
 category = "main"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "Flask-2.2.4-py3-none-any.whl", hash = "sha256:13f6329ddbfff11340939cd11919daf150a01358ded4b7e81c03c055dfecb559"},
-    {file = "Flask-2.2.4.tar.gz", hash = "sha256:77504c4c097f56ac5f29b00f9009213010cf9d2923a288c0e0564a5db2bb53d6"},
+    {file = "Flask-2.2.3-py3-none-any.whl", hash = "sha256:c0bec9477df1cb867e5a67c9e1ab758de9cb4a3e52dd70681f59fa40a62b3f2d"},
+    {file = "Flask-2.2.3.tar.gz", hash = "sha256:7eb373984bf1c770023fce9db164ed0c3353cd0b53f130f4693da0ca756a2e6d"},
 ]
 
 [package.dependencies]
@@ -6110,4 +6111,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "462e3d4533fd5c69eb1ddc7417fa30a39ee5cee55432dff9b954fc7fcbe6405c"
+content-hash = "555032cd506c089ef6504768e0caf97edc8c1cd55b074745a30c92ecf4e4bb8d"
