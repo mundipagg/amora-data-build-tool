@@ -1,3 +1,5 @@
+import time
+
 from dash.testing.composite import DashComposite
 
 from tests.models.step_count_by_source import how_many_data_points_where_acquired
@@ -11,6 +13,10 @@ def test_data_questions_page(amora_dash: DashComposite):
         stay_on_page=True,
     )
     amora_dash.multiple_click("#side-bar .btn-close", clicks=1)
+
+    time.sleep(1)
+    amora_dash.find_element("div#questions-selector").click()
+
     amora_dash.select_dcc_dropdown(
         "div#questions-selector", value=how_many_data_points_where_acquired.name
     )

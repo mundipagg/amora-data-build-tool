@@ -15,6 +15,7 @@ from google.cloud.bigquery import (
     Table,
     TableReference,
 )
+from google.cloud.bigquery.schema import _DEFAULT_VALUE
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
 from sqlalchemy import (
     Column,
@@ -260,7 +261,7 @@ def schema_field_for_column(column: Column) -> SchemaField:
         field_type=field_type,
         mode=mode,
         fields=fields or (),
-        description=column.doc,
+        description=column.doc or _DEFAULT_VALUE,
     )
 
 
@@ -627,7 +628,7 @@ class struct(expression.ClauseList, expression.ColumnElement):  # type: ignore
         clauses = [
             coercions.expect(
                 roles.ExpressionElementRole,
-                dataclasses.asdict(model),
+                dataclasses.asdict(model),  # type: ignore
                 type_=self.type,
             )
         ]
