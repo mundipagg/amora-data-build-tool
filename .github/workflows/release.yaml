@@ -4,6 +4,9 @@ on:
     types:
       - created
 
+env:
+  gcp_service_account: ${{ secrets.GCP_SA_KEY }}
+
 jobs:
   release:
     name: 🚀 Deploy to PyPI
