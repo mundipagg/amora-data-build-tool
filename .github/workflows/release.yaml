@@ -29,10 +29,17 @@ jobs:
       - name: 🚀 Deploy to PyPI
         run: poetry publish --build --username __token__ --password ${{ secrets.PYPI_TOKEN }}
 
-      - name: 🐳 Set up QEMU
+  docker:
+    name: 🚀 Deploy to gcr.io/amora-data-build-tool/amora
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: 🐳 Setup QEMU
         uses: docker/setup-qemu-action@v2
 
-      - name: 🐳 Set up Docker Buildx
+      - name: 🐳 Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
 
       - name: 🐳 Login to GCR
