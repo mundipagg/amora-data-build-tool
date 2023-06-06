@@ -1,8 +1,14 @@
 [tool.poetry]
 name = "amora"
-version = "0.1.22"
+version = "0.1.23"
 description = "Amora Data Build Tool"
-authors = ["diogommartins <diogo.martins@stone.com.br>"]
+authors = [
+    "diogommartins <diogo.martins@stone.com.br>",
+    "thulio <thulio.patriota@stone.com.br>",
+    "betowxyz <robertom@marinheiro.com.br>",
+    "lemosflavio <flavio.lemos@pagar.me>",
+    "eduwxyz <eduardo.machado@pagar.me>"
+]
 license = "MIT"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
