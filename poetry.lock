@@ -898,23 +898,23 @@ dash = "*"
 
 [[package]]
 name = "dash-extensions"
-version = "0.1.13"
+version = "1.0.1"
 description = "Extensions for Plotly Dash."
 optional = true
 python-versions = ">=3.8,<4"
 files = [
-    {file = "dash_extensions-0.1.13-py3-none-any.whl", hash = "sha256:8369db7362513896116495080b425a748e49bfa9197723d101789a86b6c88434"},
-    {file = "dash_extensions-0.1.13.tar.gz", hash = "sha256:8a8da362f83c583350517e883f88514cae0c46c6d075f39579b0fdd1750f5792"},
+    {file = "dash_extensions-1.0.1-py3-none-any.whl", hash = "sha256:80f7cd2f50803b085fd8d4c3e1ac27ac4a0f850739d06db8d8910d81b714e1b1"},
+    {file = "dash_extensions-1.0.1.tar.gz", hash = "sha256:2ff43eeff7af8ddb5e7e6b4cddfc95bc0747784e23a93ef0478233c323942665"},
 ]
 
 [package.dependencies]
-dash = ">=2.8.1"
+dash = ">=2.9.3"
 Flask-Caching = "2.0.2"
 jsbeautifier = ">=1.14.3,<2.0.0"
 more-itertools = ">=9.0.0,<10.0.0"
 
 [package.extras]
-mantine = ["dash-mantine-components (>=0.11.0,<0.12.0)"]
+mantine = ["dash-mantine-components (>=0.11.1,<0.12.0)"]
 
 [[package]]
 name = "dash-html-components"
@@ -5861,4 +5861,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "78281269ecef390e5ebe6bfb9ba84cf18fede84f461ebc94b9f4b8ed1a483847"
+content-hash = "3806e0e5b03a365f82b10e3e40887f9d05361d0cdf1470e5af8d71f0f43fb4bb"
