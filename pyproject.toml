@@ -47,7 +47,7 @@ fsspec = "^2022.5.0"
 gcsfs = "^2022.5.0"
 shed = ">=0.9.5,<2023.6.0"
 humanize = "^4.2.3"
-dash-extensions = { version = "^0.1.10", optional = true }
+dash-extensions = { version = ">=0.1.10,<1.1.0", optional = true }
 dash-mantine-components = { version = ">=0.10.2,<0.12.0", optional = true }
 pydantic = { extras = ["email"], version = "^1.10.2" }
 prometheus-flask-exporter = { version = "0.22.3", optional = true }
