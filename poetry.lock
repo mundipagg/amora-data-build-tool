@@ -809,13 +809,13 @@ files = [
 
 [[package]]
 name = "dash"
-version = "2.9.3"
+version = "2.10.2"
 description = "A Python framework for building reactive web-apps. Developed by Plotly."
 optional = true
 python-versions = ">=3.6"
 files = [
-    {file = "dash-2.9.3-py3-none-any.whl", hash = "sha256:a749ae1ea9de3fe7b785353a818ec9b629d39c6b7e02462954203bd1e296fd0e"},
-    {file = "dash-2.9.3.tar.gz", hash = "sha256:47392f8d6455dc989a697407eb5941f3bad80604df985ab1ac9d4244568ffb34"},
+    {file = "dash-2.10.2-py3-none-any.whl", hash = "sha256:f1b7132558bd2341e6cf7ca1e83e216d46bbb27a255ca962a0fa5561c6776953"},
+    {file = "dash-2.10.2.tar.gz", hash = "sha256:b99839890b44171da0e3668c2e607ef4b4f6948a6074c034693534ba52aa1d2b"},
 ]
 
 [package.dependencies]
@@ -824,7 +824,7 @@ dash-core-components = "2.0.0"
 dash-html-components = "2.0.0"
 dash-table = "5.0.0"
 dash-testing-stub = {version = ">=0.0.2", optional = true, markers = "extra == \"testing\""}
-Flask = ">=1.0.4"
+Flask = ">=1.0.4,<2.3.0"
 lxml = {version = ">=4.6.2", optional = true, markers = "extra == \"testing\""}
 multiprocess = {version = ">=0.70.12", optional = true, markers = "extra == \"testing\""}
 percy = {version = ">=2.0.2", optional = true, markers = "extra == \"testing\""}
@@ -834,6 +834,7 @@ pytest = {version = ">=6.0.2", optional = true, markers = "extra == \"testing\""
 requests = {version = ">=2.21.0", extras = ["security"], optional = true, markers = "extra == \"testing\""}
 selenium = {version = ">=3.141.0,<=4.2.0", optional = true, markers = "extra == \"testing\""}
 waitress = {version = ">=1.4.4", optional = true, markers = "extra == \"testing\""}
+Werkzeug = "<2.3.0"
 
 [package.extras]
 celery = ["celery[redis] (>=5.1.2)", "importlib-metadata (<5)", "redis (>=3.5.3)"]
@@ -5860,4 +5861,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "682313408b3bf1209136a03b31a58d67e92cff6b04cbfb1f443b18aa973bf1af"
+content-hash = "78281269ecef390e5ebe6bfb9ba84cf18fede84f461ebc94b9f4b8ed1a483847"
