@@ -915,12 +915,13 @@ files = [
 
 [[package]]
 name = "dash-mantine-components"
-version = "0.11.1"
+version = "0.12.1"
 description = "Plotly Dash Components based on Mantine"
 optional = true
 python-versions = "*"
 files = [
-    {file = "dash_mantine_components-0.11.1-py3-none-any.whl", hash = "sha256:4940a7b2b0ef4a20de496c73b4ae4b534efeea6566a093be205b0c0370f3bf42"},
+    {file = "dash_mantine_components-0.12.1-py3-none-any.whl", hash = "sha256:2630bca31cb96d96fb2c4f986e639b9f92d6319aba8cba02f76da6c0d8f5ca48"},
+    {file = "dash_mantine_components-0.12.1.tar.gz", hash = "sha256:c3dcbfd89813a1539654b8d016eb953dc5f67aafe1a77d45b5ec9faa6f25d3e7"},
 ]
 
 [[package]]
@@ -5847,4 +5848,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "f5b6faf9951dd8fae83a1f9372b0175d4970a405c4fdb4a2611ba8501119a896"
+content-hash = "f334753b436d4d957951d7be3663ff413457597c391a7d9d061c6cc808bae20a"
