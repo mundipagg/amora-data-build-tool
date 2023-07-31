@@ -6,7 +6,7 @@ import typer
 
 from amora import compilation, manifest, materialization, utils
 from amora.cli import dash, feature_store, models
-from amora.cli.shared_options import force_option, models_option, target_option
+from amora.cli.shared_options import force_option, models_option, target_option, depends_option
 from amora.cli.type_specs import Models
 from amora.config import settings
 from amora.dag import DependencyDAG
@@ -25,6 +25,7 @@ def compile(
     models: Optional[Models] = models_option,
     target: Optional[str] = target_option,
     force: Optional[bool] = force_option,
+    depends: Optional[bool] = depends_option,
 ) -> None:
     """
     Generates executable SQL from model files. Compiled SQL files are written to the `./target` directory.
@@ -45,17 +46,29 @@ def compile(
         if models and model_file_path.stem not in models:
             continue
 
-        source_sql_statement = model.source()
-        if source_sql_statement is None:
-            typer.echo(f"⏭ Skipping compilation of model `{model_file_path}`")
-            continue
+        model_list: List[Models] = []
 
-        target_file_path = model.target_path()
-        typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
+        model_list.append(model)
 
-        content = compilation.compile_statement(source_sql_statement)
-        target_file_path.parent.mkdir(parents=True, exist_ok=True)
-        target_file_path.write_text(content)
+        if depends:
+            parents_models = model.__depends_on__
+
+            for parent_model in parents_models:
+                model_list.append(parent_model)
+
+        for model in model_list:
+            source_sql_statement = model.source()
+
+            if source_sql_statement is None:
+                typer.echo(f"⏭ Skipping compilation of model `{model_file_path}`")
+                continue
+
+            target_file_path = model.target_path()
+            typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
+
+            content = compilation.compile_statement(source_sql_statement)
+            target_file_path.parent.mkdir(parents=True, exist_ok=True)
+            target_file_path.write_text(content)
 
     current_manifest.save()
 
@@ -81,8 +94,8 @@ def materialize(
     model_to_task: Dict[str, materialization.Task] = {}
 
     for target_file_path in utils.list_target_files():
-        if models and target_file_path.stem not in models:
-            continue
+        # if models and target_file_path.stem not in models:
+        #     continue
 
         task = materialization.Task.for_target(target_file_path)
         model_to_task[task.model.unique_name()] = task
