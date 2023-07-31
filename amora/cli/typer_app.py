@@ -25,7 +25,7 @@ def compile(
     models: Optional[Models] = models_option,
     target: Optional[str] = target_option,
     force: Optional[bool] = force_option,
-    depends: Optional[bool] = depends_option,
+    depends: Optional[bool] = depends_option
 ) -> None:
     """
     Generates executable SQL from model files. Compiled SQL files are written to the `./target` directory.
@@ -42,27 +42,32 @@ def compile(
         compilation.remove_compiled_files(removed)
         models_to_compile = current_manifest.get_models_to_compile(previous_manifest)
 
+
+
+
     for model, model_file_path in models_to_compile:
+        
         if models and model_file_path.stem not in models:
             continue
-
-        model_list: List[Models] = []
-
+        
+        model_list = []
+        
         model_list.append(model)
-
+        
         if depends:
             parents_models = model.__depends_on__
-
+            
             for parent_model in parents_models:
                 model_list.append(parent_model)
-
+        
         for model in model_list:
-            source_sql_statement = model.source()
-
+            
+            source_sql_statement= model.source()
+            
             if source_sql_statement is None:
                 typer.echo(f"⏭ Skipping compilation of model `{model_file_path}`")
                 continue
-
+            
             target_file_path = model.target_path()
             typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
 
