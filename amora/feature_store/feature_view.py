@@ -6,7 +6,6 @@ from amora.feature_store import settings
 from amora.feature_store.protocols import FeatureViewSourceProtocol
 from amora.feature_store.type_mapping import feast_type_for_colum
 from amora.models import Model
-from amora.providers.bigquery import get_fully_qualified_id
 
 
 def name_for_model(model: Model) -> str:
@@ -40,7 +39,7 @@ def feature_view_for_model(model: Model) -> FeatureView:
             for col in model.feature_view_features()
         ],
         source=BigQuerySource(
-            table=get_fully_qualified_id(model),
+            table=model.fully_qualified_name(),
             timestamp_field=model.feature_view_event_timestamp().name,
         ),
         ttl=timedelta(seconds=settings.DEFAULT_FEATURE_TTL_IN_SECONDS),

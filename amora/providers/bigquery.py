@@ -171,10 +171,6 @@ def get_client() -> Client:
     return _client
 
 
-def get_fully_qualified_id(model: Model) -> str:
-    return f"{model.__table__.metadata.schema}.{model.__tablename__}"
-
-
 def get_schema(table_id: str) -> Schema:
     """
     Given a `table_id`, returns the `Schema` of the table by querying BigQueries API
@@ -331,7 +327,7 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
     client = get_client()
     source = model.source()
     if source is None:
-        table = client.get_table(get_fully_qualified_id(model))
+        table = client.get_table(model.fully_qualified_name())
 
         if table.table_type == "VIEW":
             query_job = client.query(
