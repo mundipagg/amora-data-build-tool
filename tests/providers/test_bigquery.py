@@ -159,7 +159,9 @@ def test_cte_from_rows_with_record_repeated_fields():
 
 
 def test_cte_from_dataframe():
-    df = pd.DataFrame(np.random.randint(0, 1000, size=(10, 5)), columns=list("AMORA"))
+    df = pd.DataFrame(
+        np.random.randint(0, 1000, size=(10, 5)), columns=["A", "B", "C", "D", "E"]
+    )
     cte = cte_from_dataframe(df)
 
     assert isinstance(cte, CTE)
