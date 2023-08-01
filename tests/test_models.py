@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+from sqlalchemy import Integer, text
 
 from amora.compilation import compile_statement
 from amora.models import (
@@ -15,6 +16,7 @@ from amora.models import (
     select_models_with_label_keys,
     select_models_with_labels,
 )
+from amora.protocols import Compilable
 
 from tests.models.deeply.nested.array_repeated_fields import ArrayRepeatedFields
 from tests.models.health import Health
@@ -150,3 +152,35 @@ def test_without_owner():
         id: int = Field(primary_key=True)
 
     assert ModelWithoutOwner.owner() == ""
+
+
+def test_raw_sql_as_source():
+    class RawSqlModel(AmoraModel):
+        __depends_on__ = [Health]
+
+        id: int = Field(Integer, primary_key=True, doc=Health.id.__doc__)
+
+        @classmethod
+        def source(cls) -> Compilable:
+            return (
+                text(
+                    f"""
+    with source as (
+        select id from {Health.fully_qualified_name()}
+    ) select * from source
+    """
+                )
+                .columns(id=Integer)
+                .subquery()
+            )
+
+    assert (
+        compile_statement(RawSqlModel.source())
+        == """
+with source as
+  (select id
+   from amora-data-build-tool.amora.health)
+select *
+from source
+""".strip()
+    )

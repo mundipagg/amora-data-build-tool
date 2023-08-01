@@ -4,7 +4,7 @@ from uuid import uuid4
 
 import pandas as pd
 import pytest
-from sqlalchemy import TIMESTAMP, Float, Integer, String
+from sqlalchemy import TIMESTAMP, Float, Integer, String, text
 
 from amora.feature_store.decorators import feature_view
 from amora.meta_queries import summarize
@@ -56,6 +56,30 @@ def simple_model(step_count_by_source_100_rows):
             return cte_from_dataframe(df=step_count_by_source_100_rows)
 
     yield SimpleModel
+
+
+@pytest.fixture(scope="module")
+def raw_sql_model():
+    class RawSQLModel(AmoraModel):
+        __depends_on__ = []
+        __tablename__override__ = uuid4().hex
+        __model_config__ = ModelConfig(
+            materialized=MaterializationTypes.ephemeral,
+        )
+
+        value: int = Field(Integer, doc="A simple Integer value", primary_key=True)
+
+        @classmethod
+        def source(cls):
+            return (
+                text("SELECT 1 as value UNION ALL SELECT 3 as value")
+                .columns(
+                    value=Integer,
+                )
+                .subquery()
+            )
+
+    yield RawSQLModel
 
 
 @pytest.fixture(scope="module")
@@ -136,6 +160,29 @@ def test_summarize_simple_model(simple_model, simple_model_summary):
     )
 
 
+def test_summarize_raw_sql_model(raw_sql_model):
+    expected = [
+        {
+            "column_name": "value",
+            "column_type": "INTEGER",
+            "min": "1",
+            "max": "3",
+            "unique_count": 2,
+            "avg": "2",
+            "stddev": 1.4142135623730951,
+            "null_percentage": 0.0,
+            "is_fv_feature": False,
+            "is_fv_entity": False,
+            "is_fv_event_timestamp": False,
+        }
+    ]
+    summary = summarize(raw_sql_model).to_dict(orient="records")
+    assert sorted(summary, key=lambda column: column["column_name"]) == sorted(
+        expected,
+        key=lambda column: column["column_name"],
+    )
+
+
 @pytest.fixture(scope="module")
 def feature_view_model(step_count_by_source_100_rows):
     @feature_view
@@ -177,6 +224,55 @@ def feature_view_model(step_count_by_source_100_rows):
             return cte_from_dataframe(df=step_count_by_source_100_rows)
 
     yield FeatureViewModel
+
+
+@pytest.fixture(scope="module")
+def raw_sql_feature_view_model():
+    @feature_view
+    class RawSQLFeatureViewModel(AmoraModel):
+        __depends_on__ = []
+        __tablename__override__ = uuid4().hex
+        __model_config__ = ModelConfig(
+            materialized=MaterializationTypes.ephemeral,
+        )
+
+        name: str = Field(String, doc="FeatureView entity", primary_key=True)
+        value: int = Field(Integer, doc="A simple Integer value")
+        ts: datetime = Field(TIMESTAMP, doc="FeatureView timestamp ", primary_key=True)
+
+        @classmethod
+        def source(cls):
+            return (
+                text(
+                    """
+select 'a' as name, 1 as value, '2023-08-02 14:59:10.282511+00' as ts
+union all
+select 'a' as name, 2 as value, '2023-08-02 14:59:10.282511+00' as ts
+"""
+                )
+                .columns(
+                    name=String,
+                    value=Integer,
+                    ts=TIMESTAMP,
+                )
+                .subquery()
+            )
+
+        @classmethod
+        def feature_view_entities(cls):
+            return [cls.name]
+
+        @classmethod
+        def feature_view_features(cls):
+            return [
+                cls.value,
+            ]
+
+        @classmethod
+        def feature_view_event_timestamp(cls):
+            return cls.ts
+
+    yield RawSQLFeatureViewModel
 
 
 @pytest.fixture(scope="module")
@@ -254,6 +350,54 @@ def test_summarize_feature_view_model(feature_view_model, feature_view_model_sum
     summary = summarize(feature_view_model).to_dict(orient="records")
     assert sorted(summary, key=lambda column: column["column_name"]) == sorted(
         feature_view_model_summary, key=lambda column: column["column_name"]
+    )
+
+
+def test_summarize_raw_sql_feature_view_model(raw_sql_feature_view_model):
+    expected = [
+        {
+            "column_name": "name",
+            "column_type": "VARCHAR",
+            "min": "a",
+            "max": "a",
+            "unique_count": 1,
+            "avg": None,
+            "stddev": None,
+            "null_percentage": 0.0,
+            "is_fv_feature": False,
+            "is_fv_entity": True,
+            "is_fv_event_timestamp": False,
+        },
+        {
+            "column_name": "ts",
+            "column_type": "TIMESTAMP",
+            "min": "2023-08-02 14:59:10.282511+00",
+            "max": "2023-08-02 14:59:10.282511+00",
+            "unique_count": 1,
+            "avg": None,
+            "stddev": None,
+            "null_percentage": 0.0,
+            "is_fv_feature": False,
+            "is_fv_entity": False,
+            "is_fv_event_timestamp": True,
+        },
+        {
+            "column_name": "value",
+            "column_type": "INTEGER",
+            "min": "1",
+            "max": "2",
+            "unique_count": 2,
+            "avg": "1.5",
+            "stddev": 0.7071067811865476,
+            "null_percentage": 0.0,
+            "is_fv_feature": True,
+            "is_fv_entity": False,
+            "is_fv_event_timestamp": False,
+        },
+    ]
+    summary = summarize(raw_sql_feature_view_model).to_dict(orient="records")
+    assert sorted(summary, key=lambda column: column["column_name"]) == sorted(
+        expected, key=lambda column: column["column_name"]
     )
 
 

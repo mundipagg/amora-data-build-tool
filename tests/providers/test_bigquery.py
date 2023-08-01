@@ -50,6 +50,7 @@ from amora.providers.bigquery import (
     struct_for_model,
     zip_arrays,
 )
+
 from tests.models.health import Health
 from tests.models.heart_rate import HeartRate
 from tests.models.heart_rate_over_100 import HeartRateOver100
