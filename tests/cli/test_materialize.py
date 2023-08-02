@@ -82,7 +82,6 @@ def test_materialize_with_model_options(
         ["materialize", "--model", "steps"],
     )
 
-    # breakpoint()
     assert result.exit_code == 0
 
     executor_mock.map.assert_called_once_with(
