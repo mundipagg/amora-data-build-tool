@@ -6,7 +6,12 @@ import typer
 
 from amora import compilation, manifest, materialization, utils
 from amora.cli import dash, feature_store, models
-from amora.cli.shared_options import force_option, models_option, target_option
+from amora.cli.shared_options import (
+    depends_option,
+    force_option,
+    models_option,
+    target_option,
+)
 from amora.cli.type_specs import Models
 from amora.config import settings
 from amora.dag import DependencyDAG
@@ -65,6 +70,7 @@ def materialize(
     models: Optional[Models] = models_option,
     target: str = target_option,
     draw_dag: bool = typer.Option(False, "--draw-dag"),
+    depends: bool = depends_option,
     no_compile: bool = typer.Option(
         False,
         "--no-compile",
@@ -75,32 +81,28 @@ def materialize(
     Executes the compiled SQL against the current target database.
 
     """
-    
-    
-    depends = True
-    
+
     if not no_compile:
-        compile(models=models, target=target, force=True if models else False)
+        if depends:
+            compile(models=models, target=target, force=True if models else False)
+
+        else:
+            compile(models=models, target=target)
 
     model_to_task: Dict[str, materialization.Task] = {}
 
     for target_file_path in utils.list_target_files():
-        
-        #breakpoint()
         task = materialization.Task.for_target(target_file_path)
-        
+
         if models and target_file_path.stem not in models:
             continue
 
         model_to_task[task.model.unique_name()] = task
-        
-        
+
         if depends:
             dependencies = task.model.__depends_on__
             for dependency in dependencies:
-                
                 dependency_target_path = dependency.target_path()
-                #breakpoint()
                 dependency_task = materialization.Task.for_target(
                     dependency_target_path
                 )
