@@ -6,7 +6,7 @@ import typer
 
 from amora import compilation, manifest, materialization, utils
 from amora.cli import dash, feature_store, models
-from amora.cli.shared_options import force_option, models_option, target_option, depends_option
+from amora.cli.shared_options import force_option, models_option, target_option
 from amora.cli.type_specs import Models
 from amora.config import settings
 from amora.dag import DependencyDAG
@@ -25,7 +25,6 @@ def compile(
     models: Optional[Models] = models_option,
     target: Optional[str] = target_option,
     force: Optional[bool] = force_option,
-    depends: Optional[bool] = depends_option
 ) -> None:
     """
     Generates executable SQL from model files. Compiled SQL files are written to the `./target` directory.
@@ -42,38 +41,21 @@ def compile(
         compilation.remove_compiled_files(removed)
         models_to_compile = current_manifest.get_models_to_compile(previous_manifest)
 
-
-
-
     for model, model_file_path in models_to_compile:
-        
-        if models and model_file_path.stem not in models:
+        if models and not force and model_file_path.stem not in models:
             continue
-        
-        model_list = []
-        
-        model_list.append(model)
-        
-        if depends:
-            parents_models = model.__depends_on__
-            
-            for parent_model in parents_models:
-                model_list.append(parent_model)
-        
-        for model in model_list:
-            
-            source_sql_statement= model.source()
-            
-            if source_sql_statement is None:
-                typer.echo(f"⏭ Skipping compilation of model `{model_file_path}`")
-                continue
-            
-            target_file_path = model.target_path()
-            typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
 
-            content = compilation.compile_statement(source_sql_statement)
-            target_file_path.parent.mkdir(parents=True, exist_ok=True)
-            target_file_path.write_text(content)
+        source_sql_statement = model.source()
+        if source_sql_statement is None:
+            typer.echo(f"⏭ Skipping compilation of model `{model_file_path}`")
+            continue
+
+        target_file_path = model.target_path()
+        typer.echo(f"🏗 Compiling model `{model_file_path}` -> `{target_file_path}`")
+
+        content = compilation.compile_statement(source_sql_statement)
+        target_file_path.parent.mkdir(parents=True, exist_ok=True)
+        target_file_path.write_text(content)
 
     current_manifest.save()
 
@@ -93,17 +75,36 @@ def materialize(
     Executes the compiled SQL against the current target database.
 
     """
+    
+    
+    depends = True
+    
     if not no_compile:
-        compile(models=models, target=target)
+        compile(models=models, target=target, force=True if models else False)
 
     model_to_task: Dict[str, materialization.Task] = {}
 
     for target_file_path in utils.list_target_files():
-        # if models and target_file_path.stem not in models:
-        #     continue
-
+        
+        #breakpoint()
         task = materialization.Task.for_target(target_file_path)
+        
+        if models and target_file_path.stem not in models:
+            continue
+
         model_to_task[task.model.unique_name()] = task
+        
+        
+        if depends:
+            dependencies = task.model.__depends_on__
+            for dependency in dependencies:
+                
+                dependency_target_path = dependency.target_path()
+                #breakpoint()
+                dependency_task = materialization.Task.for_target(
+                    dependency_target_path
+                )
+            model_to_task[dependency_task.model.unique_name()] = dependency_task
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
