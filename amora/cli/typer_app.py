@@ -100,13 +100,18 @@ def materialize(
         model_to_task[task.model.unique_name()] = task
 
         if depends:
+            
             dependencies = task.model.__depends_on__
-            for dependency in dependencies:
-                dependency_target_path = dependency.target_path()
-                dependency_task = materialization.Task.for_target(
-                    dependency_target_path
-                )
-            model_to_task[dependency_task.model.unique_name()] = dependency_task
+            
+            if not dependencies:
+                continue
+            else:
+                for dependency in dependencies:
+                    dependency_target_path = dependency.target_path()
+                    dependency_task = materialization.Task.for_target(
+                        dependency_target_path
+                    )
+                model_to_task[dependency_task.model.unique_name()] = dependency_task
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
