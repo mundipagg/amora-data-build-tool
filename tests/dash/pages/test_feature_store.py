@@ -1,6 +1,3 @@
-from unittest.mock import patch
-
-import pandas as pd
 import pytest
 from dash.testing.composite import DashComposite
 

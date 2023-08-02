@@ -43,7 +43,6 @@ from amora.providers.bigquery import (
     dry_run,
     estimated_query_cost_in_usd,
     estimated_storage_cost_in_usd,
-    get_fully_qualified_id,
     run,
     sample,
     schema_for_model,
@@ -51,7 +50,6 @@ from amora.providers.bigquery import (
     struct_for_model,
     zip_arrays,
 )
-
 from tests.models.health import Health
 from tests.models.heart_rate import HeartRate
 from tests.models.heart_rate_over_100 import HeartRateOver100
@@ -161,7 +159,9 @@ def test_cte_from_rows_with_record_repeated_fields():
 
 
 def test_cte_from_dataframe():
-    df = pd.DataFrame(np.random.randint(0, 1000, size=(10, 5)), columns=list("AMORA"))
+    df = pd.DataFrame(
+        np.random.randint(0, 1000, size=(10, 5)), columns=["A", "B", "C", "D", "E"]
+    )
     cte = cte_from_dataframe(df)
 
     assert isinstance(cte, CTE)
@@ -220,13 +220,13 @@ def test_estimated_storage_cost_in_usd(total_bytes: int, expected_cost: float):
 def test_dry_run_on_sourceless_table_model():
     result = dry_run(Health)
     assert isinstance(result, DryRunResult)
-    assert result.referenced_tables == [get_fully_qualified_id(Health)]
+    assert result.referenced_tables == [Health.fully_qualified_name()]
 
 
 def test_dry_run_on_sourceless_view_model():
     result = dry_run(HeartRateOver100)
     assert isinstance(result, DryRunResult)
-    assert result.referenced_tables == [get_fully_qualified_id(HeartRate)]
+    assert result.referenced_tables == [HeartRate.fully_qualified_name()]
 
 
 def test_dry_run_on_invalid_model():
@@ -262,7 +262,7 @@ def test_dry_run_on_model_with_source():
 
     assert isinstance(result, DryRunResult)
     assert result.referenced_tables == [
-        get_fully_qualified_id(dep) for dep in HeartRate.__depends_on__
+        dep.fully_qualified_name() for dep in HeartRate.__depends_on__
     ]
 
 

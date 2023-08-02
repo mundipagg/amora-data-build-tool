@@ -1,3 +1,4 @@
+from pathlib import Path
 from timeit import default_timer
 from typing import Optional
 
@@ -13,6 +14,21 @@ from amora.logger import logger
 from amora.version import VERSION
 
 
+def _ensure_metrics_dir():
+    import os
+
+    metrics_dir = os.environ.get(
+        "PROMETHEUS_MULTIPROC_DIR", os.environ.get("prometheus_multiproc_dir")
+    )
+
+    if not metrics_dir:
+        raise ValueError(
+            "one of env PROMETHEUS_MULTIPROC_DIR or env prometheus_multiproc_dir must be set"
+        )
+
+    Path(metrics_dir).mkdir(parents=True, exist_ok=True)
+
+
 def add_prometheus_metrics(dash: Dash) -> None:
     flask_app = dash.server
     registry = CollectorRegistry()
@@ -21,6 +37,8 @@ def add_prometheus_metrics(dash: Dash) -> None:
             app=flask_app, registry=registry, export_defaults=False
         )
     else:
+        _ensure_metrics_dir()
+
         metrics = GunicornPrometheusMetrics(
             app=flask_app, registry=registry, export_defaults=False
         )
