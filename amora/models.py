@@ -3,7 +3,6 @@ import importlib
 import inspect
 import re
 from collections import defaultdict
-from datetime import datetime
 from enum import Enum, auto
 from inspect import getfile
 from pathlib import Path
@@ -237,6 +236,10 @@ class AmoraModel:
             return str(model_owner)
 
         return ""
+
+    @classmethod
+    def fully_qualified_name(cls):
+        return f"{cls.__table__.metadata.schema}.{cls.__tablename__}"
 
 
 def _is_amora_model(candidate: ModuleType) -> bool:
