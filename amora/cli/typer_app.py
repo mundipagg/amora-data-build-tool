@@ -11,7 +11,6 @@ from amora.cli.shared_options import (
     force_option,
     models_option,
     target_option,
-    depth_option,
 )
 from amora.cli.type_specs import Models
 from amora.config import settings
@@ -22,15 +21,11 @@ from amora.models import list_models
 def recursive_dependency(
     materialization_task,
     model_to_task,
-    current_depth: int = 1,
-    max_depth: Optional[int] = None,
 ):
     """Recursively find dependencies of a materialization task."""
 
-    if max_depth is not None and current_depth > max_depth:
-        return
-
     dependencies = materialization_task.model.__depends_on__
+
     if not dependencies:
         return
     else:
@@ -40,9 +35,7 @@ def recursive_dependency(
 
             model_to_task[dependency_task.model.unique_name()] = dependency_task
 
-            return recursive_dependency(
-                dependency_task, model_to_task, current_depth + 1, max_depth
-            )
+            return recursive_dependency(dependency_task, model_to_task)
 
 
 app = typer.Typer(
@@ -96,10 +89,9 @@ def compile(
 @app.command()
 def materialize(
     models: Optional[Models] = models_option,
-    depth: Optional[int] = depth_option,
     target: str = target_option,
     draw_dag: bool = typer.Option(False, "--draw-dag"),
-    depends: bool = depends_option,
+    depends: Optional[bool] = depends_option,
     no_compile: bool = typer.Option(
         False,
         "--no-compile",
@@ -108,12 +100,15 @@ def materialize(
 ) -> None:
     """
     Executes the compiled SQL against the current target database.
-
     """
 
     if not no_compile:
         if depends:
-            compile(models=models, target=target, force=True if models else False)
+            compile(
+                models=models,
+                target=target,
+                force=True if models else False,
+            )
 
         else:
             compile(models=models, target=target)
@@ -129,7 +124,7 @@ def materialize(
         model_to_task[task.model.unique_name()] = task
 
         if depends:
-            recursive_dependency(task, model_to_task, 1, depth)
+            recursive_dependency(task, model_to_task)
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
