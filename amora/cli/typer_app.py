@@ -18,21 +18,25 @@ from amora.dag import DependencyDAG
 from amora.models import list_models
 
 
-def recursive_dependency(materialization_task, model_to_task):
+def recursive_dependency(materialization_task, model_to_task, current_depth, max_depth):
     """Recursively find dependencies of a materialization task."""
+
+    if current_depth > max_depth:
+        return
+
     dependencies = materialization_task.model.__depends_on__
     if not dependencies:
-        return []
+        return
     else:
         for dependency in dependencies:
             dependency_target_path = dependency.target_path()
-            dependency_task = materialization.Task.for_target(
-                dependency_target_path
-            )
-            
+            dependency_task = materialization.Task.for_target(dependency_target_path)
+
             model_to_task[dependency_task.model.unique_name()] = dependency_task
-            
-            return [dependency_task] + recursive_dependency(dependency_task, model_to_task)
+
+            return recursive_dependency(
+                dependency_task, model_to_task, current_depth + 1, max_depth
+            )
 
 
 app = typer.Typer(
@@ -118,8 +122,7 @@ def materialize(
         model_to_task[task.model.unique_name()] = task
 
         if depends:
-            
-            recursive_dependency(task, model_to_task)
+            recursive_dependency(task, model_to_task, 0, 1)
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
