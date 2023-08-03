@@ -39,3 +39,27 @@ def ensure_path(func: Callable) -> Callable:
         return func(*args, **kwargs)
 
     return wrapper
+
+
+def recursive_dependency(
+    materialization_task,
+    model_to_task,
+):
+    """Recursively find dependencies of a materialization task."""
+
+    from amora.materialization import Task
+
+    dependencies = materialization_task.model.__depends_on__
+
+    if not dependencies:
+        return
+    else:
+        for dependency in dependencies:
+            if dependency.source() is None:
+                continue
+
+            dependency_target_path = dependency.target_path()
+            dependency_task = Task.for_target(dependency_target_path)
+            model_to_task[dependency_task.model.unique_name()] = dependency_task
+
+            return recursive_dependency(dependency_task, model_to_task)
