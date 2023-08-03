@@ -21,7 +21,7 @@ from amora.models import list_models
 def recursive_dependency(materialization_task, model_to_task, current_depth, max_depth):
     """Recursively find dependencies of a materialization task."""
 
-    if current_depth > max_depth:
+    if max_depth is not None and current_depth > max_depth:
         return
 
     dependencies = materialization_task.model.__depends_on__
