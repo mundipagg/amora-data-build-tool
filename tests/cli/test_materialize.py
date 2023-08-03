@@ -119,3 +119,30 @@ def test_materialize_with_no_compile_option(
 
     assert result.exit_code == 0
     compile.assert_not_called()
+
+
+@patch("concurrent.futures.ProcessPoolExecutor")
+@patch("amora.cli.typer_app.compile")
+@patch("amora.materialization.materialize")
+def test_materialize_with_depends_options(
+    materialize: MagicMock, compile: MagicMock, pool_mock: MagicMock
+):
+    executor_mock = MagicMock()
+    executor_mock.map = MagicMock()
+    pool_mock.return_value.__enter__.return_value = executor_mock
+
+    for model in [Steps]:
+        target_path = model.target_path()
+        target_path.write_text("SELECT 1")
+
+    result = runner.invoke(
+        app,
+        ["materialize", "--model", "steps", "--depends"],
+    )
+
+    assert result.exit_code == 0
+
+    executor_mock.map.assert_called_once_with(
+        materialize, ["SELECT 1"], [Steps.unique_name()], [Steps.__model_config__]
+    )
+    compile.assert_called_once_with(models=["steps"], target=None, force=True)
