@@ -107,11 +107,12 @@ def materialize(
                 continue
             else:
                 for dependency in dependencies:
+                    #breakpoint()
                     dependency_target_path = dependency.target_path()
                     dependency_task = materialization.Task.for_target(
                         dependency_target_path
                     )
-                model_to_task[dependency_task.model.unique_name()] = dependency_task
+                    model_to_task[dependency_task.model.unique_name()] = dependency_task
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
