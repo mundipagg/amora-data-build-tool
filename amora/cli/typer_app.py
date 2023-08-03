@@ -11,6 +11,7 @@ from amora.cli.shared_options import (
     force_option,
     models_option,
     target_option,
+    depth_option,
 )
 from amora.cli.type_specs import Models
 from amora.config import settings
@@ -18,7 +19,12 @@ from amora.dag import DependencyDAG
 from amora.models import list_models
 
 
-def recursive_dependency(materialization_task, model_to_task, current_depth, max_depth):
+def recursive_dependency(
+    materialization_task,
+    model_to_task,
+    current_depth: int = 1,
+    max_depth: Optional[int] = None,
+):
     """Recursively find dependencies of a materialization task."""
 
     if max_depth is not None and current_depth > max_depth:
@@ -90,6 +96,7 @@ def compile(
 @app.command()
 def materialize(
     models: Optional[Models] = models_option,
+    depth: Optional[int] = depth_option,
     target: str = target_option,
     draw_dag: bool = typer.Option(False, "--draw-dag"),
     depends: bool = depends_option,
@@ -122,7 +129,7 @@ def materialize(
         model_to_task[task.model.unique_name()] = task
 
         if depends:
-            recursive_dependency(task, model_to_task, 0, 1)
+            recursive_dependency(task, model_to_task, 1, depth)
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
