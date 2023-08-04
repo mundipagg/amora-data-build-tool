@@ -77,7 +77,6 @@ def materialize(
     """
     Executes the compiled SQL against the current target database.
     """
-
     if not no_compile:
         if depends:
             force = depends and models != []
@@ -94,11 +93,13 @@ def materialize(
         model_to_task[task.model.unique_name()] = task
 
         if depends:
-            depends_model_to_task: Dict[str, materialization.Task] = {}
-
-            utils.recursive_dependency(task, depends_model_to_task)
-
-            model_to_task.update(depends_model_to_task)
+            for dependency_target_path in utils.recursive_dependencies_targets(
+                task.model
+            ):
+                dependency_task = materialization.Task.for_target(
+                    dependency_target_path
+                )
+                model_to_task[dependency_task.model.unique_name()] = dependency_task
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
