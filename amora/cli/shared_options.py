@@ -18,7 +18,3 @@ force_option = typer.Option(
     "--force",
     help="Flag to force Amora to recompile all models.",
 )
-
-depends_option = typer.Option(
-    False, "--depends", help="Flag to materialize also the dependents of the model"
-)
