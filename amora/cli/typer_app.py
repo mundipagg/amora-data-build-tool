@@ -78,9 +78,8 @@ def materialize(
     Executes the compiled SQL against the current target database.
     """
     if not no_compile:
-        if depends:
-            force = depends and models != []
-            compile(models=models, target=target, force=force)
+        force = depends and models != []
+        compile(models=models, target=target, force=force)
 
     model_to_task: Dict[str, materialization.Task] = {}
 
