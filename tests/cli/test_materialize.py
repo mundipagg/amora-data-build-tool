@@ -44,7 +44,7 @@ def test_materialize_without_arguments_and_options(
 
     assert result.exit_code == 0
 
-    compile.assert_called_once_with(target=None, models=[])
+    compile.assert_called_once_with(models=[], target=None, force=False)
 
     assert executor_mock.map.call_count == 2
 
@@ -88,7 +88,7 @@ def test_materialize_with_model_options(
     executor_mock.map.assert_called_once_with(
         materialize, ["SELECT 1"], [Steps.unique_name()], [Steps.__model_config__]
     )
-    compile.assert_called_once_with(models=["steps"], target=None)
+    compile.assert_called_once_with(models=["steps"], target=None, force=False)
 
 
 @patch("concurrent.futures.ProcessPoolExecutor")
