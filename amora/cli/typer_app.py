@@ -65,7 +65,7 @@ def materialize(
     models: Optional[Models] = models_option,
     target: str = target_option,
     draw_dag: bool = typer.Option(False, "--draw-dag"),
-    depends: Optional[bool] = typer.Option(
+    depends: bool = typer.Option(
         False, "--depends", help="Flag to materialize also the dependents of the model"
     ),
     no_compile: bool = typer.Option(
@@ -80,14 +80,8 @@ def materialize(
 
     if not no_compile:
         if depends:
-            compile(
-                models=models,
-                target=target,
-                force=True if models else False,
-            )
-
-        else:
-            compile(models=models, target=target)
+            force = depends and models != []
+            compile(models=models, target=target, force=force)
 
     model_to_task: Dict[str, materialization.Task] = {}
 
