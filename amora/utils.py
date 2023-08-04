@@ -1,7 +1,7 @@
 import functools
 import sys
 from pathlib import Path
-from typing import Callable, Iterable, Union
+from typing import Callable, Generator, Iterable, Union
 
 from amora.config import settings
 
@@ -39,3 +39,19 @@ def ensure_path(func: Callable) -> Callable:
         return func(*args, **kwargs)
 
     return wrapper
+
+
+def recursive_dependencies_targets(
+    model,
+) -> Generator[Path, None, None]:
+    """Recursively find dependencies of a Model."""
+    dependencies = model.__depends_on__
+
+    for dependency in dependencies:
+        if dependency.source() is None:
+            continue
+
+        yield dependency.target_path()
+
+        for sub_dependency in dependency.__depends_on__:
+            yield from recursive_dependencies_targets(sub_dependency)

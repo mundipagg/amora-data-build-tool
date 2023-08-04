@@ -42,7 +42,7 @@ def compile(
         models_to_compile = current_manifest.get_models_to_compile(previous_manifest)
 
     for model, model_file_path in models_to_compile:
-        if models and model_file_path.stem not in models:
+        if models and not force and model_file_path.stem not in models:
             continue
 
         source_sql_statement = model.source()
@@ -65,6 +65,9 @@ def materialize(
     models: Optional[Models] = models_option,
     target: str = target_option,
     draw_dag: bool = typer.Option(False, "--draw-dag"),
+    depends: bool = typer.Option(
+        False, "--depends", help="Flag to materialize also the dependents of the model"
+    ),
     no_compile: bool = typer.Option(
         False,
         "--no-compile",
@@ -73,19 +76,29 @@ def materialize(
 ) -> None:
     """
     Executes the compiled SQL against the current target database.
-
     """
     if not no_compile:
-        compile(models=models, target=target)
+        force = depends and models != []
+        compile(models=models, target=target, force=force)
 
     model_to_task: Dict[str, materialization.Task] = {}
 
     for target_file_path in utils.list_target_files():
+        task = materialization.Task.for_target(target_file_path)
+
         if models and target_file_path.stem not in models:
             continue
 
-        task = materialization.Task.for_target(target_file_path)
         model_to_task[task.model.unique_name()] = task
+
+        if depends:
+            for dependency_target_path in utils.recursive_dependencies_targets(
+                task.model
+            ):
+                dependency_task = materialization.Task.for_target(
+                    dependency_target_path
+                )
+                model_to_task[dependency_task.model.unique_name()] = dependency_task
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
