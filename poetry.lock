@@ -123,6 +123,21 @@ files = [
 frozenlist = ">=1.1.0"
 
 [[package]]
+name = "ansi2html"
+version = "1.8.0"
+description = ""
+optional = true
+python-versions = ">=3.6"
+files = [
+    {file = "ansi2html-1.8.0-py3-none-any.whl", hash = "sha256:ef9cc9682539dbe524fbf8edad9c9462a308e04bce1170c32daa8fdfd0001785"},
+    {file = "ansi2html-1.8.0.tar.gz", hash = "sha256:38b82a298482a1fa2613f0f9c9beb3db72a8f832eeac58eb2e47bf32cd37f6d5"},
+]
+
+[package.extras]
+docs = ["Sphinx", "setuptools-scm", "sphinx-rtd-theme"]
+test = ["pytest", "pytest-cov"]
+
+[[package]]
 name = "anyio"
 version = "3.6.2"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
@@ -795,16 +810,17 @@ files = [
 
 [[package]]
 name = "dash"
-version = "2.10.2"
+version = "2.11.1"
 description = "A Python framework for building reactive web-apps. Developed by Plotly."
 optional = true
 python-versions = ">=3.6"
 files = [
-    {file = "dash-2.10.2-py3-none-any.whl", hash = "sha256:f1b7132558bd2341e6cf7ca1e83e216d46bbb27a255ca962a0fa5561c6776953"},
-    {file = "dash-2.10.2.tar.gz", hash = "sha256:b99839890b44171da0e3668c2e607ef4b4f6948a6074c034693534ba52aa1d2b"},
+    {file = "dash-2.11.1-py3-none-any.whl", hash = "sha256:a5b55efc7f139538d95331fa0b5ee0d21600f7dafa9cce4fe4f887b773aba01a"},
+    {file = "dash-2.11.1.tar.gz", hash = "sha256:1acc4c634311cb306a1086fff315c1f2aaa3898bac362d93bc8db6b1a6474e5c"},
 ]
 
 [package.dependencies]
+ansi2html = "*"
 beautifulsoup4 = {version = ">=4.8.2", optional = true, markers = "extra == \"testing\""}
 dash-core-components = "2.0.0"
 dash-html-components = "2.0.0"
@@ -813,18 +829,24 @@ dash-testing-stub = {version = ">=0.0.2", optional = true, markers = "extra == \
 Flask = ">=1.0.4,<2.3.0"
 lxml = {version = ">=4.6.2", optional = true, markers = "extra == \"testing\""}
 multiprocess = {version = ">=0.70.12", optional = true, markers = "extra == \"testing\""}
+nest-asyncio = "*"
 percy = {version = ">=2.0.2", optional = true, markers = "extra == \"testing\""}
 plotly = ">=5.0.0"
 psutil = {version = ">=5.8.0", optional = true, markers = "extra == \"testing\""}
 pytest = {version = ">=6.0.2", optional = true, markers = "extra == \"testing\""}
-requests = {version = ">=2.21.0", extras = ["security"], optional = true, markers = "extra == \"testing\""}
+requests = [
+    {version = "*"},
+    {version = ">=2.21.0", extras = ["security"], optional = true, markers = "extra == \"testing\""},
+]
+retrying = "*"
 selenium = {version = ">=3.141.0,<=4.2.0", optional = true, markers = "extra == \"testing\""}
+typing-extensions = ">=4.1.1"
 waitress = {version = ">=1.4.4", optional = true, markers = "extra == \"testing\""}
 Werkzeug = "<2.3.0"
 
 [package.extras]
 celery = ["celery[redis] (>=5.1.2)", "importlib-metadata (<5)", "redis (>=3.5.3)"]
-ci = ["black (==21.6b0)", "black (==22.3.0)", "dash-dangerously-set-inner-html", "dash-flow-example (==0.0.5)", "flake8 (==3.9.2)", "flaky (==3.7.0)", "flask-talisman (==1.0.0)", "isort (==4.3.21)", "mimesis", "mock (==4.0.3)", "numpy", "openpyxl", "orjson (==3.5.4)", "orjson (==3.6.7)", "pandas (==1.1.5)", "pandas (>=1.4.0)", "preconditions", "pyarrow", "pyarrow (<3)", "pylint (==2.13.5)", "pytest-mock", "pytest-rerunfailures", "pytest-sugar (==0.9.6)", "xlrd (<2)", "xlrd (>=2.0.1)"]
+ci = ["black (==21.6b0)", "black (==22.3.0)", "dash-dangerously-set-inner-html", "dash-flow-example (==0.0.5)", "flake8 (==3.9.2)", "flaky (==3.7.0)", "flask-talisman (==1.0.0)", "isort (==4.3.21)", "jupyterlab (<4.0.0)", "mimesis", "mock (==4.0.3)", "numpy", "openpyxl", "orjson (==3.5.4)", "orjson (==3.6.7)", "pandas (==1.1.5)", "pandas (>=1.4.0)", "preconditions", "pyarrow", "pyarrow (<3)", "pylint (==2.13.5)", "pytest-mock", "pytest-rerunfailures", "pytest-sugar (==0.9.6)", "xlrd (<2)", "xlrd (>=2.0.1)"]
 compress = ["flask-compress"]
 dev = ["PyYAML (>=5.4.1)", "coloredlogs (>=15.0.1)", "fire (>=0.4.0)"]
 diskcache = ["diskcache (>=5.2.1)", "multiprocess (>=0.70.12)", "psutil (>=5.8.0)"]
@@ -3578,6 +3600,17 @@ docs = ["myst-parser", "pydata-sphinx-theme", "sphinx", "sphinxcontrib-github-al
 test = ["pep440", "pre-commit", "pytest", "testpath"]
 
 [[package]]
+name = "nest-asyncio"
+version = "1.5.7"
+description = "Patch asyncio to allow nested event loops"
+optional = true
+python-versions = ">=3.5"
+files = [
+    {file = "nest_asyncio-1.5.7-py3-none-any.whl", hash = "sha256:5301c82941b550b3123a1ea772ba9a1c80bad3a182be8c1a5ae6ad3be57a9657"},
+    {file = "nest_asyncio-1.5.7.tar.gz", hash = "sha256:6a80f7b98f24d9083ed24608977c09dd608d83f91cccc24c9d2cba6d10e01c10"},
+]
+
+[[package]]
 name = "networkx"
 version = "3.1"
 description = "Python package for creating and manipulating graphs and networks"
@@ -4710,6 +4743,20 @@ requests = ">=2.0.0"
 
 [package.extras]
 rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
+
+[[package]]
+name = "retrying"
+version = "1.3.4"
+description = "Retrying"
+optional = true
+python-versions = "*"
+files = [
+    {file = "retrying-1.3.4-py3-none-any.whl", hash = "sha256:8cc4d43cb8e1125e0ff3344e9de678fefd85db3b750b81b2240dc0183af37b35"},
+    {file = "retrying-1.3.4.tar.gz", hash = "sha256:345da8c5765bd982b1d1915deb9102fd3d1f7ad16bd84a9700b85f64d24e8f3e"},
+]
+
+[package.dependencies]
+six = ">=1.7.0"
 
 [[package]]
 name = "rich"
@@ -5863,4 +5910,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "1f7c6ba140a047f2b07acc7082f9f8796786c3b37b4b03b27b14b6e479280711"
+content-hash = "074377b985d33cf152a3a33cbd71c8693c7f744e04af1df03e289af6b25ee0d7"
