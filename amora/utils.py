@@ -43,7 +43,7 @@ def ensure_path(func: Callable) -> Callable:
 
 def recursive_dependency(
     materialization_task,
-    model_to_task,
+    depends_model_to_task,
 ):
     """Recursively find dependencies of a materialization task."""
 
@@ -60,6 +60,6 @@ def recursive_dependency(
 
             dependency_target_path = dependency.target_path()
             dependency_task = Task.for_target(dependency_target_path)
-            model_to_task[dependency_task.model.unique_name()] = dependency_task
+            depends_model_to_task[dependency_task.model.unique_name()] = dependency_task
 
-            return recursive_dependency(dependency_task, model_to_task)
+            return recursive_dependency(dependency_task, depends_model_to_task)
