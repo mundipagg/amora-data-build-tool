@@ -6,12 +6,7 @@ import typer
 
 from amora import compilation, manifest, materialization, utils
 from amora.cli import dash, feature_store, models
-from amora.cli.shared_options import (
-    depends_option,
-    force_option,
-    models_option,
-    target_option,
-)
+from amora.cli.shared_options import force_option, models_option, target_option
 from amora.cli.type_specs import Models
 from amora.config import settings
 from amora.dag import DependencyDAG
@@ -70,7 +65,9 @@ def materialize(
     models: Optional[Models] = models_option,
     target: str = target_option,
     draw_dag: bool = typer.Option(False, "--draw-dag"),
-    depends: Optional[bool] = depends_option,
+    depends: Optional[bool] = typer.Option(
+        False, "--depends", help="Flag to materialize also the dependents of the model"
+    ),
     no_compile: bool = typer.Option(
         False,
         "--no-compile",
@@ -103,7 +100,11 @@ def materialize(
         model_to_task[task.model.unique_name()] = task
 
         if depends:
-            utils.recursive_dependency(task, model_to_task)
+            depends_model_to_task: Dict[str, materialization.Task] = {}
+
+            utils.recursive_dependency(task, depends_model_to_task)
+
+            model_to_task.update(depends_model_to_task)
 
     dag = DependencyDAG.from_tasks(tasks=model_to_task.values())
 
