@@ -22,7 +22,7 @@ app = typer.Typer(
 
 @app.command()
 def compile(
-    models: Optional[Models] = models_option,
+    models: Models = models_option,
     target: Optional[str] = target_option,
     force: Optional[bool] = force_option,
 ) -> None:
@@ -62,7 +62,7 @@ def compile(
 
 @app.command()
 def materialize(
-    models: Optional[Models] = models_option,
+    models: Models = models_option,
     target: str = target_option,
     draw_dag: bool = typer.Option(False, "--draw-dag"),
     no_compile: bool = typer.Option(
