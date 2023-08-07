@@ -2,7 +2,7 @@ import time
 
 from dash.testing.composite import DashComposite
 
-from tests.models.step_count_by_source import StepCountBySource
+from tests.models.heart_rate_over_100 import HeartRateOver100
 
 
 def test_models_page(amora_dash: DashComposite):
@@ -19,9 +19,9 @@ def test_models_page(amora_dash: DashComposite):
     amora_dash.find_element("div#model-select-dropdown").click()
 
     amora_dash.select_dcc_dropdown(
-        "div#model-select-dropdown", value=StepCountBySource.unique_name()
+        "div#model-select-dropdown", value=HeartRateOver100.unique_name()
     )
 
     amora_dash.wait_for_text_to_equal(
-        selector="H4.card-title", text=StepCountBySource.unique_name()
+        selector="H4.card-title", text=HeartRateOver100.unique_name()
     )
