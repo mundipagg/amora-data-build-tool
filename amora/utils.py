@@ -55,3 +55,9 @@ def recursive_dependencies_targets(
 
         for sub_dependency in dependency.__depends_on__:
             yield from recursive_dependencies_targets(sub_dependency)
+
+
+def add_plus_prefix(target_file_path: str) -> str:
+    model_with_plus = "+" + target_file_path
+
+    return model_with_plus
