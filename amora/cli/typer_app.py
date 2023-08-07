@@ -75,11 +75,14 @@ def materialize(
     Executes the compiled SQL against the current target database.
     """
     if not no_compile:
+        
         models_without_plus = [
             model[1:] if model.startswith("+") else model for model in models
         ]
+        
+        contains_plus = any(model.startswith("+") for model in models)
 
-        force = models_without_plus != []
+        force = contains_plus and models != []
         compile(models=models_without_plus, target=target, force=force)
 
     model_to_task: Dict[str, materialization.Task] = {}
