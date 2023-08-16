@@ -654,6 +654,7 @@ def test_zip_arrays():
     ]
 
 
+@pytest.mark.skip("Dados sumiram")
 def test_table_sample():
     sample_df = sample(StepCountBySource)
     assert isinstance(sample_df, pd.DataFrame)
