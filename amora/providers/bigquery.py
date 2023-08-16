@@ -2,7 +2,8 @@ import dataclasses
 import decimal
 from datetime import date, datetime, time
 from enum import Enum
-from typing import Any, Callable, Dict, Hashable, Iterable, List, Optional, Union
+from pathlib import Path
+from typing import Any, Callable, Dict, Hashable, Iterable, List, Optional, Tuple, Union
 
 import pandas as pd
 import sqlalchemy
@@ -17,6 +18,8 @@ from google.cloud.bigquery import (
 )
 from google.cloud.bigquery.schema import _DEFAULT_VALUE
 from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
+from jinja2 import Environment, PackageLoader, select_autoescape
+from shed import shed
 from sqlalchemy import (
     Column,
     String,
@@ -50,6 +53,7 @@ from amora.models import (
     Field,
     MaterializationTypes,
     Model,
+    amora_model_for_path,
 )
 from amora.protocols import Compilable
 from amora.storage import cache
@@ -57,6 +61,13 @@ from amora.version import VERSION
 
 Schema = List[SchemaField]
 BQTable = Union[Table, TableReference, str]
+
+JINJA2_NEW_MODEL_TEMPLATE = Environment(
+    loader=PackageLoader("amora"),
+    autoescape=select_autoescape(),
+    trim_blocks=True,
+    lstrip_blocks=True,
+).get_template("new-model.py.jinja2")
 
 BIGQUERY_TYPES_TO_PYTHON_TYPES = {
     "ARRAY": list,
@@ -260,6 +271,133 @@ def schema_for_model_source(model: Model) -> Optional[Schema]:
         return None
 
     return result.schema
+
+
+def list_tables(dataset_reference: str) -> List[str]:
+    """
+    List tables in the dataset.
+
+    Read more:
+        https://cloud.google.com/bigquery/docs/reference/rest/v2/tables/list
+
+    Examples:
+
+        >>> amora.providers.bigquery.list_tables("amora-data-build-tool.amora")
+        [
+            'amora-data-build-tool.amora.array_repeated_fields',
+            'amora-data-build-tool.amora.health',
+            'amora-data-build-tool.amora.heart_rate',
+            'amora-data-build-tool.amora.heart_rate_agg',
+            'amora-data-build-tool.amora.heart_rate_over_100',
+            'amora-data-build-tool.amora.step_count_by_source',
+            'amora-data-build-tool.amora.steps',
+            'amora-data-build-tool.amora.steps_agg'
+        ]
+    """
+    for table_list_item in get_client().list_tables(dataset_reference):
+        yield str(table_list_item.reference)
+
+
+def list_datasets(project_id: str) -> Iterable[str]:
+    """
+    Returns an iterable of dataset IDs for a given project.
+
+    Args:
+        project_id (str): The ID of the project to list datasets for.
+
+    Returns:
+        An iterable of dataset IDs as strings
+
+    Examples:
+        >>> list(list_datasets("amora-data-build-tool"))
+        [
+            'amora-data-build-tool.amora',
+            'amora-data-build-tool.amora_feature_store',
+            'amora-data-build-tool.apolo',
+            'amora-data-build-tool.diogo',
+            'amora-data-build-tool.home',
+            'amora-data-build-tool.raw',
+            'amora-data-build-tool.raw_diogo',
+            'amora-data-build-tool.raw_mi_fitness',
+            'amora-data-build-tool.tmp'
+        ]
+    """
+    for d in get_client().list_datasets(project_id):
+        yield d.full_dataset_id.replace(":", ".")
+
+
+def import_model(table_reference: str) -> str:
+    env = Environment(
+        loader=PackageLoader("amora"),
+        autoescape=select_autoescape(),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("new-model.py.jinja2")
+
+    project, dataset, table = table_reference.split(".")
+    model_name = "".join(part.title() for part in table.split("_"))
+
+    sorted_schema = sorted(get_schema(table_reference), key=lambda field: field.name)
+    model_source_code = template.render(
+        BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
+        BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES=BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
+        dataset=dataset,
+        dataset_id=f"{project}.{dataset}",
+        model_name=model_name,
+        project=project,
+        schema=sorted_schema,
+        table=table,
+    )
+    return model_source_code
+
+
+def import_table(table_reference: str, overwrite=False) -> Tuple[Model, Path]:
+    """
+    Creates an `AmoraModel` file from a table reference and returns the model reference.
+    E.g.:
+
+    >>> amora.providers.bigquery.import_table("amora-data-build-tool.amora.health")
+    """
+    destination_file_path = settings.models_path.joinpath(
+        table_reference.replace("-", "_").replace(".", "/") + ".py"
+    )
+
+    if destination_file_path.exists() and not overwrite:
+        raise ValueError(
+            f"`{destination_file_path}` already exists. "
+            f"Pass `--overwrite` to overwrite file.",
+        )
+
+    project, dataset, table = table_reference.split(".")
+    model_name = "".join(part.title() for part in table.split("_"))
+    sorted_schema = sorted(get_schema(table_reference), key=lambda field: field.name)
+
+    model_source_code = JINJA2_NEW_MODEL_TEMPLATE.render(
+        BIGQUERY_TYPES_TO_PYTHON_TYPES=BIGQUERY_TYPES_TO_PYTHON_TYPES,
+        BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES=BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES,
+        dataset=dataset,
+        dataset_id=f"{project}.{dataset}",
+        model_name=model_name,
+        project=project,
+        schema=sorted_schema,
+        table=table,
+    )
+
+    formatted_source_code = shed(model_source_code)
+
+    destination_file_path.parent.mkdir(parents=True, exist_ok=True)
+    destination_file_path.write_text(data=formatted_source_code)
+
+    logger.info(
+        f"🎉 Amora Model imported",
+        extra=dict(
+            destination_file_path=destination_file_path,
+            model_name=model_name,
+            table_reference=table_reference,
+        ),
+    )
+    return amora_model_for_path(destination_file_path), destination_file_path
 
 
 @log_execution()
