@@ -1,3 +1,5 @@
+import os
+import shutil
 from concurrent import futures
 from typing import Dict, List, Optional
 
@@ -146,6 +148,19 @@ def test(ctx: typer.Context) -> None:
     return_code = pytest.main(pytest_args)
 
     raise typer.Exit(return_code)
+
+
+@app.command()
+def clean() -> None:
+    """
+    Clean compiled files from target.
+    """
+
+    for root, dirs, files in os.walk(settings.target_path):
+        for f in files:
+            os.unlink(os.path.join(root, f))
+        for d in dirs:
+            shutil.rmtree(os.path.join(root, d))
 
 
 app.add_typer(dash.app, name="dash")
