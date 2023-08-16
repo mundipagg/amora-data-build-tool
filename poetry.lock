@@ -353,6 +353,17 @@ moreorless = ">=0.2.0"
 volatile = "*"
 
 [[package]]
+name = "bracex"
+version = "2.3.post1"
+description = "Bash style brace expander."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "bracex-2.3.post1-py3-none-any.whl", hash = "sha256:351b7f20d56fb9ea91f9b9e9e7664db466eb234188c175fd943f8f755c807e73"},
+    {file = "bracex-2.3.post1.tar.gz", hash = "sha256:e7b23fc8b2cd06d3dec0692baabecb249dda94e06a617901ff03a6c56fd71693"},
+]
+
+[[package]]
 name = "cachelib"
 version = "0.9.0"
 description = "A collection of cache libraries in the same API interface."
@@ -3154,14 +3165,17 @@ mkdocs = ">=0.17"
 
 [[package]]
 name = "mkdocs-include-markdown-plugin"
-version = "5.1.0"
+version = "6.0.0"
 description = "Mkdocs Markdown includer plugin."
 optional = false
 python-versions = "<3.13,>=3.8"
 files = [
-    {file = "mkdocs_include_markdown_plugin-5.1.0-py3-none-any.whl", hash = "sha256:e9ca188ab1d86f5fc4a6b96ce8c85acf6e25f114897868041056ec7945f29f65"},
-    {file = "mkdocs_include_markdown_plugin-5.1.0.tar.gz", hash = "sha256:4a1b8d79a0e1b6fd357ca8013a6d1701c755ada4acb74ee97b0642d1afe6756e"},
+    {file = "mkdocs_include_markdown_plugin-6.0.0-py3-none-any.whl", hash = "sha256:098a3abbebcd72c9081bdc2348f38e400d6a9f340e99b58c006ec54b14ecb1c7"},
+    {file = "mkdocs_include_markdown_plugin-6.0.0.tar.gz", hash = "sha256:3b84820d0805a94f9a8767c7a204d8e83d2ee7fc433fb4779dd21001826e20bf"},
 ]
+
+[package.dependencies]
+wcmatch = ">=8,<9"
 
 [package.extras]
 cache = ["platformdirs"]
@@ -5606,6 +5620,20 @@ files = [
 anyio = ">=3.0.0"
 
 [[package]]
+name = "wcmatch"
+version = "8.4.1"
+description = "Wildcard/glob file name matcher."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "wcmatch-8.4.1-py3-none-any.whl", hash = "sha256:3476cd107aba7b25ba1d59406938a47dc7eec6cfd0ad09ff77193f21a964dee7"},
+    {file = "wcmatch-8.4.1.tar.gz", hash = "sha256:b1f042a899ea4c458b7321da1b5e3331e3e0ec781583434de1301946ceadb943"},
+]
+
+[package.dependencies]
+bracex = ">=2.1.1"
+
+[[package]]
 name = "webencodings"
 version = "0.5.1"
 description = "Character encoding aliases for legacy web content"
@@ -5933,4 +5961,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "b60bd4206af3bfe8e43745a1bebb597c0b443ddecb41aa4cf39afd7baa61a17e"
+content-hash = "d763531e52e09b26e3ac0ad8e497509d77b07f6294e36ffc690cc15a5ccdb706"
