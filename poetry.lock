@@ -822,13 +822,13 @@ files = [
 
 [[package]]
 name = "dash"
-version = "2.11.1"
+version = "2.12.1"
 description = "A Python framework for building reactive web-apps. Developed by Plotly."
 optional = true
 python-versions = ">=3.6"
 files = [
-    {file = "dash-2.11.1-py3-none-any.whl", hash = "sha256:a5b55efc7f139538d95331fa0b5ee0d21600f7dafa9cce4fe4f887b773aba01a"},
-    {file = "dash-2.11.1.tar.gz", hash = "sha256:1acc4c634311cb306a1086fff315c1f2aaa3898bac362d93bc8db6b1a6474e5c"},
+    {file = "dash-2.12.1-py3-none-any.whl", hash = "sha256:23fcde95e59e353c34712c8fa3e90e784a7247a9e5f6ef47e467add10b7e91ab"},
+    {file = "dash-2.12.1.tar.gz", hash = "sha256:c7d3dccafff2d041a371dcf5bbb2a1701a38ca178c12dce93e64207e3aecbaeb"},
 ]
 
 [package.dependencies]
@@ -852,6 +852,7 @@ requests = [
 ]
 retrying = "*"
 selenium = {version = ">=3.141.0,<=4.2.0", optional = true, markers = "extra == \"testing\""}
+setuptools = "*"
 typing-extensions = ">=4.1.1"
 waitress = {version = ">=1.4.4", optional = true, markers = "extra == \"testing\""}
 Werkzeug = "<2.3.0"
@@ -5962,4 +5963,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "d763531e52e09b26e3ac0ad8e497509d77b07f6294e36ffc690cc15a5ccdb706"
+content-hash = "de59e2d98da400026cb1fd4f86930b40e1c880a7cce651f53c12f365e2741f34"
