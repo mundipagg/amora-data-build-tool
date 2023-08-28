@@ -1569,16 +1569,6 @@ ssh = ["paramiko"]
 tqdm = ["tqdm"]
 
 [[package]]
-name = "future"
-version = "0.18.3"
-description = "Clean single-source support for Python 3 and 2"
-optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-files = [
-    {file = "future-0.18.3.tar.gz", hash = "sha256:34a17436ed1e96697a86f9de3d15a3b0be01d8bc8de9c1dffd59fb8234ed5307"},
-]
-
-[[package]]
 name = "gcsfs"
 version = "2022.11.0"
 description = "Convenient Filesystem interface over GCS"
@@ -1752,7 +1742,7 @@ tqdm = ["tqdm (>=4.7.4,<5.0.0dev)"]
 name = "google-cloud-bigquery-storage"
 version = "2.19.1"
 description = "Google Cloud Bigquery Storage API client library"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "google-cloud-bigquery-storage-2.19.1.tar.gz", hash = "sha256:0d9b5f42a703f3210b4b3ad45a18139191f934740fdf3629b1b22fd95adf0bba"},
@@ -4160,7 +4150,7 @@ test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
 name = "pyarrow"
 version = "11.0.0"
 description = "Python library for Apache Arrow"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "pyarrow-11.0.0-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:40bb42afa1053c35c749befbe72f6429b7b5f45710e85059cdd534553ebcf4f2"},
@@ -5022,28 +5012,26 @@ sqlcipher = ["sqlcipher3-binary"]
 
 [[package]]
 name = "sqlalchemy-bigquery"
-version = "1.6.1"
+version = "1.8.0"
 description = "SQLAlchemy dialect for BigQuery"
 optional = false
 python-versions = ">=3.7, <3.12"
 files = [
-    {file = "sqlalchemy-bigquery-1.6.1.tar.gz", hash = "sha256:352fe5e1d2a9d2991a88c501a97624912e4b59b4b5c0d6a98c63b7228f37ea4e"},
-    {file = "sqlalchemy_bigquery-1.6.1-py2.py3-none-any.whl", hash = "sha256:e9ce790d5172fbcc867b4fc92ec5047ad5e906e0121691907aab86e8a69adb65"},
+    {file = "sqlalchemy-bigquery-1.8.0.tar.gz", hash = "sha256:fdc58cc23415b9e251dc90a97052a4831894c15b1b54911909d746696eba6f38"},
+    {file = "sqlalchemy_bigquery-1.8.0-py2.py3-none-any.whl", hash = "sha256:d755a9f820c373858cc799fd4b03d334fb1c372e21a6d224f82eb4f10db00124"},
 ]
 
 [package.dependencies]
-future = "*"
 google-api-core = ">=1.31.5,<2.0.dev0 || >2.3.0,<3.0.0dev"
 google-auth = ">=1.25.0,<3.0.0dev"
 google-cloud-bigquery = ">=2.25.2,<4.0.0dev"
-google-cloud-bigquery-storage = ">=2.0.0,<3.0.0dev"
 packaging = "*"
-pyarrow = ">=3.0.0"
 sqlalchemy = ">=1.2.0,<2.0.0dev"
 
 [package.extras]
 alembic = ["alembic"]
-all = ["GeoAlchemy2", "alembic", "packaging", "pytz", "shapely"]
+all = ["GeoAlchemy2", "alembic", "google-cloud-bigquery-storage (>=2.0.0,<3.0.0dev)", "grpcio (>=1.47.0,<2.0dev)", "grpcio (>=1.49.1,<2.0dev)", "packaging", "pyarrow (>=3.0.0)", "pytz", "shapely"]
+bqstorage = ["google-cloud-bigquery-storage (>=2.0.0,<3.0.0dev)", "grpcio (>=1.47.0,<2.0dev)", "grpcio (>=1.49.1,<2.0dev)", "pyarrow (>=3.0.0)"]
 geography = ["GeoAlchemy2", "shapely"]
 tests = ["packaging", "pytz"]
 
