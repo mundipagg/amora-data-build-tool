@@ -32,7 +32,7 @@ jobs:
         run: sudo apt-get install libxml2-dev libxslt-dev
 
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🐍 Install python ${{ matrix.python }}
         uses: actions/setup-python@v4
