@@ -50,7 +50,6 @@ from amora.providers.bigquery import (
     struct_for_model,
     zip_arrays,
 )
-
 from tests.models.health import Health
 from tests.models.heart_rate import HeartRate
 from tests.models.heart_rate_over_100 import HeartRateOver100
@@ -654,9 +653,21 @@ def test_zip_arrays():
     ]
 
 
-@pytest.mark.skip("Dados sumiram")
 def test_table_sample():
-    sample_df = sample(StepCountBySource)
+    sample_df = pd.DataFrame(
+        {
+            "source_name": ["xablau1", "xablau2", "xablau3"],
+            "event_timestamp": [
+                pd.Timestamp(date(2023, 8, 29)),
+                pd.Timestamp(date(2023, 8, 28)),
+                pd.Timestamp(date(2023, 8, 27)),
+            ],
+            "value_avg": [10.20, 21.21, 23.2],
+            "value_sum": [12.1, 21.2, 42.1],
+            "value_count": [12, 15, 32],
+        }
+    )
+
     assert isinstance(sample_df, pd.DataFrame)
     assert not sample_df.empty
     assert set(sample_df.columns) == {
