@@ -877,13 +877,13 @@ files = [
 
 [[package]]
 name = "dash-bootstrap-components"
-version = "1.4.2"
+version = "1.5.0"
 description = "Bootstrap themed components for use in Plotly Dash"
 optional = true
 python-versions = ">=3.7, <4"
 files = [
-    {file = "dash-bootstrap-components-1.4.2.tar.gz", hash = "sha256:b7514be30e229a1701db5010a47d275882a94d1efff4c803ac42a9d222ed86e0"},
-    {file = "dash_bootstrap_components-1.4.2-py3-none-any.whl", hash = "sha256:4f59352a2f81cb0c41ae75dd3e0814f64049a4520f935397298e9a093ace727c"},
+    {file = "dash-bootstrap-components-1.5.0.tar.gz", hash = "sha256:083158c07434b9965e2d6c3e8ca72dbbe47dab23e676258cef9bf0ad47d2e250"},
+    {file = "dash_bootstrap_components-1.5.0-py3-none-any.whl", hash = "sha256:b487fec1a85e3d6a8564fe04c0a9cd9e846f75ea9e563456ed3879592889c591"},
 ]
 
 [package.dependencies]
