@@ -822,13 +822,13 @@ files = [
 
 [[package]]
 name = "dash"
-version = "2.12.1"
+version = "2.13.0"
 description = "A Python framework for building reactive web-apps. Developed by Plotly."
 optional = true
 python-versions = ">=3.6"
 files = [
-    {file = "dash-2.12.1-py3-none-any.whl", hash = "sha256:23fcde95e59e353c34712c8fa3e90e784a7247a9e5f6ef47e467add10b7e91ab"},
-    {file = "dash-2.12.1.tar.gz", hash = "sha256:c7d3dccafff2d041a371dcf5bbb2a1701a38ca178c12dce93e64207e3aecbaeb"},
+    {file = "dash-2.13.0-py3-none-any.whl", hash = "sha256:ca21f01f720652c7e2d16d04d4e27803c2b60c4c2a382e750c3d8d778c06e209"},
+    {file = "dash-2.13.0.tar.gz", hash = "sha256:07c192db694b9bb4c87d57b6da877413f2695bfcb1d5c51f08995de7dcdd1e92"},
 ]
 
 [package.dependencies]
@@ -5954,4 +5954,4 @@ feature-store = ["feast", "prometheus-fastapi-instrumentator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "133af7fb3f738801e968d036bfba0fb452a7f835e5e9e325b2bea76ebc423779"
+content-hash = "08b74694d5a7ffb1efe30e13335cc30f1ef1b39b2bf1aa2353300e7ea57ae2a2"
