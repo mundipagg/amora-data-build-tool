@@ -3163,13 +3163,13 @@ mkdocs = ">=0.17"
 
 [[package]]
 name = "mkdocs-include-markdown-plugin"
-version = "6.0.0"
+version = "6.0.1"
 description = "Mkdocs Markdown includer plugin."
 optional = false
 python-versions = "<3.13,>=3.8"
 files = [
-    {file = "mkdocs_include_markdown_plugin-6.0.0-py3-none-any.whl", hash = "sha256:098a3abbebcd72c9081bdc2348f38e400d6a9f340e99b58c006ec54b14ecb1c7"},
-    {file = "mkdocs_include_markdown_plugin-6.0.0.tar.gz", hash = "sha256:3b84820d0805a94f9a8767c7a204d8e83d2ee7fc433fb4779dd21001826e20bf"},
+    {file = "mkdocs_include_markdown_plugin-6.0.1-py3-none-any.whl", hash = "sha256:cbb71f06bf6bd03312f0ff79e1aed198ad13c0ff4fcaf5bb7fe5da385fba4849"},
+    {file = "mkdocs_include_markdown_plugin-6.0.1.tar.gz", hash = "sha256:eb8832b36a72c1c416baec666eeed057c2e613e8b07b353e86fa518157858b0a"},
 ]
 
 [package.dependencies]
