@@ -919,13 +919,13 @@ dash = "*"
 
 [[package]]
 name = "dash-extensions"
-version = "1.0.3"
+version = "1.0.4"
 description = "Extensions for Plotly Dash."
 optional = true
 python-versions = ">=3.8,<4"
 files = [
-    {file = "dash_extensions-1.0.3-py3-none-any.whl", hash = "sha256:34d8871c6e7ee93ba39f3abc72bd3161cec25352255caf82894071f373509624"},
-    {file = "dash_extensions-1.0.3.tar.gz", hash = "sha256:cec84f601c39a47b7a01686be3e2227f0e7e8bbe79466f4f6fb01f36d71a351a"},
+    {file = "dash_extensions-1.0.4-py3-none-any.whl", hash = "sha256:2bf3622db6327bb3ffdc86be180ff40d6fc04674698840ffcd6fac0838b83a1e"},
+    {file = "dash_extensions-1.0.4.tar.gz", hash = "sha256:badc238c3e276324a2d90dc2e789d83ce2e5343e13a66d74f771610f920a16dd"},
 ]
 
 [package.dependencies]
