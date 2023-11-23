@@ -23,8 +23,6 @@ jobs:
         python: ["3.9"]
         experimental: [false]
         include:
-          - python: "3.8"
-            experimental: true
           - python: "3.10"
             experimental: true
     steps:
@@ -67,7 +65,9 @@ jobs:
         run: poetry run py.test --cov=amora --cov-report=term-missing --cov-report=xml ./tests
 
       - name: 🧪 Mypy - Static type check
-        run: poetry run mypy --xml-report .mypy_coverage --html-report .mypy_coverage --ignore-missing-imports --pretty --no-color-output amora tests examples
+        run:
+          poetry run mypy --xml-report .mypy_coverage --html-report .mypy_coverage
+          --ignore-missing-imports --pretty --no-color-output amora tests examples
 
       - uses: codecov/codecov-action@v3
         with:
