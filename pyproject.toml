@@ -7,7 +7,7 @@ authors = [
     "thulio <thulio.patriota@stone.com.br>",
     "betowxyz <robertom@marinheiro.com.br>",
     "lemosflavio <flavio.lemos@pagar.me>",
-    "eduwxyz <eduardo.machado@pagar.me>"
+    "eduwxyz <eduardo.machado@pagar.me>",
 ]
 license = "MIT"
 classifiers = [
@@ -15,14 +15,13 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: SQL",
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.11"
+python = ">=3.9,<3.11"
 pandas = { version = "^1.3.0", extras = ["output_formatting"] }
 matplotlib = "^3.4.2"
 sqlalchemy-bigquery = "^1.4"
