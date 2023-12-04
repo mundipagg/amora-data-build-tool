@@ -22,7 +22,7 @@ app = typer.Typer(
 
 @app.command()
 def compile(
-    models: Optional[Models] = models_option,
+    models: Models = models_option,
     target: Optional[str] = target_option,
     force: Optional[bool] = force_option,
 ) -> None:
@@ -62,12 +62,9 @@ def compile(
 
 @app.command()
 def materialize(
-    models: Optional[Models] = models_option,
+    models: Models = models_option,
     target: str = target_option,
     draw_dag: bool = typer.Option(False, "--draw-dag"),
-    depends: bool = typer.Option(
-        False, "--depends", help="Flag to materialize also the dependents of the model"
-    ),
     no_compile: bool = typer.Option(
         False,
         "--no-compile",
@@ -78,20 +75,28 @@ def materialize(
     Executes the compiled SQL against the current target database.
     """
     if not no_compile:
-        force = depends and models != []
-        compile(models=models, target=target, force=force)
+        models_without_plus = [
+            model[1:] if model.startswith("+") else model for model in models
+        ]
+
+        contains_plus = any(model.startswith("+") for model in models)
+
+        force = contains_plus and models != []
+        compile(models=models_without_plus, target=target, force=force)
 
     model_to_task: Dict[str, materialization.Task] = {}
 
     for target_file_path in utils.list_target_files():
         task = materialization.Task.for_target(target_file_path)
 
-        if models and target_file_path.stem not in models:
+        if models_without_plus and target_file_path.stem not in models_without_plus:
             continue
 
         model_to_task[task.model.unique_name()] = task
 
-        if depends:
+        model_with_plus = utils.add_plus_prefix(target_file_path.stem)
+
+        if model_with_plus in models:
             for dependency_target_path in utils.recursive_dependencies_targets(
                 task.model
             ):

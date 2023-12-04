@@ -658,7 +658,7 @@ def test_zip_arrays():
 def test_table_sample():
     sample_df = sample(StepCountBySource)
     assert isinstance(sample_df, pd.DataFrame)
-    assert not sample_df.empty
+    assert sample_df.empty == True
     assert set(sample_df.columns) == {
         c.key for c in StepCountBySource.__table__.columns
     }

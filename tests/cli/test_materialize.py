@@ -138,7 +138,7 @@ def test_materialize_with_depends_options(
 
     result = runner.invoke(
         app,
-        ["materialize", "--model", "heart_agg", "--depends"],
+        ["materialize", "--model", "+heart_agg"],
     )
 
     assert result.exit_code == 0
