@@ -47,7 +47,6 @@ from amora.logger import log_execution, logger
 from amora.models import (
     SQLALCHEMY_METADATA_KEY,
     AmoraModel,
-    Field,
     MaterializationTypes,
     Model,
 )
@@ -136,8 +135,8 @@ class TimePart(Enum):
 
 @dataclasses.dataclass
 class DryRunResult(BaseResult):
-    model: Model
-    schema: Optional[Schema]
+    model: Optional[Model] = None
+    schema: Optional[Schema] = None
 
     @property
     def estimated_cost(self):
@@ -180,11 +179,36 @@ def get_schema(table_id: str) -> Schema:
     return table.schema
 
 
-def column_for_schema_field(schema: SchemaField, **kwargs) -> dataclasses.Field:
+def column_for_schema_field(schema: SchemaField, **kwargs) -> Column:
     """
-    Build a `Column` from a `google.cloud.bigquery.schema.SchemaField`
+    Build a SQLAlchemy `Column` from a Google BigQuery `SchemaField`.
 
-    Read more: https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#tablefieldschema
+    This function generates a column object that represents a single field in a BigQuery table. It maps the data
+    type of the input schema field to the corresponding SQLAlchemy data type. If the field is an array or a record,
+    the function recursively generates the appropriate column object.
+
+    Args:
+        schema (google.cloud.bigquery.schema.SchemaField): A `SchemaField` object that represents the field in a BigQuery table.
+        **kwargs: Optional keyword arguments that will be passed to the `Column` constructor.
+
+    Returns:
+        sqlalchemy.sql.schema.Column: A `Column` object that represents the input schema field.
+
+    Raises:
+        KeyError: If the input schema field has an unsupported data type.
+
+    See Also:
+        https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#tablefieldschema: The official documentation for the `SchemaField` object.
+
+    Example:
+        To create a table in SQLAlchemy that has the same schema as a BigQuery table:
+
+        ```
+        bq_client = bigquery.Client()
+        table_ref = bq_client.get_table('my_dataset.my_table')
+        columns = [column_for_schema_field(field) for field in table_ref.schema]
+        table = Table('my_table', metadata, *columns)
+        ```
     """
     if schema.mode == "REPEATED":
         if schema.field_type == "RECORD":
@@ -197,7 +221,7 @@ def column_for_schema_field(schema: SchemaField, **kwargs) -> dataclasses.Field:
         else:
             column_type = BIGQUERY_TYPES_TO_SQLALCHEMY_TYPES[schema.field_type]
 
-    return Field(column_type, **kwargs)
+    return Column(column_type, name=schema.name, **kwargs)
 
 
 def schema_for_struct(struct: STRUCT) -> Schema:
@@ -358,15 +382,38 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
         )
 
     query = compile_statement(source)
+    return dry_run_query(query)
+
+
+def dry_run_query(query: str):
+    """
+    Allows you to perform a dry run of a SQL query using the Google Cloud BigQuery API.
+    A dry run is a method of testing a query without actually executing it, to estimate the amount of data
+    that would be processed and the cost of the query.
+
+    Args:
+        query (str): The SQL query to perform a dry run for.
+
+    Returns:
+        DryRunResult: A named tuple containing information about the dry run query job, including the job ID,
+        total bytes processed, referenced tables, query text, schema, and user email. Returns `None` if the query
+        contains model references that are not materialized.
+
+    Examples:
+        >>> dry_run_query("SELECT * FROM mydataset.mytable")
+        DryRunResult(job_id='my-job-id', total_bytes=123456, referenced_tables=['mydataset.mytable'],
+        query='SELECT * FROM mydataset.mytable', schema=[('column1', 'STRING'), ('column2', 'INTEGER')],
+        user_email='amora@stone.com.br')
+    """
     try:
-        query_job = client.query(
+        query_job = get_client().query(
             query=query,
             job_config=QueryJobConfig(dry_run=True, use_query_cache=False),
         )
     except NotFound:
         logger.exception(
             "The query may contain model references that are not materialized.",
-            extra={"sql": query},
+            extra={"query": query},
         )
         return None
     else:
@@ -378,7 +425,6 @@ def dry_run(model: Model) -> Optional[DryRunResult]:
                 for table in query_job.referenced_tables
             ],
             query=query,
-            model=model,
             schema=query_job.schema,
             user_email=query_job.user_email,
         )

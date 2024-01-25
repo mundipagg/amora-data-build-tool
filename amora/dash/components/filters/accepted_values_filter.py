@@ -1,7 +1,7 @@
 from dash import dcc, html
 from dash.development.base_component import Component
 
-from amora.dashboards import AcceptedValuesFilter
+from amora.filters import AcceptedValuesFilter
 
 
 def layout(filter: AcceptedValuesFilter) -> Component:
@@ -9,9 +9,9 @@ def layout(filter: AcceptedValuesFilter) -> Component:
         [
             filter.title,
             dcc.Dropdown(
-                id=filter.id,
-                options=filter.values,
-                value=filter.default or filter.values,
+                id=filter.field,
+                options=filter.selectable_values,
+                value=filter.default,
                 multi=True,
             ),
         ]

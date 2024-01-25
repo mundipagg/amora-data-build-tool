@@ -8,7 +8,7 @@ from amora.models import AmoraModel, Field, Label, MaterializationTypes, ModelCo
 from amora.protocols import Compilable
 from amora.questions import question
 from amora.transformations import datetime_trunc_hour
-from amora.visualization import BigNumber
+from amora.visualization import BigNumber, LineChart
 
 from tests.models.steps import Steps
 
@@ -71,4 +71,19 @@ class StepCountBySource(AmoraModel):
 
 @question(view_config=BigNumber())
 def how_many_data_points_where_acquired():
-    return select(func.sum(StepCountBySource.value_count).label("total"))
+    return select(
+        func.sum(StepCountBySource.value_count).label("total"),
+        StepCountBySource.source_name,
+    ).group_by(StepCountBySource.source_name)
+
+
+@question(
+    view_config=LineChart(x_func=lambda df: df["day"], y_func=lambda df: df["total"])
+)
+def how_many_data_points_where_acquired_per_day():
+    day = func.date(StepCountBySource.event_timestamp).label("day")
+    return select(
+        func.sum(StepCountBySource.value_count).label("total"),
+        StepCountBySource.source_name,
+        day,
+    ).group_by(StepCountBySource.source_name, day)

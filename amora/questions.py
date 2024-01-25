@@ -1,15 +1,36 @@
+import unicodedata
 from datetime import date
-from typing import Callable, Optional, Set
+from typing import Callable, List, Optional, Set
 
 import pandas as pd
+from sqlalchemy import Column
 
 from amora.compilation import compile_statement
 from amora.protocols import Compilable
-from amora.providers.bigquery import run
+from amora.providers import bigquery
 from amora.storage import cache
 from amora.visualization import Table, Visualization, VisualizationConfig
 
 QuestionFunc = Callable[[], Compilable]
+
+
+def parse_name(question_name: str, replace_non_alpha_to: str = "_"):
+    """
+    Parses a string to a valid Python function name.
+
+    Args:
+        question_name: Question name to parse
+
+    Returns:
+        A valid Python function name
+    """
+    s = question_name.replace("?", "")
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = s.encode("ascii", "ignore").decode("ascii")
+    s = "".join(c if c.isalnum() else replace_non_alpha_to for c in s)
+    s = s.lower()
+    return s
 
 
 class Question:
@@ -24,9 +45,10 @@ class Question:
     Lets define a new data question:
 
     ```python
+    from examples.models.step_count_by_source import StepCountBySource
+
     from amora.models import select
     from amora.questions import question
-    from examples.models.step_count_by_source import StepCountBySource
 
 
     @question
@@ -158,8 +180,23 @@ class Question:
         2            11644600.0        116446.00            116.44600        iPhone
         ```
         """
-        result = run(self.question_func())
+        result = bigquery.run(self.question_func())
         return result.rows.to_dataframe(create_bqstorage_client=False)
+
+    def answer_columns(self) -> List[Column]:
+        """
+        Returns an iterable of SQLAlchemy `Column` objects that correspond to the columns returned by executing the
+        SQL query associated with this `Question` instance.
+
+        Returns:
+            Iterable[sqlalchemy.sql.schema.Column]: An iterable of `Column` objects that correspond to the columns returned
+            by executing the SQL query associated with this `Question` instance.
+
+        Raises:
+            google.api_core.exceptions.GoogleAPIError: If the query job fails.
+        """
+        result = bigquery.dry_run_query(self.sql)
+        return [bigquery.column_for_schema_field(field) for field in result.schema]
 
     @property
     def uid(self) -> str:
@@ -172,16 +209,24 @@ class Question:
         return Visualization(data=self.answer_df(), config=self.view_config)
 
     def to_markdown(self) -> str:
+        return "\n".join(
+            [
+                f"## {self.name}",
+                f"```sql \n {self.sql} \n```",
+                f"### Answer",
+                self.answer_df().to_markdown(),
+            ]
+        )
+
+    def to_html(self):
         return f"""
-            ## {self.name}
+            <h2>{self.name}</h2>
 
-            ```sql
-            {self.sql}
-            ```
+            <pre><code>{self.sql}</code></pre>
 
-            ### Answer
+            <h3>Answer</h3>
 
-            {self.answer_df().to_markdown()}
+            {self.answer_df().to_html()}
         """
 
     def _repr_markdown_(self):

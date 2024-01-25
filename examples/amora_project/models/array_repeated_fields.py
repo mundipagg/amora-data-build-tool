@@ -15,7 +15,7 @@ class ArrayRepeatedFields(AmoraModel):
 
     str_arr: List[str] = Field(ARRAY(String))
     int_arr: List[int] = Field(ARRAY(Integer))
-    id: str = Field(primary_key=True)
+    id: str = Field(String, primary_key=True)
 
     @classmethod
     def source(cls) -> Compilable:

@@ -26,13 +26,7 @@ from sqlalchemy_bigquery.base import BQArray
 
 from amora.compilation import compile_statement
 from amora.config import settings
-from amora.models import (
-    SQLALCHEMY_METADATA_KEY,
-    AmoraModel,
-    Field,
-    MaterializationTypes,
-    ModelConfig,
-)
+from amora.models import AmoraModel, Field, MaterializationTypes, ModelConfig
 from amora.protocols import Compilable
 from amora.providers.bigquery import (
     DryRunResult,
@@ -323,7 +317,6 @@ def test_schema_for_model():
                 SchemaField("key", "INTEGER", "NULLABLE", None, None, (), None),
                 SchemaField("value", "STRING", "NULLABLE", None, None, (), None),
             ),
-            None,
         ),
         SchemaField(
             "a_struct",
@@ -335,7 +328,6 @@ def test_schema_for_model():
                 SchemaField("id", "INTEGER", "NULLABLE", None, None, (), None),
                 SchemaField("label", "STRING", "NULLABLE", None, None, (), None),
             ),
-            None,
         ),
     ]
 
@@ -407,10 +399,7 @@ def test_column_for_schema_field_on_struct_field():
     )
     column = column_for_schema_field(struct_field)
 
-    assert (
-        column.metadata[SQLALCHEMY_METADATA_KEY].type.get_col_spec()
-        == "STRUCT<id STRING, x INT64, y INT64>"
-    )
+    assert column.type.get_col_spec() == "STRUCT<id STRING, x INT64, y INT64>"
 
 
 def test_columns_for_schema_field_on_repeated_struct_field():
@@ -446,10 +435,7 @@ def test_columns_for_schema_field_on_repeated_struct_field():
         ),
     )
     column = column_for_schema_field(repeated_struct_field)
-    assert (
-        repr(column.metadata[SQLALCHEMY_METADATA_KEY].type)
-        == "ARRAY(STRUCT(id=String(), x=Integer(), y=Integer()))"
-    )
+    assert repr(column.type) == "ARRAY(STRUCT(id=String(), x=Integer(), y=Integer()))"
 
 
 def test_columns_for_schema_field_on_repeated_struct_field_with_repeated_fields():
@@ -494,7 +480,7 @@ def test_columns_for_schema_field_on_repeated_struct_field_with_repeated_fields(
     )
     column = column_for_schema_field(complex_struct_field)
     assert (
-        repr(column.metadata[SQLALCHEMY_METADATA_KEY].type)
+        repr(column.type)
         == "ARRAY(STRUCT(nodes=ARRAY(STRUCT(id=String(), label=String())), edges=ARRAY(STRUCT(from_node=STRUCT(id=String(), label=String()), to_node=STRUCT(id=String(), label=String())))))"
     )
 
